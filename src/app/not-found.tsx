@@ -5,10 +5,10 @@ export default async function NotFound() {
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") ?? "unknown";
 
-  console.error(
-    "404 Error: User attempted to access non-existent route:",
-    pathname
-  );
+  // console.error(
+  //   "404 Error: User attempted to access non-existent route:",
+  //   pathname
+  // );
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted">

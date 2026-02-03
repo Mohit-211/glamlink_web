@@ -13,7 +13,7 @@ const Magazine = () => {
         <MagazineIssues />
       </main>
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
