@@ -1,7 +1,7 @@
-import Header from "@/components/Header";
 import Footer from "@/components/common/Footer";
 import PromosHero from "@/components/promos/PromosHero";
 import PromosEmptyState from "@/components/promos/PromosEmptyState";
+import Header from "@/components/common/Header";
 
 const Promos = () => {
   return (

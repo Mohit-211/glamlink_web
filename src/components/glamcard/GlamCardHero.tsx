@@ -1,139 +1,125 @@
-import { Play, MapPin, Calendar, Star, Sparkles, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+"use client";
 
-const GlamCardHero = () => {
+import React from "react";
+
+interface GlamCardHeroProps {
+  onApplyClick: () => void;
+}
+const GlamCardHero: React.FC<GlamCardHeroProps> = ({
+  onApplyClick,
+}) => {
   return (
-    <section className="py-16 lg:py-24 bg-background relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-primary/5 rounded-full blur-3xl" />
-      </div>
+    <section className="w-full bg-white py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="relative overflow-hidden rounded-[28px] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.12)]">
 
-      <div className="container-glamlink relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left: Content */}
-          <div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
-              <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-medium">The Future of Beauty Business</span>
+          {/* TOP GRADIENT ACCENT */}
+          <div className="absolute left-0 top-0 h-[6px] w-full bg-gradient-to-r from-[#23aeb8] via-[#53bec6] to-[#5cc2d6]" />
+
+          <div className="grid grid-cols-1 gap-14 px-10 py-16 lg:grid-cols-2 lg:px-16">
+
+            {/* LEFT CONTENT */}
+            <div>
+              <h2 className="text-3xl font-semibold text-gray-900">
+                The Link in Bio, Evolved.
+              </h2>
+
+              <p className="mt-6 text-base leading-relaxed text-gray-700">
+                Your digital presence should be as refined as your craft.
+                The <strong>Glam Card</strong> is the new industry standard—a
+                high-conversion storefront designed to turn followers into
+                clients instantly.
+              </p>
+
+              <p className="mt-4 text-base leading-relaxed text-gray-700">
+                Feature a <strong>personal video greeting</strong>, a tour of
+                your space, or a <strong>promo of your signature work</strong>{" "}
+                alongside integrated mapping and{" "}
+                <strong>one-touch booking</strong>.
+              </p>
+
+              <h3 className="mt-8 text-lg font-semibold text-gray-900">
+                Powered by Glamlink. Built for the Beauty + Wellness Pro.
+              </h3>
+
+              <p className="mt-4 text-base leading-relaxed text-gray-700">
+                Centralize your entire brand in one destination—from{" "}
+                <strong>Service Menus</strong> and{" "}
+                <strong>Direct Booking</strong> to{" "}
+                <strong>Clips</strong> and <strong>Photo Albums</strong>.
+              </p>
+
+              <p className="mt-4 text-base leading-relaxed text-gray-700">
+                Build authority with <strong>Verified Reviews</strong> and
+                prepare to scale with an{" "}
+                <strong>Integrated Shop</strong> coming soon.
+              </p>
+
+              {/* GRADIENT BUTTON */}
+              <button
+                className="mt-10 rounded-full px-9 py-4 text-sm font-semibold text-white shadow-lg transition hover:opacity-90"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #23aeb8 0%, #53bec6 50%, #5cc2d6 100%)",
+                }}
+                onClick={() => (window.location.href = "/apply/digital")}
+              >
+                Apply for Your Glam Card
+              </button>
             </div>
 
-            <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-6 leading-tight">
-              The Link in Bio,{' '}
-              <span className="gradient-text">Evolved.</span>
-            </h1>
+            {/* RIGHT CARD */}
+            <div className="flex justify-center lg:justify-end">
+              <div className="relative w-[340px] rounded-2xl bg-white shadow-[0_18px_50px_rgba(0,0,0,0.18)] overflow-hidden">
 
-            <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-              The Glam Card is your high-conversion digital storefront — designed to turn followers 
-              into clients instantly. Go beyond static links with personal video greetings, space tours, 
-              promotional visuals, integrated mapping, and one-touch booking.
-            </p>
+                {/* HEADER */}
+                <div className="px-6 pt-8 text-center">
+                  <h3 className="text-2xl font-medium text-gray-900 leading-snug">
+                    Connected to
+                    <br />
+                    Glamlink Directory + Map
+                  </h3>
 
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              Bridge the gap between discovery and confirmed appointments with a single, powerful link.
-            </p>
-
-            {/* Feature highlights */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              {[
-                { icon: Play, text: 'Video Greetings' },
-                { icon: MapPin, text: 'Integrated Maps' },
-                { icon: Calendar, text: 'One-Touch Booking' },
-                { icon: Star, text: 'Verified Reviews' },
-              ].map((feature, idx) => (
-                <div key={idx} className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <feature.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <span className="text-foreground font-medium">{feature.text}</span>
-                </div>
-              ))}
-            </div>
-
-            <Button className="btn-primary px-8 py-6 text-lg gap-2">
-              Apply for Your Glam Card
-              <ArrowRight className="w-5 h-5" />
-            </Button>
-          </div>
-
-          {/* Right: Phone Mockup */}
-          <div className="relative flex justify-center lg:justify-end">
-            {/* Glow effect */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-80 h-80 bg-primary/20 rounded-full blur-3xl" />
-            </div>
-
-            {/* Phone frame */}
-            <div className="relative w-[320px] lg:w-[360px] bg-card rounded-[3rem] p-3 shadow-2xl border border-border">
-              <div className="bg-background rounded-[2.5rem] overflow-hidden">
-                {/* Status bar */}
-                <div className="h-8 bg-foreground/5 flex items-center justify-center">
-                  <div className="w-20 h-5 bg-foreground/20 rounded-full" />
+                  <p className="mt-2 text-xs tracking-widest text-gray-500">
+                    INCLUDES A GLAMLINK PROFILE
+                  </p>
                 </div>
 
-                {/* Card content */}
-                <div className="p-6">
-                  {/* Profile header */}
-                  <div className="text-center mb-6">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 mx-auto mb-4 flex items-center justify-center">
-                      <span className="text-3xl font-bold text-primary">M</span>
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground">Maya Rodriguez</h3>
-                    <p className="text-muted-foreground">Hair Stylist & Colorist</p>
-                    <div className="flex items-center justify-center gap-1 mt-2">
-                      <Star className="w-4 h-4 text-warning fill-warning" />
-                      <span className="text-sm font-medium text-foreground">4.9</span>
-                      <span className="text-sm text-muted-foreground">(127 reviews)</span>
-                    </div>
+                {/* SEARCH */}
+                <div className="mt-6 flex items-center gap-3 px-6">
+                  <div className="flex-1 rounded-full border px-4 py-2 text-sm text-gray-600">
+                    www.glamlink.net
                   </div>
-
-                  {/* Quick actions */}
-                  <div className="grid grid-cols-3 gap-3 mb-6">
-                    {['Book', 'Message', 'Shop'].map((action) => (
-                      <button
-                        key={action}
-                        className="py-3 rounded-xl bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
-                      >
-                        {action}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Gallery preview */}
-                  <div className="grid grid-cols-3 gap-2 mb-6">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="aspect-square rounded-xl bg-secondary" />
-                    ))}
-                  </div>
-
-                  {/* Location */}
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="w-4 h-4 text-primary" />
-                    <span>Brooklyn, NY</span>
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full border text-sm">
+                    🔍
                   </div>
                 </div>
+
+                {/* MOCKUPS */}
+                <div className="relative mt-8 px-6">
+                  <img
+                    src="/directory-laptop.png"
+                    alt="Directory Laptop"
+                    className="w-full rounded-lg"
+                  />
+                  <img
+                    src="/directory-mobile.png"
+                    alt="Directory Mobile"
+                    className="absolute -bottom-6 left-6 w-[90px] rounded-lg shadow-xl"
+                  />
+                </div>
+
+                {/* FOOTER GRADIENT */}
+                <div className="mt-12 bg-gradient-to-t from-black to-transparent px-6 py-6 text-center">
+                  <p className="text-xs tracking-widest text-white">
+                    www.glamlink.net
+                  </p>
+                </div>
+
               </div>
             </div>
 
-            {/* Floating badge */}
-            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 bg-primary text-primary-foreground rounded-full shadow-lg font-medium text-sm">
-              ACCESS by Glamlink
-            </div>
           </div>
-        </div>
-
-        {/* Ecosystem section */}
-        <div className="mt-20 lg:mt-28 text-center max-w-3xl mx-auto">
-          <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-4">
-            Powered by Glamlink.{' '}
-            <span className="text-muted-foreground">Built for the Beauty + Wellness Pro.</span>
-          </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Glamlink centralizes your service menus, direct booking, clips, photo albums, 
-            verified reviews, and future integrated shop into one professional destination. 
-            The Glam Card is the front door — Glamlink is the engine behind your scalable growth.
-          </p>
         </div>
       </div>
     </section>

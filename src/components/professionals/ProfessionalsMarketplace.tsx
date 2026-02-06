@@ -1,3 +1,4 @@
+'use client'
 import { Search, Filter, MapPin, Star, Instagram, MessageCircle, ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';

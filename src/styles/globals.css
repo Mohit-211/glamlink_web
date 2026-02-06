@@ -260,3 +260,24 @@
     }
   }
 }
+.ck-editor__editable {
+  min-height: 120px;
+  font-size: 14px;
+  padding: 12px 16px;
+}
+
+.ck.ck-editor__main > .ck-editor__editable {
+  border: none;
+}
+
+.ck.ck-toolbar {
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+}
+.ck-editor__editable {
+  min-height: 160px;
+  padding: 12px;
+}
+.ck.ck-editor__main > .ck-editor__editable {
+  border: none;
+}
