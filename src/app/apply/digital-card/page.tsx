@@ -9,7 +9,7 @@ const GlamCardHero = dynamic(
 );
 
 const GlamCardApplication = dynamic(
-  () => import("@/components/glamcard/GlamCardApplication"),
+  () => import("@/components/glamcard/GlamCardForm/GlamCardApplication"),
   { ssr: false }
 );
 

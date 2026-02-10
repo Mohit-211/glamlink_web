@@ -43,7 +43,7 @@ const AccessSection: React.FC = () => {
       }}
       className="mt-10 rounded-full px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:opacity-90"
     >
-      Claim Your FREE Digital Card
+      Claim Your FREE Access Card
     </button>
 
           </div>

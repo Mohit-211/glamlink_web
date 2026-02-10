@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import BasicInfoForm from "./BasicInfoForm";
-import MediaAndProfileForm from "./MediaAndProfileForm";
-import ServicesAndBookingForm from "./ServicesAndBookingForm";
-import GlamlinkIntegrationForm from "./GlamlinkIntegrationForm";
+
 import SuccessModal from "@/components/SuccessModal";
 import { GlamCardFormData } from "./types";
+import BasicInfoForm from "./BasicInfoForm";
+import MediaAndProfileForm from "../MediaAndProfileForm";
+import GlamlinkIntegrationForm from "./GlamlinkIntegrationForm";
+import ServicesAndBookingForm from "./ServicesAndBookingForm";
 
 interface Props {
   data: GlamCardFormData;
@@ -54,6 +55,8 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
         "important_info",
         "excites_about_glamlink",
         "biggest_pain_points",
+        "specialties",
+        "locations"
       ] as const;
 
       jsonFields.forEach(field => {

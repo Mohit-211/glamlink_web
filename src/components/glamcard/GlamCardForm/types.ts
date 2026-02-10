@@ -6,17 +6,20 @@ export interface BusinessHour {
   closed?: boolean;
 }
 export interface Location {
+  // id(id: any, arg1: { isOpen: boolean; }): void;
+  isOpen: any;
   id: string;
   label: string;
-  type: "exact" | "city";
+  location_type: "exact_address" | "city_only";
   address: string;
   city: string;
+  area?: string;
   state: string;
   business_name: string;
   phone: string;
   description: string;
   isPrimary: boolean;
-  isOpen: boolean;
+  // isOpen: boolean;
 }
 export interface GalleryMetaItem {
   id: string;

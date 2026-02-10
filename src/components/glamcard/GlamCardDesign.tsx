@@ -1,8 +1,8 @@
 'use client';
-// GlamCardDesign.tsx
+
 import axios from "axios";
-import GlamCardLivePreview from "./GlamCardLivePreview";
 import { useEffect, useState } from "react";
+import GlamCardLivePreview from "./GlamCardLivePreview";
 import { GlamCardFormData } from "./GlamCardForm/types";
 
 interface Props {
@@ -18,14 +18,16 @@ const GlamCardDesign: React.FC<Props> = ({ slug }) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
+        const res = await axios.get(
           `https://node.glamlink.net:5000/api/v1/businessCard/getBusinessCard/${slug}`
         );
-console.log(response,"====")
-        if (response.data) {
-          setData(response?.data?.data); // assuming API returns GlamCardFormData structure
+
+        if (res?.data?.data) {
+          setData(res.data.data);
+        } else {
+          setError("No business card found.");
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error(err);
         setError("Failed to load business card.");
       } finally {
@@ -36,15 +38,26 @@ console.log(response,"====")
     fetchData();
   }, [slug]);
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
-  if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
-  if (!data) return <p className="text-center mt-10">No data found.</p>;
+  if (loading) {
+    return <p className="mt-20 text-center">Loading...</p>;
+  }
+
+  if (error) {
+    return <p className="mt-20 text-center text-red-500">{error}</p>;
+  }
+
+  if (!data) {
+    return <p className="mt-20 text-center">No data found.</p>;
+  }
 
   return (
-  <div className="max-w-4xl mx-auto p-4 mt-20">
-  <GlamCardLivePreview data={data} />
-</div>
-
+    <div className="max-w-4xl mx-auto p-4 mt-20">
+      <GlamCardLivePreview
+        data={data}
+        mode="view"   // 🔥 IMPORTANT
+        sticky={false}
+      />
+    </div>
   );
 };
 

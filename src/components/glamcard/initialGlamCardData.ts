@@ -9,7 +9,7 @@ export const initialGlamCardData: GlamCardFormData = {
   bio: "Award-winning stylist with 8+ years of experience.",
 
   primary_specialty: "Hair Styling & Color",
-  specialties: ["Balayage", "Color Correction", "Bridal Styling"],
+  specialties: [],
 
   // gallery_meta: [],
   custom_handle: "luxebeauty",

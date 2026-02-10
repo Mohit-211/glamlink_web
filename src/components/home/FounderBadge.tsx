@@ -1,71 +1,80 @@
-import { Crown, Star, Zap, Gift } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-
-const perks = [
-  "Exclusive Founder Badge on profile",
-  "Priority feature access",
-  "Founding member recognition",
-  "Early access to new tools",
-];
 
 const FounderBadge = () => {
   return (
-    <section className="py-16 lg:py-24 bg-secondary/30">
+    <section className="py-20 bg-white">
       <div className="container-glamlink">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Badge Visual */}
-          <div className="relative inline-block mb-8">
-            <div className="absolute inset-0 bg-warning/20 blur-3xl rounded-full scale-150" />
-            <div className="relative">
-              <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-gradient-to-br from-warning via-warning to-amber-600 flex items-center justify-center shadow-large animate-float">
-                <div className="w-28 h-28 lg:w-36 lg:h-36 rounded-full bg-background flex items-center justify-center border-4 border-warning/30">
-                  <Crown className="w-12 h-12 lg:w-16 lg:h-16 text-warning" />
-                </div>
-              </div>
-              <div className="absolute -top-2 -right-2 badge-founder">
-                <Star className="w-4 h-4 fill-current" />
-              </div>
+        {/* Founder Badge */}
+        <div className="max-w-3xl mx-auto text-center mb-24">
+          {/* Badge Image */}
+          <div className="flex justify-center mb-6">
+            <Image
+              src="https://thumbs.dreamstime.com/b/golden-shield-emblem-empty-badge-symbol-award-merit-recognition-excellence-achievement-security-shiny-polished-metallic-410628199.jpg"
+              alt="Glamlink Founder Shield"
+              width={200}
+              height={200}
+              unoptimized
+              className="rounded-full"
+            />
+          </div>
+
+          <h2 className="text-2xl md:text-3xl font-semibold mb-3 text-foreground">
+            Founder Badge (First 100 Only)
+          </h2>
+
+          <p className="text-muted-foreground mb-2">
+            Early professionals get exclusive visibility, permanent perks, and
+            first access to new tools.
+          </p>
+
+          <p className="text-sm font-medium text-foreground">
+            Join now and be recognized as a Founding Member.
+          </p>
+        </div>
+
+        {/* Download Section */}
+        <div className="max-w-5xl mx-auto text-center">
+          <h2 className="text-2xl md:text-3xl font-semibold mb-3 text-foreground">
+            Download Glamlink for Free
+          </h2>
+
+          <p className="text-muted-foreground mb-12">
+            Whether you're booking a beauty service or building your business.
+          </p>
+
+          {/* Cards */}
+          <div className="grid md:grid-cols-2 gap-6 mb-12">
+            <div className="rounded-xl bg-gray-50 border p-6">
+              <h3 className="font-semibold mb-2 text-foreground">
+                For Users
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Discover trusted pros, book instantly, and shop expert-approved
+                products.
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-gray-50 border p-6">
+              <h3 className="font-semibold mb-2 text-foreground">
+                For Professionals
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Build your brand, grow your client base, and sell products
+                directly.
+              </p>
             </div>
           </div>
 
-          {/* Content */}
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warning/10 text-warning text-sm font-medium mb-6">
-            <Zap className="w-4 h-4" />
-            Limited to First 100 Members
-          </span>
-
-          <h2 className="section-heading text-3xl lg:text-4xl mb-4">
-            Claim Your <span className="text-warning">Founder Badge</span>
-          </h2>
-
-          <p className="section-subheading mx-auto mb-10">
-            Be among the first 100 beauty professionals to join Glamlink and
-            receive exclusive Founder status—a permanent mark of recognition on
-            your profile.
-          </p>
-
-          {/* Perks Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            {perks.map((perk) => (
-              <div
-                key={perk}
-                className="card-glamlink py-4 flex items-center gap-3"
-              >
-                <Gift className="w-5 h-5 text-warning shrink-0" />
-                <span className="text-sm font-medium text-foreground text-left">
-                  {perk}
-                </span>
-              </div>
-            ))}
-          </div>
-
+          {/* Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button className="btn-hero bg-warning hover:bg-warning/90 shadow-none hover:shadow-lg">
-              Claim Founder Badge
+            <Button className="bg-teal-500 hover:bg-teal-600 text-white px-6">
+              Download for Users
             </Button>
-            <span className="text-sm text-muted-foreground">
-              Only 23 spots remaining
-            </span>
+
+            <Button className="bg-black text-white hover:bg-black/90 px-6">
+              Download for Pros
+            </Button>
           </div>
         </div>
       </div>

@@ -105,7 +105,7 @@ export default function ProfessionalsSection() {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="section-heading text-3xl lg:text-4xl mb-4">
-            Meet the <span className="gradient-text">Professionals</span>
+            <span className="gradient-text">   Meet the  Professionals</span>
           </h2>
           <p className="section-subheading mx-auto">
             Browse our curated marketplace of verified beauty experts ready to
@@ -136,11 +136,10 @@ export default function ProfessionalsSection() {
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                activeFilter === filter
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeFilter === filter
                   ? "bg-primary text-primary-foreground shadow-primary"
                   : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-primary/50"
-              }`}
+                }`}
             >
               {filter}
             </button>
@@ -217,11 +216,10 @@ export default function ProfessionalsSection() {
           {[1, 2, 3, 4, 5].map((page) => (
             <button
               key={page}
-              className={`w-10 h-10 rounded-full text-sm font-medium transition-all ${
-                page === 1
+              className={`w-10 h-10 rounded-full text-sm font-medium transition-all ${page === 1
                   ? "bg-primary text-primary-foreground"
                   : "border border-border bg-card text-muted-foreground hover:border-primary hover:text-foreground"
-              }`}
+                }`}
             >
               {page}
             </button>

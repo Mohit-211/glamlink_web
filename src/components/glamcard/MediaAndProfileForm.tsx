@@ -2,9 +2,9 @@
 
 import React, { useState, useCallback, useEffect } from "react";
 import Cropper from "react-easy-crop";
-import Modal from "./Modal";
-import getCroppedImg from "./cropImageHelper";
-import { GalleryMetaItem, GlamCardFormData } from "./types";
+import Modal from "./GlamCardForm/Modal";
+import { GalleryMetaItem, GlamCardFormData } from "./GlamCardForm/types";
+import getCroppedImg from "./GlamCardForm/cropImageHelper";
 
 /* ================= TYPES ================= */
 

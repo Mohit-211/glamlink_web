@@ -1,99 +1,67 @@
 "use client";
 
 import { useState } from "react";
-import { Search, MapPin, Sparkles } from "lucide-react";
+import { Search } from "lucide-react";
 
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <section className="relative pt-24 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-20 right-1/4 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      </div>
-
+    <section className="pt-40 pb-20 bg-white">
       <div className="container-glamlink">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-soft border border-primary/20 mb-8 animate-fade-up">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">
-              Trusted by 10,000+ beauty lovers
-            </span>
-          </div>
-
-          {/* Headline */}
-          <h1
-            className="section-heading text-4xl sm:text-5xl lg:text-6xl mb-6 animate-fade-up"
-            style={{ animationDelay: "0.1s" }}
-          >
-            Discover Beauty Professionals{" "}
-            <span className="gradient-text">Near You</span>
+        {/* Heading */}
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="section-heading text-3xl sm:text-4xl mb-3">
+            Discover Beauty Professionals Near You
           </h1>
 
-          {/* Subheadline */}
-          <p
-            className="section-subheading mx-auto mb-10 animate-fade-up"
-            style={{ animationDelay: "0.2s" }}
-          >
-            Browse verified stylists, makeup artists, and beauty experts by
-            location or specialty. Book instantly and look your best.
+          <p className="section-subheading mb-6">
+            Browse by location or speciality
           </p>
 
-          {/* Search Bar */}
-          <div
-            className="max-w-2xl mx-auto animate-fade-up"
-            style={{ animationDelay: "0.3s" }}
-          >
-            <div className="search-pill flex-col sm:flex-row gap-3 sm:gap-2 p-3 sm:p-2">
-              <div className="flex items-center gap-3 flex-1 px-2">
-                <Search className="w-5 h-5 text-muted-foreground shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Search by name, specialty, or service..."
-                  className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-base"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-
-              <div className="hidden sm:block w-px h-8 bg-border" />
-
-              <div className="flex items-center gap-3 flex-1 px-2">
-                <MapPin className="w-5 h-5 text-muted-foreground shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Location..."
-                  className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-base"
-                />
-              </div>
-
-              <button className="btn-primary shrink-0 py-3 px-6">Search</button>
+          {/* Search */}
+          <div className="flex justify-center mb-4">
+            <div className="relative w-full max-w-md">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search by name, specialty, or location..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-full border border-border px-11 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
             </div>
           </div>
 
-          {/* Popular Searches */}
-          <div
-            className="flex flex-wrap items-center justify-center gap-2 mt-6 animate-fade-up"
-            style={{ animationDelay: "0.4s" }}
-          >
-            <span className="text-sm text-muted-foreground">Popular:</span>
-            {[
-              "Hair Stylist",
-              "Makeup Artist",
-              "Nail Tech",
-              "Lash Artist",
-              "Barber",
-            ].map((tag) => (
-              <button
-                key={tag}
-                className="px-3 py-1.5 rounded-full bg-secondary text-sm font-medium text-secondary-foreground hover:bg-primary/10 hover:text-primary transition-colors"
-              >
-                {tag}
-              </button>
-            ))}
+          <p className="text-sm text-muted-foreground">
+            Showing 4 professionals
+          </p>
+        </div>
+
+        {/* Map + Card */}
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Map */}
+          <div className="lg:col-span-2 rounded-xl border overflow-hidden">
+            <iframe
+              title="Map"
+              src="https://www.google.com/maps?q=Las%20Vegas&z=12&output=embed"
+              className="w-full h-[420px]"
+              loading="lazy"
+            />
+          </div>
+
+          {/* Empty State Card */}
+          <div className="h-[420px] rounded-xl border flex flex-col items-center justify-center text-center bg-white">
+            <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center">
+              <Search className="w-6 h-6 text-muted-foreground" />
+            </div>
+
+            <h3 className="mt-4 text-sm font-semibold text-foreground">
+              Select a Professional
+            </h3>
+            <p className="mt-1 text-xs text-muted-foreground max-w-[220px]">
+              Click on a map marker to view their digital card
+            </p>
           </div>
         </div>
       </div>

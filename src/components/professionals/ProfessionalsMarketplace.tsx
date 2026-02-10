@@ -80,7 +80,7 @@ const ProfessionalsMarketplace = () => {
             Discover Talent
           </span>
           <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Meet The <span className="gradient-text">Professionals</span>
+             <span className="gradient-text"> Meet The Professionals</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Browse our curated marketplace of verified beauty experts. This is where your clients will find you.

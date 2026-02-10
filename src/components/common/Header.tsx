@@ -5,10 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import logo from ".././../../public/Glamlink logo.png";
+import Image from "next/image";
 const navLinks = [
   { label: "Home", href: "/", id: "home" },
   { label: "For Clients", href: "/for-clients", id: "for-clients" },
+  { label: "Journal", href: "/journal", id: "journal" },
+
   {
     label: "For Professionals",
     href: "/for-professionals",
@@ -37,12 +40,15 @@ const Header = ({ activeRoute }: HeaderProps) => {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-xl">
-                G
-              </span>
+            <div className="rounded-xl bg-primary flex items-center justify-center overflow-hidden">
+              <Image
+                src={logo}
+                alt="Glamlink Logo"
+                width={100}  // match the container width
+                height={100} // match the container height
+                className="object-cover"
+              />
             </div>
-            <span className="text-xl font-bold text-foreground">Glamlink</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -51,9 +57,8 @@ const Header = ({ activeRoute }: HeaderProps) => {
               <Link
                 key={link.id}
                 href={link.href}
-                className={`nav-link ${
-                  isActive(link) ? "text-primary after:scale-x-100" : ""
-                }`}
+                className={`nav-link ${isActive(link) ? "text-primary after:scale-x-100" : ""
+                  }`}
               >
                 {link.label}
               </Link>
@@ -90,11 +95,10 @@ const Header = ({ activeRoute }: HeaderProps) => {
                 <Link
                   key={link.id}
                   href={link.href}
-                  className={`text-base font-medium transition-colors ${
-                    isActive(link)
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`text-base font-medium transition-colors ${isActive(link)
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                    }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.label}

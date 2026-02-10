@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import GlamCardLivePreview from "./GlamCardLivePreview";
-import { initialGlamCardData } from "./initialGlamCardData";
-import GlamCardForm from "./GlamCardForm/GlamCardForm";
+import GlamCardLivePreview from "../GlamCardLivePreview";
+import { initialGlamCardData } from "../initialGlamCardData";
+import GlamCardForm from "./GlamCardForm";
 
 const GlamCardApplication: React.FC = () => {
   const [data, setData] = useState(initialGlamCardData);
@@ -14,7 +14,7 @@ const GlamCardApplication: React.FC = () => {
       </div>
 
       {/* RIGHT */}
-      <GlamCardLivePreview data={data} />
+      <GlamCardLivePreview data={data} mode="live" />
     </div>
   );
 };

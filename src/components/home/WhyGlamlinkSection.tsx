@@ -8,6 +8,8 @@ import {
   TrendingUp,
   Wrench,
   CreditCard,
+  CalendarCheck,
+  BarChart2,
 } from "lucide-react";
 
 const clientBenefits = [
@@ -35,29 +37,38 @@ const clientBenefits = [
 
 const proBenefits = [
   {
-    icon: Search,
+    icon: Search,                  // Perfect: magnifying glass = "Get Discovered" / clients find you
     title: "Get Discovered",
     description: "Clients find you based on location & specialty",
   },
   {
-    icon: Calendar,
+    icon: Calendar,                // Good: calendar = scheduling / booking
     title: "Easy Booking",
     description: "Streamlined scheduling that works for you",
   },
   {
-    icon: TrendingUp,
+    icon: CalendarCheck,           // Suggestion: better than plain Calendar — implies confirmed / in-app bookings
+    // Alternative: CalendarPlus (if it's about adding bookings)
+    title: "In-App Booking",
+    description: "Flexible scheduling built for you",
+  },
+  {
+    icon: Wrench,                  // Reasonable: tools / customize = wrench (settings / build)
+    // Suggestion: Settings or Sliders (more UI/customization feel), or Brush (if creative profile styling)
     title: "Grow Your Business",
-    description: "Tools and insights to scale your brand",
+    description: "Customize your profile with services menu, content, reviews and your shop",
   },
   {
-    icon: Wrench,
+    icon: BarChart2,               // Suggestion: better than CreditCard — growth, visibility & stats
+    // Alternative: TrendingUp (already used elsewhere, but fits "visibility and growth")
     title: "Smart Tools",
-    description: "Analytics, messaging, and management",
+    description: "Helpful features to support your visibility and growth",
   },
   {
-    icon: CreditCard,
-    title: "Seamless Payments",
-    description: "Get paid quickly and securely",
+    icon: TrendingUp,              // Excellent fit: growth, evolving platform, upward progress
+    // (You already have TrendingUp earlier — this re-uses it nicely for the final point)
+    title: "Built to Grow With You",
+    description: "A platform evolving alongside modern professionals",
   },
 ];
 
@@ -73,7 +84,7 @@ const WhyGlamlinkSection = () => {
                 For Clients
               </span>
               <h2 className="text-3xl lg:text-4xl font-bold text-foreground mt-2">
-                Why <span className="gradient-text">Glamlink</span>?
+                <span className="gradient-text">Why Glamlink ?</span>
               </h2>
             </div>
 
@@ -101,7 +112,7 @@ const WhyGlamlinkSection = () => {
                 For Professionals
               </span>
               <h2 className="text-3xl lg:text-4xl font-bold text-foreground mt-2">
-                Grow Your <span className="gradient-text">Beauty Brand</span>
+               <span className="gradient-text"> Grow Your Beauty Brand</span>
               </h2>
             </div>
 
