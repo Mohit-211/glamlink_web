@@ -19,7 +19,6 @@ interface Props {
 
 const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm " +
-  "text-gray-900 placeholder-gray-400 transition " +
   "focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
 
 const labelClass = "text-sm font-medium text-gray-700";
@@ -35,6 +34,9 @@ const createEmptyLocation = (index: number): BusinessLocation => ({
   address: "",
   city: "",
   state: "",
+  lat: undefined,
+  lng: undefined,
+  isSet: false,
   business_name: "",
   phone: "",
   description: "",
@@ -47,24 +49,18 @@ const createEmptyLocation = (index: number): BusinessLocation => ({
 const BasicInfoForm: React.FC<Props> = ({ data, setData }) => {
   if (!data) return null;
 
-  const updateHour = (
-    index: number,
-    updates: Partial<BusinessHour>
-  ) => {
+  const updateHour = (index: number, updates: Partial<BusinessHour>) => {
     setData(prev => {
-      const hours = [...prev.business_hours];
+      const hours = [...prev.business_hour];
       hours[index] = { ...hours[index], ...updates };
-      return { ...prev, business_hours: hours };
+      return { ...prev, business_hour: hours };
     });
   };
 
   const addLocation = () => {
     setData(prev => ({
       ...prev,
-      locations: [
-        ...prev.locations,
-        createEmptyLocation(prev.locations.length),
-      ],
+      locations: [...prev.locations, createEmptyLocation(prev.locations.length)],
     }));
   };
 
@@ -83,19 +79,16 @@ const BasicInfoForm: React.FC<Props> = ({ data, setData }) => {
   const removeLocation = (id: string) => {
     setData(prev => {
       let remaining = prev.locations.filter(l => l.id !== id);
-
       if (remaining.length && !remaining.some(l => l.isPrimary)) {
-        remaining = remaining.map((l, i) =>
-          i === 0 ? { ...l, isPrimary: true } : l
-        );
+        remaining[0].isPrimary = true;
       }
-
       return { ...prev, locations: remaining };
     });
   };
 
   return (
     <div className="space-y-10">
+
       {/* BASIC INFO */}
       <section className={sectionClass}>
         <h2 className="text-lg font-semibold">Basic Information</h2>
@@ -106,9 +99,7 @@ const BasicInfoForm: React.FC<Props> = ({ data, setData }) => {
             <input
               className={inputClass}
               value={data.name}
-              onChange={e =>
-                setData(prev => ({ ...prev, name: e.target.value }))
-              }
+              onChange={e => setData(p => ({ ...p, name: e.target.value }))}
             />
           </div>
 
@@ -118,10 +109,7 @@ const BasicInfoForm: React.FC<Props> = ({ data, setData }) => {
               className={inputClass}
               value={data.professional_title}
               onChange={e =>
-                setData(prev => ({
-                  ...prev,
-                  professional_title: e.target.value,
-                }))
+                setData(p => ({ ...p, professional_title: e.target.value }))
               }
             />
           </div>
@@ -132,9 +120,7 @@ const BasicInfoForm: React.FC<Props> = ({ data, setData }) => {
               type="email"
               className={inputClass}
               value={data.email}
-              onChange={e =>
-                setData(prev => ({ ...prev, email: e.target.value }))
-              }
+              onChange={e => setData(p => ({ ...p, email: e.target.value }))}
             />
           </div>
 
@@ -143,99 +129,200 @@ const BasicInfoForm: React.FC<Props> = ({ data, setData }) => {
             <input
               className={inputClass}
               value={data.phone}
-              onChange={e =>
-                setData(prev => ({ ...prev, phone: e.target.value }))
-              }
+              onChange={e => setData(p => ({ ...p, phone: e.target.value }))}
             />
           </div>
 
           <div className="md:col-span-2">
             <label className={labelClass}>Professional Bio</label>
-            <div className="rounded-lg border border-gray-300 focus-within:border-pink-500 focus-within:ring-2 focus-within:ring-pink-200">
-              <CKEditor
-                editor={ClassicEditor as any}
-                data={data.bio}
-                onChange={(_, editor) =>
-                  setData(prev => ({
-                    ...prev,
-                    bio: editor.getData(),
-                  }))
-                }
-              />
-            </div>
+            <CKEditor
+              editor={ClassicEditor as any}
+              data={data.bio}
+              onChange={(_, editor) =>
+                setData(p => ({ ...p, bio: editor.getData() }))
+              }
+            />
           </div>
         </div>
       </section>
 
       {/* LOCATIONS */}
       <section className={sectionClass}>
-        <h3 className="text-lg font-semibold">Business Locations *</h3>
+        <div className="flex justify-between">
+          <h3 className="text-lg font-semibold">Business Locations *</h3>
+          <span className="text-sm text-gray-500">
+            ({data.locations.length} of 30)
+          </span>
+        </div>
 
-        <div className="space-y-4">
-          {data.locations.map((loc, index) => (
-            <div key={loc.id} className="rounded-lg border bg-white">
-              <button
-                type="button"
-                onClick={() =>
-                  updateLocation(loc.id, { isOpen: !loc.isOpen })
-                }
-                className="flex w-full justify-between bg-yellow-50 px-4 py-3 text-left"
-              >
-                <div className="font-medium">
+        {data.locations.map((loc, index) => (
+          <div key={loc.id} className="rounded-lg border overflow-hidden">
+
+            {/* HEADER */}
+            <div className="flex justify-between bg-yellow-50 px-4 py-3">
+              <div>
+                <p className="font-medium">
                   #{index + 1} {loc.label}
                   {loc.isPrimary && (
-                    <span className="ml-2 rounded-full bg-yellow-200 px-2 py-0.5 text-xs">
+                    <span className="ml-2 rounded-full bg-yellow-200 px-2 text-xs">
                       ⭐ Primary
                     </span>
                   )}
-                </div>
-              </button>
+                </p>
+                <p className="text-xs text-gray-500">
+                  {loc.address || "No address set"}
+                </p>
+              </div>
 
-              {loc.isOpen && (
-                <div className="space-y-5 p-4">
-                  <div className="flex gap-6">
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="radio"
-                        checked={loc.type === "exact"}
-                        onChange={() =>
-                          updateLocation(loc.id, { type: "exact" })
-                        }
-                      />
-                      Exact Address
-                    </label>
+              <div className="flex gap-3">
+                <button
+                  onClick={() =>
+                    updateLocation(loc.id, { isOpen: !loc.isOpen })
+                  }
+                >
+                  {loc.isOpen ? "▲" : "▼"}
+                </button>
 
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="radio"
-                        checked={loc.type === "city"}
-                        onChange={() =>
-                          updateLocation(loc.id, { type: "city" })
-                        }
-                      />
-                      City Only
-                    </label>
-                  </div>
-
-                  {data.locations.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeLocation(loc.id)}
-                      className="text-sm text-red-500 hover:underline"
-                    >
-                      Delete location
-                    </button>
-                  )}
-                </div>
-              )}
+                {data.locations.length > 1 && (
+                  <button
+                    onClick={() => removeLocation(loc.id)}
+                    className="text-red-500"
+                  >
+                    🗑
+                  </button>
+                )}
+              </div>
             </div>
-          ))}
-        </div>
+
+            {/* BODY */}
+            {loc.isOpen && (
+              <div className="space-y-5 p-5">
+
+                {/* TYPE */}
+                <div className="flex gap-6">
+                  <label>
+                    <input
+                      type="radio"
+                      checked={loc.type === "exact"}
+                      onChange={() =>
+                        updateLocation(loc.id, { type: "exact" })
+                      }
+                    /> Exact Address
+                  </label>
+
+                  <label>
+                    <input
+                      type="radio"
+                      checked={loc.type === "city"}
+                      onChange={() =>
+                        updateLocation(loc.id, { type: "city" })
+                      }
+                    /> City Only
+                  </label>
+                </div>
+
+                {/* LABEL */}
+                <input
+                  className={inputClass}
+                  value={loc.label}
+                  onChange={e =>
+                    updateLocation(loc.id, { label: e.target.value })
+                  }
+                />
+
+                {/* EXACT ADDRESS */}
+                {loc.type === "exact" && (
+                  <>
+                    <div className="flex gap-3">
+                      <input
+                        className={inputClass}
+                        value={loc.address}
+                        onChange={e =>
+                          updateLocation(loc.id, { address: e.target.value })
+                        }
+                        placeholder="Start typing address..."
+                      />
+                      <button
+                        className="rounded-lg bg-teal-500 px-4 text-white"
+                        onClick={() =>
+                          updateLocation(loc.id, {
+                            isSet: true,
+                            lat: 36.1699,
+                            lng: -115.1398,
+                            description: `Business location: ${loc.address}`,
+                          })
+                        }
+                      >
+                        Use Address
+                      </button>
+                    </div>
+
+                    {loc.isSet && (
+                      <>
+                        <div className="rounded-lg bg-green-50 p-4 text-sm">
+                          <p className="font-medium text-green-700">
+                            ✔ Location Set
+                          </p>
+                          <p>{loc.address}</p>
+                          <p className="text-xs">
+                            Coordinates: {loc.lat}, {loc.lng}
+                          </p>
+                        </div>
+
+                        <iframe
+                          title="map"
+                          height="200"
+                          className="w-full rounded-lg border"
+                          src={`https://maps.google.com/maps?q=${loc.lat},${loc.lng}&z=15&output=embed`}
+                        />
+                      </>
+                    )}
+                  </>
+                )}
+
+                {/* BUSINESS INFO */}
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    className={inputClass}
+                    placeholder="Business Name"
+                    value={loc.business_name}
+                    onChange={e =>
+                      updateLocation(loc.id, {
+                        business_name: e.target.value,
+                      })
+                    }
+                  />
+
+                  <input
+                    className={inputClass}
+                    placeholder="Phone"
+                    value={loc.phone}
+                    onChange={e =>
+                      updateLocation(loc.id, { phone: e.target.value })
+                    }
+                  />
+                </div>
+
+                {/* DESCRIPTION */}
+                <textarea
+                  rows={3}
+                  className={inputClass}
+                  value={loc.description}
+                  onChange={e =>
+                    updateLocation(loc.id, {
+                      description: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            )}
+          </div>
+        ))}
 
         <button
           type="button"
           onClick={addLocation}
-          className="mt-4 w-full rounded-lg border border-dashed py-3 text-sm font-medium hover:bg-gray-50"
+          className="w-full rounded-lg border border-dashed py-3"
         >
           + Add Location
         </button>
@@ -245,34 +332,30 @@ const BasicInfoForm: React.FC<Props> = ({ data, setData }) => {
       <section className={sectionClass}>
         <h3 className="text-lg font-semibold">Business Hours</h3>
 
-        <div className="space-y-3">
-          {data.business_hours.map((hour, i) => (
-            <div
-              key={hour.day}
-              className="flex items-center gap-4 rounded-lg bg-gray-50 p-4"
-            >
-              <span className="w-24 font-medium">{hour.day}</span>
-
+        {data.business_hour.map((hour, i) => (
+          <div key={hour.day} className="flex gap-4">
+            <span className="w-24">{hour.day}</span>
+            <input
+              type="time"
+              className={inputClass}
+              value={hour.open_time}
+              onChange={e => updateHour(i, { open_time: e.target.value })}
+            />
+            <input
+              type="time"
+              className={inputClass}
+              value={hour.close_time}
+              onChange={e => updateHour(i, { close_time: e.target.value })}
+            />
+            <label>
               <input
-                type="time"
-                className={inputClass}
-                value={hour.open_time}
-                onChange={e =>
-                  updateHour(i, { open_time: e.target.value })
-                }
-              />
-
-              <input
-                type="time"
-                className={inputClass}
-                value={hour.close_time}
-                onChange={e =>
-                  updateHour(i, { close_time: e.target.value })
-                }
-              />
-            </div>
-          ))}
-        </div>
+                type="checkbox"
+                checked={hour.closed}
+                onChange={e => updateHour(i, { closed: e.target.checked })}
+              /> Closed
+            </label>
+          </div>
+        ))}
       </section>
     </div>
   );

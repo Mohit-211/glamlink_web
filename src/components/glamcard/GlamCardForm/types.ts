@@ -1,12 +1,10 @@
 /* ================= SHARED TYPES ================= */
-
 export interface BusinessHour {
   day: string;
   open_time: string;
   close_time: string;
   closed?: boolean;
 }
-
 export interface Location {
   id: string;
   label: string;
@@ -20,17 +18,16 @@ export interface Location {
   isPrimary: boolean;
   isOpen: boolean;
 }
-
 export interface GalleryMetaItem {
   id: string;
-  src: string;              // base64 or url
-  caption?: string;
+  caption: string;
   is_thumbnail: boolean;
   sort_order: number;
 }
-
-
 export interface GlamCardFormData {
+  offer_promotion: boolean | undefined;
+  booking_link: string;
+  profileImage: string | Blob | undefined;
   /* BASIC INFO */
   name: string;
   business_name: string;
@@ -39,22 +36,15 @@ export interface GlamCardFormData {
   email: string;
   phone: string;
   bio: string;
-
-  /* MEDIA */
-  // profileImage?: string;
-          // base64 / URL (preview)
-  // profileImage?: string;
-  profileImage?: File; 
+  profile_image?: File;              // ✅ SINGLE profile image
+  images: File[];            // ✅ gallery images only
   gallery_meta: GalleryMetaItem[];
-
   /* LOCATIONS */
   locations: Location[];
-  business_hours: BusinessHour[];
-
+  business_hour: BusinessHour[];
   /* SERVICES */
   primary_specialty: string;
   specialties: string[];
-
   /* LINKS */
   custom_handle: string;
   website: string;
@@ -64,14 +54,11 @@ export interface GlamCardFormData {
     facebook?: string;
     youtube?: string;
   };
-
   /* BOOKING */
   preferred_booking_method: string;
   important_info: string[];
-
   /* MARKETING */
-  excitement: string[];
-  painPoints: string[];
-  promo: boolean;
-  eliteSetup: boolean;
+  excites_about_glamlink: string[];
+  biggest_pain_points: string[];
+  elite_setup: boolean;
 }

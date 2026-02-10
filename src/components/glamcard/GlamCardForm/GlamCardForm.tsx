@@ -6,11 +6,6 @@ import GlamlinkIntegrationForm from "./GlamlinkIntegrationForm";
 import SuccessModal from "@/components/SuccessModal";
 import { GlamCardFormData } from "./types";
 
-/* ================= TYPES ================= */
-
-
-
-
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
@@ -26,23 +21,83 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
     try {
       setLoading(true);
 
+      const formData = new FormData();
+
+      /* ================= PROFILE IMAGE ================= */
+      if (data.profile_image) {
+        formData.append("profile_image", data.profile_image);
+      }
+
+      /* ================= GALLERY IMAGES ================= */
+      data.images?.forEach(file => {
+        formData.append("images", file);
+      });
+
+      /* ================= GALLERY META ================= */
+      if (data.gallery_meta?.length) {
+        formData.append(
+          "gallery_meta",
+          JSON.stringify(
+            data.gallery_meta.map(({ caption, is_thumbnail, sort_order }) => ({
+              caption,
+              is_thumbnail,
+              sort_order,
+            }))
+          )
+        );
+      }
+
+      /* ================= STRINGIFY OBJECTS / ARRAYS ================= */
+      const jsonFields = [
+        "business_hour",
+        "social_media",
+        "important_info",
+        "excites_about_glamlink",
+        "biggest_pain_points",
+      ] as const;
+
+      jsonFields.forEach(field => {
+        const value = data[field];
+        if (value !== undefined) {
+          formData.append(field, JSON.stringify(value));
+        }
+      });
+
+      /* ================= PRIMITIVE FIELDS ================= */
+      const primitiveFields = [
+        "name",
+        "email",
+        "phone",
+        "business_name",
+        "professional_title",
+        "bio",
+        "preferred_booking_method",
+        "booking_link",
+        "offer_promotion",
+        "elite_setup",
+      ] as const;
+
+      primitiveFields.forEach(field => {
+        const value = data[field];
+        if (value !== undefined && value !== null) {
+          formData.append(field, String(value));
+        }
+      });
+
       const res = await fetch(
         "https://node.glamlink.net:5000/api/v1/businessCard",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+          body: formData, // ✅ DO NOT set Content-Type
         }
       );
-console.log(res,"res")
+
       if (!res.ok) {
         throw new Error("Failed to create GlamCard");
       }
 
       await res.json();
-      setShowSuccess(true); // ✅ OPEN MODAL
+      setShowSuccess(true);
     } catch (error) {
       console.error("ERROR 👉", error);
       alert("Failed to create Business Card");
@@ -78,12 +133,10 @@ console.log(res,"res")
         </div>
       </div>
 
-      {/* ✅ SUCCESS MODAL */}
       <SuccessModal
         open={showSuccess}
         onClose={() => setShowSuccess(false)}
       />
-      
     </>
   );
 };

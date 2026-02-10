@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useCallback } from "react";
+
+import React, { useState, useCallback, useEffect } from "react";
 import Cropper from "react-easy-crop";
 import Modal from "./Modal";
 import getCroppedImg from "./cropImageHelper";
@@ -11,8 +12,6 @@ interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
 }
-
-
 
 /* ================= STYLES ================= */
 
@@ -29,6 +28,9 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
   const [isCropOpen, setIsCropOpen] = useState(false);
+
+  /* ===== GALLERY PREVIEW (UI ONLY) ===== */
+  const [galleryPreview, setGalleryPreview] = useState<string[]>([]);
 
   const gallery_meta: GalleryMetaItem[] = data.gallery_meta || [];
 
@@ -53,14 +55,11 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
   const applyCrop = async () => {
     if (!imageSrc || !croppedAreaPixels) return;
 
-    const croppedImage = await getCroppedImg(
-      imageSrc,
-      croppedAreaPixels
-    );
+    const croppedFile = await getCroppedImg(imageSrc, croppedAreaPixels);
 
     setData(prev => ({
       ...prev,
-      profileImage: croppedImage,
+      profile_image: croppedFile, // ✅ single profile image
     }));
 
     setIsCropOpen(false);
@@ -72,52 +71,61 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
     const files = e.target.files;
     if (!files) return;
 
-    const uploads: GalleryMetaItem[] = [];
-    const existingCount = gallery_meta.length;
+    const fileArray = Array.from(files);
 
-    Array.from(files).forEach((file, index) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        uploads.push({
-          id: crypto.randomUUID(),
-          src: reader.result as string,
-          caption: "",
-          is_thumbnail: false,
-          sort_order: existingCount + uploads.length + 1,
-        });
+    // UI previews
+    setGalleryPreview(prev => [
+      ...prev,
+      ...fileArray.map(file => URL.createObjectURL(file)),
+    ]);
 
-        if (uploads.length === files.length) {
-          setData(prev => {
-            let merged = [...prev.gallery_meta, ...uploads].slice(0, 5);
+    setData(prev => {
+      const existingImages = prev.images || [];
 
-            // Ensure exactly one thumbnail
-            if (!merged.some(i => i.is_thumbnail)) {
-              merged = merged.map((i, idx) => ({
-                ...i,
-                is_thumbnail: idx === 0,
-              }));
-            }
+      const newFiles = fileArray.slice(
+        0,
+        5 - existingImages.length
+      );
 
-            return { ...prev, gallery_meta: merged };
-          });
-        }
+      const newMeta: GalleryMetaItem[] = newFiles.map((_, index) => ({
+        id: crypto.randomUUID(),
+        caption: "",
+        is_thumbnail: false,
+        sort_order: existingImages.length + index + 1,
+      }));
+
+      let mergedMeta = [...(prev.gallery_meta || []), ...newMeta];
+
+      if (!mergedMeta.some(m => m.is_thumbnail)) {
+        mergedMeta[0].is_thumbnail = true;
+      }
+
+      return {
+        ...prev,
+        images: [...existingImages, ...newFiles],
+        gallery_meta: mergedMeta,
       };
-      reader.readAsDataURL(file);
     });
   };
 
   const removeMedia = (id: string) => {
     setData(prev => {
-      let filtered = prev.gallery_meta.filter(m => m.id !== id);
+      const index = prev.gallery_meta.findIndex(m => m.id === id);
 
-      if (filtered.length && !filtered.some(m => m.is_thumbnail)) {
-        filtered = filtered.map((m, i) => ({
-          ...m,
-          is_thumbnail: i === 0,
-        }));
+      setGalleryPreview(p => p.filter((_, i) => i !== index));
+
+      const updatedImages = prev.images.filter((_, i) => i !== index);
+      let updatedMeta = prev.gallery_meta.filter(m => m.id !== id);
+
+      if (updatedMeta.length && !updatedMeta.some(m => m.is_thumbnail)) {
+        updatedMeta[0].is_thumbnail = true;
       }
 
-      return { ...prev, gallery_meta: filtered };
+      return {
+        ...prev,
+        images: updatedImages,
+        gallery_meta: updatedMeta,
+      };
     });
   };
 
@@ -140,6 +148,14 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
     }));
   };
 
+  /* ================= CLEANUP ================= */
+
+  useEffect(() => {
+    return () => {
+      galleryPreview.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [galleryPreview]);
+
   /* ================= RENDER ================= */
 
   return (
@@ -147,16 +163,35 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
       <h2 className="text-lg font-semibold">Media & Profile</h2>
 
       {/* PROFILE IMAGE */}
-      <label className={labelClass}>Profile Image</label>
-      <label className="inline-flex cursor-pointer rounded-full bg-teal-500 px-4 py-2 text-white">
-        Choose file
-        <input
-          type="file"
-          hidden
-          accept="image/*"
-          onChange={handleProfileUpload}
-        />
-      </label>
+      <div className="space-y-2">
+        <label className={labelClass}>Profile Image</label>
+
+        <div className="relative w-32 h-32">
+          <div className="w-32 h-32 rounded-full border border-gray-300 overflow-hidden flex items-center justify-center bg-gray-50">
+            {data?.profile_image ? (
+              <img
+                src={URL.createObjectURL(data.profile_image)}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-gray-400 text-sm text-center px-4">
+                Upload<br />Profile Image
+              </span>
+            )}
+          </div>
+
+          <label className="absolute bottom-0 right-0 cursor-pointer bg-teal-500 text-white p-2 rounded-full shadow-md hover:bg-teal-600">
+            🔄
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleProfileUpload}
+            />
+          </label>
+        </div>
+      </div>
 
       {/* GALLERY */}
       <div className="flex justify-between items-center">
@@ -174,7 +209,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
       </div>
 
       {gallery_meta.length ? (
-        gallery_meta.map(item => (
+        gallery_meta.map((item, index) => (
           <div key={item.id} className="rounded-xl border p-4 space-y-4">
             <div className="flex justify-between">
               {item.is_thumbnail && (
@@ -191,12 +226,12 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
             </div>
 
             <img
-              src={item.src}
+              src={galleryPreview[index]}
               className="h-48 w-full object-contain rounded"
             />
 
             <input
-              value={item.caption || ""}
+              value={item.caption}
               onChange={e =>
                 updateCaption(item.id, e.target.value)
               }
@@ -221,21 +256,48 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
       {/* CROP MODAL */}
       {isCropOpen && (
         <Modal onClose={() => setIsCropOpen(false)}>
-          <Cropper
-            image={imageSrc!}
-            crop={crop}
-            zoom={zoom}
-            aspect={1}
-            onCropChange={setCrop}
-            onCropComplete={onCropComplete}
-            onZoomChange={setZoom}
-          />
-          <button
-            onClick={applyCrop}
-            className="mt-4 w-full rounded bg-teal-500 py-2 text-white"
-          >
-            Apply
-          </button>
+          <div className="w-[90vw] max-w-md">
+            <div className="relative h-80 w-full bg-black rounded overflow-hidden">
+              <Cropper
+                image={imageSrc!}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+              />
+            </div>
+
+            <div className="mt-4">
+              <label className="text-sm text-gray-600">Zoom</label>
+              <input
+                type="range"
+                min={1}
+                max={3}
+                step={0.1}
+                value={zoom}
+                onChange={e => setZoom(Number(e.target.value))}
+                className="w-full"
+              />
+            </div>
+
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={() => setIsCropOpen(false)}
+                className="flex-1 rounded border py-2"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={applyCrop}
+                className="flex-1 rounded bg-teal-500 py-2 text-white"
+              >
+                Apply Crop
+              </button>
+            </div>
+          </div>
         </Modal>
       )}
     </section>

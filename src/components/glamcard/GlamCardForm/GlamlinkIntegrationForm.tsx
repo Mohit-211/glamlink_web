@@ -35,15 +35,18 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
   if (!data) return null;
 
   const toggleArrayValue = (
-    key: "excitement" | "painPoints",
+    key: "excites_about_glamlink" | "biggest_pain_points",
     value: string
   ) => {
-    setData(prev => ({
-      ...prev,
-      [key]: prev[key].includes(value)
-        ? prev[key].filter(v => v !== value)
-        : [...prev[key], value],
-    }));
+    setData(prev => {
+      const arr = prev[key] || [];
+      return {
+        ...prev,
+        [key]: arr.includes(value)
+          ? arr.filter(v => v !== value)
+          : [...arr, value],
+      };
+    });
   };
 
   return (
@@ -70,15 +73,17 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
             >
               <input
                 type="checkbox"
-                checked={data.excitement.includes(item)}
-                onChange={() => toggleArrayValue("excitement", item)}
+                checked={data?.excites_about_glamlink?.includes(item)}
+                onChange={() =>
+                  toggleArrayValue("excites_about_glamlink", item)
+                }
               />
               {item}
             </label>
           ))}
         </div>
 
-        {data.excitement.length === 0 && (
+        {data?.excites_about_glamlink?.length === 0 && (
           <div className="rounded-md bg-yellow-50 px-3 py-2 text-xs text-yellow-700">
             Minimum 1 selection required
           </div>
@@ -100,28 +105,33 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
             >
               <input
                 type="checkbox"
-                checked={data.painPoints.includes(item)}
-                onChange={() => toggleArrayValue("painPoints", item)}
+                checked={data?.biggest_pain_points?.includes(item)}
+                onChange={() =>
+                  toggleArrayValue("biggest_pain_points", item)
+                }
               />
               {item}
             </label>
           ))}
         </div>
 
-        {data.painPoints.length === 0 && (
+        {data?.biggest_pain_points?.length === 0 && (
           <div className="rounded-md bg-yellow-50 px-3 py-2 text-xs text-yellow-700">
             Minimum 1 selection required
           </div>
         )}
       </div>
 
-      {/* ================= PROMO ================= */}
+      {/* ================= PROMOTION ================= */}
       <label className="flex items-center gap-2 text-sm">
         <input
           type="checkbox"
-          checked={data.promo}
+          checked={data.offer_promotion}
           onChange={e =>
-            setData(prev => ({ ...prev, promo: e.target.checked }))
+            setData(prev => ({
+              ...prev,
+              offer_promotion: e.target.checked,
+            }))
           }
         />
         I would like to offer a promotion with my digital card
@@ -131,9 +141,12 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
       <label className="flex items-start gap-2 rounded-lg border border-gray-300 p-4 text-sm">
         <input
           type="checkbox"
-          checked={data.eliteSetup}
+          checked={data.elite_setup}
           onChange={e =>
-            setData(prev => ({ ...prev, eliteSetup: e.target.checked }))
+            setData(prev => ({
+              ...prev,
+              elite_setup: e.target.checked,
+            }))
           }
         />
         <span>

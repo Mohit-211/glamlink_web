@@ -19,20 +19,25 @@ export const initialGlamCardData: GlamCardFormData = {
   preferred_booking_method: "instagram",
   important_info: ["Deposit required to secure booking"],
 
-  business_hours: [
-    { day: "Monday", open_time: "09:00", close_time: "17:00" },
-    { day: "Tuesday", open_time: "09:00", close_time: "17:00" },
-    { day: "Wednesday", open_time: "09:00", close_time: "17:00" },
-    { day: "Thursday", open_time: "09:00", close_time: "17:00" },
-    { day: "Friday", open_time: "09:00", close_time: "17:00" },
-    { day: "Saturday", open_time: "", close_time: "" },
-    { day: "Sunday", open_time: "", close_time: "" },
+  business_hour: [
+    { day: "Monday", open_time: "09:00", close_time: "17:00", closed: false },
+    { day: "Tuesday", open_time: "09:00", close_time: "17:00", closed: false },
+    { day: "Wednesday", open_time: "09:00", close_time: "17:00", closed: false },
+    { day: "Thursday", open_time: "09:00", close_time: "17:00", closed: false },
+    { day: "Friday", open_time: "09:00", close_time: "17:00", closed: false },
+    { day: "Saturday", open_time: "", close_time: "", closed: true },
+    { day: "Sunday", open_time: "", close_time: "", closed: true },
   ],
   locations: [],
 
-  promo: false,
-  eliteSetup: true,
-  excitement: [],
-  painPoints: [],
-  gallery_meta: []
+  elite_setup: true,
+
+  gallery_meta: [],
+  profile_image: undefined,
+  images: [],
+  booking_link: "",
+  offer_promotion: undefined,
+  excites_about_glamlink: [],
+  biggest_pain_points: [],
+  profileImage: undefined
 };

@@ -197,26 +197,54 @@ const formatTikTok = (value: string) => {
 
 
       {/* Booking Method */}
-      <div>
-        <label className={labelClass}>Preferred Booking Method</label>
-        <select
-          className={inputClass}
-          value={data.preferred_booking_method}
-          onChange={e =>
-            setData(prev => ({ ...prev, preferred_booking_method: e.target.value }))
-          }
-        >
-          <option value="">Select booking method...</option>
-          <option value="dm">Instagram / DM</option>
-          <option value="website">Website Booking</option>
-          <option value="phone">Phone / Text</option>
-          <option value="third-party">Third-party App</option>
-        </select>
+  <div>
+  <label className={labelClass}>Preferred Booking Method</label>
 
-        <p className="mt-1 text-xs text-gray-500">
-          How clients should book appointments with you
-        </p>
-      </div>
+  <select
+    className={inputClass}
+    value={data.preferred_booking_method}
+    onChange={e =>
+      setData(prev => ({
+        ...prev,
+        preferred_booking_method: e.target.value,
+        booking_link:
+          e.target.value === "Go_to_Booking_Link"
+            ? prev.booking_link
+            : "", // reset if changed
+      }))
+    }
+  >
+    <option value="">Select booking method...</option>
+    <option value="Go_to_Booking_Link">Go to Booking Link</option>
+  </select>
+
+  <p className="mt-1 text-xs text-gray-500">
+    How clients should book appointments with you
+  </p>
+
+  {/* ✅ CONDITIONAL INPUT */}
+  {data.preferred_booking_method === "Go_to_Booking_Link" && (
+    <div className="mt-4">
+      <label className={labelClass}>Booking Link</label>
+      <input
+        type="url"
+        placeholder="https://booking-service.com/yourprofile"
+        className={inputClass}
+        value={data.booking_link || ""}
+        onChange={e =>
+          setData(prev => ({
+            ...prev,
+            booking_link: e.target.value,
+          }))
+        }
+      />
+      <p className="mt-1 text-xs text-gray-500">
+        Clients will be redirected to this link for booking
+      </p>
+    </div>
+  )}
+</div>
+
 
       {/* Important Info */}
       <div className="space-y-2">
