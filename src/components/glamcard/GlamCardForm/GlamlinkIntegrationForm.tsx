@@ -121,21 +121,41 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
           </div>
         )}
       </div>
+{/* ================= PROMOTION ================= */}
+<label className="flex items-center gap-2 text-sm">
+  <input
+    type="checkbox"
+    checked={data.offer_promotion}
+    onChange={e =>
+      setData(prev => ({
+        ...prev,
+        offer_promotion: e.target.checked,
+      }))
+    }
+  />
+  I would like to offer a promotion with my digital card
+</label>
 
-      {/* ================= PROMOTION ================= */}
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={data.offer_promotion}
-          onChange={e =>
-            setData(prev => ({
-              ...prev,
-              offer_promotion: e.target.checked,
-            }))
-          }
-        />
-        I would like to offer a promotion with my digital card
-      </label>
+{/* Show field only when checkbox is true */}
+{data.offer_promotion && (
+  <div className="mt-4">
+    <label className="block text-sm font-medium mb-2">
+      Promotion Details
+    </label>
+    <textarea
+      className="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+      rows={4}
+      placeholder="Enter your promotion details here..."
+      value={data.promotion_details || ''}
+      onChange={e =>
+        setData(prev => ({
+          ...prev,
+          promotion_details: e.target.value,
+        }))
+      }
+    />
+  </div>
+)}
 
       {/* ================= ELITE SETUP ================= */}
       <label className="flex items-start gap-2 rounded-lg border border-gray-300 p-4 text-sm">

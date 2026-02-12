@@ -152,13 +152,13 @@ export default function ProfessionalsSection() {
             <div key={pro.id} className="card-professional group">
               {/* Image */}
               <div className="relative aspect-[4/5] overflow-hidden">
-                <Image
+                {/* <Image
                   src={pro.image}
                   alt={pro.name}
                   fill
                   sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                /> */}
 
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-transparent to-transparent" />
 

@@ -11,19 +11,21 @@ interface FeaturedPostProps {
 }
 
 const FeaturedPost = ({ image, category, title, excerpt, author, date }: FeaturedPostProps) => {
+  console.log(image,"image")
   return (
     <article className="group cursor-pointer mb-16">
       <div className="grid md:grid-cols-2 gap-8 items-center">
         <div className="relative overflow-hidden rounded-lg aspect-[4/3]">
-          <Image
-            src={image}
-            alt={title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </div>
+  <Image
+    src={image}
+    alt={title}
+    fill
+    sizes="(max-width: 768px) 100vw, 50vw"
+    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+  />
+  <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+</div>
+
         
         <div className="py-4">
           <div className="flex items-center gap-4 mb-4">

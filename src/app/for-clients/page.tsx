@@ -17,7 +17,7 @@ const ForClients = () => {
         <HowItWorks />
         <ClientsCTA />
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

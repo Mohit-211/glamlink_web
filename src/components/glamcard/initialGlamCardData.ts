@@ -30,13 +30,14 @@ export const initialGlamCardData: GlamCardFormData = {
   ],
   locations: [],
 
-  elite_setup: true,
+  elite_setup: false,
 
   gallery_meta: [],
   profile_image: undefined,
   images: [],
   booking_link: "",
   offer_promotion: undefined,
+  promotion_details:"",
   excites_about_glamlink: [],
   biggest_pain_points: [],
   profileImage: undefined
