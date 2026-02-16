@@ -1,59 +1,73 @@
-import { Instagram, Twitter, Facebook, Linkedin, Youtube } from 'lucide-react';
+"use client";
+
+import Image from "next/image";
+import { Instagram, Twitter, Facebook, Linkedin, Youtube } from "lucide-react";
 
 const footerLinks = {
   company: [
-    { label: 'About Us', href: '#' },
-    { label: 'Careers', href: '#' },
-    { label: 'Press', href: '#' },
-    { label: 'Blog', href: '#' },
+    { label: "About Us", href: "#" },
+    { label: "Careers", href: "#" },
+    { label: "Blog", href: "#" },
+    { label: "Community", href: "#" },
   ],
   support: [
-    { label: 'Help Center', href: '#' },
-    { label: 'Contact Us', href: '#' },
-    { label: 'Safety', href: '#' },
-    { label: 'Community', href: '#' },
+    { label: "Help Center", href: "#" },
+    { label: "Contact Us", href: "#" },
+    { label: "Safety", href: "#" },
+    { label: "Accessibility", href: "#" },
   ],
   legal: [
-    { label: 'Privacy Policy', href: '#' },
-    { label: 'Terms of Use', href: '#' },
-    { label: 'Cookie Policy', href: '#' },
-    { label: 'Accessibility', href: '#' },
+    { label: "Privacy Policy", href: "#" },
+    { label: "Terms of Use", href: "#" },
+    { label: "Cookie Policy", href: "#" },
   ],
 };
 
 const socialLinks = [
-  { icon: Instagram, href: '#', label: 'Instagram' },
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: Facebook, href: '#', label: 'Facebook' },
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { icon: Youtube, href: '#', label: 'YouTube' },
+  { icon: Instagram, href: "#", label: "Instagram" },
+  { icon: Twitter, href: "#", label: "Twitter" },
+  { icon: Facebook, href: "#", label: "Facebook" },
+  { icon: Linkedin, href: "#", label: "LinkedIn" },
+  { icon: Youtube, href: "#", label: "YouTube" },
 ];
 
 const Footer = () => {
   return (
-    <footer className="bg-foreground text-background">
-      <div className="container-glamlink py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12">
-          {/* Brand */}
-          <div className="col-span-2 lg:col-span-1">
-            <a href="#" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-xl">G</span>
+    <footer className="bg-gradient-to-b from-gray-950 to-black text-gray-100">
+      <div className="container-glamlink px-5 sm:px-6 md:px-8 py-16 md:py-20">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-10">
+          {/* Brand Column */}
+          <div className="col-span-2 sm:col-span-3 md:col-span-1 lg:col-span-1 space-y-6">
+            <a href="/" className="flex items-center gap-3 group">
+              <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-2xl overflow-hidden shadow-lg shadow-[#22bccb]/25 transition-transform group-hover:scale-105">
+                <Image
+                  src="/logo.png"
+                  alt="Glamlink"
+                  fill
+                  className="object-contain"
+                  priority
+                />
               </div>
-              <span className="text-xl font-bold text-background">Glamlink</span>
+              <span className="text-2xl sm:text-2.5xl font-bold tracking-tight text-white">
+                Glamlink
+              </span>
             </a>
-            <p className="text-background/60 text-sm mb-6">
-              Connecting beauty professionals with clients who love them.
+
+            <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-md">
+              Connecting beauty professionals with clients who love them —
+              beautifully, instantly, and trustfully.
             </p>
-            <div className="flex gap-3">
+
+            <div className="flex gap-3 sm:gap-4">
               {socialLinks.map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="w-9 h-9 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/8 flex items-center justify-center text-gray-300 
+                             hover:bg-[#22bccb]/90 hover:text-white transition-all duration-300 hover:scale-110"
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                 </a>
               ))}
             </div>
@@ -61,11 +75,16 @@ const Footer = () => {
 
           {/* Company */}
           <div>
-            <h4 className="font-semibold text-background mb-4">Company</h4>
-            <ul className="space-y-3">
+            <h4 className="font-semibold text-base sm:text-lg mb-5 text-white">
+              Company
+            </h4>
+            <ul className="space-y-3 sm:space-y-3.5 text-sm sm:text-base">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-background/60 hover:text-background transition-colors">
+                  <a
+                    href={link.href}
+                    className="text-gray-400 hover:text-[#22bccb] transition-colors duration-200"
+                  >
                     {link.label}
                   </a>
                 </li>
@@ -75,11 +94,16 @@ const Footer = () => {
 
           {/* Support */}
           <div>
-            <h4 className="font-semibold text-background mb-4">Support</h4>
-            <ul className="space-y-3">
+            <h4 className="font-semibold text-base sm:text-lg mb-5 text-white">
+              Support
+            </h4>
+            <ul className="space-y-3 sm:space-y-3.5 text-sm sm:text-base">
               {footerLinks.support.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-background/60 hover:text-background transition-colors">
+                  <a
+                    href={link.href}
+                    className="text-gray-400 hover:text-[#22bccb] transition-colors duration-200"
+                  >
                     {link.label}
                   </a>
                 </li>
@@ -88,12 +112,17 @@ const Footer = () => {
           </div>
 
           {/* Legal */}
-          <div>
-            <h4 className="font-semibold text-background mb-4">Legal</h4>
-            <ul className="space-y-3">
+          <div className="hidden md:block">
+            <h4 className="font-semibold text-base sm:text-lg mb-5 text-white">
+              Legal
+            </h4>
+            <ul className="space-y-3 sm:space-y-3.5 text-sm sm:text-base">
               {footerLinks.legal.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-background/60 hover:text-background transition-colors">
+                  <a
+                    href={link.href}
+                    className="text-gray-400 hover:text-[#22bccb] transition-colors duration-200"
+                  >
                     {link.label}
                   </a>
                 </li>
@@ -101,36 +130,65 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Newsletter */}
-          <div className="col-span-2 md:col-span-4 lg:col-span-1">
-            <h4 className="font-semibold text-background mb-4">Stay Updated</h4>
-            <p className="text-sm text-background/60 mb-4">
-              Get the latest beauty tips and updates.
+          {/* Newsletter – moved to full width on small screens */}
+          <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-1 space-y-5 lg:space-y-6">
+            <h4 className="font-semibold text-base sm:text-lg text-white">
+              Stay Updated
+            </h4>
+            <p className="text-gray-400 text-sm sm:text-base">
+              Get the latest beauty tips, trends, and Glamlink updates.
             </p>
-            <div className="flex gap-2">
+
+            <form className="flex flex-col sm:flex-row gap-3">
               <input
                 type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-2.5 rounded-lg bg-background/10 border border-background/20 text-background placeholder:text-background/40 text-sm outline-none focus:border-primary transition-colors"
+                placeholder="Your email address"
+                className="flex-1 px-4 sm:px-5 py-3 rounded-xl bg-white/6 border border-white/12 text-white 
+                           placeholder:text-gray-500 text-sm sm:text-base outline-none focus:border-[#22bccb] 
+                           focus:ring-2 focus:ring-[#22bccb]/25 transition-all duration-200 min-w-0"
               />
-              <button className="px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+              <button
+                type="submit"
+                className="px-5 sm:px-6 py-3 rounded-xl bg-[#22bccb] text-white font-medium text-sm sm:text-base whitespace-nowrap
+                           hover:bg-[#1ea8b5] transition-all duration-300 shadow-md shadow-[#22bccb]/20 
+                           hover:shadow-lg hover:shadow-[#22bccb]/30 hover:scale-[1.02] flex items-center justify-center min-w-[110px]"
+              >
                 Subscribe
               </button>
-            </div>
+            </form>
+          </div>
+
+          {/* Legal on mobile – shown only on small screens */}
+          <div className="md:hidden col-span-2 sm:col-span-3 mt-4">
+            <h4 className="font-semibold text-base mb-4 text-white">Legal</h4>
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              {footerLinks.legal.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    className="text-gray-400 hover:text-[#22bccb] transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-background/10 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-background/60">
-            © {new Date().getFullYear()} Glamlink. All rights reserved.
-          </p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-sm text-background/60 hover:text-background transition-colors">
+        <div className="border-t border-white/8 mt-12 sm:mt-16 pt-8 flex flex-col sm:flex-row items-center justify-between gap-5 text-sm text-gray-400">
+          <p>© {new Date().getFullYear()} Glamlink. All rights reserved.</p>
+
+          <div className="flex flex-wrap justify-center sm:justify-end gap-5 sm:gap-7">
+            <a href="#" className="hover:text-[#22bccb] transition-colors">
               Privacy Policy
             </a>
-            <a href="#" className="text-sm text-background/60 hover:text-background transition-colors">
+            <a href="#" className="hover:text-[#22bccb] transition-colors">
               Terms of Use
+            </a>
+            <a href="#" className="hover:text-[#22bccb] transition-colors">
+              Accessibility
             </a>
           </div>
         </div>

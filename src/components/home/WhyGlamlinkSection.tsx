@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ShieldCheck,
   Package,
@@ -5,11 +7,10 @@ import {
   Heart,
   Search,
   Calendar,
-  TrendingUp,
-  Wrench,
-  CreditCard,
   CalendarCheck,
+  Wrench,
   BarChart2,
+  TrendingUp,
 } from "lucide-react";
 
 const clientBenefits = [
@@ -37,36 +38,33 @@ const clientBenefits = [
 
 const proBenefits = [
   {
-    icon: Search,                  // Perfect: magnifying glass = "Get Discovered" / clients find you
+    icon: Search,
     title: "Get Discovered",
     description: "Clients find you based on location & specialty",
   },
   {
-    icon: Calendar,                // Good: calendar = scheduling / booking
+    icon: Calendar,
     title: "Easy Booking",
     description: "Streamlined scheduling that works for you",
   },
   {
-    icon: CalendarCheck,           // Suggestion: better than plain Calendar — implies confirmed / in-app bookings
-    // Alternative: CalendarPlus (if it's about adding bookings)
+    icon: CalendarCheck,
     title: "In-App Booking",
     description: "Flexible scheduling built for you",
   },
   {
-    icon: Wrench,                  // Reasonable: tools / customize = wrench (settings / build)
-    // Suggestion: Settings or Sliders (more UI/customization feel), or Brush (if creative profile styling)
+    icon: Wrench,
     title: "Grow Your Business",
-    description: "Customize your profile with services menu, content, reviews and your shop",
+    description:
+      "Customize your profile with services menu, content, reviews and your shop",
   },
   {
-    icon: BarChart2,               // Suggestion: better than CreditCard — growth, visibility & stats
-    // Alternative: TrendingUp (already used elsewhere, but fits "visibility and growth")
+    icon: BarChart2,
     title: "Smart Tools",
     description: "Helpful features to support your visibility and growth",
   },
   {
-    icon: TrendingUp,              // Excellent fit: growth, evolving platform, upward progress
-    // (You already have TrendingUp earlier — this re-uses it nicely for the final point)
+    icon: TrendingUp,
     title: "Built to Grow With You",
     description: "A platform evolving alongside modern professionals",
   },
@@ -74,59 +72,77 @@ const proBenefits = [
 
 const WhyGlamlinkSection = () => {
   return (
-    <section className="py-16 lg:py-24">
-      <div className="container-glamlink">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
-          {/* For Clients */}
-          <div id="clients">
-            <div className="mb-8">
-              <span className="text-sm font-semibold text-primary uppercase tracking-wide">
+    <section className="py-20 md:py-28 bg-gradient-to-b from-gray-50/50 via-white to-gray-50/50">
+      <div className="container-glamlink px-5 md:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 xl:gap-16">
+          {/* Clients Column */}
+          <div className="space-y-10">
+            <div className="space-y-4">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-[#22bccb]/10 text-[#22bccb] text-sm font-semibold uppercase tracking-wide">
                 For Clients
               </span>
-              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mt-2">
-                <span className="gradient-text">Why Glamlink ?</span>
+              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">
+                Why choose <span className="text-[#22bccb]">Glamlink</span>?
               </h2>
+              <p className="text-lg text-gray-600 max-w-xl">
+                Discover trusted beauty professionals and everything you need —
+                all in one beautiful place.
+              </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               {clientBenefits.map(({ icon: Icon, title, description }) => (
-                <div key={title} className="flex gap-4 group">
-                  <div className="feature-icon shrink-0 transition-transform group-hover:scale-110">
-                    <Icon className="w-5 h-5" />
+                <div
+                  key={title}
+                  className="group flex items-start gap-5 hover:bg-[#22bccb]/5 rounded-xl p-4 -mx-4 transition-all duration-300"
+                >
+                  <div className="shrink-0 w-12 h-12 rounded-xl bg-[#22bccb]/10 flex items-center justify-center text-[#22bccb] transition-transform group-hover:scale-110 group-hover:rotate-3">
+                    <Icon className="w-6 h-6" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-1">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1.5 group-hover:text-[#22bccb] transition-colors">
                       {title}
                     </h3>
-                    <p className="text-muted-foreground">{description}</p>
+                    <p className="text-gray-600 leading-relaxed">
+                      {description}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* For Professionals */}
-          <div className="lg:border-l lg:border-border lg:pl-16">
-            <div className="mb-8">
-              <span className="text-sm font-semibold text-primary uppercase tracking-wide">
+          {/* Professionals Column */}
+          <div className="space-y-10 lg:border-l lg:border-gray-100 lg:pl-16 xl:pl-20">
+            <div className="space-y-4">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-[#22bccb]/10 text-[#22bccb] text-sm font-semibold uppercase tracking-wide">
                 For Professionals
               </span>
-              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mt-2">
-               <span className="gradient-text"> Grow Your Beauty Brand</span>
+              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">
+                Grow your <span className="text-[#22bccb]">Beauty Brand</span>
               </h2>
+              <p className="text-lg text-gray-600 max-w-xl">
+                Get found, book easily, customize freely, and scale smarter —
+                built for today’s beauty creators.
+              </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               {proBenefits.map(({ icon: Icon, title, description }) => (
-                <div key={title} className="flex gap-4 group">
-                  <div className="feature-icon shrink-0 transition-transform group-hover:scale-110">
-                    <Icon className="w-5 h-5" />
+                <div
+                  key={title}
+                  className="group flex items-start gap-5 hover:bg-[#22bccb]/5 rounded-xl p-4 -mx-4 transition-all duration-300"
+                >
+                  <div className="shrink-0 w-12 h-12 rounded-xl bg-[#22bccb]/10 flex items-center justify-center text-[#22bccb] transition-transform group-hover:scale-110 group-hover:rotate-3">
+                    <Icon className="w-6 h-6" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-1">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1.5 group-hover:text-[#22bccb] transition-colors">
                       {title}
                     </h3>
-                    <p className="text-muted-foreground">{description}</p>
+                    <p className="text-gray-600 leading-relaxed">
+                      {description}
+                    </p>
                   </div>
                 </div>
               ))}

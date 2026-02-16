@@ -1,79 +1,151 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Sparkles, ShieldCheck, ArrowRight, Download } from "lucide-react";
 
 const FounderBadge = () => {
   return (
-    <section className="py-20 bg-white">
-      <div className="container-glamlink">
-        {/* Founder Badge */}
-        <div className="max-w-3xl mx-auto text-center mb-24">
-          {/* Badge Image */}
-          <div className="flex justify-center mb-6">
-            <Image
-              src="https://thumbs.dreamstime.com/b/golden-shield-emblem-empty-badge-symbol-award-merit-recognition-excellence-achievement-security-shiny-polished-metallic-410628199.jpg"
-              alt="Glamlink Founder Shield"
-              width={200}
-              height={200}
-              unoptimized
-              className="rounded-full"
-            />
+    <section className="py-20 md:py-28 bg-gradient-to-b from-white via-gray-50/70 to-white relative overflow-hidden">
+      {/* Subtle background accent */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#22bccb]/5 rounded-full blur-3xl -translate-y-1/3 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#22bccb]/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3" />
+      </div>
+
+      <div className="container-glamlink px-5 md:px-8 relative z-10">
+        {/* Founder Badge Section */}
+        <div className="max-w-4xl mx-auto text-center mb-24 md:mb-32">
+          <div className="inline-flex items-center justify-center mb-8 relative">
+            {/* Glow effect behind badge */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#22bccb]/30 via-transparent to-[#22bccb]/10 rounded-full blur-2xl scale-125 opacity-70" />
+
+            <div className="relative">
+              <Image
+                src="https://thumbs.dreamstime.com/b/golden-shield-emblem-empty-badge-symbol-award-merit-recognition-excellence-achievement-security-shiny-polished-metallic-410628199.jpg"
+                alt="Glamlink Founder Shield Badge"
+                width={180}
+                height={180}
+                className="rounded-full border-8 border-white shadow-2xl shadow-[#22bccb]/20 object-cover"
+                unoptimized
+                priority
+              />
+
+              {/* Small exclusive badge overlay */}
+              <div className="absolute -top-3 -right-3 bg-[#22bccb] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                Exclusive
+              </div>
+            </div>
           </div>
 
-          <h2 className="text-2xl md:text-3xl font-semibold mb-3 text-foreground">
-            Founder Badge (First 100 Only)
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-5">
+            Founder Badge
+            <span className="text-[#22bccb] block mt-2">First 100 Only</span>
           </h2>
 
-          <p className="text-muted-foreground mb-2">
-            Early professionals get exclusive visibility, permanent perks, and
-            first access to new tools.
+          <p className="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto mb-6 leading-relaxed">
+            Be among the first professionals to join Glamlink and unlock
+            permanent founder perks:
           </p>
 
-          <p className="text-sm font-medium text-foreground">
-            Join now and be recognized as a Founding Member.
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-8">
+            <div className="flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-sm rounded-full border border-gray-200 shadow-sm">
+              <ShieldCheck className="w-5 h-5 text-[#22bccb]" />
+              <span className="text-sm font-medium">Exclusive visibility</span>
+            </div>
+            <div className="flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-sm rounded-full border border-gray-200 shadow-sm">
+              <Sparkles className="w-5 h-5 text-[#22bccb]" />
+              <span className="text-sm font-medium">Permanent perks</span>
+            </div>
+            <div className="flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-sm rounded-full border border-gray-200 shadow-sm">
+              <ArrowRight className="w-5 h-5 text-[#22bccb]" />
+              <span className="text-sm font-medium">First access to tools</span>
+            </div>
+          </div>
+
+          <p className="text-base font-medium text-gray-800">
+            Join now and be officially recognized as a{" "}
+            <span className="text-[#22bccb] font-semibold">
+              Founding Member
+            </span>
+            .
           </p>
         </div>
 
-        {/* Download Section */}
+        {/* Download Glamlink Section */}
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold mb-3 text-foreground">
-            Download Glamlink for Free
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-5">
+            Download Glamlink <span className="text-[#22bccb]">for Free</span>
           </h2>
 
-          <p className="text-muted-foreground mb-12">
-            Whether you're booking a beauty service or building your business.
+          <p className="text-lg md:text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
+            Whether you're discovering and booking beauty services or building
+            and growing your professional brand — start today.
           </p>
 
-          {/* Cards */}
-          <div className="grid md:grid-cols-2 gap-6 mb-12">
-            <div className="rounded-xl bg-gray-50 border p-6">
-              <h3 className="font-semibold mb-2 text-foreground">
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-12">
+            {/* User Card */}
+            <div className="group relative rounded-2xl bg-white border border-gray-200 p-8 shadow-sm hover:shadow-xl hover:shadow-[#22bccb]/15 transition-all duration-300 hover:-translate-y-1">
+              <div className="absolute -top-3 left-6 bg-[#22bccb] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
                 For Users
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Discover trusted pros, book instantly, and shop expert-approved
-                products.
-              </p>
+              </div>
+
+              <div className="mt-6">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4 group-hover:text-[#22bccb] transition-colors">
+                  Discover & Book
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Find trusted beauty professionals near you, book instantly,
+                  and shop expert-approved products — all in one elegant app.
+                </p>
+              </div>
+
+              <div className="mt-8 flex justify-center">
+                <Download className="w-12 h-12 text-[#22bccb]/30 group-hover:text-[#22bccb]/60 transition-colors" />
+              </div>
             </div>
 
-            <div className="rounded-xl bg-gray-50 border p-6">
-              <h3 className="font-semibold mb-2 text-foreground">
+            {/* Pros Card */}
+            <div className="group relative rounded-2xl bg-white border border-gray-200 p-8 shadow-sm hover:shadow-xl hover:shadow-[#22bccb]/15 transition-all duration-300 hover:-translate-y-1">
+              <div className="absolute -top-3 left-6 bg-[#22bccb] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
                 For Professionals
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Build your brand, grow your client base, and sell products
-                directly.
-              </p>
+              </div>
+
+              <div className="mt-6">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4 group-hover:text-[#22bccb] transition-colors">
+                  Build & Grow
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Create your digital presence, grow your client base, manage
+                  bookings, and sell products directly — designed for modern
+                  beauty creators.
+                </p>
+              </div>
+
+              <div className="mt-8 flex justify-center">
+                <Download className="w-12 h-12 text-[#22bccb]/30 group-hover:text-[#22bccb]/60 transition-colors" />
+              </div>
             </div>
           </div>
 
-          {/* Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button className="bg-teal-500 hover:bg-teal-600 text-white px-6">
-              Download for Users
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+            <Button
+              size="lg"
+              className="min-w-[220px] bg-[#22bccb] hover:bg-[#1ea8b5] text-white font-semibold text-base py-7 rounded-full shadow-lg shadow-[#22bccb]/25 hover:shadow-xl hover:shadow-[#22bccb]/35 transition-all duration-300 group"
+            >
+              <span>Download for Users</span>
+              <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Button>
 
-            <Button className="bg-black text-white hover:bg-black/90 px-6">
-              Download for Pros
+            <Button
+              size="lg"
+              variant="outline"
+              className="min-w-[220px] border-2 border-gray-800 text-gray-900 hover:bg-gray-900 hover:text-white font-semibold text-base py-7 rounded-full transition-all duration-300 group"
+            >
+              <span>Download for Pros</span>
+              <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
         </div>

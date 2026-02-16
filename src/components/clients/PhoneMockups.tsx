@@ -1,88 +1,116 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import { Download } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import phone1 from '../../../public/assets/phone1.jpg'
-import phone2 from '../../../public/assets/phone2.jpg'
-import phone3 from '../../../public/assets/phone3.jpg'
+import Image from "next/image";
+import { Download, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import phone1 from "../../../public/assets/phone1.jpg";
+import phone2 from "../../../public/assets/phone2.jpg";
+import phone3 from "../../../public/assets/phone3.jpg";
 
-const images = [phone1, phone2, phone3]
+const images = [phone1, phone2, phone3];
 
 const PhoneMockups = () => {
   return (
-    <section className="py-20 lg:py-28 relative overflow-hidden">
+    <section className="relative py-16 md:py-20 lg:py-24 overflow-hidden bg-gradient-to-b from-white via-[#22bccb]/2 to-white">
+      {/* Softer background glows */}
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-1/3 left-1/4 w-48 md:w-72 h-48 md:h-72 bg-[#22bccb]/6 rounded-full blur-3xl animate-pulse-slow" />
+        <div className="absolute bottom-1/3 right-1/4 w-48 md:w-64 h-48 md:h-64 bg-[#22bccb]/5 rounded-full blur-3xl animate-pulse-slow delay-1000" />
+      </div>
 
-      {/* Gradient Background */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-secondary/60 via-background to-background" />
-
-      <div className="container-glamlink">
-
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-            Your All-In-One <span className="gradient-text">Beauty Platform</span>
+      <div className="container-glamlink px-5 md:px-8">
+        {/* Header – compact */}
+        <div className="text-center mb-10 md:mb-14">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">
+            Your All-In-One
+            <br className="hidden sm:block" />
+            <span className="bg-gradient-to-r from-[#22bccb] via-[#1ea8b5] to-[#22bccb] bg-clip-text text-transparent">
+              Beauty Platform
+            </span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Everything you need to discover, connect, and shop — all in one beautiful experience.
+          <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Discover professionals, browse transformations, book instantly, and
+            shop expert-curated products — all in one beautifully designed
+            experience.
           </p>
         </div>
 
-        {/* Phone Showcase */}
-        <div className="relative flex items-center justify-center mb-20">
+        {/* Phones – smaller & better spaced */}
+        <div className="relative flex items-center justify-center mb-12 md:mb-16">
+          {/* Subtle center glow */}
+          <div className="absolute w-[180px] md:w-[260px] h-[180px] md:h-[260px] bg-[#22bccb]/10 rounded-full blur-3xl -z-10 animate-pulse-slow" />
 
-          {/* Glow Effect Behind Center */}
-          <div className="absolute w-[300px] h-[300px] bg-primary/20 blur-[120px] rounded-full -z-10 " />
-
-          <div className="flex items-end justify-center gap-10 lg:gap-30">
-
+          <div className="flex flex-row items-end justify-center gap-4 xs:gap-6 sm:gap-8 md:gap-12 lg:gap-16 perspective-[900px]">
             {images.map((image, index) => {
-              const isCenter = index === 1
+              const isCenter = index === 1;
+              const tilt = isCenter
+                ? "rotateY(0deg)"
+                : index === 0
+                ? "rotateY(-10deg)"
+                : "rotateY(10deg)";
 
               return (
                 <div
                   key={index}
                   className={`
-          relative transition-all duration-700 ease-out
-          ${isCenter
-                      ? 'scale-110 z-20'
-                      : 'scale-95 opacity-90'}
-          ${index === 0 ? '-mr-16 lg:-mr-24' : ''}
-          ${index === 2 ? '-ml-16 lg:-ml-24' : ''}
-        `}
+                    relative transition-all duration-700 ease-out transform-gpu
+                    ${
+                      isCenter
+                        ? "z-20 scale-105 md:scale-108"
+                        : "scale-90 md:scale-95 opacity-90 hover:opacity-100"
+                    }
+                    group
+                  `}
+                  style={{
+                    transform: `perspective(900px) ${tilt} rotateX(${
+                      isCenter ? "3deg" : "5deg"
+                    })`,
+                  }}
                 >
-                  {/* 👇 THIS is the important fix */}
-                  <div className="relative w-[260px] sm:w-[280px] lg:w-[320px] aspect-[9/18]
-">
-
+                  <div
+                    className={`
+                      relative w-[160px] xs:w-[180px] sm:w-[200px] md:w-[240px] lg:w-[280px]
+                      aspect-[9/19] rounded-[1.8rem] md:rounded-[2.2rem] overflow-hidden
+                      border-[8px] md:border-[12px] border-black/90 shadow-lg shadow-black/20
+                      transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-[0_20px_50px_rgba(34,188,203,0.2)]
+                    `}
+                  >
                     <Image
                       src={image}
-                      alt={`Phone ${index}`}
+                      alt={`Glamlink app screen ${index + 1}`}
                       fill
-                      className="object-contain drop-shadow-[0_40px_80px_rgba(0,0,0,0.25)]"
+                      className="object-cover"
                       priority={isCenter}
+                      quality={85}
                     />
 
+                    {/* Light screen overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-white/5 pointer-events-none" />
                   </div>
                 </div>
-              )
+              );
             })}
-
           </div>
-
         </div>
 
         {/* CTA */}
         <div className="text-center">
-          <Button className="px-8 py-6 text-lg btn-hero gap-3 shadow-lg hover:scale-105 transition-transform duration-300">
-            <Download className="w-6 h-6" />
+          <Button
+            size="lg"
+            className="group px-7 md:px-9 py-5 md:py-6 bg-[#22bccb] hover:bg-[#1ea8b5] text-white font-semibold text-base md:text-lg rounded-full shadow-lg shadow-[#22bccb]/25 hover:shadow-xl hover:shadow-[#22bccb]/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2.5 mx-auto"
+          >
+            <Download className="w-5 h-5 transition-transform group-hover:-translate-y-0.5" />
             Download Glamlink
+            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
           </Button>
-        </div>
 
+          <p className="mt-4 text-sm text-gray-500">
+            Free on iOS & Android • No credit card needed
+          </p>
+        </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default PhoneMockups
+export default PhoneMockups;

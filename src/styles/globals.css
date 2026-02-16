@@ -1,69 +1,16 @@
 @import "tailwindcss";
 
-/* Enable .dark class support */
-@custom-variant dark (&:is(.dark *));
-
-/* -----------------------------
-   THEME TOKENS (shadcn bridge)
-------------------------------*/
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-
-  --color-sidebar: var(--sidebar-background);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-}
-
-/* -----------------------------
-   ROOT (LIGHT MODE)
-------------------------------*/
+/* ────────────────────────────────────────────────
+   THEME VARIABLES (light + dark mode)
+───────────────────────────────────────────────── */
 :root {
-  /* Typography */
   --radius: 0.75rem;
 
-  /* Glamlink Primary Palette */
+  /* Primary (your #22bccb ≈ hsl(184, 68%, 43%)) */
   --primary: 184 68% 43%;
   --primary-foreground: 0 0% 100%;
-  --primary-soft: 184 50% 95%;
-  --primary-glow: 184 68% 50%;
 
-  /* Core Surfaces */
+  /* Surfaces */
   --background: 0 0% 100%;
   --foreground: 220 20% 15%;
 
@@ -73,7 +20,6 @@
   --popover: 0 0% 100%;
   --popover-foreground: 220 20% 15%;
 
-  /* Secondary */
   --secondary: 220 15% 96%;
   --secondary-foreground: 220 20% 25%;
 
@@ -83,57 +29,28 @@
   --accent: 184 68% 95%;
   --accent-foreground: 184 68% 30%;
 
-  /* Functional */
   --destructive: 0 84% 60%;
   --border: 220 15% 90%;
   --input: 220 15% 90%;
   --ring: 184 68% 43%;
 
-  /* Sidebar */
+  /* Sidebar (if applicable) */
   --sidebar-background: 0 0% 98%;
   --sidebar-foreground: 240 5.3% 26.1%;
   --sidebar-primary: 184 68% 43%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 184 50% 95%;
-  --sidebar-accent-foreground: 184 68% 30%;
   --sidebar-border: 220 15% 90%;
-  --sidebar-ring: 184 68% 43%;
-
-  /* Glamlink Gradients */
-  /* --gradient-hero: linear-gradient(
-    135deg,
-    hsl(184 68% 43%) 0%,
-    hsl(184 50% 55%) 50%,
-    hsl(190 60% 60%) 100%
-  ); */
-
-  --gradient-card: linear-gradient(
-    180deg,
-    hsl(0 0% 100%) 0%,
-    hsl(220 15% 98%) 100%
-  );
-
-  --gradient-badge: linear-gradient(
-    135deg,
-    hsl(45 90% 55%) 0%,
-    hsl(38 92% 50%) 100%
-  );
 
   /* Shadows */
   --shadow-soft: 0 2px 8px -2px hsl(220 20% 15% / 0.08);
   --shadow-medium: 0 4px 16px -4px hsl(220 20% 15% / 0.12);
   --shadow-large: 0 8px 32px -8px hsl(220 20% 15% / 0.16);
   --shadow-primary: 0 4px 20px -4px hsl(184 68% 43% / 0.35);
-  --shadow-card-hover: 0 12px 40px -12px hsl(220 20% 15% / 0.18);
 }
 
-/* -----------------------------
-   DARK MODE
-------------------------------*/
+/* Dark mode overrides */
 .dark {
-  --primary: 184 68% 50%;
-  --primary-foreground: 220 20% 10%;
-
   --background: 220 20% 8%;
   --foreground: 220 15% 95%;
 
@@ -161,12 +78,12 @@
   --sidebar-border: 220 15% 20%;
 }
 
-/* -----------------------------
+/* ────────────────────────────────────────────────
    BASE STYLES
-------------------------------*/
+───────────────────────────────────────────────── */
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
 
   html {
@@ -175,7 +92,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: Inter, system-ui, -apple-system, sans-serif;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
   }
 
   h1,
@@ -187,56 +104,55 @@
     @apply font-semibold tracking-tight;
   }
 
-  .heading-display {
+  /* Elegant display font for headlines */
+  .font-display {
     font-family: "Playfair Display", Georgia, serif;
   }
 }
 
-/* -----------------------------
-   COMPONENT UTILITIES
-------------------------------*/
+/* ────────────────────────────────────────────────
+   COMPONENTS & UTILITIES
+───────────────────────────────────────────────── */
 @layer components {
   .container-glamlink {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto max-w-7xl px-5 sm:px-6 lg:px-8;
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:opacity-90;
-    box-shadow: var(--shadow-primary);
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:shadow-primary/35 active:scale-[0.98];
   }
 
-  .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-all duration-200 hover:bg-secondary;
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition-all hover:border-primary/50 hover:bg-primary/5;
   }
 
   .card-glamlink {
-    @apply rounded-2xl bg-card border border-border p-6 transition-all duration-300;
-    box-shadow: var(--shadow-soft);
-  }
-
-  .badge-founder {
-    background: var(--gradient-badge);
-    @apply inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold text-white;
+    @apply rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] transition-all hover:shadow-[var(--shadow-medium)];
   }
 
   .gradient-text {
-    /* background: var(--gradient-hero); */
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: #24bbcb;
+    @apply bg-gradient-to-r from-primary via-[#1ea8b5] to-primary bg-clip-text text-transparent;
+  }
+
+  .badge-soft {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary;
   }
 }
 
-/* -----------------------------
+/* ────────────────────────────────────────────────
    ANIMATIONS
-------------------------------*/
+───────────────────────────────────────────────── */
 @layer utilities {
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
 
   .animate-fade-up {
-    animation: fadeUp 0.6s ease-out forwards;
+    animation: fadeUp 0.8s ease-out forwards;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
   @keyframes float {
@@ -245,40 +161,60 @@
       transform: translateY(0);
     }
     50% {
-      transform: translateY(-10px);
+      transform: translateY(-12px);
     }
   }
 
   @keyframes fadeUp {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(24px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
-}
-.ck-editor__editable {
-  min-height: 120px;
-  font-size: 14px;
-  padding: 12px 16px;
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.75;
+      transform: scale(1.05);
+    }
+  }
+
+  .animation-delay-150 {
+    animation-delay: 0.15s;
+  }
+  .animation-delay-300 {
+    animation-delay: 0.3s;
+  }
+  .animation-delay-500 {
+    animation-delay: 0.5s;
+  }
+  .animation-delay-700 {
+    animation-delay: 0.7s;
+  }
 }
 
-.ck.ck-editor__main > .ck-editor__editable {
-  border: none;
+/* ────────────────────────────────────────────────
+   CKEditor Overrides
+───────────────────────────────────────────────── */
+.ck-editor__editable {
+  min-height: 160px !important;
+  padding: 16px !important;
+  font-size: 1rem;
+  line-height: 1.6;
+  border: none !important;
 }
 
 .ck.ck-toolbar {
-  border: none;
-  border-bottom: 1px solid #e5e7eb;
-}
-.ck-editor__editable {
-  min-height: 160px;
-  padding: 12px;
-}
-.ck.ck-editor__main > .ck-editor__editable {
-  border: none;
-  /* color:"#24bbcb" */
+  border: none !important;
+  border-bottom: 1px solid theme("borderColor.DEFAULT") !important;
+  background: theme("colors.background") !important;
 }

@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  devIndicators: false,
   images: {
-    domains: ['node.glamlink.net'],
+    domains: ["node.glamlink.net"],
   },
 };
 
