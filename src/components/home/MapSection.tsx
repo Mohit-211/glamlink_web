@@ -104,7 +104,6 @@ const MapSection = () => {
             </div>
           </div>
 
-          {/* Detail Card */}
           <div className="lg:col-span-2">
             <div className="card-glamlink h-full flex flex-col">
               <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
@@ -120,7 +119,6 @@ const MapSection = () => {
                 </p>
               </div>
 
-              {/* Quick Stats */}
               <div className="border-t border-border pt-6 mt-auto">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>

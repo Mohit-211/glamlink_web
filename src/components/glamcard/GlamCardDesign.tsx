@@ -4,6 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import GlamCardLivePreview from "./GlamCardLivePreview";
 import { GlamCardFormData } from "./GlamCardForm/types";
+import { getBusinessCardBySlug } from "@/api/Api";
 
 interface Props {
   slug: string; // Example: "alex-johnson-3916edda"
@@ -14,29 +15,30 @@ const GlamCardDesign: React.FC<Props> = ({ slug }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(
-          `https://node.glamlink.net:5000/api/v1/businessCard/getBusinessCard/${slug}`
-        );
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
 
-        if (res?.data?.data) {
-          setData(res.data.data);
-        } else {
-          setError("No business card found.");
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load business card.");
-      } finally {
-        setLoading(false);
+      const res = await getBusinessCardBySlug(slug);
+
+      if (res?.data) {
+        setData(res.data);
+      } else {
+        setError("No business card found.");
       }
-    };
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load business card.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  if (slug) {
     fetchData();
-  }, [slug]);
+  }
+}, [slug]);
 
   if (loading) {
     return <p className="mt-20 text-center">Loading...</p>;

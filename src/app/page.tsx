@@ -10,7 +10,7 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <MapSection />
+      {/* <MapSection /> */}
       <AccessSection />
       <ProfessionalsSection />
       <WhyGlamlinkSection />
