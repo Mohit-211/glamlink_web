@@ -13,7 +13,7 @@ const Promos = () => {
         <PromosEmptyState />
       </main>
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

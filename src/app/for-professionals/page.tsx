@@ -15,7 +15,7 @@ const ForProfessionals = () => {
 
       <main className="pt-16 lg:pt-20">
         <ProfessionalsMarketplace />
-        <PassionToPower />
+        {/* <PassionToPower /> */}
         <ProfileCards />
         <SalesSection />
         <PromoBanner />
