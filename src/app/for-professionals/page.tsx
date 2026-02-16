@@ -23,7 +23,6 @@ const ForProfessionals = () => {
         <ProfessionalsCTA />
       </main>
 
-      <Footer />
     </div>
   );
 };
