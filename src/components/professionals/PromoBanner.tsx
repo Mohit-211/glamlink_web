@@ -1,17 +1,16 @@
-import { ArrowRight, Clock } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ArrowRight, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const PromoBanner = () => {
   return (
     <section className="py-16">
       <div className="max-w-6xl mx-auto px-6">
-        
         <div className="relative overflow-hidden rounded-3xl shadow-[0_40px_80px_rgba(0,0,0,0.15)]">
-          
           {/* Gradient Background */}
-          <div className="bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600
- px-8 py-20 text-center  relative">
-
+          <div
+            className="bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600
+ px-8 py-20 text-center  relative"
+          >
             {/* Dotted pattern */}
             <div className="absolute inset-0 opacity-10">
               <div
@@ -29,7 +28,6 @@ const PromoBanner = () => {
             <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
 
             <div className="relative z-10 flex flex-col items-center">
-
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-medium mb-6">
                 <Clock className="w-4 h-4" />
@@ -37,7 +35,7 @@ const PromoBanner = () => {
               </div>
 
               {/* Heading */}
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl  mb-6">
                 Join Now, Pay Less
               </h2>
 
@@ -56,14 +54,12 @@ const PromoBanner = () => {
               <p className="text-white/70 text-sm mt-6">
                 No setup fees • Instant approval • Cancel anytime
               </p>
-
             </div>
           </div>
         </div>
-
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default PromoBanner
+export default PromoBanner;

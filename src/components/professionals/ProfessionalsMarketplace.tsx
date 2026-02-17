@@ -94,11 +94,11 @@ const ProfessionalsMarketplace = () => {
       <div className="container-glamlink px-5 md:px-8">
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
-          <span className="inline-flex items-center px-5 py-2 rounded-full bg-[#22bccb]/10 text-[#22bccb] text-sm font-semibold mb-5">
+          <span className="inline-flex items-center px-5 py-2 rounded-full bg-[#24bbcb]/10 text-[#24bbcb] text-sm font-semibold mb-5">
             Discover Talent
           </span>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-900 mb-5">
-            Meet the <span className="text-[#22bccb]">Professionals</span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl  tracking-tight text-gray-900 mb-5">
+            Meet the <span className="text-[#24bbcb]">Professionals</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Browse our hand-curated marketplace of verified beauty experts ready
@@ -116,14 +116,14 @@ const ProfessionalsMarketplace = () => {
                 type="text"
                 placeholder="Search by name, specialty, or location..."
                 className="w-full pl-14 pr-6 py-4 bg-white border border-gray-200 rounded-full text-base shadow-sm 
-                           focus:outline-none focus:border-[#22bccb]/60 focus:ring-4 focus:ring-[#22bccb]/15 
+                           focus:outline-none focus:border-[#24bbcb]/60 focus:ring-4 focus:ring-[#24bbcb]/15 
                            transition-all duration-200 placeholder:text-gray-400"
               />
             </div>
 
             {/* Sort + Filters */}
             <div className="flex gap-3 items-center">
-              <div className="relative inline-flex items-center px-5 py-4 bg-white border border-gray-200 rounded-full shadow-sm hover:border-[#22bccb]/40 transition-all">
+              <div className="relative inline-flex items-center px-5 py-4 bg-white border border-gray-200 rounded-full shadow-sm hover:border-[#24bbcb]/40 transition-all">
                 <SlidersHorizontal className="w-5 h-5 text-gray-500 mr-2" />
                 <select
                   value={activeSort}
@@ -155,7 +155,7 @@ const ProfessionalsMarketplace = () => {
 
               <Button
                 variant="outline"
-                className="h-13 px-6 border-gray-200 hover:border-[#22bccb]/50 hover:bg-[#22bccb]/5 transition-all"
+                className="h-13 px-6 border-gray-200 hover:border-[#24bbcb]/50 hover:bg-[#24bbcb]/5 transition-all"
               >
                 <Filter className="w-5 h-5 mr-2" />
                 Filters
@@ -170,7 +170,7 @@ const ProfessionalsMarketplace = () => {
             <div
               key={pro.id}
               className="group relative rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-md 
-                         hover:shadow-2xl hover:shadow-[#22bccb]/15 hover:-translate-y-2 transition-all duration-300"
+                         hover:shadow-2xl hover:shadow-[#24bbcb]/15 hover:-translate-y-2 transition-all duration-300"
             >
               {/* Image */}
               <div className="relative aspect-[4/5] overflow-hidden">
@@ -204,7 +204,7 @@ const ProfessionalsMarketplace = () => {
                       </span>
                     </div>
                   </div>
-                  <h3 className="text-2xl font-bold mb-1">{pro.name}</h3>
+                  <h3 className="text-2xl  mb-1">{pro.name}</h3>
                   <p className="text-base opacity-90">{pro.title}</p>
                 </div>
               </div>
@@ -212,15 +212,15 @@ const ProfessionalsMarketplace = () => {
               {/* Footer bar */}
               <div className="px-6 py-5 flex items-center justify-between bg-gradient-to-r from-gray-50 to-white">
                 <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <MapPin className="w-4 h-4 text-[#22bccb]" />
+                  <MapPin className="w-4 h-4 text-[#24bbcb]" />
                   <span>{pro.location}</span>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-[#22bccb]/10 text-[#22bccb] text-xs font-medium">
+                <span className="px-3 py-1 rounded-full bg-[#24bbcb]/10 text-[#24bbcb] text-xs font-medium">
                   {pro.specialty}
                 </span>
               </div>
 
-              <Button className="w-full rounded-t-none bg-[#22bccb] hover:bg-[#1ea8b5] text-white font-semibold py-6 transition-all duration-300 group-hover:scale-[1.02]">
+              <Button className="w-full rounded-t-none bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold py-6 transition-all duration-300 group-hover:scale-[1.02]">
                 Book Now
               </Button>
             </div>
@@ -232,8 +232,8 @@ const ProfessionalsMarketplace = () => {
           <Button
             onClick={() => setIsModalOpen(true)}
             size="lg"
-            className="bg-[#22bccb] hover:bg-[#1ea8b5] text-white px-10 py-7 rounded-full shadow-lg shadow-[#22bccb]/25 
-                       hover:shadow-xl hover:shadow-[#22bccb]/35 transition-all duration-300 text-lg font-medium group"
+            className="bg-[#24bbcb] hover:bg-[#1ea8b5] text-white px-10 py-7 rounded-full shadow-lg shadow-[#24bbcb]/25 
+                       hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 text-lg font-medium group"
           >
             Show More Professionals
             <ArrowRight className="ml-3 w-5 h-5 transition-transform group-hover:translate-x-1" />
@@ -259,11 +259,11 @@ const ProfessionalsMarketplace = () => {
             </button>
 
             <div className="p-8 md:p-10 text-center">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-[#22bccb]/10 flex items-center justify-center">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-[#24bbcb]/10 flex items-center justify-center">
                 <span className="text-4xl">✨</span>
               </div>
 
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl md:text-3xl  text-gray-900 mb-4">
                 Unlock the Full Glamlink Experience
               </h2>
 

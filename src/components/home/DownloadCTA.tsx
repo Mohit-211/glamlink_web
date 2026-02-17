@@ -14,7 +14,7 @@ const DownloadCTA = () => {
   return (
     <section className="py-20 md:py-28 relative overflow-hidden">
       {/* Subtle background gradient + pattern */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#22bccb]/5 via-white to-[#22bccb]/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#24bbcb]/5 via-white to-[#24bbcb]/5 pointer-events-none" />
 
       <div className="absolute inset-0 opacity-[0.04]">
         <svg className="w-full h-full" viewBox="0 0 800 800">
@@ -25,7 +25,7 @@ const DownloadCTA = () => {
               height="40"
               patternUnits="userSpaceOnUse"
             >
-              <circle cx="20" cy="20" r="2" fill="#22bccb" />
+              <circle cx="20" cy="20" r="2" fill="#24bbcb" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#dots)" />
@@ -36,8 +36,8 @@ const DownloadCTA = () => {
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16 md:mb-20">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-900 mb-5">
-              Download Glamlink <span className="text-[#22bccb]">for Free</span>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl  tracking-tight text-gray-900 mb-5">
+              Download Glamlink <span className="text-[#24bbcb]">for Free</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Join thousands of beauty lovers discovering trusted professionals
@@ -49,19 +49,17 @@ const DownloadCTA = () => {
           {/* Two-column CTA cards */}
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             {/* For Clients */}
-            <div className="group relative rounded-3xl bg-white border border-gray-200/80 shadow-xl shadow-[#22bccb]/5 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-[#22bccb]/15 hover:-translate-y-2">
+            <div className="group relative rounded-3xl bg-white border border-gray-200/80 shadow-xl shadow-[#24bbcb]/5 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-[#24bbcb]/15 hover:-translate-y-2">
               {/* Accent bar */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#22bccb] to-[#1ea8b5]" />
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#24bbcb] to-[#1ea8b5]" />
 
               <div className="p-8 lg:p-10">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 rounded-2xl bg-[#22bccb]/10 flex items-center justify-center text-[#22bccb] transition-transform group-hover:scale-110 group-hover:rotate-3">
+                  <div className="w-14 h-14 rounded-2xl bg-[#24bbcb]/10 flex items-center justify-center text-[#24bbcb] transition-transform group-hover:scale-110 group-hover:rotate-3">
                     <Users className="w-7 h-7" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">
-                      For Clients
-                    </h3>
+                    <h3 className="text-2xl  text-gray-900">For Clients</h3>
                     <p className="text-sm text-gray-600 mt-1">
                       Discover & book beauty pros
                     </p>
@@ -94,17 +92,17 @@ const DownloadCTA = () => {
             </div>
 
             {/* For Professionals */}
-            <div className="group relative rounded-3xl bg-gradient-to-br from-[#22bccb]/5 to-white border border-[#22bccb]/30 shadow-xl shadow-[#22bccb]/10 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-[#22bccb]/25 hover:-translate-y-2">
+            <div className="group relative rounded-3xl bg-gradient-to-br from-[#24bbcb]/5 to-white border border-[#24bbcb]/30 shadow-xl shadow-[#24bbcb]/10 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-[#24bbcb]/25 hover:-translate-y-2">
               {/* Accent bar */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#22bccb] to-[#1ea8b5]" />
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#24bbcb] to-[#1ea8b5]" />
 
               <div className="p-8 lg:p-10">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 rounded-2xl bg-[#22bccb]/10 flex items-center justify-center text-[#22bccb] transition-transform group-hover:scale-110 group-hover:rotate-3">
+                  <div className="w-14 h-14 rounded-2xl bg-[#24bbcb]/10 flex items-center justify-center text-[#24bbcb] transition-transform group-hover:scale-110 group-hover:rotate-3">
                     <Briefcase className="w-7 h-7" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">
+                    <h3 className="text-2xl  text-gray-900">
                       For Professionals
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
@@ -121,7 +119,7 @@ const DownloadCTA = () => {
 
                 <Button
                   size="lg"
-                  className="w-full bg-[#22bccb] hover:bg-[#1ea8b5] text-white rounded-xl py-7 text-base font-semibold shadow-lg shadow-[#22bccb]/30 hover:shadow-xl hover:shadow-[#22bccb]/40 transition-all duration-300 group-hover:scale-[1.02]"
+                  className="w-full bg-[#24bbcb] hover:bg-[#1ea8b5] text-white rounded-xl py-7 text-base font-semibold shadow-lg shadow-[#24bbcb]/30 hover:shadow-xl hover:shadow-[#24bbcb]/40 transition-all duration-300 group-hover:scale-[1.02]"
                 >
                   <Download className="w-5 h-5 mr-2" />
                   Join as Professional

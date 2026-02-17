@@ -11,11 +11,11 @@ const images = [phone1, phone2, phone3];
 
 const PhoneMockups = () => {
   return (
-    <section className="relative py-16 md:py-20 lg:py-24 overflow-hidden bg-gradient-to-b from-white via-[#22bccb]/2 to-white">
+    <section className="relative py-16 md:py-20 lg:py-24 overflow-hidden bg-gradient-to-b from-white via-[#24bbcb]/2 to-white">
       {/* Softer background glows */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
-        <div className="absolute top-1/3 left-1/4 w-48 md:w-72 h-48 md:h-72 bg-[#22bccb]/6 rounded-full blur-3xl animate-pulse-slow" />
-        <div className="absolute bottom-1/3 right-1/4 w-48 md:w-64 h-48 md:h-64 bg-[#22bccb]/5 rounded-full blur-3xl animate-pulse-slow delay-1000" />
+        <div className="absolute top-1/3 left-1/4 w-48 md:w-72 h-48 md:h-72 bg-[#24bbcb]/6 rounded-full blur-3xl animate-pulse-slow" />
+        <div className="absolute bottom-1/3 right-1/4 w-48 md:w-64 h-48 md:h-64 bg-[#24bbcb]/5 rounded-full blur-3xl animate-pulse-slow delay-1000" />
       </div>
 
       <div className="container-glamlink px-5 md:px-8">
@@ -24,7 +24,7 @@ const PhoneMockups = () => {
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">
             Your All-In-One
             <br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-[#22bccb] via-[#1ea8b5] to-[#22bccb] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#24bbcb] via-[#1ea8b5] to-[#24bbcb] bg-clip-text text-transparent">
               Beauty Platform
             </span>
           </h2>
@@ -38,7 +38,7 @@ const PhoneMockups = () => {
         {/* Phones – smaller & better spaced */}
         <div className="relative flex items-center justify-center mb-12 md:mb-16">
           {/* Subtle center glow */}
-          <div className="absolute w-[180px] md:w-[260px] h-[180px] md:h-[260px] bg-[#22bccb]/10 rounded-full blur-3xl -z-10 animate-pulse-slow" />
+          <div className="absolute w-[180px] md:w-[260px] h-[180px] md:h-[260px] bg-[#24bbcb]/10 rounded-full blur-3xl -z-10 animate-pulse-slow" />
 
           <div className="flex flex-row items-end justify-center gap-4 xs:gap-6 sm:gap-8 md:gap-12 lg:gap-16 perspective-[900px]">
             {images.map((image, index) => {
@@ -97,7 +97,7 @@ const PhoneMockups = () => {
         <div className="text-center">
           <Button
             size="lg"
-            className="group px-7 md:px-9 py-5 md:py-6 bg-[#22bccb] hover:bg-[#1ea8b5] text-white font-semibold text-base md:text-lg rounded-full shadow-lg shadow-[#22bccb]/25 hover:shadow-xl hover:shadow-[#22bccb]/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2.5 mx-auto"
+            className="group px-7 md:px-9 py-5 md:py-6 bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold text-base md:text-lg rounded-full shadow-lg shadow-[#24bbcb]/25 hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2.5 mx-auto"
           >
             <Download className="w-5 h-5 transition-transform group-hover:-translate-y-0.5" />
             Download Glamlink

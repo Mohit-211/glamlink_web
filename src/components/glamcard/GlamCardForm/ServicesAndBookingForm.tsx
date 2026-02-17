@@ -6,8 +6,7 @@ interface Props {
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
 }
 
-const sectionClass =
-  "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
+const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
 
 const labelClass = "text-sm font-medium text-gray-700";
 
@@ -275,7 +274,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                 <button
                   type="button"
                   onClick={() => removeInfo(i)}
-                  className="text-red-600 hover:text-red-800 text-xl font-bold"
+                  className="text-red-600 hover:text-red-800 text-xl "
                 >
                   ×
                 </button>

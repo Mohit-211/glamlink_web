@@ -54,17 +54,17 @@ const FeaturesGrid = () => {
     <section className="relative py-20 md:py-28 bg-gradient-to-b from-white via-gray-50/70 to-white overflow-hidden">
       {/* Subtle background accent */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-[#22bccb]/5 rounded-full blur-3xl -translate-y-1/3 -translate-x-1/3" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#22bccb]/5 rounded-full blur-3xl translate-y-1/3 translate-x-1/3" />
+        <div className="absolute top-0 left-0 w-96 h-96 bg-[#24bbcb]/5 rounded-full blur-3xl -translate-y-1/3 -translate-x-1/3" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#24bbcb]/5 rounded-full blur-3xl translate-y-1/3 translate-x-1/3" />
       </div>
 
       <div className="container-glamlink px-5 md:px-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-16 md:mb-20">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-900 mb-5">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl  tracking-tight text-gray-900 mb-5">
             Your Link To
             <br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-[#22bccb] via-[#1ea8b5] to-[#22bccb] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#24bbcb] via-[#1ea8b5] to-[#24bbcb] bg-clip-text text-transparent">
               Everything Beauty
             </span>
           </h2>
@@ -82,7 +82,7 @@ const FeaturesGrid = () => {
               key={feature.title}
               className={`
                 group relative rounded-2xl border border-gray-100 bg-white p-8 shadow-sm
-                transition-all duration-500 hover:shadow-xl hover:shadow-[#22bccb]/15
+                transition-all duration-500 hover:shadow-xl hover:shadow-[#24bbcb]/15
                 hover:-translate-y-2 animate-fade-up
               `}
               style={{ animationDelay: `${index * 0.08}s` }}
@@ -90,19 +90,19 @@ const FeaturesGrid = () => {
               {/* Coming Soon Badge */}
               {feature.comingSoon && (
                 <div className="absolute top-5 right-5 z-10">
-                  <span className="px-4 py-1.5 rounded-full bg-[#22bccb]/10 text-[#22bccb] text-xs font-semibold tracking-wide uppercase">
+                  <span className="px-4 py-1.5 rounded-full bg-[#24bbcb]/10 text-[#24bbcb] text-xs font-semibold tracking-wide uppercase">
                     Coming Soon
                   </span>
                 </div>
               )}
 
               {/* Icon */}
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#22bccb]/10 text-[#22bccb] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#24bbcb]/10 text-[#24bbcb] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
                 <feature.icon className="h-7 w-7" />
               </div>
 
               {/* Title & Description */}
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-3 group-hover:text-[#22bccb] transition-colors">
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-3 group-hover:text-[#24bbcb] transition-colors">
                 {feature.title}
               </h3>
 
@@ -111,7 +111,7 @@ const FeaturesGrid = () => {
               </p>
 
               {/* Subtle bottom accent line on hover */}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#22bccb]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#24bbcb]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
           ))}
         </div>

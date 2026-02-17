@@ -7,16 +7,14 @@ export default function IssuePage() {
   const params = useParams();
 
   // App Router params are string | string[]
-  const slug = Array.isArray(params.slug)
-    ? params.slug[0]
-    : params.slug;
+  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
   const issue = allIssues.find((i) => i.slug === slug);
 
   if (!issue) {
     return (
       <div className="p-8 text-center">
-        <h1 className="text-3xl font-bold">Issue not found</h1>
+        <h1 className="text-3xl ">Issue not found</h1>
         <p className="text-muted-foreground mt-2">
           The requested magazine issue does not exist.
         </p>
@@ -29,7 +27,7 @@ export default function IssuePage() {
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">{issue.title}</h1>
+      <h1 className="text-3xl  mb-6">{issue.title}</h1>
 
       <iframe
         src={flipbookUrl}

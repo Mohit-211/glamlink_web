@@ -1,5 +1,5 @@
-import { Sparkles, Rocket, TrendingUp, Zap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Sparkles, Rocket, TrendingUp, Zap } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const PassionToPower = () => {
   return (
@@ -15,19 +15,21 @@ const PassionToPower = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
             <Sparkles className="w-4 h-4" />
-            <span className="text-sm font-medium">The Future of Beauty Business</span>
+            <span className="text-sm font-medium">
+              The Future of Beauty Business
+            </span>
           </div>
 
           {/* Headline */}
-          <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-6">
-            Turn Your Passion Into{' '}
-            <span className="gradient-text">Power</span>
+          <h2 className="text-4xl lg:text-5xl xl:text-6xl  text-foreground mb-6">
+            Turn Your Passion Into <span className="gradient-text">Power</span>
           </h2>
 
           {/* Description */}
           <p className="text-lg lg:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Glamlink blends viral content, e-commerce, and AI-driven discovery to help you claim your space, 
-            get discovered by thousands, and thrive like never before.
+            Glamlink blends viral content, e-commerce, and AI-driven discovery
+            to help you claim your space, get discovered by thousands, and
+            thrive like never before.
           </p>
 
           {/* Feature highlights */}
@@ -58,7 +60,10 @@ const PassionToPower = () => {
               <Sparkles className="w-5 h-5" />
               Become a Founding Pro
             </Button>
-            <Button variant="outline" className="px-8 py-6 text-lg border-2 hover:bg-secondary">
+            <Button
+              variant="outline"
+              className="px-8 py-6 text-lg border-2 hover:bg-secondary"
+            >
               Access E-Commerce Panel
             </Button>
           </div>

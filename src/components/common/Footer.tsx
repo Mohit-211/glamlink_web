@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import logo from "../../../public/header_logo.png";
 import { Instagram, Twitter, Facebook, Linkedin, Youtube } from "lucide-react";
 
 const footerLinks = {
@@ -39,18 +40,16 @@ const Footer = () => {
           {/* Brand Column */}
           <div className="col-span-2 sm:col-span-3 md:col-span-1 lg:col-span-1 space-y-6">
             <a href="/" className="flex items-center gap-3 group">
-              <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-2xl overflow-hidden shadow-lg shadow-[#22bccb]/25 transition-transform group-hover:scale-105">
+              <div className="relative w-full h-11 sm:w-full sm:h-12 rounded-2xl overflow-hidden shadow-lg shadow-[#24bbcb]/25 transition-transform group-hover:scale-105">
                 <Image
-                  src="/logo.png"
+                  src={logo}
                   alt="Glamlink"
                   fill
                   className="object-contain"
                   priority
+                  quality={95}
                 />
               </div>
-              <span className="text-2xl sm:text-2.5xl font-bold tracking-tight text-white">
-                Glamlink
-              </span>
             </a>
 
             <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-md">
@@ -65,7 +64,7 @@ const Footer = () => {
                   href={href}
                   aria-label={label}
                   className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/8 flex items-center justify-center text-gray-300 
-                             hover:bg-[#22bccb]/90 hover:text-white transition-all duration-300 hover:scale-110"
+                             hover:bg-[#24bbcb]/90 hover:text-white transition-all duration-300 hover:scale-110"
                 >
                   <Icon className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                 </a>
@@ -83,7 +82,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-gray-400 hover:text-[#22bccb] transition-colors duration-200"
+                    className="text-gray-400 hover:text-[#24bbcb] transition-colors duration-200"
                   >
                     {link.label}
                   </a>
@@ -102,7 +101,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-gray-400 hover:text-[#22bccb] transition-colors duration-200"
+                    className="text-gray-400 hover:text-[#24bbcb] transition-colors duration-200"
                   >
                     {link.label}
                   </a>
@@ -121,7 +120,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-gray-400 hover:text-[#22bccb] transition-colors duration-200"
+                    className="text-gray-400 hover:text-[#24bbcb] transition-colors duration-200"
                   >
                     {link.label}
                   </a>
@@ -144,14 +143,14 @@ const Footer = () => {
                 type="email"
                 placeholder="Your email address"
                 className="flex-1 px-4 sm:px-5 py-3 rounded-xl bg-white/6 border border-white/12 text-white 
-                           placeholder:text-gray-500 text-sm sm:text-base outline-none focus:border-[#22bccb] 
-                           focus:ring-2 focus:ring-[#22bccb]/25 transition-all duration-200 min-w-0"
+                           placeholder:text-gray-500 text-sm sm:text-base outline-none focus:border-[#24bbcb] 
+                           focus:ring-2 focus:ring-[#24bbcb]/25 transition-all duration-200 min-w-0"
               />
               <button
                 type="submit"
-                className="px-5 sm:px-6 py-3 rounded-xl bg-[#22bccb] text-white font-medium text-sm sm:text-base whitespace-nowrap
-                           hover:bg-[#1ea8b5] transition-all duration-300 shadow-md shadow-[#22bccb]/20 
-                           hover:shadow-lg hover:shadow-[#22bccb]/30 hover:scale-[1.02] flex items-center justify-center min-w-[110px]"
+                className="px-5 sm:px-6 py-3 rounded-xl bg-[#24bbcb] text-white font-medium text-sm sm:text-base whitespace-nowrap
+                           hover:bg-[#1ea8b5] transition-all duration-300 shadow-md shadow-[#24bbcb]/20 
+                           hover:shadow-lg hover:shadow-[#24bbcb]/30 hover:scale-[1.02] flex items-center justify-center min-w-[110px]"
               >
                 Subscribe
               </button>
@@ -166,7 +165,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-gray-400 hover:text-[#22bccb] transition-colors"
+                    className="text-gray-400 hover:text-[#24bbcb] transition-colors"
                   >
                     {link.label}
                   </a>
@@ -181,13 +180,13 @@ const Footer = () => {
           <p>© {new Date().getFullYear()} Glamlink. All rights reserved.</p>
 
           <div className="flex flex-wrap justify-center sm:justify-end gap-5 sm:gap-7">
-            <a href="#" className="hover:text-[#22bccb] transition-colors">
+            <a href="#" className="hover:text-[#24bbcb] transition-colors">
               Privacy Policy
             </a>
-            <a href="#" className="hover:text-[#22bccb] transition-colors">
+            <a href="#" className="hover:text-[#24bbcb] transition-colors">
               Terms of Use
             </a>
-            <a href="#" className="hover:text-[#22bccb] transition-colors">
+            <a href="#" className="hover:text-[#24bbcb] transition-colors">
               Accessibility
             </a>
           </div>

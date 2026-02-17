@@ -6,8 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Download, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import logo from "../../../public/logo.png"; // adjust path if needed
-
+import logo from "../../../public/header_logo.png"; // adjust path if needed
 const navLinks = [
   { label: "Home", href: "/", id: "home" },
   { label: "For Clients", href: "/for-clients", id: "for-clients" },
@@ -60,13 +59,13 @@ const Header = ({ activeRoute }: HeaderProps) => {
                 href={link.href}
                 className={`relative px-4 xl:px-5 py-2.5 text-sm xl:text-base font-medium rounded-lg transition-all duration-300 ${
                   isActive(link)
-                    ? "text-[#22bccb] bg-[#22bccb]/5"
+                    ? "text-[#24bbcb] bg-[#24bbcb]/5"
                     : "text-gray-700 hover:text-gray-900 hover:bg-gray-50/80"
                 }`}
               >
                 {link.label}
                 {isActive(link) && (
-                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#22bccb] rounded-full" />
+                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#24bbcb] rounded-full" />
                 )}
               </Link>
             ))}
@@ -74,7 +73,7 @@ const Header = ({ activeRoute }: HeaderProps) => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:block">
-            <Button className="bg-[#22bccb] hover:bg-[#1ea8b5] text-white font-semibold px-6 md:px-8 py-5 md:py-6 rounded-full shadow-lg shadow-[#22bccb]/25 hover:shadow-xl hover:shadow-[#22bccb]/35 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 text-base">
+            <Button className="bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold px-6 md:px-8 py-5 md:py-6 rounded-full shadow-lg shadow-[#24bbcb]/25 hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 text-base">
               <Download className="w-4.5 h-4.5" />
               Download App
             </Button>
@@ -109,7 +108,7 @@ const Header = ({ activeRoute }: HeaderProps) => {
                 href={link.href}
                 className={`px-5 py-4 text-lg font-medium rounded-xl transition-all ${
                   isActive(link)
-                    ? "bg-[#22bccb]/10 text-[#22bccb]"
+                    ? "bg-[#24bbcb]/10 text-[#24bbcb]"
                     : "text-gray-800 hover:bg-gray-50"
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -121,7 +120,7 @@ const Header = ({ activeRoute }: HeaderProps) => {
 
           <div className="mt-8">
             <Button
-              className="w-full bg-[#22bccb] hover:bg-[#1ea8b5] text-white font-semibold py-6 rounded-full shadow-lg shadow-[#22bccb]/25 hover:shadow-xl hover:shadow-[#22bccb]/35 transition-all duration-300 text-lg flex items-center justify-center gap-2"
+              className="w-full bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold py-6 rounded-full shadow-lg shadow-[#24bbcb]/25 hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 text-lg flex items-center justify-center gap-2"
               onClick={() => setMobileMenuOpen(false)}
             >
               <Download className="w-5 h-5" />

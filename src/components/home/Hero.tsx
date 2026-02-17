@@ -123,21 +123,20 @@ const Hero = () => {
       <div className="container-glamlink px-5 md:px-8">
         {/* Hero text block */}
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-900 mb-5 leading-tight">
-            Discover Beauty Professionals
+          <h1 className="text-2xl sm:text-2xl md:text-5xl  tracking-tight text-gray-900 mb-5 leading-tight">
+            Discover Beauty Professionals Near You
             <br className="hidden sm:block" />
-            <span className="text-[#22bccb]">Near You</span>
+            {/* <span className="text-[#24bbcb]">Near You</span> */}
           </h1>
 
           <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Find trusted stylists, artists & experts by location or specialty —
-            instantly.
+            Browse by location or specialty
           </p>
 
           {/* Search */}
           <div className="relative max-w-2xl mx-auto mb-6">
             <div className="relative group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 transition-colors group-focus-within:text-[#22bccb]" />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 transition-colors group-focus-within:text-[#24bbcb]" />
 
               <input
                 type="text"
@@ -149,7 +148,7 @@ const Hero = () => {
                 }}
                 onFocus={() => setShowDropdown(true)}
                 className="w-full pl-14 pr-6 py-4.5 bg-white border border-gray-200 rounded-full text-base shadow-sm 
-                           focus:outline-none focus:border-[#22bccb]/60 focus:ring-4 focus:ring-[#22bccb]/15 
+                           focus:outline-none focus:border-[#24bbcb]/60 focus:ring-4 focus:ring-[#24bbcb]/15 
                            transition-all duration-200 placeholder:text-gray-400"
               />
             </div>
@@ -171,9 +170,9 @@ const Hero = () => {
                       <button
                         key={i}
                         onClick={() => handleSelectProfessional(pro)}
-                        className="w-full px-5 py-3.5 text-left hover:bg-[#22bccb]/5 transition-colors flex flex-col gap-0.5 group"
+                        className="w-full px-5 py-3.5 text-left hover:bg-[#24bbcb]/5 transition-colors flex flex-col gap-0.5 group"
                       >
-                        <span className="text-sm font-medium text-gray-900 group-hover:text-[#22bccb]">
+                        <span className="text-sm font-medium text-gray-900 group-hover:text-[#24bbcb]">
                           {pro.name || "—"}
                         </span>
                         <span className="text-xs text-gray-500">
@@ -212,7 +211,7 @@ const Hero = () => {
                   onChange={(e) =>
                     setSelectedLocationIndex(Number(e.target.value))
                   }
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-[#22bccb]/30 focus:border-[#22bccb]/60 transition"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-[#24bbcb]/30 focus:border-[#24bbcb]/60 transition"
                 >
                   {locations.map((loc: any, idx: number) => (
                     <option key={idx} value={idx}>
@@ -239,7 +238,7 @@ const Hero = () => {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-[#22bccb] hover:bg-[#1ea8b5] text-white font-medium px-7 py-3.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300 text-sm md:text-base"
+                className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-medium px-7 py-3.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300 text-sm md:text-base"
               >
                 <MapPin className="w-4 h-4" />
                 Get Directions
@@ -255,8 +254,8 @@ const Hero = () => {
               </div>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
-                <div className="w-16 h-16 rounded-full bg-[#22bccb]/10 flex items-center justify-center mb-4">
-                  <Search className="w-7 h-7 text-[#22bccb]" />
+                <div className="w-16 h-16 rounded-full bg-[#24bbcb]/10 flex items-center justify-center mb-4">
+                  <Search className="w-7 h-7 text-[#24bbcb]" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-800 mb-2">
                   Select a Professional

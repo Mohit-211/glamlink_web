@@ -13,12 +13,12 @@ const AccessSection: React.FC = () => {
           {/* Left – Content */}
           <div className="space-y-8 lg:space-y-10 max-w-xl">
             <div className="space-y-5">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#22bccb]/10 text-[#22bccb] text-sm font-medium">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#24bbcb]/10 text-[#24bbcb] text-sm font-medium">
                 <Sparkles className="w-4 h-4" />
                 <span>Modern Link in Bio</span>
               </div>
 
-              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 leading-tight">
+              <h2 className="text-4xl sm:text-5xl  tracking-tight text-gray-900 leading-tight">
                 Access by Glamlink
               </h2>
 
@@ -34,7 +34,7 @@ const AccessSection: React.FC = () => {
                 that answers every client question before they even ask.
               </p>
 
-              <p className="text-base leading-relaxed font-medium text-[#22bccb]">
+              <p className="text-base leading-relaxed font-medium text-[#24bbcb]">
                 Every Access Card also connects directly to your free Glamlink
                 profile and the beauty professional directory — so your link
                 doesn’t just organize your business… it helps new clients
@@ -50,9 +50,9 @@ const AccessSection: React.FC = () => {
 
             <button
               onClick={() => router.push("/apply/digital-card")}
-              className="group relative inline-flex items-center gap-3 px-8 py-4.5 bg-gradient-to-r from-[#22bccb] via-[#1ea8b5] to-[#22bccb] 
-                         text-white font-semibold text-base rounded-full shadow-lg shadow-[#22bccb]/25 
-                         hover:shadow-xl hover:shadow-[#22bccb]/35 transition-all duration-300 
+              className="group relative inline-flex items-center gap-3 px-8 py-4.5 bg-gradient-to-r from-[#24bbcb] via-[#1ea8b5] to-[#24bbcb] 
+                         text-white font-semibold text-base rounded-full shadow-lg shadow-[#24bbcb]/25 
+                         hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 
                          hover:scale-[1.02] active:scale-[0.98]"
             >
               <span>Claim Your FREE Access Card</span>
@@ -65,7 +65,7 @@ const AccessSection: React.FC = () => {
             {/* Subtle background glow + mock phone frame effect */}
             <div className="relative">
               {/* Glow behind */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#22bccb]/20 via-transparent to-[#22bccb]/10 rounded-[3.5rem] blur-3xl scale-110 opacity-70" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#24bbcb]/20 via-transparent to-[#24bbcb]/10 rounded-[3.5rem] blur-3xl scale-110 opacity-70" />
 
               {/* Card with modern phone-like presentation */}
               <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-black/15 border border-gray-200/60 bg-white transform transition-transform hover:scale-[1.02] duration-500">
@@ -78,7 +78,7 @@ const AccessSection: React.FC = () => {
               </div>
 
               {/* Optional subtle badge/ribbon (can remove if not wanted) */}
-              <div className="absolute -top-3 -right-3 rotate-12 bg-[#22bccb] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
+              <div className="absolute -top-3 -right-3 rotate-12 bg-[#24bbcb] text-white text-xs  px-4 py-1.5 rounded-full shadow-md">
                 Live Preview
               </div>
             </div>

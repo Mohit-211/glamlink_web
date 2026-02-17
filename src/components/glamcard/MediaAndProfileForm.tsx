@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import Cropper from "react-easy-crop";
 import Modal from "./GlamCardForm/Modal";
 import { GalleryMetaItem, GlamCardFormData } from "./GlamCardForm/types";
@@ -16,25 +16,30 @@ interface Props {
 /* ================= STYLES ================= */
 
 const sectionClass =
-  "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
+  "space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm";
 const labelClass = "text-sm font-medium text-gray-700";
 
 /* ================= COMPONENT ================= */
 
 const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
-  /* ===== PROFILE IMAGE CROP ===== */
+  /* ================= PROFILE IMAGE ================= */
+
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
   const [isCropOpen, setIsCropOpen] = useState(false);
 
-  /* ===== GALLERY PREVIEW (UI ONLY) ===== */
-  const [galleryPreview, setGalleryPreview] = useState<string[]>([]);
-
-  const gallery_meta: GalleryMetaItem[] = data.gallery_meta || [];
-
-  /* ================= CROP ================= */
+  /* Generate preview safely */
+  useEffect(() => {
+    if (data.profile_image instanceof File) {
+      const url = URL.createObjectURL(data.profile_image);
+      setProfilePreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [data.profile_image]);
 
   const onCropComplete = useCallback((_: any, pixels: any) => {
     setCroppedAreaPixels(pixels);
@@ -57,9 +62,9 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
 
     const croppedFile = await getCroppedImg(imageSrc, croppedAreaPixels);
 
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      profile_image: croppedFile, // ✅ single profile image
+      profile_image: croppedFile,
     }));
 
     setIsCropOpen(false);
@@ -67,57 +72,50 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
 
   /* ================= GALLERY ================= */
 
+  const [galleryPreview, setGalleryPreview] = useState<string[]>([]);
+  const gallery_meta: GalleryMetaItem[] = data.gallery_meta || [];
+
+  /* Sync previews when images change */
+  useEffect(() => {
+    const urls = data.images.map((file) => URL.createObjectURL(file));
+    setGalleryPreview(urls);
+
+    return () => urls.forEach((url) => URL.revokeObjectURL(url));
+  }, [data.images]);
+
   const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
-    const fileArray = Array.from(files);
-
-    // UI previews
-    setGalleryPreview(prev => [
-      ...prev,
-      ...fileArray.map(file => URL.createObjectURL(file)),
-    ]);
-
-    setData(prev => {
+    setData((prev) => {
       const existingImages = prev.images || [];
+      const allowed = files.slice(0, 5 - existingImages.length);
+      if (!allowed.length) return prev;
 
-      const newFiles = fileArray.slice(
-        0,
-        5 - existingImages.length
-      );
-
-      const newMeta: GalleryMetaItem[] = newFiles.map((_, index) => ({
+      const newMeta: GalleryMetaItem[] = allowed.map((_, index) => ({
         id: crypto.randomUUID(),
         caption: "",
-        is_thumbnail: false,
-        sort_order: existingImages.length + index + 1,
+        is_thumbnail: existingImages.length === 0 && index === 0,
+        sort_order: existingImages.length + index,
       }));
-
-      let mergedMeta = [...(prev.gallery_meta || []), ...newMeta];
-
-      if (!mergedMeta.some(m => m.is_thumbnail)) {
-        mergedMeta[0].is_thumbnail = true;
-      }
 
       return {
         ...prev,
-        images: [...existingImages, ...newFiles],
-        gallery_meta: mergedMeta,
+        images: [...existingImages, ...allowed],
+        gallery_meta: [...(prev.gallery_meta || []), ...newMeta],
       };
     });
   };
 
   const removeMedia = (id: string) => {
-    setData(prev => {
-      const index = prev.gallery_meta.findIndex(m => m.id === id);
-
-      setGalleryPreview(p => p.filter((_, i) => i !== index));
+    setData((prev) => {
+      const index = prev.gallery_meta.findIndex((m) => m.id === id);
+      if (index === -1) return prev;
 
       const updatedImages = prev.images.filter((_, i) => i !== index);
-      let updatedMeta = prev.gallery_meta.filter(m => m.id !== id);
+      let updatedMeta = prev.gallery_meta.filter((m) => m.id !== id);
 
-      if (updatedMeta.length && !updatedMeta.some(m => m.is_thumbnail)) {
+      if (updatedMeta.length && !updatedMeta.some((m) => m.is_thumbnail)) {
         updatedMeta[0].is_thumbnail = true;
       }
 
@@ -130,9 +128,9 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
   };
 
   const setThumbnail = (id: string) => {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      gallery_meta: prev.gallery_meta.map(m => ({
+      gallery_meta: prev.gallery_meta.map((m) => ({
         ...m,
         is_thumbnail: m.id === id,
       })),
@@ -140,21 +138,13 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
   };
 
   const updateCaption = (id: string, caption: string) => {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      gallery_meta: prev.gallery_meta.map(m =>
+      gallery_meta: prev.gallery_meta.map((m) =>
         m.id === id ? { ...m, caption } : m
       ),
     }));
   };
-
-  /* ================= CLEANUP ================= */
-
-  useEffect(() => {
-    return () => {
-      galleryPreview.forEach(url => URL.revokeObjectURL(url));
-    };
-  }, [galleryPreview]);
 
   /* ================= RENDER ================= */
 
@@ -162,41 +152,49 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
     <section className={sectionClass}>
       <h2 className="text-lg font-semibold">Media & Profile</h2>
 
-      {/* PROFILE IMAGE */}
-      <div className="space-y-2">
+      {/* PROFILE */}
+      <div className="space-y-3">
         <label className={labelClass}>Profile Image</label>
 
-        <div className="relative w-32 h-32">
-          <div className="w-32 h-32 rounded-full border border-gray-300 overflow-hidden flex items-center justify-center bg-gray-50">
-            {data?.profile_image ? (
-              <img
-                src={URL.createObjectURL(data.profile_image)}
-                alt="Profile"
-                className="w-full h-full object-cover"
+        <div className="flex items-center gap-5">
+          <div className="relative w-32 h-32">
+            <div className="w-32 h-32 rounded-full border overflow-hidden bg-gray-50 flex items-center justify-center">
+              {profilePreview ? (
+                <img
+                  src={profilePreview}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-gray-400 text-sm text-center">
+                  Upload
+                  <br />
+                  Profile
+                </span>
+              )}
+            </div>
+
+            <label className="absolute bottom-0 right-0 cursor-pointer bg-teal-500 text-white p-2 rounded-full shadow hover:bg-teal-600">
+              ✎
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleProfileUpload}
               />
-            ) : (
-              <span className="text-gray-400 text-sm text-center px-4">
-                Upload<br />Profile Image
-              </span>
-            )}
+            </label>
           </div>
 
-          <label className="absolute bottom-0 right-0 cursor-pointer bg-teal-500 text-white p-2 rounded-full shadow-md hover:bg-teal-600">
-            🔄
-            <input
-              type="file"
-              hidden
-              accept="image/*"
-              onChange={handleProfileUpload}
-            />
-          </label>
+          <p className="text-sm text-gray-500">
+            Square image works best. Face centered. Clean background.
+          </p>
         </div>
       </div>
 
-      {/* GALLERY */}
-      <div className="flex justify-between items-center">
-        <label className={labelClass}>Gallery & Portfolio</label>
-        <label className="cursor-pointer rounded-lg bg-teal-500 px-4 py-2 text-white">
+      {/* GALLERY HEADER */}
+      <div className="flex justify-between items-center pt-2">
+        <label className={labelClass}>Gallery (Max 5)</label>
+
+        <label className="cursor-pointer rounded-lg bg-teal-500 px-4 py-2 text-white hover:bg-teal-600">
           + Upload
           <input
             type="file"
@@ -208,56 +206,63 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
         </label>
       </div>
 
+      {/* GALLERY GRID */}
       {gallery_meta.length ? (
-        gallery_meta.map((item, index) => (
-          <div key={item.id} className="rounded-xl border p-4 space-y-4">
-            <div className="flex justify-between">
-              {item.is_thumbnail && (
-                <span className="bg-teal-500 text-white text-xs px-2 py-1 rounded">
-                  Thumbnail
-                </span>
-              )}
-              <button
-                onClick={() => removeMedia(item.id)}
-                className="text-red-600"
-              >
-                Remove
-              </button>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {gallery_meta.map((item, index) => (
+            <div
+              key={item.id}
+              className="border rounded-xl p-3 space-y-2 bg-gray-50"
+            >
+              <div className="relative">
+                <img
+                  src={galleryPreview[index]}
+                  className="h-32 w-full object-cover rounded-lg"
+                />
+
+                {item.is_thumbnail && (
+                  <span className="absolute top-1 left-1 bg-teal-500 text-white text-xs px-2 py-0.5 rounded">
+                    Thumbnail
+                  </span>
+                )}
+              </div>
+
+              <input
+                value={item.caption}
+                onChange={(e) => updateCaption(item.id, e.target.value)}
+                placeholder="Caption"
+                className="w-full border rounded px-2 py-1 text-sm"
+              />
+
+              <div className="flex justify-between text-xs">
+                {!item.is_thumbnail && (
+                  <button
+                    onClick={() => setThumbnail(item.id)}
+                    className="text-teal-600 hover:underline"
+                  >
+                    Make Thumbnail
+                  </button>
+                )}
+
+                <button
+                  onClick={() => removeMedia(item.id)}
+                  className="text-red-600 hover:underline"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
-
-            <img
-              src={galleryPreview[index]}
-              className="h-48 w-full object-contain rounded"
-            />
-
-            <input
-              value={item.caption}
-              onChange={e =>
-                updateCaption(item.id, e.target.value)
-              }
-              placeholder="Caption"
-              className="w-full border rounded px-3 py-2"
-            />
-
-            {!item.is_thumbnail && (
-              <button
-                onClick={() => setThumbnail(item.id)}
-                className="text-teal-600"
-              >
-                Set as Thumbnail
-              </button>
-            )}
-          </div>
-        ))
+          ))}
+        </div>
       ) : (
-        <p className="text-gray-400">No media uploaded</p>
+        <p className="text-gray-400 text-sm">No media uploaded</p>
       )}
 
       {/* CROP MODAL */}
       {isCropOpen && (
         <Modal onClose={() => setIsCropOpen(false)}>
-          <div className="w-[90vw] max-w-md">
-            <div className="relative h-80 w-full bg-black rounded overflow-hidden">
+          <div className="w-[90vw] max-w-md space-y-4">
+            <div className="relative h-80 bg-black rounded overflow-hidden">
               <Cropper
                 image={imageSrc!}
                 crop={crop}
@@ -269,30 +274,27 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
               />
             </div>
 
-            <div className="mt-4">
-              <label className="text-sm text-gray-600">Zoom</label>
-              <input
-                type="range"
-                min={1}
-                max={3}
-                step={0.1}
-                value={zoom}
-                onChange={e => setZoom(Number(e.target.value))}
-                className="w-full"
-              />
-            </div>
+            <input
+              type="range"
+              min={1}
+              max={3}
+              step={0.1}
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              className="w-full"
+            />
 
-            <div className="mt-4 flex gap-3">
+            <div className="flex gap-3">
               <button
                 onClick={() => setIsCropOpen(false)}
-                className="flex-1 rounded border py-2"
+                className="flex-1 border rounded py-2"
               >
                 Cancel
               </button>
 
               <button
                 onClick={applyCrop}
-                className="flex-1 rounded bg-teal-500 py-2 text-white"
+                className="flex-1 bg-teal-500 text-white rounded py-2 hover:bg-teal-600"
               >
                 Apply Crop
               </button>
