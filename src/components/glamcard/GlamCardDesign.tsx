@@ -57,7 +57,6 @@ useEffect(() => {
       <GlamCardLivePreview
         data={data}
         mode="view"   // 🔥 IMPORTANT
-        sticky={false}
       />
     </div>
   );
