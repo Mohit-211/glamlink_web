@@ -1,0 +1,1 @@
+export { digitalCardFormConfig } from './digitalCardConfig';

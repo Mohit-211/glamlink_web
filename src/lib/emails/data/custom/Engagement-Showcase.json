@@ -1,0 +1,236 @@
+{
+  "customer": {
+    "firstName": "Sarah",
+    "lastName": "Johnson",
+    "email": "sarah@example.com"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Empowering Beauty Entrepreneurs"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "engagement_showcase",
+    "utm_content": "engagement"
+  },
+  "theme": "standard",
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "💎 Your Beauty Journey",
+      "subtitle": "Engagement & Rewards Update"
+    },
+    {
+      "type": "reward-progress",
+      "title": "Your Reward Progress",
+      "subtitle": "You're doing amazing!",
+      "currentPoints": 850,
+      "nextMilestone": 1000,
+      "customerName": "Sarah",
+      "milestones": [
+        {
+          "points": 250,
+          "title": "Beauty Novice",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=80&h=80&fit=crop&crop=faces",
+          "description": "Welcome to your beauty journey!",
+          "achieved": true,
+          "current": false
+        },
+        {
+          "points": 500,
+          "title": "Style Explorer",
+          "image": "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=80&h=80&fit=crop&crop=faces",
+          "description": "You're exploring new styles!",
+          "achieved": true,
+          "current": false
+        },
+        {
+          "points": 750,
+          "title": "Beauty Enthusiast",
+          "image": "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=80&h=80&fit=crop&crop=faces",
+          "description": "Beauty is your passion!",
+          "achieved": true,
+          "current": false
+        },
+        {
+          "points": 1000,
+          "title": "Glamour Expert",
+          "image": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=80&h=80&fit=crop&crop=faces",
+          "description": "You've mastered the art of beauty!",
+          "achieved": false,
+          "current": true
+        },
+        {
+          "points": 1500,
+          "title": "Beauty Influencer",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=faces",
+          "description": "You inspire others with your style!",
+          "achieved": false,
+          "current": false
+        }
+      ],
+      "progressMessage": "Only 150 points away from your next reward!",
+      "viewHistoryUrl": "https://glamlink.com/rewards/history"
+    },
+    {
+      "type": "monthly-challenge",
+      "title": "Monthly Challenge",
+      "subtitle": "November Beauty Mastery",
+      "challengeName": "30-Day Glow Up Challenge",
+      "challengeImage": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=400&h=250&fit=crop",
+      "description": "Transform your beauty routine with our expert-curated 30-day challenge. Complete daily tasks to earn exclusive rewards and level up your skills!",
+      "deadline": "November 30, 2025",
+      "totalReward": "500 Glamcoins + Exclusive Badge",
+      "currentProgress": 12,
+      "totalSteps": 30,
+      "steps": [
+        {
+          "id": "step1",
+          "title": "Master the Perfect Base",
+          "description": "Learn foundation techniques from our certified pros",
+          "completed": true,
+          "reward": "50 Glamcoins"
+        },
+        {
+          "id": "step2",
+          "title": "Eye Makeup Fundamentals",
+          "description": "Create stunning eye looks with basic techniques",
+          "completed": true,
+          "reward": "75 Glamcoins"
+        },
+        {
+          "id": "step3",
+          "title": "Lip Color Confidence",
+          "description": "Find your perfect lip shade and application style",
+          "completed": false,
+          "reward": "60 Glamcoins"
+        }
+      ],
+      "ctaText": "Continue Challenge",
+      "ctaUrl": "https://glamlink.com/challenges/glow-up",
+      "status": "active"
+    },
+    {
+      "type": "leaderboard",
+      "title": "Beauty Champions",
+      "subtitle": "This month's top performers",
+      "period": "November 2025",
+      "entries": [
+        {
+          "rank": 1,
+          "name": "Emma Rodriguez",
+          "profileImage": "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=60&h=60&fit=crop&crop=faces",
+          "points": 2850,
+          "badge": "Glow Master",
+          "isCurrentUser": false,
+          "profileUrl": "https://glamlink.com/profile/emma-r"
+        },
+        {
+          "rank": 2,
+          "name": "You (Sarah)",
+          "profileImage": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=60&h=60&fit=crop&crop=faces",
+          "points": 2650,
+          "badge": "Rising Star",
+          "isCurrentUser": true,
+          "profileUrl": "https://glamlink.com/profile/sarah-j"
+        },
+        {
+          "rank": 3,
+          "name": "Maya Chen",
+          "profileImage": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=faces",
+          "points": 2420,
+          "badge": "Trendsetter",
+          "isCurrentUser": false,
+          "profileUrl": "https://glamlink.com/profile/maya-c"
+        },
+        {
+          "rank": 4,
+          "name": "Aria Thompson",
+          "profileImage": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&h=60&fit=crop&crop=faces",
+          "points": 2180,
+          "badge": "Style Icon",
+          "isCurrentUser": false,
+          "profileUrl": "https://glamlink.com/profile/aria-t"
+        },
+        {
+          "rank": 5,
+          "name": "Zoe Williams",
+          "profileImage": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=60&h=60&fit=crop&crop=faces",
+          "points": 1980,
+          "badge": "Beauty Pro",
+          "isCurrentUser": false,
+          "profileUrl": "https://glamlink.com/profile/zoe-w"
+        }
+      ],
+      "currentUserRank": 2,
+      "totalParticipants": 1247,
+      "viewFullUrl": "https://glamlink.com/leaderboard"
+    },
+    {
+      "type": "special-offers",
+      "title": "🎁 Exclusive Member Offers",
+      "subtitle": "Limited time rewards just for you!",
+      "featuredOffer": {
+        "title": "Premium Skincare Bundle",
+        "description": "Get our top-rated cleanser, serum, and moisturizer in this exclusive bundle. Perfect for your winter skincare routine!",
+        "image": "https://images.unsplash.com/photo-1570194065650-d99fb4bedf56?w=300&h=300&fit=crop",
+        "originalPrice": "$149.99",
+        "discountedPrice": "$89.99",
+        "discountPercentage": "40% OFF",
+        "coinCost": "150 Glamcoins",
+        "expiryDate": "November 30, 2025",
+        "ctaText": "Claim Now",
+        "ctaUrl": "https://glamlink.com/offers/skincare-bundle",
+        "badge": "Best Value"
+      },
+      "secondaryOffers": [
+        {
+          "id": "offer1",
+          "title": "Luxury Makeup Brush Set",
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=150&h=150&fit=crop",
+          "coinCost": "75 Glamcoins",
+          "description": "Professional-grade brushes for flawless application",
+          "ctaUrl": "https://glamlink.com/offers/brush-set"
+        },
+        {
+          "id": "offer2",
+          "title": "Monthly Beauty Box",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=150&h=150&fit=crop",
+          "coinCost": "50 Glamcoins",
+          "description": "Curated beauty products delivered monthly",
+          "ctaUrl": "https://glamlink.com/offers/beauty-box"
+        },
+        {
+          "id": "offer3",
+          "title": "1-on-1 Beauty Consultation",
+          "image": "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=150&h=150&fit=crop",
+          "coinCost": "100 Glamcoins",
+          "description": "Personal session with certified beauty expert",
+          "ctaUrl": "https://glamlink.com/offers/consultation"
+        }
+      ],
+      "viewAllUrl": "https://glamlink.com/offers"
+    },
+    {
+      "type": "app-download-cta",
+      "showUserSection": true,
+      "showProSection": true
+    },
+    {
+      "type": "footer",
+      "copyrightText": "© 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "https://glamlink.com/unsubscribe",
+      "preferencesUrl": "https://glamlink.com/preferences"
+    }
+  ]
+}

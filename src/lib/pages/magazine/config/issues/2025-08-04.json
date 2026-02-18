@@ -1,0 +1,614 @@
+{
+  "id": "2025-08-04",
+  "title": "The Glamlink Edit",
+  "subtitle": "Issue #1: The Launch Edition",
+  "featuredPerson": "MELANIE MARKS",
+  "featuredTitle": "Founder & CEO",
+  "issueNumber": 1,
+  "issueDate": "2025-08-04",
+  "coverImage": "/images/cover_1_edited.png",
+  "coverImageAlt": "Glamlink Magazine Issue 1 - Summer Glow Edition",
+  "description": "Welcome to the inaugural issue of The Glamlink Edit - your monthly guide to building a successful beauty business on Glamlink.",
+  "editorNote": "Welcome to The Glamlink Edit! This is more than just a magazine - it's your monthly playbook for beauty business success. Each issue brings you exclusive interviews with top professionals, platform updates, trending treatments, and the strategies that are driving real results on Glamlink. Let's build something beautiful together.",
+  "featured": false,
+  "sections": [
+    {
+      "id": "cover-pro-feature-1",
+      "type": "cover-pro-feature",
+      "title": "Cover Pro Feature",
+      "subtitle": "Melanie Marks: Building the Future of Beauty",
+      "content": {
+        "type": "cover-pro-feature",
+        "coverImage": "/images/cover_1_edited.png",
+        "coverImageAlt": "Melanie Marks - Glamlink Founder",
+        "professionalName": "Melanie Marks",
+        "professionalTitle": "Founder & CEO of Glamlink",
+        "professionalImage": "/images/cover_1_edited.png",
+        "pullQuote": "Beauty has the power to transform lives. Glamlink empowers the transformers.",
+        "journey": "Melanie Marks didn't set out to revolutionize the beauty industry. As a licensed aesthetician with over 15 years of experience, she witnessed firsthand the struggles beauty professionals faced in building their brands and connecting with clients in the digital age.\n\n\"I saw incredibly talented professionals who were masters at their craft but struggled with the business side,\" Melanie recalls. \"They were spending more time on marketing and administrative tasks than doing what they loved – making people feel beautiful.\"\n\nThis observation sparked the idea for Glamlink in 2023. Melanie envisioned a platform that would empower beauty entrepreneurs by providing them with the tools they needed to succeed in the digital marketplace.",
+        "niche": "Creating technology solutions for beauty entrepreneurs, focusing on AI-powered tools and multi-tenant marketplace architecture that allows professionals to build their own branded storefronts.",
+        "glamlinkUsage": "As the founder, Melanie uses Glamlink to showcase how the platform works, demonstrating features like AI content generation, brand management tools, and the comprehensive admin panel. She regularly tests new features with her own demo brand to ensure they meet the needs of beauty professionals.",
+        "achievements": [
+          "Built Glamlink from concept to launch as a solo founder",
+          "Created the first AI-powered beauty marketplace platform",
+          "Developed proprietary technology for multi-tenant brand management",
+          "Pioneered the integration of AI content generation for beauty businesses",
+          "Established partnerships with leading beauty professionals nationwide"
+        ],
+        "socialLinks": {
+          "instagram": "https://instagram.com/glamlink",
+          "website": "https://glamlink.com",
+          "glamlinkProfile": "/brand/glamlink"
+        }
+      }
+    },
+    {
+      "id": "whats-new-1",
+      "type": "whats-new-glamlink",
+      "title": "What's New in Glamlink",
+      "subtitle": "Platform Updates & Features",
+      "content": {
+        "type": "whats-new-glamlink",
+        "features": [
+          {
+            "title": "AI Content Generator",
+            "description": "Generate professional product descriptions, provider bios, and marketing content with one click",
+            "icon": "🤖",
+            "availability": "Now Live"
+          },
+          {
+            "title": "Brand Setup Wizard",
+            "description": "Complete brand profile setup in under 10 minutes with our guided questionnaire",
+            "icon": "🚀",
+            "availability": "Now Live"
+          },
+          {
+            "title": "Multi-Image Galleries",
+            "description": "Showcase products and transformations with beautiful image galleries",
+            "icon": "📸",
+            "availability": "Now Live"
+          }
+        ],
+        "sneakPeeks": [
+          {
+            "title": "Live Commerce Integration",
+            "teaser": "Host live shopping events directly from your Glamlink storefront",
+            "releaseDate": "September 2025"
+          },
+          {
+            "title": "Mobile App",
+            "teaser": "Manage your brand on the go with our upcoming iOS and Android apps",
+            "releaseDate": "Q4 2025"
+          }
+        ],
+        "tips": [
+          {
+            "title": "Optimize Your Images",
+            "description": "Use high-quality, well-lit photos to increase engagement by up to 40%",
+            "link": "/help/image-optimization"
+          },
+          {
+            "title": "Complete Your Profile",
+            "description": "Brands with complete profiles see 3x more client inquiries",
+            "link": "/profile/brand"
+          },
+          {
+            "title": "Use AI Wisely",
+            "description": "Customize AI-generated content to maintain your unique brand voice",
+            "link": "/help/ai-tools"
+          }
+        ],
+        "usageBoosts": [
+          {
+            "title": "Add 5+ Products",
+            "impact": "Increases visibility in search results",
+            "metric": "+65%"
+          },
+          {
+            "title": "Upload Before/After Photos",
+            "impact": "Builds trust with potential clients",
+            "metric": "+120%"
+          },
+          {
+            "title": "Enable Online Booking",
+            "impact": "Converts browsers into buyers",
+            "metric": "+85%"
+          }
+        ]
+      }
+    },
+    {
+      "id": "top-treatment-1",
+      "type": "top-treatment",
+      "title": "Top Treatment of the Month",
+      "subtitle": "Hydrafacial",
+      "content": {
+        "type": "top-treatment",
+        "treatmentName": "Hydrafacial",
+        "heroImage": "/images/placeholder.png",
+        "whyTrending": "Hydrafacial has become the go-to treatment for instant glow and deep hydration. With its gentle yet effective approach, it's perfect for all skin types and delivers immediate results that clients love to share on social media.",
+        "whyItMatters": "In today's instant-gratification world, clients want treatments that deliver visible results immediately. Hydrafacial not only meets this demand but also provides long-term skin health benefits.",
+        "benefits": [
+          "Deep cleansing and exfoliation",
+          "Intense hydration boost",
+          "Reduced appearance of fine lines",
+          "Even skin tone and texture",
+          "No downtime required"
+        ],
+        "duration": "30-45 min",
+        "frequency": "Monthly",
+        "priceRange": "$150-$300",
+        "results": "Immediate glow with continued improvement over 7 days. Best results with monthly treatments.",
+        "beforeAfter": {
+          "before": "/images/placeholder.png",
+          "after": "/images/placeholder.png"
+        },
+        "proInsights": [
+          {
+            "proName": "Sarah Chen, MD",
+            "proImage": "/images/placeholder.png",
+            "quote": "Hydrafacial is my most requested treatment. Clients love that they can see results immediately and there's no recovery time."
+          }
+        ],
+        "additionalInfo": "Pro tip: Combine with LED therapy for enhanced results and offer as a premium package.",
+        "bookingLink": "/search/treatments/hydrafacial"
+      }
+    },
+    {
+      "id": "product-spotlight-1",
+      "type": "top-product-spotlight",
+      "title": "Top Product Spotlight",
+      "subtitle": "Best-Selling Beauty Essential",
+      "content": {
+        "type": "top-product-spotlight",
+        "productName": "Vitamin C + E Brightening Serum",
+        "productImage": "/images/placeholder.png",
+        "brandName": "GlowLab Pro",
+        "price": 68,
+        "originalPrice": 85,
+        "discount": 20,
+        "description": "A powerhouse serum combining stable Vitamin C with Vitamin E and Ferulic Acid for maximum brightening and antioxidant protection. This lightweight formula absorbs quickly and works under any moisturizer or SPF.",
+        "keyFeatures": [
+          "20% stable Vitamin C complex",
+          "Brightens dark spots in 4 weeks",
+          "Protects against environmental damage",
+          "Suitable for all skin types",
+          "Fragrance-free formula"
+        ],
+        "ingredients": [
+          "Vitamin C (20%)",
+          "Vitamin E",
+          "Ferulic Acid",
+          "Hyaluronic Acid",
+          "Niacinamide"
+        ],
+        "isBestseller": true,
+        "proRecommendation": {
+          "proName": "Lisa Wang",
+          "proImage": "/images/placeholder.png",
+          "quote": "I recommend this to all my clients looking to brighten their complexion. The results speak for themselves!"
+        },
+        "reviewHighlights": [
+          "My dark spots have faded significantly after just 3 weeks!",
+          "Love how this makes my skin glow without being greasy",
+          "Finally a Vitamin C serum that doesn't irritate my sensitive skin"
+        ],
+        "unitsSold": 2500,
+        "rating": 4.8,
+        "reviewCount": 342,
+        "shopLink": "/brand/glowlab/products/vitamin-c-serum",
+        "similarProducts": [
+          {
+            "id": "prod-2",
+            "name": "Retinol Renewal Cream",
+            "image": "/images/placeholder.png",
+            "price": 72,
+            "link": "/brand/glowlab/products/retinol-cream"
+          },
+          {
+            "id": "prod-3",
+            "name": "Hydrating Face Oil",
+            "image": "/images/placeholder.png",
+            "price": 58,
+            "link": "/brand/glowlab/products/face-oil"
+          }
+        ]
+      }
+    },
+    {
+      "id": "maries-column-1",
+      "type": "maries-column",
+      "title": "Marie's Column: Build Like a Pro",
+      "subtitle": "The Power of Starting Before You're Ready",
+      "content": {
+        "type": "maries-column",
+        "title": "The Power of Starting Before You're Ready",
+        "subtitle": "Why perfectionism is killing your beauty business dreams",
+        "authorImage": "/images/cover_1_edited.png",
+        "openingQuote": "The best time to plant a tree was 20 years ago. The second best time is now.",
+        "mainContent": "I meet so many talented beauty professionals who are waiting for the 'perfect moment' to launch their business on Glamlink. They want their photos to be perfect, their service menu complete, their pricing strategy flawless. But here's what I've learned after 15 years in this industry and building Glamlink from scratch: perfection is the enemy of progress.\n\nWhen I started Glamlink, I didn't have all the answers. The first version of our platform was embarrassingly basic compared to what we have today. But you know what? It worked. It solved a real problem for real people, and that's all that mattered.\n\nThe beauty professionals who succeed on Glamlink aren't the ones with perfect photos or flawless bios. They're the ones who start, learn, and iterate. They post their first product even if the description isn't perfect. They upload their certifications even if they're still working on advanced training. They begin.\n\nHere's the truth: Your clients don't need you to be perfect. They need you to be present, authentic, and willing to help them feel beautiful. Every day you wait to launch is a day you're not serving the clients who need exactly what you offer.\n\nThe platform is designed to grow with you. You can update your photos later. You can refine your service descriptions as you learn what resonates. You can adjust your prices based on demand. But none of that matters if you never start.",
+        "keyTakeaways": [
+          "Done is better than perfect - you can always improve later",
+          "Your first version doesn't define your final destination",
+          "Every successful beauty business started with an imperfect first step",
+          "The market will teach you what it wants faster than planning ever will",
+          "Action creates clarity, not the other way around"
+        ],
+        "actionItems": [
+          "Upload at least 3 services or products to your Glamlink profile this week",
+          "Write your brand story in your own words - don't overthink it",
+          "Share one before/after photo or client testimonial",
+          "Set up your booking calendar, even if it's just for next week",
+          "Send your Glamlink profile link to 5 existing clients"
+        ],
+        "closingThought": "Remember: You don't have to be great to start, but you have to start to be great. Your future clients are waiting for you. Don't keep them waiting any longer.",
+        "signatureImage": "/images/placeholder.png"
+      }
+    },
+    {
+      "id": "coin-drop-1",
+      "type": "coin-drop",
+      "title": "Coin Drop",
+      "subtitle": "Earn Rewards for Growing Your Business",
+      "content": {
+        "type": "coin-drop",
+        "monthlyChallenge": {
+          "title": "Launch Week Challenge",
+          "description": "Complete your brand profile and earn bonus coins during our launch celebration!",
+          "coinReward": 500,
+          "steps": [
+            "Complete your brand profile (all sections)",
+            "Add at least 5 products or services",
+            "Upload 3 before/after photos",
+            "Get 5 client reviews",
+            "Share your profile on social media with #GlamlinkPro"
+          ],
+          "deadline": "August 31, 2025",
+          "participants": 127
+        },
+        "waysToEarn": [
+          {
+            "action": "Complete brand profile",
+            "coins": 100,
+            "icon": "✅",
+            "frequency": "One time"
+          },
+          {
+            "action": "Add a new product",
+            "coins": 20,
+            "icon": "🛍️",
+            "frequency": "Per product"
+          },
+          {
+            "action": "Get a client review",
+            "coins": 50,
+            "icon": "⭐",
+            "frequency": "Per review"
+          },
+          {
+            "action": "Daily login",
+            "coins": 5,
+            "icon": "📱",
+            "frequency": "Daily"
+          },
+          {
+            "action": "Refer a pro",
+            "coins": 200,
+            "icon": "🤝",
+            "frequency": "Per referral"
+          }
+        ],
+        "featuredRewards": [
+          {
+            "name": "Pro Photography Session",
+            "coinCost": 1000,
+            "value": 500,
+            "image": "/images/placeholder.png"
+          },
+          {
+            "name": "Featured Placement (1 Month)",
+            "coinCost": 750,
+            "value": 299,
+            "image": "/images/placeholder.png"
+          },
+          {
+            "name": "AI Credits Bundle",
+            "coinCost": 300,
+            "value": 99,
+            "image": "/images/placeholder.png"
+          }
+        ],
+        "leaderboard": [
+          {
+            "name": "Sarah Beauty Studio",
+            "coins": 2840,
+            "image": "/images/placeholder.png",
+            "badge": "Top Earner"
+          },
+          {
+            "name": "Glow Aesthetics",
+            "coins": 2235,
+            "image": "/images/placeholder.png",
+            "badge": "Rising Star"
+          },
+          {
+            "name": "Luxe Lashes",
+            "coins": 1950,
+            "image": "/images/placeholder.png",
+            "badge": "Consistent"
+          }
+        ],
+        "specialOffers": [
+          {
+            "title": "Double Coins Weekend",
+            "description": "Earn 2x coins on all activities",
+            "discount": "2X COINS",
+            "minCoins": 0,
+            "endsIn": "2 days"
+          }
+        ]
+      }
+    },
+    {
+      "id": "glamlink-stories-1",
+      "type": "glamlink-stories",
+      "title": "Glamlink Stories",
+      "subtitle": "This Week's Top Posts",
+      "content": {
+        "type": "glamlink-stories",
+        "stories": [
+          {
+            "profileName": "Sarah Beauty Studio",
+            "profileImage": "/images/placeholder.png",
+            "image": "/images/placeholder.png",
+            "caption": "Amazing transformation using the new Hydrafacial technique! Swipe to see the before 👉",
+            "storyType": "before-after",
+            "timestamp": "2 hours ago",
+            "likes": 342,
+            "comments": 28,
+            "tags": [
+              "hydrafacial",
+              "glowingskin",
+              "transformation"
+            ],
+            "link": "/brand/sarah-beauty/posts/1"
+          },
+          {
+            "profileName": "Glow Aesthetics",
+            "profileImage": "/images/placeholder.png",
+            "image": "/images/placeholder.png",
+            "caption": "Quick tutorial: How to apply Vitamin C serum for maximum effectiveness 🍊",
+            "storyType": "tutorial",
+            "timestamp": "5 hours ago",
+            "likes": 256,
+            "comments": 15,
+            "views": 1200,
+            "isVideo": true,
+            "tags": [
+              "tutorial",
+              "vitaminc",
+              "skincare"
+            ],
+            "link": "/brand/glow-aesthetics/videos/1"
+          },
+          {
+            "profileName": "Luxe Lashes",
+            "profileImage": "/images/placeholder.png",
+            "image": "/images/placeholder.png",
+            "caption": "New hybrid lash extensions just dropped! Book now for 20% off first appointment",
+            "storyType": "product",
+            "timestamp": "1 day ago",
+            "likes": 189,
+            "comments": 12,
+            "tags": [
+              "lashes",
+              "newservice",
+              "promotion"
+            ],
+            "link": "/brand/luxe-lashes/services/hybrid"
+          },
+          {
+            "profileName": "Beauty Lab Pro",
+            "profileImage": "/images/placeholder.png",
+            "image": "/images/placeholder.png",
+            "caption": "5 stars from Jennifer! 'Best facial I've ever had!' Read more reviews on our profile",
+            "storyType": "review",
+            "timestamp": "3 days ago",
+            "likes": 127,
+            "comments": 8,
+            "tags": [
+              "review",
+              "testimonial",
+              "happyclient"
+            ],
+            "link": "/brand/beauty-lab-pro/reviews"
+          }
+        ],
+        "featuredStories": [
+          {
+            "title": "Microblading Mastery",
+            "description": "Watch how this pro creates perfect natural-looking brows",
+            "image": "/images/placeholder.png",
+            "profileName": "Brow Bar Studio",
+            "profileImage": "/images/placeholder.png",
+            "badge": "Most Viewed",
+            "link": "/brand/brow-bar/featured/microblading"
+          },
+          {
+            "title": "Summer Skin Prep",
+            "description": "Essential treatments before your vacation",
+            "image": "/images/placeholder.png",
+            "profileName": "Radiance Med Spa",
+            "profileImage": "/images/placeholder.png",
+            "badge": "Editor's Pick",
+            "link": "/brand/radiance/featured/summer"
+          }
+        ]
+      }
+    },
+    {
+      "id": "spotlight-city-vegas",
+      "type": "spotlight-city",
+      "title": "Spotlight City",
+      "subtitle": "Las Vegas: The Beauty Capital of Entertainment",
+      "content": {
+        "type": "spotlight-city",
+        "cityName": "Las Vegas",
+        "cityImage": "/images/placeholder.png",
+        "description": "Where beauty meets entertainment - discover the pros making Vegas glamorous 24/7",
+        "topPros": [
+          {
+            "name": "Diamond Rose Beauty",
+            "specialty": "Bridal & Special Events",
+            "image": "/images/placeholder.png",
+            "link": "/brand/diamond-rose",
+            "achievement": "Official makeup artist for 500+ Vegas weddings"
+          },
+          {
+            "name": "Neon Glow Aesthetics",
+            "specialty": "24-Hour Beauty Services",
+            "image": "/images/placeholder.png",
+            "link": "/brand/neon-glow",
+            "achievement": "Only round-the-clock beauty service on the Strip"
+          },
+          {
+            "name": "ShowTime Glam",
+            "specialty": "Performance Makeup",
+            "image": "/images/placeholder.png",
+            "link": "/brand/showtime",
+            "achievement": "Trusted by Cirque du Soleil performers"
+          }
+        ],
+        "trends": [
+          {
+            "name": "24-Hour Glow",
+            "description": "Long-lasting makeup that survives Vegas nights",
+            "popularity": "hot"
+          },
+          {
+            "name": "Pool Party Proof",
+            "description": "Waterproof everything for dayclub season",
+            "popularity": "trending"
+          },
+          {
+            "name": "Showgirl Lashes",
+            "description": "Dramatic lash extensions inspired by Vegas performers",
+            "popularity": "emerging"
+          }
+        ],
+        "localEvents": [
+          {
+            "title": "Vegas Beauty Week",
+            "date": "September 15-22, 2025",
+            "location": "Las Vegas Convention Center",
+            "description": "The largest beauty trade show in the Southwest"
+          },
+          {
+            "title": "Poolside Beauty Popup",
+            "date": "Every Saturday in August",
+            "location": "Various Vegas Pools",
+            "description": "Mobile beauty services at major pool parties"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pro-tips-ecommerce",
+      "type": "pro-tips",
+      "title": "Pro Tips",
+      "subtitle": "E-Commerce Excellence",
+      "content": {
+        "type": "pro-tips",
+        "authorName": "Jessica Chen",
+        "authorTitle": "E-Commerce Strategy Expert",
+        "authorImage": "/images/placeholder.png",
+        "topic": "Building Your Online Beauty Empire",
+        "tips": [
+          {
+            "title": "Master Your Product Photos",
+            "content": "Invest in good lighting - natural light is free and flattering. Take photos from multiple angles and always include a swatch or application shot. Your photos are your silent salespeople working 24/7.",
+            "icon": "📸",
+            "proTip": "Use a white foam board as a reflector to eliminate harsh shadows. This $5 investment will transform your product photography."
+          },
+          {
+            "title": "Write Descriptions That Sell",
+            "content": "Don't just list ingredients - tell a story. How will this product transform your customer's routine? What problem does it solve? Use sensory words that help customers imagine the experience.",
+            "icon": "✍️",
+            "proTip": "Start with the benefit, not the feature. Instead of 'Contains hyaluronic acid,' write 'Wake up to plump, hydrated skin that glows.'"
+          },
+          {
+            "title": "Leverage Social Proof",
+            "content": "Reviews are gold. Encourage happy customers to share their experience by making it easy - send follow-up emails with direct review links and consider offering loyalty points for reviews.",
+            "icon": "⭐",
+            "proTip": "Respond to EVERY review, even negative ones. Your response shows future customers how you handle issues."
+          },
+          {
+            "title": "Create Bundles That Make Sense",
+            "content": "Package complementary products together at a slight discount. This increases average order value and introduces customers to more of your range.",
+            "icon": "🎁",
+            "proTip": "Name your bundles based on the result, not the products. 'Glass Skin Set' sells better than 'Serum + Moisturizer Bundle.'"
+          },
+          {
+            "title": "Optimize for Mobile Shopping",
+            "content": "Over 70% of beauty purchases happen on mobile. Ensure your Glamlink shop looks perfect on phones - test every button, every image, every checkout step.",
+            "icon": "📱",
+            "proTip": "Keep product titles under 60 characters so they don't get cut off on mobile screens."
+          }
+        ],
+        "callToAction": {
+          "text": "Start Your Glamlink Shop Today",
+          "link": "/profile/brand"
+        }
+      }
+    },
+    {
+      "id": "quote-wall-inspiration",
+      "type": "quote-wall",
+      "title": "Quote Wall",
+      "subtitle": "Words to Build By",
+      "content": {
+        "type": "quote-wall",
+        "theme": "Inspiration for Beauty Entrepreneurs",
+        "quotes": [
+          {
+            "text": "Your passion for beauty is valid. Your business dreams are valid. The world needs what you have to offer.",
+            "author": "Melanie Marks",
+            "authorTitle": "Founder & CEO, Glamlink",
+            "authorImage": "/images/cover_1_edited.png",
+            "featured": true
+          },
+          {
+            "text": "I started with one lipstick shade and a dream. Now I have 200 products. Start where you are.",
+            "author": "Rosa Martinez",
+            "authorTitle": "Founder, Rosa Beauty",
+            "authorImage": "/images/placeholder.png"
+          },
+          {
+            "text": "Every 'no' taught me something. Every setback made me stronger. Trust the process.",
+            "author": "Michael Chang",
+            "authorTitle": "Celebrity Makeup Artist",
+            "authorImage": "/images/placeholder.png"
+          },
+          {
+            "text": "Your authenticity is your superpower. Don't try to be another brand - be the only you.",
+            "author": "Aisha Patel",
+            "authorTitle": "Beauty Influencer & Entrepreneur",
+            "authorImage": "/images/placeholder.png"
+          },
+          {
+            "text": "The beauty industry isn't just about products - it's about making people feel seen and valued.",
+            "author": "David Kim",
+            "authorTitle": "Spa Owner",
+            "authorImage": "/images/placeholder.png"
+          },
+          {
+            "text": "Consistency beats perfection every time. Show up for your business every day, even in small ways.",
+            "author": "Sarah Johnson",
+            "authorTitle": "Brand Consultant",
+            "authorImage": "/images/placeholder.png"
+          }
+        ]
+      }
+    }
+  ]
+}

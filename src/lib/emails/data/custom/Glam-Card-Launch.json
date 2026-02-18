@@ -1,0 +1,68 @@
+{
+  "customer": {
+    "firstName": "[First Name]",
+    "lastName": "[Last Name]",
+    "email": "[email]",
+    "handle": "[Their Handle]",
+    "glamCardUrl": "[Link to Your Glam Card]",
+    "temporaryPassword": "[Password You Set]"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/images/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Where Beauty Meets Innovation",
+    "appLoginUrl": "https://qrco.de/bfw5e3"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "glam_card_launch",
+    "utm_content": "founding_100_welcome"
+  },
+  "socialMedia": {
+    "instagram": "https://www.instagram.com/glamlink_app/",
+    "tiktok": "https://www.tiktok.com/@founderofglamlink"
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "Glamlink",
+      "subtitle": "Your Glam Card is Ready"
+    },
+    {
+      "type": "text",
+      "content": "<h2 style='margin: 0 0 10px; color: #333333; font-weight: bold;'>Your brand has a new home.</h2><p style='margin: 0 0 10px; color: #333333; line-height: 1.5;'>While you were behind the chair, our Concierge Team was busy building. Your custom <strong>Glam Card</strong> is officially live, and your <strong>Glamlink Profile</strong> has been curated with your best work.</p><p style='margin: 0 0 12px; color: #333333; line-height: 1.5;'>We've pre-loaded your services, featured your signature clips, and organized your albums so you can start winning immediately.</p>",
+      "alignment": "left"
+    },
+    {
+      "type": "button",
+      "text": "View Your Glam Card",
+      "url": "[Link to Your Glam Card]",
+      "alignment": "center",
+      "style": "primary"
+    },
+    {
+      "type": "text",
+      "content": "<h3 style='margin: 0 0 8px; color: #333333; font-weight: bold;'>Your Professional Launch Kit:</h3><p style='margin: 0 0 6px; color: #333333;'><strong>1. Access the App:</strong> <a href='https://qrco.de/bfw5e3' style='color: #22b8c8;'>https://qrco.de/bfw5e3</a></p><ul style='margin: 0 0 8px 20px; padding: 0; color: #333333;'><li style='margin-bottom: 3px;'><strong>Username:</strong> [Their Handle]</li><li style='margin-bottom: 3px;'><strong>Temporary Password:</strong> [Password You Set] <em style='color: #666666;'>(We recommend updating this in your settings once you've taken the tour.)</em></li></ul><p style='margin: 0 0 6px; color: #333333;'><strong>2. Your Welcome Pack (Attached):</strong> We have attached your custom <strong>Glamlink QR Code</strong> and a <strong>Launch PDF</strong>.</p><ul style='margin: 0 0 8px 20px; padding: 0; color: #333333;'><li style='margin-bottom: 3px;'><strong>Print the QR:</strong> Display it at your station so clients can scan to see your albums and leave reviews instantly.</li><li style='margin-bottom: 3px;'><strong>The Launch Graphic:</strong> We've included a high-end graphic for you to post or pin to your socials to announce your new digital home.</li></ul><p style='margin: 8px 0 0; color: #333333;'><strong>The Takeover Starts Now.</strong> Put your Glam Card link in your bio, pin your launch graphic, and welcome your clients to the future of beauty.</p><p style='margin: 4px 0 0; color: #333333;'><strong>The Glamlink Team</strong></p>",
+      "alignment": "left"
+    },
+    {
+      "type": "text",
+      "content": "<h2 style='margin: 0 0 8px; color: #333333; font-weight: bold; text-align: center;'>Welcome to the Founding 100.</h2><div style='text-align: center; margin: 0;'><img src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://qrco.de/bfwqsw' alt='Your Glamlink QR Code' style='width: 200px; height: 200px; margin: 0 auto;' /><p style='margin: 8px 0 0; color: #333333; font-style: italic;'>\"Scan to explore my work, book services, and leave a review.\"</p></div>",
+      "alignment": "center"
+    },
+    {
+      "type": "text",
+      "content": "<div style='margin: 0; padding: 12px; background-color: #f8f8f8; border-radius: 8px;'><p style='margin: 0 0 8px; color: #333333;'><strong>Step 1:</strong> Update your Instagram/TikTok bio link to your new Glam Card.</p><p style='margin: 0 0 8px; color: #333333;'><strong>Step 2:</strong> Print this page for your studio.</p><p style='margin: 0; color: #333333;'><strong>Step 3:</strong> Pin your Glam Card on IG and add to your link in bio.</p></div>",
+      "alignment": "left"
+    },
+    {
+      "type": "footer",
+      "copyrightText": "© 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "https://glamlink.com/unsubscribe",
+      "preferencesUrl": "https://glamlink.com/preferences"
+    }
+  ]
+}

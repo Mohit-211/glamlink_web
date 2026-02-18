@@ -1,0 +1,474 @@
+{
+  "id": "top-treatment",
+  "title": "Top Treatment Feature",
+  "description": "Showcase your signature beauty treatment! Help clients discover your unique services and expertise.",
+  "icon": "sparkles",
+  "bannerColor": "bg-gradient-to-r from-pink-600 to-rose-600",
+  "enabled": true,
+  "order": 4,
+  "sections": [
+    {
+      "id": "profile",
+      "title": "Profile Information",
+      "description": "Your basic contact and business information",
+      "layout": "grid",
+      "order": 1,
+      "fields": [
+        {
+          "id": "email",
+          "name": "email",
+          "type": "email",
+          "label": "Email",
+          "required": true,
+          "placeholder": "your@email.com",
+          "order": 1,
+          "validation": {
+            "minChars": 6,
+            "message": "Email must be at least 6 characters"
+          }
+        },
+        {
+          "id": "fullName",
+          "name": "fullName",
+          "type": "text",
+          "label": "Full Name",
+          "required": true,
+          "placeholder": "Enter your full name",
+          "order": 2,
+          "validation": {
+            "minChars": 2,
+            "message": "Full name must be at least 2 characters"
+          }
+        },
+        {
+          "id": "phone",
+          "name": "phone",
+          "type": "tel",
+          "label": "Phone Number",
+          "required": true,
+          "placeholder": "(555) 123-4567",
+          "order": 3,
+          "validation": {
+            "minChars": 10,
+            "message": "Phone number must be at least 10 digits"
+          }
+        },
+        {
+          "id": "businessName",
+          "name": "businessName",
+          "type": "text",
+          "label": "Business Name",
+          "required": true,
+          "placeholder": "Enter your business name",
+          "order": 4,
+          "validation": {
+            "minChars": 2,
+            "message": "Business name must be at least 2 characters"
+          }
+        },
+        {
+          "id": "businessAddress",
+          "name": "businessAddress",
+          "type": "text",
+          "label": "Business Address",
+          "required": true,
+          "placeholder": "Enter your business address",
+          "order": 5,
+          "validation": {
+            "minChars": 10,
+            "message": "Please enter a complete address"
+          }
+        },
+        {
+          "id": "instagramHandle",
+          "name": "instagramHandle",
+          "type": "text",
+          "label": "Instagram Handle",
+          "required": true,
+          "placeholder": "@yourhandle",
+          "order": 6,
+          "validation": {
+            "minChars": 2,
+            "message": "Instagram handle must be at least 2 characters"
+          }
+        },
+        {
+          "id": "primarySpecialties",
+          "name": "primarySpecialties",
+          "type": "multi-checkbox",
+          "label": "Primary Specialties",
+          "required": true,
+          "minSelections": 1,
+          "columns": 2,
+          "order": 7,
+          "options": [
+            {
+              "id": "hair_stylist",
+              "label": "Hair Stylist"
+            },
+            {
+              "id": "makeup_artist",
+              "label": "Makeup Artist"
+            },
+            {
+              "id": "esthetician",
+              "label": "Esthetician"
+            },
+            {
+              "id": "nail_tech",
+              "label": "Nail Tech"
+            },
+            {
+              "id": "massage_therapist",
+              "label": "Massage Therapist"
+            },
+            {
+              "id": "wellness",
+              "label": "Wellness"
+            },
+            {
+              "id": "injector",
+              "label": "Injector"
+            },
+            {
+              "id": "med_spa",
+              "label": "Med Spa"
+            },
+            {
+              "id": "other",
+              "label": "Other"
+            }
+          ],
+          "validation": {
+            "message": "Please select at least one specialty"
+          }
+        }
+      ]
+    },
+    {
+      "id": "treatment-details",
+      "title": "Treatment Details",
+      "description": "Everything about your signature treatment",
+      "layout": "single",
+      "order": 2,
+      "fields": [
+        {
+          "id": "treatmentName",
+          "name": "treatmentName",
+          "type": "text",
+          "label": "Treatment Name",
+          "required": true,
+          "maxLength": 100,
+          "placeholder": "Name of your signature treatment",
+          "order": 1,
+          "validation": {
+            "minChars": 3,
+            "message": "Treatment name must be at least 3 characters"
+          }
+        },
+        {
+          "id": "treatmentDescription",
+          "name": "treatmentDescription",
+          "type": "textarea",
+          "label": "Treatment Description",
+          "required": true,
+          "maxLength": 6000,
+          "rows": 4,
+          "placeholder": "Describe your treatment in detail - what it is, what it does, and why it's special...",
+          "order": 2,
+          "validation": {
+            "minChars": 50,
+            "message": "Treatment description must be at least 50 characters"
+          }
+        },
+        {
+          "id": "treatmentBenefits",
+          "name": "treatmentBenefits",
+          "type": "bullet-array",
+          "label": "Client Benefits",
+          "required": true,
+          "placeholder": "Enter a benefit",
+          "maxPoints": 5,
+          "helperText": "List your top 5 client benefits",
+          "order": 3,
+          "validation": {
+            "minChars": 15,
+            "message": "Each benefit must be at least 15 characters"
+          }
+        },
+        {
+          "id": "treatmentDuration",
+          "name": "treatmentDuration",
+          "type": "text",
+          "label": "Treatment Duration",
+          "required": true,
+          "maxLength": 50,
+          "placeholder": "e.g., 60 minutes, 2 hours",
+          "order": 4,
+          "validation": {
+            "minChars": 3,
+            "message": "Treatment duration must be at least 3 characters"
+          }
+        },
+        {
+          "id": "treatmentFrequency",
+          "name": "treatmentFrequency",
+          "type": "text",
+          "label": "How often should this treatment be done?",
+          "required": true,
+          "maxLength": 500,
+          "placeholder": "e.g., every month, once a week",
+          "order": 5,
+          "validation": {
+            "minChars": 5,
+            "message": "Treatment frequency must be at least 5 characters"
+          }
+        },
+        {
+          "id": "treatmentPrice",
+          "name": "treatmentPrice",
+          "type": "text",
+          "label": "Price Range",
+          "required": true,
+          "maxLength": 50,
+          "placeholder": "e.g., $150-200, Starting at $250",
+          "order": 6,
+          "validation": {
+            "minChars": 2,
+            "message": "Treatment price must be at least 2 characters"
+          }
+        }
+      ]
+    },
+    {
+      "id": "your-expertise",
+      "title": "Your Expertise",
+      "description": "Your experience and results",
+      "layout": "single",
+      "order": 3,
+      "fields": [
+        {
+          "id": "treatmentExperience",
+          "name": "treatmentExperience",
+          "type": "textarea",
+          "label": "Your Experience with This Treatment",
+          "required": true,
+          "maxLength": 5000,
+          "rows": 4,
+          "placeholder": "How long have you been performing this treatment? What's your training and background?",
+          "order": 1,
+          "validation": {
+            "minChars": 20,
+            "message": "Treatment experience must be at least 20 characters"
+          }
+        },
+        {
+          "id": "beforeAfterPhotos",
+          "name": "beforeAfterPhotos",
+          "type": "file-upload",
+          "label": "Before & After Photos",
+          "required": true,
+          "helperText": "Upload 3-5 high-quality before and after photos showing your results",
+          "order": 2,
+          "validation": {
+            "minFiles": 3,
+            "maxFiles": 5,
+            "maxSize": 100,
+            "accept": "image/*,video/*",
+            "message": "Please upload at least 3 before/after photos (max 5, up to 100MB each)"
+          }
+        },
+        {
+          "id": "clientResults",
+          "name": "clientResults",
+          "type": "textarea",
+          "label": "Typical Client Results",
+          "required": true,
+          "maxLength": 4000,
+          "rows": 3,
+          "placeholder": "What kind of results can clients typically expect? How long do results last?",
+          "order": 3,
+          "validation": {
+            "minChars": 30,
+            "message": "Client results must be at least 30 characters"
+          }
+        }
+      ]
+    },
+    {
+      "id": "client-information",
+      "title": "Client Information",
+      "description": "Who this treatment is for",
+      "layout": "single",
+      "order": 4,
+      "fields": [
+        {
+          "id": "idealCandidates",
+          "name": "idealCandidates",
+          "type": "textarea",
+          "label": "Ideal Candidates for This Treatment",
+          "required": true,
+          "maxLength": 4000,
+          "rows": 3,
+          "placeholder": "Who is the perfect client for this treatment? What conditions or concerns does it address?",
+          "order": 1,
+          "validation": {
+            "minChars": 30,
+            "message": "Ideal candidates must be at least 30 characters"
+          }
+        },
+        {
+          "id": "aftercareInstructions",
+          "name": "aftercareInstructions",
+          "type": "textarea",
+          "label": "Aftercare Instructions",
+          "required": true,
+          "maxLength": 4000,
+          "rows": 3,
+          "placeholder": "What aftercare do you recommend to maintain and enhance results?",
+          "order": 2,
+          "validation": {
+            "minChars": 40,
+            "message": "Aftercare instructions must be at least 40 characters"
+          }
+        }
+      ]
+    },
+    {
+      "id": "glamlink-closing",
+      "title": "Glamlink Integration",
+      "description": "Your feature connects to Glamlink.",
+      "layout": "single",
+      "order": 5,
+      "fields": [
+        {
+          "id": "excitementFeatures",
+          "name": "excitementFeatures",
+          "type": "multi-checkbox",
+          "label": "What excites you about Glamlink",
+          "required": true,
+          "minSelections": 1,
+          "columns": 2,
+          "order": 1,
+          "options": [
+            {
+              "id": "discovery",
+              "label": "Clients ability to discover pros nearby"
+            },
+            {
+              "id": "booking",
+              "label": "Seamless booking inside Glamlink"
+            },
+            {
+              "id": "ecommerce",
+              "label": "Pro shops & e-commerce"
+            },
+            {
+              "id": "magazine",
+              "label": "The Glamlink Edit magazine"
+            },
+            {
+              "id": "ai",
+              "label": "AI powered discovery (coming soon)"
+            },
+            {
+              "id": "community",
+              "label": "Community & networking with other pros"
+            }
+          ],
+          "validation": {
+            "message": "Please select at least one feature"
+          }
+        },
+        {
+          "id": "painPoints",
+          "name": "painPoints",
+          "type": "multi-checkbox",
+          "label": "Biggest pain points",
+          "required": true,
+          "minSelections": 1,
+          "columns": 2,
+          "order": 2,
+          "options": [
+            {
+              "id": "no-conversions",
+              "label": "Posting but no conversions"
+            },
+            {
+              "id": "dms-backforth",
+              "label": "DMs-too much back and forth"
+            },
+            {
+              "id": "no-shows",
+              "label": "No shows"
+            },
+            {
+              "id": "juggling-platforms",
+              "label": "Juggling too many platforms"
+            },
+            {
+              "id": "finding-clients",
+              "label": "Finding new clients"
+            },
+            {
+              "id": "no-pain-points",
+              "label": "None of the above"
+            }
+          ],
+          "validation": {
+            "message": "Please select at least one pain point"
+          }
+        },
+        {
+          "id": "instagramConsent",
+          "name": "instagramConsent",
+          "type": "checkbox",
+          "label": "I consent to have Glamlink create a free professional profile using publically available instagram content",
+          "required": true,
+          "order": 3,
+          "validation": {
+            "message": "Please consent to profile creation"
+          }
+        },
+        {
+          "id": "contentPlanningRadio",
+          "name": "contentPlanningRadio",
+          "type": "radio",
+          "label": "Content planning should be scheduled 2 weeks before being featured",
+          "required": true,
+          "order": 4,
+          "options": [
+            {
+              "id": "schedule-day",
+              "label": "Schedule a day for content"
+            },
+            {
+              "id": "create-video",
+              "label": "Create a video of your space or of a treatment"
+            }
+          ],
+          "validation": {
+            "message": "Please select a content planning option"
+          }
+        },
+        {
+          "id": "hearAboutLocalSpotlight",
+          "name": "hearAboutLocalSpotlight",
+          "type": "textarea",
+          "label": "How did you hear about Glamlink?",
+          "required": true,
+          "placeholder": "Tell us how you discovered Glamlink...",
+          "rows": 3,
+          "maxLength": 4000,
+          "order": 5,
+          "validation": {
+            "minChars": 10,
+            "message": "Please tell us how you heard about Glamlink"
+          }
+        }
+      ]
+    }
+  ],
+  "createdAt": "2025-01-15T00:00:00.000Z",
+  "updatedAt": "2025-01-15T00:00:00.000Z"
+}

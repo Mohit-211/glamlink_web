@@ -1,0 +1,201 @@
+{
+  "customer": {
+    "firstName": "Maria",
+    "lastName": "Garcia",
+    "email": "maria@example.com"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Empowering Beauty Entrepreneurs"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "content_showcase_part1",
+    "utm_content": "stories_community"
+  },
+  "theme": "standard",
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "✨ Your Beauty Community",
+      "subtitle": "Stories & Transformations"
+    },
+    {
+      "type": "featured-stories",
+      "title": "⭐ Featured This Week",
+      "subtitle": "Amazing transformations from our community",
+      "stories": [
+        {
+          "title": "30-Day Skincare Transformation",
+          "description": "See how Jessica achieved radiant skin in just one month using our recommended routine.",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&h=200&fit=crop",
+          "profileName": "Jessica M.",
+          "profileImage": "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=40&h=40&fit=crop&crop=faces",
+          "badge": "Transformation",
+          "storyUrl": "https://glamlink.com/stories/jessica-transformation",
+          "profileUrl": "https://glamlink.com/profile/jessica-m"
+        },
+        {
+          "title": "Bold Lip Color Tutorial",
+          "description": "Learn how to rock vibrant lip colors with confidence from makeup artist Ana.",
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=300&h=200&fit=crop",
+          "profileName": "Ana Rodriguez",
+          "profileImage": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=faces",
+          "badge": "Tutorial",
+          "storyUrl": "https://glamlink.com/stories/bold-lips-tutorial",
+          "profileUrl": "https://glamlink.com/profile/ana-r"
+        },
+        {
+          "title": "Natural Glow Makeup Look",
+          "description": "Achieve an effortless, natural glow with these simple techniques from certified pro Emma.",
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=300&h=200&fit=crop",
+          "profileName": "Emma Wilson",
+          "profileImage": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=faces",
+          "badge": "Pro Tips",
+          "storyUrl": "https://glamlink.com/stories/natural-glow",
+          "profileUrl": "https://glamlink.com/profile/emma-w"
+        }
+      ],
+      "gridColumns": 3,
+      "showBadges": true,
+      "viewAllUrl": "https://glamlink.com/stories"
+    },
+    {
+      "type": "story-grid",
+      "title": "Community Stories",
+      "subtitle": "Real beauty journeys from our members",
+      "stories": [
+        {
+          "profileName": "Sophie Chen",
+          "profileImage": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=32&h=32&fit=crop&crop=faces",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=240&h=300&fit=crop",
+          "caption": "Finally found my signature red lip color! Thanks to the amazing consultation with @beautypro_maria ✨",
+          "storyType": "review",
+          "timestamp": "2025-01-08T14:30:00Z",
+          "likes": 127,
+          "comments": 23,
+          "views": 856,
+          "tags": [
+            "lipstick",
+            "redlips",
+            "consultation"
+          ],
+          "isVideo": false,
+          "storyUrl": "https://glamlink.com/stories/sophie-red-lips",
+          "profileUrl": "https://glamlink.com/profile/sophie-c"
+        },
+        {
+          "profileName": "MakeupByAlex",
+          "profileImage": "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=32&h=32&fit=crop&crop=faces",
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=240&h=300&fit=crop",
+          "caption": "Step-by-step smoky eye tutorial coming up! Who wants to see it? 💫",
+          "storyType": "tutorial",
+          "timestamp": "2025-01-08T10:15:00Z",
+          "likes": 203,
+          "comments": 45,
+          "views": 1240,
+          "tags": [
+            "smokyeye",
+            "tutorial",
+            "eyemakeup"
+          ],
+          "isVideo": true,
+          "storyUrl": "https://glamlink.com/stories/alex-smoky-eye",
+          "profileUrl": "https://glamlink.com/profile/makeup-alex"
+        },
+        {
+          "profileName": "GlowGoddess",
+          "profileImage": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=faces",
+          "image": "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=240&h=300&fit=crop",
+          "caption": "Before and after using the Vitamin C serum for 4 weeks. The glow is real! ✨",
+          "storyType": "before-after",
+          "timestamp": "2025-01-07T19:45:00Z",
+          "likes": 189,
+          "comments": 34,
+          "views": 923,
+          "tags": [
+            "skincare",
+            "vitaminc",
+            "beforeafter"
+          ],
+          "isVideo": false,
+          "storyUrl": "https://glamlink.com/stories/vitamin-c-results",
+          "profileUrl": "https://glamlink.com/profile/glow-goddess"
+        },
+        {
+          "profileName": "BeautyByLila",
+          "profileImage": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=32&h=32&fit=crop&crop=faces",
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=240&h=300&fit=crop",
+          "caption": "Loving this new highlighter! Gives the perfect subtle glow 💎",
+          "storyType": "product",
+          "timestamp": "2025-01-07T16:20:00Z",
+          "likes": 156,
+          "comments": 28,
+          "views": 734,
+          "tags": [
+            "highlighter",
+            "glow",
+            "productreview"
+          ],
+          "isVideo": false,
+          "storyUrl": "https://glamlink.com/stories/lila-highlighter",
+          "profileUrl": "https://glamlink.com/profile/beauty-lila"
+        }
+      ],
+      "gridLayout": "instagram",
+      "showEngagement": true,
+      "showTimestamp": true,
+      "loadMoreUrl": "https://glamlink.com/stories/all"
+    },
+    {
+      "type": "cta-with-stats",
+      "title": "Join Our Beauty Community",
+      "subtitle": "Connect with fellow beauty enthusiasts",
+      "description": "Share your beauty journey, learn from others, and get inspired by amazing transformations from our community members.",
+      "ctaText": "Share Your Story",
+      "ctaUrl": "https://glamlink.com/stories/create",
+      "secondaryCtaText": "Browse Stories",
+      "secondaryCtaUrl": "https://glamlink.com/stories",
+      "stats": [
+        {
+          "value": "50K+",
+          "label": "Community Members",
+          "icon": "👥"
+        },
+        {
+          "value": "2.5K+",
+          "label": "Stories Shared",
+          "icon": "📸"
+        },
+        {
+          "value": "95%",
+          "label": "Love Their Results",
+          "icon": "💖"
+        }
+      ],
+      "layout": "horizontal",
+      "showIcons": true
+    },
+    {
+      "type": "app-download-cta",
+      "showUserSection": true,
+      "showProSection": true
+    },
+    {
+      "type": "footer",
+      "copyrightText": "© 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "https://glamlink.com/unsubscribe",
+      "preferencesUrl": "https://glamlink.com/preferences"
+    }
+  ]
+}

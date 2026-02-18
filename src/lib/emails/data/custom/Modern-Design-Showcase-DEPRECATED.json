@@ -1,0 +1,290 @@
+{
+  "customer": {
+    "firstName": "Alex",
+    "lastName": "Kim",
+    "email": "alex@example.com"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Empowering Beauty Entrepreneurs"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "modern_design_showcase",
+    "utm_content": "modern_sections"
+  },
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "sections": [
+    {
+      "type": "dark-cta-modal",
+      "title": "Level Up Your Beauty Game",
+      "subtitle": "Exclusive Access Awaits",
+      "description": "Join our elite community of beauty professionals and unlock advanced techniques, exclusive products, and personalized mentorship.",
+      "ctaText": "Claim Your Spot",
+      "ctaUrl": "https://glamlink.com/premium-access",
+      "secondaryCtaText": "Learn More",
+      "secondaryCtaUrl": "https://glamlink.com/premium-features",
+      "heroImage": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=600&h=300&fit=crop",
+      "features": [
+        {
+          "icon": "🎯",
+          "title": "Personalized Training",
+          "description": "Custom learning paths based on your goals and skill level"
+        },
+        {
+          "icon": "🌟",
+          "title": "Expert Mentorship",
+          "description": "1-on-1 guidance from industry-leading professionals"
+        },
+        {
+          "icon": "💎",
+          "title": "Exclusive Products",
+          "description": "Early access to premium beauty products and tools"
+        }
+      ],
+      "testimonial": {
+        "quote": "Glamlink Premium transformed my beauty business. The mentorship and exclusive access helped me increase my revenue by 300% in just 6 months!",
+        "author": "Sarah Rodriguez",
+        "role": "Certified Beauty Professional",
+        "avatar": "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=40&h=40&fit=crop&crop=faces"
+      },
+      "backgroundColor": "#0d1117",
+      "accentColor": "#58a6ff",
+      "urgencyText": "Limited Time",
+      "badge": "Premium Access"
+    },
+    {
+      "type": "circle-image-grid",
+      "title": "Discover Amazing Products",
+      "subtitle": "Curated by beauty experts",
+      "description": "Explore our handpicked selection of premium beauty products, carefully chosen by certified professionals to help you achieve your best look.",
+      "items": [
+        {
+          "id": "item1",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=120&h=120&fit=crop",
+          "title": "Glow Serum",
+          "subtitle": "Radiance Booster",
+          "description": "Vitamin C serum for instant glow and long-term skin health",
+          "itemUrl": "https://glamlink.com/products/glow-serum",
+          "badge": "NEW",
+          "price": "$89",
+          "category": "Skincare",
+          "isPopular": true
+        },
+        {
+          "id": "item2",
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=120&h=120&fit=crop",
+          "title": "Pro Brush Set",
+          "subtitle": "Professional Tools",
+          "description": "Complete set of professional-grade makeup brushes",
+          "itemUrl": "https://glamlink.com/products/pro-brush-set",
+          "badge": "BESTSELLER",
+          "price": "$124",
+          "category": "Tools",
+          "isPopular": false
+        },
+        {
+          "id": "item3",
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=120&h=120&fit=crop",
+          "title": "Lip Luxe Kit",
+          "subtitle": "Perfect Pout",
+          "description": "Complete lip care and color collection",
+          "itemUrl": "https://glamlink.com/products/lip-luxe-kit",
+          "price": "$67",
+          "category": "Makeup",
+          "isPopular": false
+        },
+        {
+          "id": "item4",
+          "image": "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=120&h=120&fit=crop",
+          "title": "Eye Perfection",
+          "subtitle": "All-in-One",
+          "description": "Complete eye makeup palette with 12 stunning shades",
+          "itemUrl": "https://glamlink.com/products/eye-perfection",
+          "badge": "LIMITED",
+          "price": "$95",
+          "category": "Makeup",
+          "isPopular": true
+        },
+        {
+          "id": "item5",
+          "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop",
+          "title": "Hydra Boost",
+          "subtitle": "Deep Moisture",
+          "description": "Intensive moisturizer for all-day hydration",
+          "itemUrl": "https://glamlink.com/products/hydra-boost",
+          "price": "$56",
+          "category": "Skincare",
+          "isPopular": false
+        },
+        {
+          "id": "item6",
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop",
+          "title": "Foundation Elite",
+          "subtitle": "Flawless Base",
+          "description": "Full coverage foundation with 24-hour wear",
+          "itemUrl": "https://glamlink.com/products/foundation-elite",
+          "badge": "PRO CHOICE",
+          "price": "$78",
+          "category": "Makeup",
+          "isPopular": false
+        },
+        {
+          "id": "item7",
+          "image": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=120&h=120&fit=crop",
+          "title": "Cleanse Pure",
+          "subtitle": "Gentle Clean",
+          "description": "Gentle yet effective daily cleanser for all skin types",
+          "itemUrl": "https://glamlink.com/products/cleanse-pure",
+          "price": "$43",
+          "category": "Skincare",
+          "isPopular": false
+        },
+        {
+          "id": "item8",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=120&h=120&fit=crop",
+          "title": "Highlight Glow",
+          "subtitle": "Radiant Finish",
+          "description": "Luminous highlighter for that perfect glow",
+          "itemUrl": "https://glamlink.com/products/highlight-glow",
+          "badge": "TRENDING",
+          "price": "$52",
+          "category": "Makeup",
+          "isPopular": true
+        }
+      ],
+      "gridColumns": 4,
+      "showBadges": true,
+      "showPrices": true,
+      "backgroundColor": "#f8f9fa",
+      "accentColor": "#20c997",
+      "viewAllUrl": "https://glamlink.com/products"
+    },
+    {
+      "type": "interactive-content-cards",
+      "title": "Latest Content",
+      "subtitle": "Stay updated with our newest tutorials, articles, and products",
+      "cards": [
+        {
+          "id": "card1",
+          "type": "tutorial",
+          "title": "Master the Smoky Eye",
+          "subtitle": "Step-by-step guide",
+          "description": "Learn how to create the perfect smoky eye look with our comprehensive tutorial. Includes product recommendations and pro tips from certified makeup artists.",
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=300&h=200&fit=crop",
+          "cardUrl": "https://glamlink.com/tutorials/smoky-eye-master",
+          "author": "Emma Rodriguez",
+          "authorImage": "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=24&h=24&fit=crop&crop=faces",
+          "date": "2025-01-08",
+          "duration": "12 min",
+          "badge": "Pro Tutorial",
+          "category": "Eye Makeup",
+          "readTime": "5 min read",
+          "isNew": true,
+          "isFeatured": false
+        },
+        {
+          "id": "card2",
+          "type": "article",
+          "title": "Winter Skincare Essentials",
+          "subtitle": "Protect your skin",
+          "description": "Discover the must-have products and techniques to keep your skin healthy and glowing throughout the winter months. Expert advice from dermatologists.",
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=300&h=200&fit=crop",
+          "cardUrl": "https://glamlink.com/articles/winter-skincare-essentials",
+          "author": "Dr. Sarah Kim",
+          "authorImage": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=24&h=24&fit=crop&crop=faces",
+          "date": "2025-01-07",
+          "badge": "Expert Advice",
+          "category": "Skincare",
+          "readTime": "8 min read",
+          "isNew": false,
+          "isFeatured": true
+        },
+        {
+          "id": "card3",
+          "type": "product",
+          "title": "New Foundation Launch",
+          "subtitle": "24-hour coverage",
+          "description": "Introducing our latest foundation formula with 24-hour wear, SPF protection, and 40 inclusive shades. Perfect for all skin types and tones.",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&h=200&fit=crop",
+          "cardUrl": "https://glamlink.com/products/foundation-24h",
+          "price": "$68",
+          "originalPrice": "$85",
+          "badge": "Launch Special",
+          "category": "Foundation",
+          "isNew": true,
+          "isFeatured": false
+        },
+        {
+          "id": "card4",
+          "type": "video",
+          "title": "Live Makeup Session",
+          "subtitle": "Interactive learning",
+          "description": "Join our live makeup session where certified professionals demonstrate techniques and answer your questions in real-time.",
+          "image": "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=200&fit=crop",
+          "cardUrl": "https://glamlink.com/live/makeup-session-jan",
+          "author": "Alex Thompson",
+          "authorImage": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=24&h=24&fit=crop&crop=faces",
+          "date": "2025-01-15",
+          "duration": "45 min",
+          "badge": "Live Event",
+          "category": "Interactive",
+          "isNew": false,
+          "isFeatured": true
+        },
+        {
+          "id": "card5",
+          "type": "event",
+          "title": "Beauty Workshop NYC",
+          "subtitle": "In-person learning",
+          "description": "Join us in New York for an intensive beauty workshop covering advanced techniques, product knowledge, and business strategies.",
+          "image": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=300&h=200&fit=crop",
+          "cardUrl": "https://glamlink.com/events/nyc-workshop",
+          "date": "2025-02-15",
+          "price": "$299",
+          "badge": "Workshop",
+          "category": "Education",
+          "isNew": false,
+          "isFeatured": false
+        },
+        {
+          "id": "card6",
+          "type": "offer",
+          "title": "Exclusive Bundle Deal",
+          "subtitle": "Limited time only",
+          "description": "Get our complete skincare routine bundle at 40% off. Includes cleanser, serum, moisturizer, and sunscreen. Perfect for new customers.",
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=300&h=200&fit=crop",
+          "cardUrl": "https://glamlink.com/offers/skincare-bundle",
+          "price": "$89",
+          "originalPrice": "$149",
+          "badge": "40% OFF",
+          "category": "Bundle Deal",
+          "isNew": true,
+          "isFeatured": true
+        }
+      ],
+      "layout": "grid",
+      "showCategories": true,
+      "showAuthors": true,
+      "showDates": true,
+      "backgroundColor": "#f8f9fa",
+      "accentColor": "#6366f1",
+      "viewAllUrl": "https://glamlink.com/content"
+    },
+    {
+      "type": "footer",
+      "copyrightText": "© 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "https://glamlink.com/unsubscribe",
+      "preferencesUrl": "https://glamlink.com/preferences"
+    }
+  ]
+}

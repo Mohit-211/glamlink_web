@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Two Column With Quote - Text Wrap Test</title>
+  <style>
+    /* ==========================================================================
+       BASE STYLES - Matching TwoColumnWithQuotePreview.tsx
+       ========================================================================== */
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Georgia, serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .page-container {
+      /* A4 portrait proportions */
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      margin: 0 auto;
+      padding: 32px; /* p-8 = 2rem = 32px */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* ==========================================================================
+       HEADER STYLES - Matching TwoColumnWithQuotePreview.tsx
+       ========================================================================== */
+
+    .article-title {
+      font-family: Arial, sans-serif;
+      font-size: 1.5rem; /* text-2xl */
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .byline {
+      font-family: Arial, sans-serif;
+      font-size: 0.75rem; /* text-xs */
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: center;
+      color: #4b5563; /* text-gray-600 */
+      margin-bottom: 1.5rem;
+    }
+
+    /* ==========================================================================
+       RECOMMENDED APPROACH: Two Side-by-Side Columns with Centered Quote
+
+       This approach uses two separate column containers with a positioned
+       quote element in the middle. Text flows around using floated spacers.
+       ========================================================================== */
+
+    .two-column-wrapper {
+      position: relative;
+      display: flex;
+      gap: 2rem;
+    }
+
+    .column {
+      flex: 1;
+      font-size: 0.875rem; /* text-sm */
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    .column p {
+      margin-bottom: 1em;
+    }
+
+    /* The quote positioned in the center */
+    .center-quote-wrapper {
+      position: absolute;
+      left: 50%;
+      top: 30%; /* Adjust this to control vertical position */
+      transform: translateX(-50%);
+      width: 50%;
+      z-index: 10;
+    }
+
+    .center-quote {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      border-top: 2px solid #000;
+      border-bottom: 2px solid #000;
+      padding: 1.5rem 1rem;
+      background: #ffffff;
+    }
+
+    .center-quote .quote-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+
+    .center-quote .quote-context {
+      font-size: 0.875rem;
+      color: #374151;
+    }
+
+    /* Float helpers to wrap text around the quote */
+    .left-column .quote-spacer {
+      float: right;
+      width: 30%; /* Overlap into center area */
+      shape-outside: inset(0);
+      margin-left: 0.5rem;
+    }
+
+    .right-column .quote-spacer {
+      float: left;
+      width: 30%;
+      shape-outside: inset(0);
+      margin-right: 0.5rem;
+    }
+
+    /* ==========================================================================
+       COMPARISON: CSS Columns with column-span (current implementation)
+       This breaks the flow rather than wrapping - shown for comparison
+       ========================================================================== */
+
+    .css-columns-approach {
+      column-count: 2;
+      column-gap: 2rem;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    .css-columns-approach p {
+      margin-bottom: 1em;
+    }
+
+    .css-columns-approach .full-width-quote {
+      column-span: all;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      border-top: 2px solid #000;
+      border-bottom: 2px solid #000;
+      padding: 1.5rem 1rem;
+      margin: 1.5rem auto;
+      max-width: 80%;
+    }
+
+    /* Section dividers */
+    .section-divider {
+      margin: 3rem 0;
+      padding: 1rem;
+      background: #f3f4f6;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      color: #6b7280;
+    }
+
+    /* Labels */
+    .approach-label {
+      font-family: Arial, sans-serif;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       RECOMMENDED: Two Side-by-Side Columns (Flexbox) with Float Spacers
+       Most reliable for achieving the wrap effect
+       ======================================================================== -->
+  <div class="page-container">
+    <div class="approach-label">RECOMMENDED: Two Side-by-Side Columns with Centered Quote (Text Wraps Around)</div>
+
+    <h1 class="article-title">asdas</h1>
+    <p class="byline">CXZCZX</p>
+
+    <div class="two-column-wrapper">
+      <!-- Absolutely positioned quote in center -->
+      <div class="center-quote-wrapper" style="top: 28%;">
+        <div class="center-quote">
+          <p class="quote-text">Sample quote here</p>
+          <p class="quote-context">Sample context here</p>
+        </div>
+      </div>
+
+      <!-- Left Column -->
+      <div class="column left-column">
+        <p><strong>Gloria Jones is quickly becoming one of the most talked-about rising estheticians in the beauty industry, a reputation built not on overnight virality but on a foundation of hard work, technical skill, and a sincere commitment to client care.</strong> Her journey reflects the evolution of modern skincare—where expertise, empathy, and innovation converge.</p>
+
+        <p>From a young age, Gloria had a natural fascination with skincare and wellness, first sparked by her own struggles with chronic breakouts in high school. Instead of settling for surface level solutions, she immersed herself in understanding why skin behaves the way it does.</p>
+
+        <!-- Spacer to push text around quote (floats right in left column) -->
+        <div class="quote-spacer" style="height: 130px; background: rgba(255,0,0,0.08);"></div>
+
+        <p>She began reading dermatology blogs, studying ingredient lists, and experimenting with at-home routines—not just for herself, but for friends and family. What began as curiosity became a passion, and it didn't take long before everyone around her recognized that she had both a knack and a genuine interest in helping others feel good in their skin.</p>
+
+        <p>Gloria's professional journey truly began when she enrolled in an accredited esthetics program, where she excelled in both theory and technique. She consistently topped her class in areas like skin analysis, advanced facial treatments, and product chemistry.</p>
+
+        <p>Instructors often praised her meticulous attention to detail and her intuitive ability to recognize a client's unique needs. Unlike many students who focused solely on practical technique, Gloria made it a priority to master the underlying science, giving her the type of deep foundational knowledge that now sets her apart in her field.</p>
+      </div>
+
+      <!-- Right Column -->
+      <div class="column right-column">
+        <p>Perhaps I, at 46, am just not the likeliest client for these new modes of therapy. Those younger than me have "grown up with some sort of device as a fifth limb," points out Alana Phemsak, a social worker and the founder and CEO of WellVentures, a service that helps search people with a therapist.</p>
+
+        <p>Their first instinct for everything is their phone. Gen Z also spent formative years during the pandemic relying on smartphones and social media for connectivity.</p>
+
+        <!-- Spacer to push text around quote (floats left in right column) -->
+        <div class="quote-spacer" style="height: 130px; background: rgba(0,0,255,0.08);"></div>
+
+        <p>AI can certainly bridge the gap for those in need of quick counsel. "With AI, when the thought strikes, you can immediately connect, or it helps capture that behavioral momentum," says Glover. And, she adds, it allows people to do work between their sessions with a human therapist.</p>
+
+        <p>A study published earlier this year positioned ChatGPT against a human therapist and found that participants could rarely tell the difference. The ChatGPT responses were also rated higher. More practically speaking, AI is able to swiftly and efficiently review medical records and documents.</p>
+
+        <p>Gloria's signature approach is a hybrid of science-based methodology and warm, personalized service. She is known for her customized facial protocols, which adapt to each client's skin type, lifestyle, and sensitivity thresholds.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider">--- COMPARISON: Current Implementation (Column-Span) ---</div>
+
+  <!-- ========================================================================
+       COMPARISON: CSS Columns with column-span (Current Implementation)
+       Shows how text BREAKS rather than wraps
+       ======================================================================== -->
+  <div class="page-container">
+    <div class="approach-label">CURRENT: CSS column-span (Text Breaks at Quote, Doesn't Wrap Around)</div>
+
+    <h1 class="article-title">asdas</h1>
+    <p class="byline">CXZCZX</p>
+
+    <div class="css-columns-approach">
+      <p><strong>Gloria Jones is quickly becoming one of the most talked-about rising estheticians in the beauty industry, a reputation built not on overnight virality but on a foundation of hard work, technical skill, and a sincere commitment to client care.</strong> Her journey reflects the evolution of modern skincare—where expertise, empathy, and innovation converge.</p>
+
+      <p>From a young age, Gloria had a natural fascination with skincare and wellness, first sparked by her own struggles with chronic breakouts in high school. Instead of settling for surface level solutions, she immersed herself in understanding why skin behaves the way it does. She began reading dermatology blogs, studying ingredient lists, and experimenting with at-home routines—not just for herself, but for friends and family.</p>
+
+      <div class="full-width-quote">
+        <p class="quote-text" style="font-size: 1.25rem; font-weight: 600; line-height: 1.3; margin-bottom: 0.5rem;">Sample quote here</p>
+        <p class="quote-context" style="font-size: 0.875rem; color: #374151;">Sample context here</p>
+      </div>
+
+      <p>What began as curiosity became a passion, and it didn't take long before everyone around her recognized that she had both a knack and a genuine interest in helping others feel good in their skin. Gloria's professional journey truly began when she enrolled in an accredited esthetics program, where she excelled in both theory and technique.</p>
+
+      <p>She consistently topped her class in areas like skin analysis, advanced facial treatments, and product chemistry. Instructors often praised her meticulous attention to detail and her intuitive ability to recognize a client's unique needs. Unlike many students who focused solely on practical technique, Gloria made it a priority to master the underlying science.</p>
+
+      <p>After receiving her license, Gloria entered the industry determined to build a career rooted in education blend seamlessly. In a field that is more crowded than ever, Gloria is distinguishing herself through her nuanced understanding of skin science and her highly personalized approach.</p>
+    </div>
+  </div>
+
+  <div class="section-divider">--- Implementation Notes for React ---</div>
+
+  <div class="page-container" style="min-height: auto; padding: 2rem;">
+    <h2 style="font-family: Arial, sans-serif; margin-bottom: 1rem;">Implementation Notes for TwoColumnWithQuotePreview.tsx</h2>
+
+    <div style="font-family: Arial, sans-serif; font-size: 0.875rem; line-height: 1.8;">
+      <p><strong>Key Changes Needed:</strong></p>
+      <ol style="margin: 1rem 0 1rem 2rem;">
+        <li>Replace CSS columns with flexbox two-column layout</li>
+        <li>Split content into left and right column paragraphs (not by position %)</li>
+        <li>Position quote absolutely in center between columns</li>
+        <li>Add invisible spacer divs that float to push text around quote</li>
+        <li>Calculate spacer position based on quotePosition percentage</li>
+      </ol>
+
+      <p style="margin-top: 1rem;"><strong>React Component Structure:</strong></p>
+      <pre style="background: #f3f4f6; padding: 1rem; margin: 1rem 0; overflow-x: auto; font-size: 0.75rem; white-space: pre-wrap;">
+{/* Container with position: relative */}
+&lt;div className="two-column-wrapper" style={{ position: 'relative', display: 'flex', gap: '2rem' }}&gt;
+
+  {/* Absolutely positioned quote */}
+  &lt;div style={{
+    position: 'absolute',
+    left: '50%',
+    top: `${quotePosition}%`,
+    transform: 'translateX(-50%)',
+    width: '50%',
+    zIndex: 10
+  }}&gt;
+    {/* Quote content */}
+  &lt;/div&gt;
+
+  {/* Left Column */}
+  &lt;div className="column" style={{ flex: 1 }}&gt;
+    {leftParagraphs.map((p, i) =&gt; (
+      &lt;React.Fragment key={i}&gt;
+        {i === spacerIndex && (
+          &lt;div style={{ float: 'right', width: '30%', height: '130px' }} /&gt;
+        )}
+        &lt;p&gt;{p}&lt;/p&gt;
+      &lt;/React.Fragment&gt;
+    ))}
+  &lt;/div&gt;
+
+  {/* Right Column */}
+  &lt;div className="column" style={{ flex: 1 }}&gt;
+    {rightParagraphs.map((p, i) =&gt; (
+      &lt;React.Fragment key={i}&gt;
+        {i === spacerIndex && (
+          &lt;div style={{ float: 'left', width: '30%', height: '130px' }} /&gt;
+        )}
+        &lt;p&gt;{p}&lt;/p&gt;
+      &lt;/React.Fragment&gt;
+    ))}
+  &lt;/div&gt;
+
+&lt;/div&gt;
+      </pre>
+
+      <p style="margin-top: 1rem;"><strong>Content Splitting Logic:</strong></p>
+      <pre style="background: #f3f4f6; padding: 1rem; margin: 1rem 0; overflow-x: auto; font-size: 0.75rem; white-space: pre-wrap;">
+// Split paragraphs alternately between columns
+const paragraphs = articleContent.split('&lt;/p&gt;').filter(p => p.trim());
+const leftParagraphs = paragraphs.filter((_, i) => i % 2 === 0);
+const rightParagraphs = paragraphs.filter((_, i) => i % 2 === 1);
+
+// Calculate spacer index based on quotePosition
+const spacerIndex = Math.floor((quotePosition / 100) * leftParagraphs.length);
+      </pre>
+    </div>
+  </div>
+
+</body>
+</html>

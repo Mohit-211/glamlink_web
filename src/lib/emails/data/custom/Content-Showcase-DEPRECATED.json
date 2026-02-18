@@ -1,0 +1,313 @@
+{
+  "customer": {
+    "firstName": "Maria",
+    "lastName": "Garcia",
+    "email": "maria@example.com"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Empowering Beauty Entrepreneurs"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "content_showcase",
+    "utm_content": "content_stories"
+  },
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "✨ Your Beauty Community",
+      "subtitle": "Stories, Events & Inspiration"
+    },
+    {
+      "type": "featured-stories",
+      "title": "⭐ Featured This Week",
+      "subtitle": "Amazing transformations from our community",
+      "stories": [
+        {
+          "title": "30-Day Skincare Transformation",
+          "description": "See how Jessica achieved radiant skin in just one month using our recommended routine.",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&h=200&fit=crop",
+          "profileName": "Jessica M.",
+          "profileImage": "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=40&h=40&fit=crop&crop=faces",
+          "badge": "Transformation",
+          "storyUrl": "https://glamlink.com/stories/jessica-transformation",
+          "profileUrl": "https://glamlink.com/profile/jessica-m"
+        },
+        {
+          "title": "Bold Lip Color Tutorial",
+          "description": "Learn how to rock vibrant lip colors with confidence from makeup artist Ana.",
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=300&h=200&fit=crop",
+          "profileName": "Ana Rodriguez",
+          "profileImage": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=faces",
+          "badge": "Tutorial",
+          "storyUrl": "https://glamlink.com/stories/bold-lips-tutorial",
+          "profileUrl": "https://glamlink.com/profile/ana-r"
+        },
+        {
+          "title": "Natural Glow Makeup Look",
+          "description": "Achieve an effortless, natural glow with these simple techniques from certified pro Emma.",
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=300&h=200&fit=crop",
+          "profileName": "Emma Wilson",
+          "profileImage": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=faces",
+          "badge": "Pro Tips",
+          "storyUrl": "https://glamlink.com/stories/natural-glow",
+          "profileUrl": "https://glamlink.com/profile/emma-w"
+        }
+      ],
+      "gridColumns": 3,
+      "showBadges": true,
+      "backgroundColor": "#f8f9fa",
+      "viewAllUrl": "https://glamlink.com/stories"
+    },
+    {
+      "type": "story-grid",
+      "title": "Community Stories",
+      "subtitle": "Real beauty journeys from our members",
+      "stories": [
+        {
+          "profileName": "Sophie Chen",
+          "profileImage": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=32&h=32&fit=crop&crop=faces",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=240&h=300&fit=crop",
+          "caption": "Finally found my signature red lip color! Thanks to the amazing consultation with @beautypro_maria ✨",
+          "storyType": "review",
+          "timestamp": "2025-01-08T14:30:00Z",
+          "likes": 127,
+          "comments": 23,
+          "views": 856,
+          "tags": ["lipstick", "redlips", "consultation"],
+          "isVideo": false,
+          "storyUrl": "https://glamlink.com/stories/sophie-red-lips",
+          "profileUrl": "https://glamlink.com/profile/sophie-c"
+        },
+        {
+          "profileName": "MakeupByAlex",
+          "profileImage": "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=32&h=32&fit=crop&crop=faces",
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=240&h=300&fit=crop",
+          "caption": "Step-by-step smoky eye tutorial coming up! Who wants to see it? 💫",
+          "storyType": "tutorial",
+          "timestamp": "2025-01-08T10:15:00Z",
+          "likes": 203,
+          "comments": 45,
+          "views": 1240,
+          "tags": ["smokyeye", "tutorial", "eyemakeup"],
+          "isVideo": true,
+          "storyUrl": "https://glamlink.com/stories/alex-smoky-eye",
+          "profileUrl": "https://glamlink.com/profile/makeup-alex"
+        },
+        {
+          "profileName": "GlowGoddess",
+          "profileImage": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=faces",
+          "image": "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=240&h=300&fit=crop",
+          "caption": "Before and after using the Vitamin C serum for 4 weeks. The glow is real! ✨",
+          "storyType": "before-after",
+          "timestamp": "2025-01-07T19:45:00Z",
+          "likes": 189,
+          "comments": 34,
+          "views": 923,
+          "tags": ["skincare", "vitaminc", "beforeafter"],
+          "isVideo": false,
+          "storyUrl": "https://glamlink.com/stories/vitamin-c-results",
+          "profileUrl": "https://glamlink.com/profile/glow-goddess"
+        },
+        {
+          "profileName": "BeautyByLila",
+          "profileImage": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=32&h=32&fit=crop&crop=faces",
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=240&h=300&fit=crop",
+          "caption": "Loving this new highlighter! Gives the perfect subtle glow 💎",
+          "storyType": "product",
+          "timestamp": "2025-01-07T16:20:00Z",
+          "likes": 156,
+          "comments": 28,
+          "views": 734,
+          "tags": ["highlighter", "glow", "productreview"],
+          "isVideo": false,
+          "storyUrl": "https://glamlink.com/stories/lila-highlighter",
+          "profileUrl": "https://glamlink.com/profile/beauty-lila"
+        }
+      ],
+      "gridLayout": "instagram",
+      "showEngagement": true,
+      "showTimestamp": true,
+      "backgroundColor": "#f8f9fa",
+      "loadMoreUrl": "https://glamlink.com/stories/all"
+    },
+    {
+      "type": "events-list",
+      "title": "Upcoming Events",
+      "subtitle": "Join our beauty community events",
+      "events": [
+        {
+          "title": "Winter Beauty Trends Workshop",
+          "date": "2025-01-25",
+          "location": "Los Angeles Beauty Center",
+          "description": "Learn the latest winter beauty trends from industry experts. Includes hands-on practice and exclusive product samples.",
+          "type": "Workshop",
+          "price": "Free for Members",
+          "eventUrl": "https://glamlink.com/events/winter-trends",
+          "registrationUrl": "https://glamlink.com/events/winter-trends/register",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=100&h=100&fit=crop",
+          "isVirtual": false,
+          "capacity": 50,
+          "organizer": "Glamlink Education Team"
+        },
+        {
+          "title": "Virtual Skincare Consultation Hour",
+          "date": "2025-01-20",
+          "location": "Online (Zoom)",
+          "description": "Free 1-hour group consultation with certified dermatologist Dr. Sarah Kim. Ask questions and get expert advice.",
+          "type": "Consultation",
+          "price": "Free",
+          "eventUrl": "https://glamlink.com/events/skincare-consultation",
+          "registrationUrl": "https://glamlink.com/events/skincare-consultation/register",
+          "isVirtual": true,
+          "capacity": 100,
+          "organizer": "Dr. Sarah Kim"
+        },
+        {
+          "title": "Makeup Artist Certification Course",
+          "date": "2025-02-01",
+          "location": "New York Beauty Academy",
+          "description": "4-week intensive course leading to professional makeup artist certification. Perfect for aspiring beauty professionals.",
+          "type": "Course",
+          "price": "$1,200",
+          "eventUrl": "https://glamlink.com/events/certification-course",
+          "registrationUrl": "https://glamlink.com/events/certification-course/register",
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=100&h=100&fit=crop",
+          "isVirtual": false,
+          "capacity": 25,
+          "organizer": "NYC Beauty Academy"
+        }
+      ],
+      "showType": true,
+      "borderColor": "#20c997",
+      "backgroundColor": "#f8f9fa",
+      "viewAllUrl": "https://glamlink.com/events",
+      "showImages": true
+    },
+    {
+      "type": "photo-gallery",
+      "title": "Photo Gallery",
+      "subtitle": "Beauty moments captured by our community",
+      "photos": [
+        {
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=200&h=200&fit=crop",
+          "title": "Golden Hour Glow",
+          "caption": "Natural makeup perfection",
+          "description": "Soft, natural makeup that enhances your natural beauty",
+          "alt": "Woman with natural golden hour makeup",
+          "photographer": "Sarah Chen",
+          "photoUrl": "https://glamlink.com/gallery/golden-hour-glow"
+        },
+        {
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=200&h=200&fit=crop",
+          "title": "Professional Tools",
+          "caption": "Quality makes all the difference",
+          "description": "Premium makeup brushes for professional results",
+          "alt": "Professional makeup brushes laid out on marble",
+          "photographer": "Emma Rodriguez",
+          "photoUrl": "https://glamlink.com/gallery/professional-tools"
+        },
+        {
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=200&h=200&fit=crop",
+          "title": "Skincare Routine",
+          "caption": "Self-care Sunday vibes",
+          "description": "A relaxing skincare routine with luxury products",
+          "alt": "Skincare products arranged aesthetically",
+          "photographer": "Maria Lopez",
+          "photoUrl": "https://glamlink.com/gallery/skincare-routine"
+        },
+        {
+          "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop",
+          "title": "Bold Confidence",
+          "caption": "Express yourself fearlessly",
+          "description": "Bold makeup look that makes a statement",
+          "alt": "Woman with bold, colorful makeup",
+          "photographer": "Alex Thompson",
+          "photoUrl": "https://glamlink.com/gallery/bold-confidence"
+        },
+        {
+          "image": "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop",
+          "title": "Natural Beauty",
+          "caption": "Less is more",
+          "description": "Embracing natural beauty with minimal makeup",
+          "alt": "Woman with minimal natural makeup",
+          "photographer": "Grace Kim",
+          "photoUrl": "https://glamlink.com/gallery/natural-beauty"
+        },
+        {
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop",
+          "title": "Evening Glamour",
+          "caption": "Ready for the night",
+          "description": "Sophisticated evening makeup for special occasions",
+          "alt": "Woman with elegant evening makeup",
+          "photographer": "Sophia Martinez",
+          "photoUrl": "https://glamlink.com/gallery/evening-glamour"
+        }
+      ],
+      "galleryLayout": "grid",
+      "columns": 3,
+      "showCaptions": true,
+      "showCredits": true,
+      "backgroundColor": "#f8f9fa",
+      "viewAllUrl": "https://glamlink.com/gallery"
+    },
+    {
+      "type": "cta-with-stats",
+      "title": "Join the Beauty Revolution",
+      "subtitle": "Be part of something amazing",
+      "description": "Connect with certified beauty professionals, learn new techniques, and grow your beauty business with our comprehensive platform.",
+      "ctaText": "Start Your Journey",
+      "ctaUrl": "https://glamlink.com/join",
+      "secondaryCtaText": "Learn More",
+      "secondaryCtaUrl": "https://glamlink.com/about",
+      "stats": [
+        {
+          "value": "50K+",
+          "label": "Active Members",
+          "icon": "👥",
+          "color": "#6366f1"
+        },
+        {
+          "value": "1,200+",
+          "label": "Certified Pros",
+          "icon": "⭐",
+          "color": "#8b5cf6"
+        },
+        {
+          "value": "95%",
+          "label": "Success Rate",
+          "icon": "📈",
+          "color": "#10b981"
+        },
+        {
+          "value": "24/7",
+          "label": "Support",
+          "icon": "💬",
+          "color": "#f59e0b"
+        }
+      ],
+      "layout": "horizontal",
+      "backgroundColor": "#f8f9fa",
+      "ctaBackgroundColor": "#1e3a5f",
+      "statsBackgroundColor": "#ffffff",
+      "showIcons": true
+    },
+    {
+      "type": "footer",
+      "copyrightText": "© 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "https://glamlink.com/unsubscribe",
+      "preferencesUrl": "https://glamlink.com/preferences"
+    }
+  ]
+}

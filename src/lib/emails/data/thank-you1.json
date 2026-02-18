@@ -1,0 +1,78 @@
+{
+  "customer": {
+    "firstName": "Sarah",
+    "lastName": "Johnson",
+    "email": "sarah.johnson@example.com"
+  },
+  "order": {
+    "orderNumber": "GL-2025-001234",
+    "orderDate": "2025-01-10",
+    "totalAmount": 125.99,
+    "items": [
+      {
+        "name": "Radiant Glow Serum",
+        "quantity": 1,
+        "price": 68.99,
+        "image": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "Hydrating Face Mask Set",
+        "quantity": 2,
+        "price": 28.50,
+        "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop"
+      }
+    ],
+    "shippingAddress": {
+      "street": "123 Beauty Lane",
+      "city": "Los Angeles",
+      "state": "CA",
+      "zip": "90210"
+    },
+    "estimatedDelivery": "2025-01-15"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/images/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Where Beauty Meets Innovation"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "order_confirmation",
+    "utm_content": "thank_you_purchase"
+  },
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "recommendedProducts": [
+    {
+      "name": "Vitamin C Brightening Cream",
+      "price": 54.99,
+      "image": "https://images.unsplash.com/photo-1570194065650-d99fb4b38e38?w=400&h=400&fit=crop",
+      "url": "https://glamlink.com/products/vitamin-c-cream"
+    },
+    {
+      "name": "Retinol Night Treatment",
+      "price": 72.99,
+      "image": "https://images.unsplash.com/photo-1556228841-a3c527ebefe5?w=400&h=400&fit=crop",
+      "url": "https://glamlink.com/products/retinol-treatment"
+    },
+    {
+      "name": "Gentle Cleansing Oil",
+      "price": 32.99,
+      "image": "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&h=400&fit=crop",
+      "url": "https://glamlink.com/products/cleansing-oil"
+    }
+  ],
+  "coupon": {
+    "code": "THANKYOU15",
+    "discount": "15% off",
+    "expiryDate": "2025-02-10",
+    "description": "Your next purchase"
+  }
+}

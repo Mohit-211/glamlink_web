@@ -1,0 +1,181 @@
+{
+  "customer": {
+    "firstName": "Alex",
+    "lastName": "Kim",
+    "email": "alex@example.com"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Empowering Beauty Entrepreneurs"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "modern_design_showcase_part2",
+    "utm_content": "products_content"
+  },
+  "theme": "standard",
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "✨ Modern Beauty Collection",
+      "subtitle": "Products & Latest Content"
+    },
+    {
+      "type": "circle-image-grid",
+      "title": "Discover Amazing Products",
+      "subtitle": "Curated by beauty experts",
+      "description": "Explore our handpicked selection of premium beauty products, carefully chosen by certified professionals to help you achieve your best look.",
+      "items": [
+        {
+          "id": "item1",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=120&h=120&fit=crop",
+          "title": "Glow Serum",
+          "subtitle": "Radiance Booster",
+          "description": "Vitamin C serum for instant glow and long-term skin health",
+          "itemUrl": "https://glamlink.com/products/glow-serum",
+          "badge": "NEW",
+          "price": "$89",
+          "category": "Skincare",
+          "isPopular": true
+        },
+        {
+          "id": "item2",
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=120&h=120&fit=crop",
+          "title": "Pro Brush Set",
+          "subtitle": "Professional Tools",
+          "description": "Complete set of professional-grade makeup brushes",
+          "itemUrl": "https://glamlink.com/products/pro-brush-set",
+          "badge": "BESTSELLER",
+          "price": "$124",
+          "category": "Tools",
+          "isPopular": false
+        },
+        {
+          "id": "item3",
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=120&h=120&fit=crop",
+          "title": "Lip Luxe Kit",
+          "subtitle": "Perfect Pout",
+          "description": "Complete lip care and color collection",
+          "itemUrl": "https://glamlink.com/products/lip-luxe-kit",
+          "price": "$67",
+          "category": "Makeup",
+          "isPopular": false
+        },
+        {
+          "id": "item4",
+          "image": "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=120&h=120&fit=crop",
+          "title": "Eye Perfection",
+          "subtitle": "All-in-One",
+          "description": "Complete eye makeup palette with 12 stunning shades",
+          "itemUrl": "https://glamlink.com/products/eye-perfection",
+          "badge": "LIMITED",
+          "price": "$95",
+          "category": "Makeup",
+          "isPopular": true
+        }
+      ],
+      "gridColumns": 4,
+      "showBadges": true,
+      "showPrices": true,
+      "viewAllUrl": "https://glamlink.com/products"
+    },
+    {
+      "type": "interactive-content-cards",
+      "title": "Latest Content",
+      "subtitle": "Stay updated with our newest tutorials, articles, and products",
+      "cards": [
+        {
+          "id": "card1",
+          "type": "tutorial",
+          "title": "Master the Smoky Eye",
+          "subtitle": "Step-by-step guide",
+          "description": "Learn how to create the perfect smoky eye look with our comprehensive tutorial. Includes product recommendations and pro tips from certified makeup artists.",
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=300&h=200&fit=crop",
+          "cardUrl": "https://glamlink.com/tutorials/smoky-eye-master",
+          "author": "Emma Rodriguez",
+          "authorImage": "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=24&h=24&fit=crop&crop=faces",
+          "date": "2025-01-08",
+          "duration": "12 min",
+          "badge": "Pro Tutorial",
+          "category": "Eye Makeup",
+          "readTime": "5 min read",
+          "isNew": true,
+          "isFeatured": false
+        },
+        {
+          "id": "card2",
+          "type": "article",
+          "title": "Winter Skincare Essentials",
+          "subtitle": "Protect your skin",
+          "description": "Discover the must-have products and techniques to keep your skin healthy and glowing throughout the winter months. Expert advice from dermatologists.",
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=300&h=200&fit=crop",
+          "cardUrl": "https://glamlink.com/articles/winter-skincare-essentials",
+          "author": "Dr. Sarah Kim",
+          "authorImage": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=24&h=24&fit=crop&crop=faces",
+          "date": "2025-01-07",
+          "badge": "Expert Advice",
+          "category": "Skincare",
+          "readTime": "8 min read",
+          "isNew": false,
+          "isFeatured": true
+        },
+        {
+          "id": "card3",
+          "type": "product",
+          "title": "New Foundation Launch",
+          "subtitle": "24-hour coverage",
+          "description": "Introducing our latest foundation formula with 24-hour wear, SPF protection, and 40 inclusive shades. Perfect for all skin types and tones.",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&h=200&fit=crop",
+          "cardUrl": "https://glamlink.com/products/foundation-24h",
+          "price": "$68",
+          "originalPrice": "$85",
+          "badge": "Launch Special",
+          "category": "Foundation",
+          "isNew": true,
+          "isFeatured": false
+        },
+        {
+          "id": "card4",
+          "type": "offer",
+          "title": "Exclusive Bundle Deal",
+          "subtitle": "Limited time only",
+          "description": "Get our complete skincare routine bundle at 40% off. Includes cleanser, serum, moisturizer, and sunscreen. Perfect for new customers.",
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=300&h=200&fit=crop",
+          "cardUrl": "https://glamlink.com/offers/skincare-bundle",
+          "price": "$89",
+          "originalPrice": "$149",
+          "badge": "40% OFF",
+          "category": "Bundle Deal",
+          "isNew": true,
+          "isFeatured": true
+        }
+      ],
+      "layout": "grid",
+      "showCategories": true,
+      "showAuthors": true,
+      "showDates": true,
+      "viewAllUrl": "https://glamlink.com/content"
+    },
+    {
+      "type": "app-download-cta",
+      "showUserSection": true,
+      "showProSection": true
+    },
+    {
+      "type": "footer",
+      "copyrightText": "© 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "https://glamlink.com/unsubscribe",
+      "preferencesUrl": "https://glamlink.com/preferences"
+    }
+  ]
+}

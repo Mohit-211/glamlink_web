@@ -1,0 +1,1419 @@
+{
+  "coverDisplayMode": "background",
+  "lockExpiresAt": null,
+  "coverImageAlt": "Glamlink Magazine Issue 103",
+  "issueNumber": 103,
+  "coverBackgroundImage": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2F2025-09-02-388261%2Fbackground%2Fbackground_1757037555985_THE%20GLAMLINK%20EDIT%20revised%20final%20version.jpg?alt=media&token=1f872545-5a9c-421a-a7fe-34fec0327f47",
+  "coverQuotePosition": "in-image",
+  "id": "2025-09-02-388261",
+  "lockedTabId": null,
+  "editorNoteTocTitle": "The Glamlink Edit",
+  "lastModified": "2025-09-10T20:27:02.140Z",
+  "lockedByName": null,
+  "lockGroup": null,
+  "coverQuote": "<p>\"The Beauty Of Being A Business Owner Is That You're In Control Of Your Destiny\"</p>",
+  "urlId": "issue-103",
+  "featuredPerson": "Featured Professional",
+  "title": "TRICIA EVANS",
+  "featured": false,
+  "description": "<p>This edition celebrates the visionaries already shaping beauty and wellness in <strong>Glamlink</strong>. From <strong>Tricia Evans</strong>, co-founder of Pretty Kitty, to <strong>Marie Matteucci</strong> on dermaplaning, Rising Star <strong>Vicki LePage</strong>, and our Local Spotlights on <strong>Polished Nails &amp; Spa</strong> and <strong>Beauty by Jann,</strong> these leaders embody the creativity and expertise driving our industry forward.</p><p>In <strong>The Glam Drop</strong>, explore what makes Glamlink different, discover platform features, what’s new, and an exclusive look at what’s coming next.</p><p>And don’t miss a preview of our <em>next cover</em>, the talented makeup artist behind the <strong>Raiderettes</strong>, bringing pro artistry to the big stage.</p>",
+  "issueDate": "2025-09-08",
+  "editorNoteTocSubtitle": "Your Bi-Weekly Digital Magazine For Beauty & Wellness ",
+  "subtitle": "Unapologetically Bold ",
+  "lockedByEmail": null,
+  "coverImage": "/images/cover_1_transparent.png",
+  "useCoverBackground": true,
+  "featuredTitle": "Beauty Expert",
+  "lockedBy": null,
+  "editorNote": "<p>Every great industry has its storytellers, and this is ours. The Glamlink Edit isn’t just a magazine; it’s a stage for the voices, innovations, and artistry shaping beauty and wellness today. Each page is designed to highlight not only the trends but also the people and the passion behind them.</p><p>This issue celebrates professionals who are rewriting what it means to lead in beauty and wellness. It’s a reminder that talent deserves visibility, and that connection should feel effortless. The Glamlink Edit exists to inspire, to inform, and to open doors, whether that’s to a new treatment, or a professional who could change your life.</p><p>We’re just at the beginning of this journey, and the future is brimming with what’s next. Thank you for turning the page with us.</p><p>— <em>Melanie Marks, Founder of Glamlink</em></p>",
+  "lockedAt": null,
+  "sectionCount": 7,
+  "lastModifiedBy": "t2Paaebk1JX3Iq6fElstbouXdEa2",
+  "lastModifiedByEmail": "system",
+  "descriptionImage": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2F2025-09-02-388261%2Fcontent%2Fcontent_1757080322227_cover_tricia.jpg?alt=media&token=a250fbc0-b440-4c0e-aaed-61d93857ecb8",
+  "visibleForPreview": false,
+  "sections": [
+    {
+      "id": "1XPpj8LATlTxAuXhSfUE",
+      "type": "custom-section",
+      "content": {
+        "subtitleFontSize": "text-2xl md:text-3xl",
+        "subtitleColor": "text-glamlink-teal",
+        "contentBlocks": [
+          {
+            "borderRadius": 0,
+            "enabled": true,
+            "borderColor": "#e5e7eb",
+            "order": 0,
+            "backgroundColor": "transparent",
+            "type": "SectionHeader",
+            "props": {
+              "subtitle2": "",
+              "subtitleStyles": {
+                "fontWeight": "font-medium",
+                "fontSize": "text-lg",
+                "textDecoration": "",
+                "color": "text-glamlink-teal",
+                "fontFamily": "font-sans",
+                "alignment": "left",
+                "fontStyle": "italic"
+              },
+              "titleStyles": {
+                "alignment": "left",
+                "color": "text-glamlink-teal",
+                "fontWeight": "font-bold",
+                "fontFamily": "font-sans",
+                "fontSize": "text-xl md:text-2xl",
+                "fontStyle": "italic"
+              },
+              "title": "",
+              "subtitle": "",
+              "subtitle2Styles": {
+                "fontSize": "text-base",
+                "alignment": "left",
+                "color": "text-gray-500",
+                "fontWeight": "font-normal",
+                "fontFamily": "font-sans"
+              }
+            },
+            "id": "block-1756815370957-19",
+            "borderWidth": 0,
+            "category": "shared",
+            "padding": 0
+          },
+          {
+            "type": "ProfessionalProfile",
+            "id": "block-1756815370957-17",
+            "enabled": true,
+            "borderRadius": 0,
+            "order": 1,
+            "padding": 0,
+            "props": {
+              "quote": "The Beauty Of Being A Business Owner Is That You’re In Control Of Your Destiny",
+              "experience": "",
+              "bioTypography": {
+                "fontWeight": "font-medium",
+                "fontSize": "text-base md:text-lg"
+              },
+              "companyTypography": {
+                "alignment": "left",
+                "textDecoration": "",
+                "fontStyle": "",
+                "color": "text-white",
+                "fontSize": "text-lg md:text-xl",
+                "fontWeight": "font-normal",
+                "fontFamily": "font-[Roboto,sans-serif]"
+              },
+              "location": "Las Vegas, NV And California ",
+              "company": "The Pretty Kitty ",
+              "titleTypography": {
+                "color": "text-white",
+                "textDecoration": "",
+                "fontFamily": "font-[Roboto,sans-serif]",
+                "fontWeight": "font-normal",
+                "fontStyle": "",
+                "fontSize": "text-lg md:text-xl",
+                "alignment": "left"
+              },
+              "nameTypography": {
+                "color": "text-white",
+                "fontSize": "text-3xl md:text-4xl",
+                "fontWeight": "font-bold",
+                "fontStyle": "",
+                "textDecoration": "",
+                "alignment": "left",
+                "fontFamily": "font-[Montserrat,sans-serif]"
+              },
+              "specialties": [],
+              "image": {
+                "objectPositionY": 0,
+                "cropData": {
+                  "zoom": 1,
+                  "crop": {
+                    "y": -12.0741390487523,
+                    "x": 0
+                  },
+                  "rotation": 0,
+                  "aspectRatio": 0.7538659793814433,
+                  "croppedAreaPixels": {
+                    "width": 1170,
+                    "y": 96,
+                    "height": 1552,
+                    "x": 0
+                  }
+                },
+                "originalUrl": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1756847367332_IMG_7653.JPEG?alt=media&token=d428f6d3-c2f1-488f-9a8e-6e9017081c9e",
+                "url": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcropped_image_1757270767466.jpg?alt=media&token=302313b6-2c0d-4690-968f-e7397b5d5dcd",
+                "objectFit": "cover",
+                "objectPositionX": 0
+              },
+              "bio": "From launching fighter jets off Navy decks to launching one of the beauty industry’s most successful waxing concepts, Tricia Evans has lived a life defined by bold choices and fearless pivots. Her story began in a small Iowa town, big dreams led her through fashion school, military service, and ultimately to the creation of The Pretty Kitty, a trailblazing waxing only destination that grew to 26 locations across the U.S. Tricia’s story is one of resilience, vision, and passion for empowering women. I sat down with her to talk about her journey, her business, and what’s next.\n\n",
+              "name": "Tricia Evans ",
+              "socialLinks": [],
+              "useOverlay": true,
+              "specialtiesTypography": {
+                "fontSize": "text-base md:text-lg"
+              },
+              "locationTypography": {
+                "fontSize": "text-base md:text-lg",
+                "fontWeight": "font-bold"
+              },
+              "title": "Co-Founder ",
+              "quoteTypography": {
+                "alignment": "left",
+                "fontWeight": "font-normal",
+                "fontStyle": "italic",
+                "color": "text-white",
+                "textDecoration": "",
+                "fontFamily": "font-serif",
+                "fontSize": "text-lg lg:text-xl"
+              }
+            },
+            "borderColor": "#e5e7eb",
+            "borderWidth": 0,
+            "backgroundColor": "transparent",
+            "category": "cover-pro-feature"
+          },
+          {
+            "enabled": true,
+            "order": 2,
+            "padding": 0,
+            "borderRadius": 0,
+            "props": {
+              "dropCapColor": "",
+              "title": "The Journey",
+              "titleStyles": {
+                "fontSize": "text-xl md:text-2xl",
+                "color": "text-gray-900",
+                "fontWeight": "font-bold",
+                "fontFamily": "font-sans",
+                "alignment": "left"
+              },
+              "dropCapStyle": "classic",
+              "titleTag": "h3",
+              "content": "<p><span style=\"font-size: 16px;\"><strong>You’ve grown The Pretty Kitty from one salon into a multi location brand, that’s now became a leader in luxury waxing. Looking back to that very first location, what was the biggest leap of faith you had to take and what gave you the courage to do it?</strong></span></p><p><span style=\"font-size: 16px;\">Opening the first salon was the ultimate leap of faith. I had just come out of a very difficult period in my life, and instead of letting it define me, I chose to see it as an opportunity to start fresh. I didn’t have anything to lose, and everything to gain. When the idea for The Pretty Kitty came to me, it felt like my ‘aha’ moment. I believed so strongly in the concept that it gave me the courage to chase it. At that same time, I had begun dating my future business partner, who brought business expertise to complement my vision. That partnership, combined with my determination, gave me the confidence to take the risk. For me, it wasn’t just about starting a business, it was about reclaiming my life, betting on myself, and building something that could empower other women too.</span></p><p><span style=\"font-size: 16px;\"><strong>Your time in the Navy, launching F-14 fighter jets, is such a striking contrast to the beauty industry. How has that experience shaped the way you approach business, leadership, or even the way you handle challenges?</strong></span></p><p><span style=\"font-size: 16px;\">My time in the Navy, working as a plane captain and launching F-14s, taught me discipline, precision, and resilience under pressure. When you’re responsible for fighter jets taking off safely, there’s no room for shortcuts or excuses. That mentality has shaped the way I run my business. I hold myself and my team to high standards, I stay calm in challenges, and I don’t shy away from hard </span><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"http://work.It\"><span style=\"font-size: 16px;\">work. It gave me the confidence to lead boldly, make quick deci</span></a><span style=\"font-size: 16px;\">sions, and face obstacles knowing I can overcome them.</span></p><p><span style=\"font-size: 16px;\"><strong>Expansion often comes with both triumphs and trials. Was there a particular moment in building The Pretty Kitty when you thought, “This might not work” and how did you push through it?</strong></span></p><p><span style=\"font-size: 16px;\">There have definitely been times when I questioned a location after it was already open. Some stores just didn’t work out, and we ended up closing them after a few years. But that’s the beauty of being a business owner, you’re in control of your destiny. If one location isn’t the right fit, you close it when the lease is up and move to a better spot. Through the years, some of our openings have been home runs, most have done really well, and a few didn’t. You just pick up, move forward, and keep building. Overall, it’s been a very successful journey.</span></p><p><span style=\"font-size: 16px;\"><strong>You’ve created a business where women feel pampered, empowered, and confident. What does confidence mean to you personally?</strong></span></p><p><span style=\"font-size: 16px;\">For me, confidence is really about owning who you are, your strengths, your flaws, your journey and moving forward anyway. It’s not about being perfect; it’s about being authentic. That’s what I love most about The Pretty Kitty. When women walk out as the best version of themselves, that’s confidence in action. And personally, it’s that same confidence that’s pushed me to take risks and keep building this brand.</span></p><p><span style=\"font-size: 16px;\"><strong>Coming from a small town in Iowa, to building a brand in areas like Las Vegas and Southern California is such a powerful journey. When you go back home, how do people there see you now?</strong></span></p><p><span style=\"font-size: 16px;\">When I go back, I think people see me as someone who had the courage to step out into the world and chase a dream, even when the path wasn’t clear. There’s a sense of pride from my hometown, it reminds me of my roots and the values of hard work and resilience that shaped me. No matter how much The Pretty Kitty has grown, I still carry that small town grounding with me.</span></p><p><span style=\"font-size: 16px;\"><strong>As The Pretty Kitty continues to evolve with services like airbrush tanning and laser hair removal, how do you balance staying innovative with holding onto the original heart of your brand?</strong></span></p><p><span style=\"font-size: 16px;\">Innovation is important, but the heart of our brand has always been about creating a luxurious, empowering experience where women feel seen and taken care of. Any new service we add whether it’s tanning or laser must align with that same promise of quality and confidence. For me, it’s not about chasing trends; it’s about thoughtful growth that enhances our clients experience while staying true to who we are.</span></p><p><span style=\"font-size: 16px;\"><strong>After nearly two decades in this business, what excites you most about the next chapter, for both you personally and for The Pretty Kitty?</strong></span></p><p><span style=\"font-size: 16px;\">Honestly, I’m most excited about what’s still ahead. Personally, I love mentoring and leading the next generation in this industry. For The Pretty Kitty, it’s about expanding with intention, bringing our concept to more markets, introducing services that add value, and continuing to set the gold standard in luxury waxing and beauty. The future isn’t just about growth, it’s about legacy, making a lasting impact on how women experience confidence and self care.</span></p><p><span style=\"font-size: 16px;\">Written by Marie Matteucci</span></p><p><span style=\"font-size: 16px;\">Beauty Columnist @</span><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"http://my.spa\"><span style=\"font-size: 16px;\">my.spa</span></a><span style=\"font-size: 16px;\">.stories</span></p><p></p>",
+              "enableDropCap": false,
+              "className": ""
+            },
+            "borderColor": "#e5e7eb",
+            "borderWidth": 0,
+            "id": "block-1756815370957-18",
+            "category": "shared",
+            "type": "RichContent",
+            "backgroundColor": "transparent"
+          },
+          {
+            "enabled": true,
+            "props": {
+              "titleTypography": {
+                "fontFamily": "",
+                "fontWeight": "font-bold",
+                "fontStyle": ""
+              },
+              "accoladesTypography": {
+                "fontWeight": "font-bold"
+              },
+              "title": "Key Achievements",
+              "accolades": [
+                "In 1989, Tricia Evans Won An MTV Dance Competition And Went On Stage With Downtown Julie Brown, Tone Loc, And Millie Vanillie",
+                "Tricia Became A Certified Plane Captain In The Navy In 1995",
+                "2006 Evans Opened The First Pretty Kitty Location In San Diego",
+                "2011 Tricia Sold Their Concept That Went On To Open An Additional 16 Locations That Were Located In TX And NJ",
+                "In 2019, She Embraced A New Chapter Of Love And Partnership, When She Married Her Best Friend, Brian"
+              ]
+            },
+            "borderColor": "#e5e7eb",
+            "borderRadius": 0,
+            "padding": 0,
+            "borderWidth": 0,
+            "order": 3,
+            "type": "AccoladesList",
+            "backgroundColor": "transparent",
+            "id": "block-1756815370957-20",
+            "category": "cover-pro-feature"
+          },
+          {
+            "id": "block-1756815370957-21",
+            "order": 4,
+            "padding": 0,
+            "category": "shared",
+            "borderWidth": 0,
+            "props": {
+              "title": "The Pretty Kitty ",
+              "imageStyling": "same-height",
+              "titleTag": "h3",
+              "photos": [
+                {
+                  "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1756848424024_IMG_5667.jpg?alt=media&token=a2bcd8b5-5035-4677-a660-ac40513026ab",
+                  "alt": "",
+                  "caption": ""
+                },
+                {
+                  "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1756848439868_A760E00E-DBAE-4870-8247-6FDA7DA1A1B6.PNG?alt=media&token=cc0bb899-8a47-4b47-8c17-2cdb75b91be9",
+                  "caption": "",
+                  "alt": ""
+                },
+                {
+                  "alt": "",
+                  "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1756848487623_FullSizeRender.jpg?alt=media&token=957e2755-7253-4e8e-938d-c50b42b9e76b",
+                  "caption": ""
+                }
+              ],
+              "columns": "responsive",
+              "titleTypography": {
+                "fontSize": "text-2xl",
+                "alignment": "center"
+              }
+            },
+            "backgroundColor": "#bcecf1",
+            "enabled": true,
+            "borderColor": "#e5e7eb",
+            "borderRadius": 0,
+            "type": "PhotoGallery"
+          },
+          {
+            "props": {
+              "titleTypography": {
+                "fontFamily": "font-sans",
+                "color": "text-gray-900",
+                "fontWeight": "font-semibold",
+                "fontSize": "text-xl",
+                "alignment": "center"
+              },
+              "socialHandle": "Use referral code @glamprettykittywax when signing up!",
+              "title": "Book With The Pretty Kitty",
+              "links": [
+                {
+                  "platform": "website",
+                  "label": "Book Now on Glamlink",
+                  "url": {
+                    "qrCode": "",
+                    "action": "user-popup",
+                    "url": "#"
+                  }
+                },
+                {
+                  "label": "Join Glamlink as a Pro",
+                  "platform": "glamlink",
+                  "url": {
+                    "action": "pro-popup",
+                    "qrCode": "",
+                    "url": "#"
+                  }
+                }
+              ]
+            },
+            "order": 5,
+            "category": "shared",
+            "type": "SocialLinks",
+            "enabled": true,
+            "id": "block-1757044682290",
+            "padding": 0,
+            "backgroundColor": "#f3f4f6",
+            "borderRadius": 0,
+            "borderColor": "#e5e7eb",
+            "borderWidth": 0
+          }
+        ],
+        "titleColor": "text-gray-900",
+        "sectionBackground": "#faf7f2",
+        "titleFontFamily": "font-[Montserrat,sans-serif]",
+        "urlSlug": "cover-feature-pro",
+        "subtitleAlignment": "center",
+        "subtitleFontFamily": "font-[Roboto,sans-serif]",
+        "layout": "single-column",
+        "titleFontSize": "text-4xl md:text-5xl",
+        "titleAlignment": "center"
+      },
+      "order": 1,
+      "lastModifiedBy": "t2Paaebk1JX3Iq6fElstbouXdEa2",
+      "version": 53,
+      "createdAt": "2025-09-02T12:17:03.016Z",
+      "createdBy": "2aEietK6rGM2A8Z9YPAckpfOSyj1",
+      "subtitle": "Tricia Evans: Unapologetically Bold",
+      "createdByEmail": "mohit@blockcod.com",
+      "lastModified": "2025-09-08T15:53:46.611Z",
+      "issueId": "2025-09-02-388261",
+      "title": "Cover Feature",
+      "lastModifiedByEmail": "melanie@glamlink.net"
+    },
+    {
+      "id": "hObuuEiDaJy4OvXAJrdH",
+      "lastModifiedByEmail": "system",
+      "title": "Rising Star",
+      "lastModifiedBy": "t2Paaebk1JX3Iq6fElstbouXdEa2",
+      "subtitle": "Vicky LePage",
+      "createdBy": "2aEietK6rGM2A8Z9YPAckpfOSyj1",
+      "order": 3,
+      "version": 36,
+      "createdAt": "2025-09-02T12:17:03.016Z",
+      "content": {
+        "subtitleFontSize": "text-3xl md:text-4xl",
+        "titleFontFamily": "font-sans",
+        "subtitleFontWeight": "font-medium",
+        "subtitle2": "By Marie Matteucci",
+        "urlSlug": "rising-star",
+        "subtitleColor": "text-glamlink-teal",
+        "titleFontSize": "text-5xl md:text-6xl",
+        "subtitleFontFamily": "font-sans",
+        "layout": "single-column",
+        "contentBlocks": [
+          {
+            "props": {
+              "starName": "Vicky LePage",
+              "quoteAuthorTypography": {
+                "fontWeight": "font-semibold",
+                "fontStyle": "italic",
+                "color": "text-gray-900",
+                "alignment": "right"
+              },
+              "starTitleTypography": {
+                "fontStyle": "",
+                "alignment": "center",
+                "fontWeight": "font-normal",
+                "textDecoration": "",
+                "fontFamily": "font-sans",
+                "color": "text-gray-600",
+                "fontSize": "text-xl"
+              },
+              "starNameTypography": {
+                "alignment": "center",
+                "color": "text-glamlink-teal",
+                "fontSize": "text-4xl lg:text-5xl",
+                "fontStyle": "",
+                "fontWeight": "font-bold",
+                "fontFamily": "font-sans",
+                "textDecoration": ""
+              },
+              "backgroundColor": "#ffffff",
+              "bioBgClassName": "bg-glamlink-teal/10",
+              "starTitle2": "Las Vegas, Nevada",
+              "quoteOverImage": true,
+              "quoteBgClassName": "#bcecf1",
+              "quote": "Fear Is The Thief Of All Dreams, DARE To Dream",
+              "bio": "<p></p>",
+              "bioTitle": "",
+              "starTitle2Typography": {
+                "color": "text-gray-900",
+                "textDecoration": "",
+                "alignment": "center",
+                "fontWeight": "font-medium",
+                "fontSize": "text-2xl",
+                "fontFamily": "font-sans",
+                "fontStyle": ""
+              },
+              "bioTitleTypography": {
+                "color": "text-gray-900",
+                "fontWeight": "font-bold",
+                "fontSize": "text-5xl"
+              },
+              "quoteTypography": {
+                "fontFamily": "",
+                "fontSize": "text-lg md:text-xl",
+                "textDecoration": "",
+                "color": "text-gray-900",
+                "fontStyle": "italic",
+                "fontWeight": "font-normal"
+              },
+              "starTitle": "Passionate Hairstylist",
+              "quoteAuthor": "",
+              "starImage": {
+                "objectFit": "cover",
+                "cropData": {
+                  "aspectRatio": 0.8309859154929577,
+                  "rotation": 0,
+                  "zoom": 1,
+                  "croppedAreaPixels": {
+                    "x": 0,
+                    "width": 590,
+                    "y": 103,
+                    "height": 710
+                  },
+                  "crop": {
+                    "y": -26.2273835315751,
+                    "x": 0
+                  }
+                },
+                "url": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcropped_starImage_1757274870093.jpg?alt=media&token=953810c2-5525-4ca7-a466-4786359f2f6b",
+                "originalUrl": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1756912095083_02E5E482-1D40-4A62-B3C8-B6E493D94272.jpeg?alt=media&token=543265d1-0e07-41e9-a5ff-d0d6f929962a"
+              }
+            },
+            "padding": 0,
+            "type": "StarProfile",
+            "enabled": true,
+            "category": "rising-star",
+            "borderRadius": 0,
+            "order": 0,
+            "borderColor": "#e5e7eb",
+            "borderWidth": 0,
+            "backgroundColor": "transparent",
+            "id": "block-1756815370957-1"
+          },
+          {
+            "props": {
+              "enableDropCap": false,
+              "dropCapStyle": "classic",
+              "dropCapColor": "",
+              "backgroundColor": "#f5e6d3",
+              "titleTag": "h3",
+              "content": "<p><span style=\"font-size: 16px;\">Every so often, someone stops your scroll on Instagram, not just because of their talent, but because their personality leaps through the screen. That’s exactly how Vicky LePage caught my eye. Her witty, creative posts had me laughing one moment and in awe of her flawless transformations the next. It quickly became clear that behind the humor was an artist with serious skill.</span></p><p><span style=\"font-size: 16px;\">Vicky began her hairstyling journey at just 17, and over the past 15 years has built a career fueled by passion, precision, and connection. Now, she’s entering a new chapter: opening her very own salon suite in Las Vegas. For her, this space isn’t just about doing hair, it’s about creating an intimate environment where artistry and personal connection come together.</span></p><p><span style=\"font-size: 16px;\">Her services span the full spectrum of modern haircare: advanced coloring and blending, color corrections, smoothing treatments, haircuts, and extensions. Clients trust her not only for her technical expertise, but also for her ability to listen and bring their vision to life.</span></p><p><span style=\"font-size: 16px;\">When it comes to products, Vicky swears by the K18 hair mask and hair oil for strengthening, paired with Pureology’s multitasking leave-in spray, a lineup that reflects her commitment to both health and style.</span></p><p><span style=\"font-size: 16px;\">But perhaps her greatest source of inspiration isn’t found in a salon chair, it’s at home. Vicky credits her son as her motivation, driving her to keep pushing forward and building the dream she’s always envisioned.</span></p><p><span style=\"font-size: 16px;\">Las Vegas has gained not just a hairstylist, but a true creative force.</span></p><p><span style=\"font-size: 16px;\"><br>Written by Marie Matteucci</span></p><p><span style=\"font-size: 16px;\">Beauty Columnist • @</span><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"http://my.spa\"><span style=\"font-size: 16px;\">my.spa</span></a><span style=\"font-size: 16px;\">.stories</span></p>",
+              "className": "",
+              "titleStyles": {
+                "fontFamily": "font-sans",
+                "alignment": "left",
+                "color": "text-gray-900",
+                "fontSize": "text-xl md:text-2xl",
+                "fontWeight": "font-bold"
+              },
+              "title": "A Creative Force In Las Vegas Hair"
+            },
+            "padding": 0,
+            "enabled": true,
+            "id": "block-1756815370957-2",
+            "backgroundColor": "transparent",
+            "type": "RichContent",
+            "borderColor": "#e5e7eb",
+            "borderRadius": 0,
+            "category": "shared",
+            "borderWidth": 0,
+            "order": 1
+          },
+          {
+            "backgroundColor": "transparent",
+            "order": 2,
+            "borderRadius": 0,
+            "type": "AchievementsGrid",
+            "padding": 0,
+            "enabled": true,
+            "props": {
+              "title": "Achievements & Recognition",
+              "bgClassName": "",
+              "backgroundColor": "#BCECF1",
+              "accolades": [
+                {
+                  "title": "Hair Ambassador And Educator For K18",
+                  "titleTypography": {
+                    "fontSize": "text-lg"
+                  },
+                  "description": "",
+                  "icon": "star"
+                },
+                {
+                  "icon": "medal",
+                  "title": "Top 30 Hairstylists In Vegas-Soeleish Magazine (3 Years In A Row)"
+                },
+                {
+                  "title": "Opened A Suite And Started A Mentorship Program",
+                  "icon": "sparkle"
+                }
+              ],
+              "titleTypography": {
+                "fontSize": "text-3xl lg:text-4xl",
+                "textDecoration": "",
+                "fontStyle": "",
+                "fontFamily": "font-sans",
+                "color": "text-gray-900",
+                "alignment": "center",
+                "fontWeight": "font-bold"
+              }
+            },
+            "id": "block-1756815370957-3",
+            "borderWidth": 0,
+            "borderColor": "#e5e7eb",
+            "category": "rising-star"
+          },
+          {
+            "borderRadius": 0,
+            "id": "block-1756815370957-4",
+            "backgroundColor": "transparent",
+            "type": "PhotoGallery",
+            "order": 3,
+            "props": {
+              "title": "A Glimpse Into Vicky's Story",
+              "titleTag": "h3",
+              "imageStyling": "same-height",
+              "titleTypography": {
+                "fontWeight": "font-bold",
+                "color": "text-gray-900",
+                "alignment": "center",
+                "fontSize": "text-3xl",
+                "textDecoration": "",
+                "fontFamily": "font-sans",
+                "fontStyle": ""
+              },
+              "photos": [
+                {
+                  "caption": "",
+                  "alt": "",
+                  "image": {
+                    "objectFit": "cover",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1756911900513_23F9047B-2DA4-407F-9796-08E1D7F145E6.jpeg?alt=media&token=eb44ed53-ffed-4b51-b4d6-10b52c1a0322"
+                  }
+                },
+                {
+                  "image": {
+                    "url": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1756911926686_94F94CA9-9884-4218-B27C-A329DEEE3F7A.jpeg?alt=media&token=3f1e581f-3099-48c7-a94d-53c0248fce63",
+                    "objectFit": "cover"
+                  },
+                  "alt": "",
+                  "caption": ""
+                },
+                {
+                  "alt": "",
+                  "caption": "",
+                  "image": {
+                    "originalUrl": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1756911960018_F4313F48-DD99-4DCC-A6C0-B6C654A03F61.jpeg?alt=media&token=50cc8fd8-8485-457c-a475-da9a1f9633a7",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcropped_image_1757277670192.jpg?alt=media&token=51df6d1c-6161-49e3-a22e-138ceb096bb9",
+                    "objectFit": "cover",
+                    "cropData": {
+                      "zoom": 1,
+                      "aspectRatio": 1.0085470085470085,
+                      "rotation": 0,
+                      "crop": {
+                        "y": -37.200876122054154,
+                        "x": 0
+                      },
+                      "croppedAreaPixels": {
+                        "y": 172,
+                        "width": 590,
+                        "height": 585,
+                        "x": 0
+                      }
+                    }
+                  }
+                }
+              ],
+              "columns": "responsive"
+            },
+            "enabled": true,
+            "category": "shared",
+            "padding": 0,
+            "borderWidth": 0,
+            "borderColor": "#e5e7eb"
+          },
+          {
+            "borderRadius": 0,
+            "type": "SocialLinks",
+            "enabled": true,
+            "borderColor": "#e5e7eb",
+            "borderWidth": 0,
+            "padding": 0,
+            "id": "block-1756815370957-5",
+            "backgroundColor": "#f3f4f6",
+            "order": 4,
+            "category": "shared",
+            "props": {
+              "links": [
+                {
+                  "url": {
+                    "qrCode": "",
+                    "url": "#",
+                    "action": "pro-popup"
+                  },
+                  "label": "Book Now on Glamlink",
+                  "platform": "instagram"
+                },
+                {
+                  "label": "Join Glamlink as a Pro",
+                  "platform": "glamlink",
+                  "url": {
+                    "qrCode": "",
+                    "url": "#",
+                    "action": "pro-popup"
+                  }
+                }
+              ],
+              "backgroundColor": "#f3f4f6",
+              "titleTypography": {
+                "color": "text-gray-900",
+                "fontWeight": "font-semibold",
+                "fontSize": "text-xl",
+                "alignment": "center",
+                "fontFamily": "font-sans"
+              },
+              "socialHandle": "Use referral code @glamvickydoeshair when signing up!",
+              "title": "Connect With Vicky "
+            }
+          }
+        ],
+        "titleAlignment": "center",
+        "titleFontWeight": "font-bold",
+        "subtitle2FontSize": "text-xl md:text-2xl",
+        "subtitle2Color": "text-gray-900",
+        "sectionBorder": true,
+        "subtitleAlignment": "center",
+        "sectionBackground": "#FAF7F2"
+      },
+      "issueId": "2025-09-02-388261",
+      "type": "custom-section",
+      "createdByEmail": "mohit@blockcod.com",
+      "lastModified": "2025-09-10T20:26:45.494Z"
+    },
+    {
+      "id": "RaBXzP38JaiVCsHqd3JJ",
+      "createdByEmail": "mohit@blockcod.com",
+      "title": "Top Treatment",
+      "version": 17,
+      "lastModifiedBy": "t2Paaebk1JX3Iq6fElstbouXdEa2",
+      "subtitle": "Waxing",
+      "lastModified": "2025-09-08T07:21:15.738Z",
+      "issueId": "2025-09-02-388261",
+      "createdBy": "2aEietK6rGM2A8Z9YPAckpfOSyj1",
+      "createdAt": "2025-09-02T12:17:03.016Z",
+      "content": {
+        "sectionBorder": true,
+        "layout": "single-column",
+        "contentBlocks": [
+          {
+            "borderRadius": 0,
+            "enabled": true,
+            "backgroundColor": "transparent",
+            "props": {
+              "overlayText": "",
+              "descriptionTypography": {
+                "fontFamily": "font-sans",
+                "fontStyle": "",
+                "color": "text-gray-600",
+                "textDecoration": "",
+                "fontSize": "text-lg md:text-xl",
+                "alignment": "center",
+                "fontWeight": "font-normal"
+              },
+              "cityNameTypography": {
+                "textDecoration": "",
+                "fontWeight": "font-bold",
+                "alignment": "center",
+                "fontSize": "text-3xl md:text-4xl",
+                "color": "text-glamlink-teal",
+                "fontStyle": "",
+                "fontFamily": "font-sans"
+              },
+              "overlayTextTypography": {
+                "textDecoration": "",
+                "fontStyle": "",
+                "color": "text-white",
+                "fontWeight": "font-bold",
+                "alignment": "left",
+                "fontFamily": "font-sans",
+                "fontSize": "text-2xl md:text-3xl"
+              },
+              "cityName": "",
+              "description": "",
+              "cityImage": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1757048827052_shutterstock_1568859463.jpg?alt=media&token=e472ccb1-928c-42e1-8d98-afadea90862e"
+            },
+            "borderColor": "#e5e7eb",
+            "id": "block-1757048781161",
+            "borderWidth": 0,
+            "category": "spotlight-city",
+            "padding": 0,
+            "type": "CityHero",
+            "order": 0
+          },
+          {
+            "borderColor": "#e5e7eb",
+            "backgroundColor": "transparent",
+            "id": "block-1756815370957-9",
+            "borderRadius": 0,
+            "padding": 0,
+            "enabled": true,
+            "props": {
+              "content": "<p>Waxing isn’t just about smooth skin-it’s a craft, a ritual, and, when done right, a beauty secret that keeps you glowing week after week. Millions of people already wax, but few know the insider tricks professionals swear by. Whether you’re a client looking for better results or a pro looking to elevate your services, here’s the real scoop.</p><p>🌟<strong> Secrets Clients Don’t Always Hear</strong></p><p><strong>Temperature Matters:</strong> A room that’s too cold makes skin tense and the process more uncomfortable. Warm, relaxed skin = smoother pulls.</p><p><strong>Cycles Count:</strong> Waxing regularly (every 4-6 weeks) trains hair to grow on the same cycle, which means cleaner results over time.</p><p><strong>Pair It Right:</strong> Waxing before a hydrating facial or body treatment allows serums and masks to penetrate deeper, amplifying results.</p><p><strong>Pro Tricks of the Trade</strong></p><ul><li><p>Rotate between hard wax and soft wax depending on the area, one size doesn’t fit all.</p></li><li><p>Keep post-wax redness minimal by applying soothing serums with calendula or chamomile.</p></li><li><p>For sensitive clients, sugaring or roll-on wax systems can be a game-changer.</p></li><li><p>Professionals know it’s not just hair removal, it’s relationship building. A calm atmosphere and aftercare education keep clients loyal.</p></li></ul><p>🔥<strong> Why It Still Matters</strong></p><p>Shaving is quick and lasers are trendy, but waxing holds its place because it’s versatile, safe, and instantly effective for almost everyone. Pregnant? Sensitive skin? Waxing can still be your go-to with the right professional.</p><p>💎<strong> Book Your Wax With the Best</strong></p><p>Ready to put these secrets to the test? You can now book waxing services directly through the <strong>Glamlink app</strong> with trusted professionals like <strong>Pretty Kitty</strong>, <strong>Polished Nails &amp; Spa</strong>, <strong>Nails by Tee</strong>, and <strong>Iconic Aesthetics by Christina in California</strong>. Smooth skin is only a click away.</p>",
+              "dropCapStyle": "classic",
+              "titleStyles": {
+                "fontSize": "text-lg md:text-xl",
+                "color": "text-glamlink-teal",
+                "alignment": "left",
+                "fontWeight": "font-bold",
+                "fontFamily": "font-sans"
+              },
+              "enableDropCap": false,
+              "title": "Tips, Tricks And Secrets",
+              "titleTag": "h3",
+              "backgroundColor": "#ffffff"
+            },
+            "borderWidth": 0,
+            "type": "RichContent",
+            "order": 1,
+            "category": "shared"
+          },
+          {
+            "backgroundColor": "transparent",
+            "id": "block-1756815370957-7",
+            "category": "top-treatment",
+            "borderRadius": 0,
+            "borderWidth": 0,
+            "order": 2,
+            "props": {
+              "benefitsTitle": "Key Benefits:",
+              "benefitsTitleTypography": {
+                "fontWeight": "font-bold",
+                "fontSize": "text-xl md:text-2xl",
+                "color": "text-gray-900"
+              },
+              "treatmentName": "Waxing Secrets",
+              "benefits": [],
+              "treatmentBackground": "transparent",
+              "backgroundColor": "#f3f4f6",
+              "treatmentStats": [
+                {
+                  "value": "10-60 mins",
+                  "backgroundColor": "#BCECF1",
+                  "icon": "⏱️",
+                  "label": "Duration"
+                },
+                {
+                  "value": "Every 4-6 Weeks",
+                  "backgroundColor": "#BCECF1",
+                  "icon": "📅",
+                  "label": "Frequency"
+                },
+                {
+                  "label": "Price Range",
+                  "value": "Depends On Area ",
+                  "icon": "💰",
+                  "backgroundColor": "#BCECF1"
+                }
+              ]
+            },
+            "borderColor": "#e5e7eb",
+            "type": "TreatmentDetails",
+            "enabled": true,
+            "padding": 0
+          },
+          {
+            "id": "block-1756815370957-8",
+            "type": "ProInsights",
+            "category": "top-treatment",
+            "backgroundColor": "transparent",
+            "borderRadius": 0,
+            "borderWidth": 0,
+            "borderColor": "#e5e7eb",
+            "order": 3,
+            "props": {
+              "title": "Celeb Quote",
+              "backgroundColor": "#FAF7F2 ",
+              "insights": [
+                {
+                  "authorTypography": {
+                    "fontWeight": "font-bold",
+                    "fontSize": "text-base md:text-lg"
+                  },
+                  "quoteTypography": {
+                    "fontWeight": "font-normal",
+                    "fontSize": "text-base md:text-lg"
+                  },
+                  "quote": "A women should try a Brazilian at least once.",
+                  "author": "Eva Longoria"
+                }
+              ]
+            },
+            "enabled": true,
+            "padding": 0
+          },
+          {
+            "borderWidth": 0,
+            "props": {
+              "title": "Expected Results:",
+              "content": "<p>Smooth, hair-free skin that lasts between 3-6 weeks, with softer regrowth over time</p>",
+              "enableDropCap": false,
+              "titleStyles": {
+                "fontFamily": "font-sans",
+                "fontWeight": "font-bold",
+                "alignment": "left",
+                "color": "text-gray-900",
+                "fontSize": "text-xl md:text-2xl"
+              },
+              "titleTag": "h3"
+            },
+            "order": 4,
+            "category": "shared",
+            "backgroundColor": "transparent",
+            "borderRadius": 0,
+            "borderColor": "#e5e7eb",
+            "padding": 0,
+            "enabled": true,
+            "type": "RichContent",
+            "id": "block-1756815370957-10"
+          },
+          {
+            "borderColor": "#e5e7eb",
+            "props": {
+              "titleTag": "h3",
+              "titleStyles": {
+                "fontWeight": "font-bold",
+                "alignment": "left",
+                "fontFamily": "font-sans",
+                "fontSize": "text-xl md:text-2xl",
+                "color": "text-gray-900"
+              },
+              "title": "Good to Know:",
+              "backgroundColor": "#BCECF1",
+              "enableDropCap": false,
+              "content": "<p><span style=\"color: rgb(55, 65, 81); font-size: medium;\">Pro Tip: Schedule your appointment at least a few days before an event and avoid booking right around your menstrual cycle, as skin is more sensitive.</span></p>"
+            },
+            "borderRadius": 0,
+            "category": "shared",
+            "order": 5,
+            "id": "block-1756815370957-11",
+            "padding": 0,
+            "enabled": true,
+            "type": "RichContent",
+            "borderWidth": 0,
+            "backgroundColor": "transparent"
+          },
+          {
+            "enabled": true,
+            "padding": 0,
+            "props": {
+              "profileImageWidth": 150,
+              "profileImageHeight": 150,
+              "title": "Book Your Next Wax Appt",
+              "titleTypography": {
+                "fontSize": "text-xl",
+                "color": "text-gray-900",
+                "fontFamily": "font-sans",
+                "fontWeight": "font-semibold",
+                "alignment": "center"
+              },
+              "profileImage": "",
+              "links": [
+                {
+                  "label": "View on Glamlink",
+                  "platform": "glamlink",
+                  "url": {
+                    "url": "https://linktr.ee/glamlink_app",
+                    "action": "link"
+                  }
+                }
+              ],
+              "profileImageBorderColor": "#f5e6d3"
+            },
+            "borderRadius": 0,
+            "order": 6,
+            "borderColor": "#e5e7eb",
+            "id": "block-1757135293223",
+            "backgroundColor": "transparent",
+            "type": "SocialLinks",
+            "borderWidth": 0,
+            "category": "shared"
+          }
+        ],
+        "sectionBackground": "#FAF7F2",
+        "subtitleFontWeight": "font-medium",
+        "titleFontSize": "text-4xl md:text-5xl",
+        "titleAlignment": "center",
+        "titleFontWeight": "font-bold",
+        "subtitleFontFamily": "font-sans",
+        "subtitleFontSize": "text-3xl md:text-4xl",
+        "urlSlug": "top-treatment",
+        "subtitleColor": "text-glamlink-teal",
+        "subtitleAlignment": "center",
+        "titleFontFamily": "font-sans",
+        "subtitle2FontSize": "text-lg"
+      },
+      "order": 4,
+      "lastModifiedByEmail": "system",
+      "type": "custom-section"
+    },
+    {
+      "id": "MnqXDld5FByNuuyrn1lS",
+      "lastModifiedByEmail": "system",
+      "lockStatus": {
+        "isExpired": true,
+        "lockedBy": "2aEietK6rGM2A8Z9YPAckpfOSyj1",
+        "lockExpiresIn": 0,
+        "lockedByEmail": "mohit@blockcod.com",
+        "sectionId": "s2sCWw0rqinBmlcxwk3K",
+        "lockedByName": "Nick Kane",
+        "isLocked": false,
+        "canEdit": true
+      },
+      "lastModifiedBy": "t2Paaebk1JX3Iq6fElstbouXdEa2",
+      "title": "Local Spotlight",
+      "subtitle": "Polished Nails & Spa And Beauty By Jann",
+      "createdBy": "2aEietK6rGM2A8Z9YPAckpfOSyj1",
+      "order": 5,
+      "version": 38,
+      "createdAt": "2025-09-04T22:42:53.548Z",
+      "content": {
+        "subtitle2Color": "text-gray-900",
+        "layout": "single-column",
+        "sectionBackground": "#FAF7F2",
+        "subtitleFontWeight": "font-normal",
+        "titleFontSize": "text-5xl md:text-6xl",
+        "subtitle2FontWeight": "font-normal",
+        "subtitle2": "",
+        "subtitle2Alignment": "center",
+        "subtitleFontSize": "text-2xl md:text-3xl",
+        "subtitleColor": "text-glamlink-teal",
+        "titleFontWeight": "font-bold",
+        "titleFontFamily": "font-sans",
+        "urlSlug": "localspotlight",
+        "titleAlignment": "center",
+        "contentBlocks": [
+          {
+            "borderWidth": 0,
+            "borderRadius": 0,
+            "type": "PhotoGallery",
+            "enabled": true,
+            "category": "shared",
+            "id": "block-1757024371422-4",
+            "backgroundColor": "transparent",
+            "props": {
+              "columns": "responsive",
+              "titleTypography": {
+                "fontStyle": "",
+                "fontSize": "text-3xl",
+                "fontFamily": "font-sans",
+                "textDecoration": "",
+                "fontWeight": "font-bold",
+                "alignment": "center",
+                "color": "text-gray-900"
+              },
+              "photos": [
+                {
+                  "alt": "",
+                  "caption": "",
+                  "image": {
+                    "objectPositionX": 0,
+                    "objectFit": "cover",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1757039609753_IMG_9024.jpg?alt=media&token=55535627-fab6-4c86-9c04-9384476bf3a5",
+                    "objectPositionY": 36
+                  }
+                },
+                {
+                  "image": {
+                    "objectFit": "cover",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1757040643244_IMG_9025.jpg?alt=media&token=b0ecb350-3f85-4b13-8a31-96c39d8a42c4"
+                  }
+                },
+                {
+                  "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1757040675318_IMG_9034.JPG?alt=media&token=199c2326-4a17-462a-bc6c-e369cb5ef3c9"
+                }
+              ],
+              "title": "",
+              "imageStyling": "same-height",
+              "titleTag": "h3"
+            },
+            "borderColor": "#e5e7eb",
+            "order": 0,
+            "padding": 0
+          },
+          {
+            "backgroundColor": "transparent",
+            "padding": 0,
+            "category": "shared",
+            "type": "RichContent",
+            "id": "block-1757024371422-2",
+            "borderColor": "#e5e7eb",
+            "borderRadius": 0,
+            "enabled": true,
+            "order": 1,
+            "props": {
+              "backgroundColor": "#f5e6d3",
+              "className": "",
+              "title": "Polished Nails & Spa ",
+              "dropCapStyle": "classic",
+              "enableDropCap": false,
+              "dropCapColor": "",
+              "titleTag": "h3",
+              "content": "<p><span style=\"font-size: 20px;\">Located In the Southwest, 7575 S Rainbow Blvd Unit 107</span></p>",
+              "titleStyles": {
+                "color": "text-gray-900",
+                "fontFamily": "font-sans",
+                "fontSize": "text-xl md:text-2xl",
+                "fontWeight": "font-bold",
+                "alignment": "left"
+              }
+            },
+            "borderWidth": 0
+          },
+          {
+            "padding": 0,
+            "borderWidth": 0,
+            "props": {
+              "benefits": [],
+              "benefitsTitleTypography": {
+                "fontWeight": "font-bold",
+                "color": "text-gray-900",
+                "fontSize": "text-xl md:text-2xl"
+              },
+              "description": "",
+              "descriptionTypography": "",
+              "treatmentBackground": "",
+              "benefitsTitle": "",
+              "treatmentStats": [
+                {
+                  "labelTypography": {
+                    "alignment": "center",
+                    "fontWeight": "font-medium",
+                    "fontSize": "text-lg"
+                  },
+                  "icon": "",
+                  "backgroundColor": "#BCECF1",
+                  "value": "",
+                  "label": "Nails"
+                },
+                {
+                  "icon": "",
+                  "value": "",
+                  "label": "Luxury Pedicures ",
+                  "labelTypography": {
+                    "fontWeight": "font-medium",
+                    "fontSize": "text-lg"
+                  },
+                  "backgroundColor": "#BCECF1"
+                },
+                {
+                  "label": "Waxing ",
+                  "value": "",
+                  "icon": "",
+                  "labelTypography": {
+                    "fontWeight": "font-medium",
+                    "fontSize": "text-lg"
+                  },
+                  "backgroundColor": "#BCECF1"
+                },
+                {
+                  "label": "Lashes",
+                  "backgroundColor": "#BCECF1",
+                  "labelTypography": {
+                    "fontWeight": "font-medium",
+                    "fontSize": "text-lg"
+                  }
+                },
+                {
+                  "backgroundColor": "#BCECF1",
+                  "labelTypography": {
+                    "fontWeight": "font-medium",
+                    "fontSize": "text-lg"
+                  },
+                  "label": "Hydro Facial "
+                },
+                {
+                  "label": "Microblading ",
+                  "labelTypography": {
+                    "fontSize": "text-lg",
+                    "fontWeight": "font-medium"
+                  },
+                  "backgroundColor": "#BCECF1"
+                }
+              ],
+              "nameTypography": "",
+              "treatmentName": ""
+            },
+            "type": "TreatmentDetails",
+            "order": 2,
+            "backgroundColor": "transparent",
+            "enabled": true,
+            "category": "top-treatment",
+            "borderRadius": 0,
+            "borderColor": "#e5e7eb",
+            "id": "block-1757047996277"
+          },
+          {
+            "enabled": true,
+            "category": "shared",
+            "borderRadius": 0,
+            "id": "block-1757024371422-5",
+            "borderWidth": 0,
+            "type": "SocialLinks",
+            "backgroundColor": "transparent",
+            "padding": 0,
+            "borderColor": "#e5e7eb",
+            "props": {
+              "backgroundColor": "#f3f4f6",
+              "titleTypography": {
+                "color": "text-gray-900",
+                "fontSize": "text-xl",
+                "fontWeight": "font-semibold",
+                "fontFamily": "font-sans",
+                "alignment": "center"
+              },
+              "profileImageWidth": "",
+              "links": [
+                {
+                  "platform": "glamlink",
+                  "label": "Book on Glamlink",
+                  "url": {
+                    "action": "link",
+                    "url": "https://linktr.ee/glamlink_app"
+                  }
+                }
+              ],
+              "profileImage": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1757113990869_Untitled%20design.png.PNG?alt=media&token=b7e4f348-41bb-4bb7-9333-e370bdcfded9",
+              "title": "Book with @polishednails",
+              "profileImageBorderColor": "#fffffff"
+            },
+            "order": 3
+          },
+          {
+            "id": "block-1757115232006",
+            "borderRadius": 0,
+            "borderWidth": 0,
+            "backgroundColor": "transparent",
+            "props": {
+              "lineStyle": "solid",
+              "lineColor": "#24bbcb",
+              "lineWidth": 1,
+              "spacing": "medium"
+            },
+            "type": "SectionDivider",
+            "category": "shared",
+            "order": 4,
+            "enabled": true,
+            "padding": 0,
+            "borderColor": "#e5e7eb"
+          },
+          {
+            "borderRadius": 0,
+            "enabled": true,
+            "props": {
+              "title": "Beauty By Jann ",
+              "titleTag": "h3",
+              "titleTypography": {
+                "alignment": "center",
+                "fontSize": "text-2xl md:text-3xl",
+                "fontStyle": "",
+                "textDecoration": "",
+                "fontWeight": "font-bold",
+                "color": "text-gray-900",
+                "fontFamily": "font-sans"
+              },
+              "columns": "3",
+              "imageStyling": "same-height",
+              "photos": [
+                {
+                  "caption": "",
+                  "alt": "",
+                  "image": {
+                    "objectPositionX": 0,
+                    "originalUrl": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1757043746099_IMG_9036.jpg?alt=media&token=68e1d31f-fe87-4adb-911d-986a2108591b",
+                    "objectPositionY": 0,
+                    "cropData": {
+                      "rotation": 0,
+                      "aspectRatio": 1.7777777777777777,
+                      "croppedAreaPixels": {
+                        "y": 275,
+                        "height": 722,
+                        "x": 0,
+                        "width": 1284
+                      },
+                      "crop": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "zoom": 1
+                    },
+                    "objectFit": "cover",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcropped_image_1757043931531.jpg?alt=media&token=6d289d3b-bd85-408b-9ba2-122644f708ae"
+                  }
+                },
+                {
+                  "alt": "",
+                  "caption": "",
+                  "image": {
+                    "url": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1757043838382_IMG_9035.jpg?alt=media&token=a3c44d6b-4f30-4e2b-9fc2-abb96f085c9c",
+                    "objectFit": "cover"
+                  }
+                },
+                {
+                  "alt": "",
+                  "image": {
+                    "objectFit": "cover",
+                    "url": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcropped_image_1757043960882.jpg?alt=media&token=1d4f0c0e-8600-4834-b182-a546b5c62e51",
+                    "cropData": {
+                      "crop": {
+                        "x": 0,
+                        "y": 28
+                      },
+                      "zoom": 1,
+                      "croppedAreaPixels": {
+                        "x": 0,
+                        "y": 191,
+                        "height": 722,
+                        "width": 1284
+                      },
+                      "rotation": 0,
+                      "aspectRatio": 1.7777777777777777
+                    },
+                    "originalUrl": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1757043902458_IMG_9037.jpg?alt=media&token=72343a11-fb1e-4771-85fa-43fdf0ba786b"
+                  },
+                  "caption": ""
+                }
+              ]
+            },
+            "id": "block-1757041818552",
+            "type": "PhotoGallery",
+            "borderWidth": 0,
+            "category": "shared",
+            "backgroundColor": "transparent",
+            "order": 5,
+            "borderColor": "#e5e7eb",
+            "padding": 0
+          },
+          {
+            "order": 6,
+            "enabled": true,
+            "padding": 0,
+            "id": "block-1757041840818",
+            "type": "RichContent",
+            "props": {
+              "title": "",
+              "content": "<p>Located in the Southwest, 8090 Blue Diamond Rd Ste 240</p>",
+              "className": "",
+              "titleTag": "h3",
+              "dropCapStyle": "classic",
+              "enableDropCap": false,
+              "titleStyles": {
+                "fontFamily": "font-sans",
+                "fontSize": "text-xl md:text-2xl",
+                "alignment": "left",
+                "color": "text-gray-900",
+                "fontWeight": "font-bold"
+              },
+              "dropCapColor": ""
+            },
+            "borderWidth": 0,
+            "borderRadius": 0,
+            "category": "shared",
+            "borderColor": "#e5e7eb",
+            "backgroundColor": "transparent"
+          },
+          {
+            "borderRadius": 0,
+            "borderWidth": 0,
+            "id": "block-1757046205287",
+            "type": "TreatmentDetails",
+            "order": 7,
+            "padding": 0,
+            "category": "top-treatment",
+            "backgroundColor": "transparent",
+            "props": {
+              "description": "",
+              "benefitsTitleTypography": {
+                "fontWeight": "font-bold",
+                "color": "text-gray-900",
+                "fontSize": "text-xl md:text-2xl"
+              },
+              "descriptionTypography": "",
+              "treatmentName": "",
+              "benefitsTitle": "",
+              "nameTypography": "",
+              "benefits": [],
+              "treatmentBackground": "",
+              "treatmentStats": [
+                {
+                  "backgroundColor": "#BCECF1",
+                  "icon": "",
+                  "labelTypography": {
+                    "fontWeight": "font-medium",
+                    "fontSize": "text-lg"
+                  },
+                  "label": "Mega Volume Lashes ",
+                  "value": ""
+                },
+                {
+                  "backgroundColor": "#BCECF1",
+                  "labelTypography": {
+                    "fontSize": "text-lg",
+                    "fontWeight": "font-medium"
+                  },
+                  "label": "Volume Lashes ",
+                  "icon": "",
+                  "value": ""
+                },
+                {
+                  "label": "Classic Lashes ",
+                  "value": "",
+                  "backgroundColor": "#BCECF1",
+                  "icon": "",
+                  "labelTypography": {
+                    "fontSize": "text-lg",
+                    "fontWeight": "font-medium"
+                  }
+                },
+                {
+                  "labelTypography": {
+                    "fontSize": "text-lg",
+                    "fontWeight": "font-medium"
+                  },
+                  "backgroundColor": "#BCECF1",
+                  "label": "Brow Wax "
+                },
+                {
+                  "labelTypography": {
+                    "fontSize": "text-lg",
+                    "fontWeight": "font-medium"
+                  },
+                  "backgroundColor": "#BCECF1",
+                  "label": "Wax + Tint "
+                },
+                {
+                  "backgroundColor": "#BCECF1",
+                  "valueTypography": {
+                    "fontWeight": "font-semibold",
+                    "fontSize": "text-lg"
+                  },
+                  "labelTypography": {
+                    "fontWeight": "font-medium",
+                    "fontSize": "text-lg"
+                  },
+                  "label": "Lamination + Tint + Wax"
+                }
+              ]
+            },
+            "borderColor": "#e5e7eb",
+            "enabled": true
+          },
+          {
+            "category": "shared",
+            "id": "block-1757043169531",
+            "props": {
+              "profileImageBorderColor": "#ffffff",
+              "profileImage": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1757114114233_IMG_8213.jpg?alt=media&token=8c90c9d1-6770-4177-b7df-f0907f7a1bc3",
+              "profileImageHeight": 200,
+              "titleTypography": {
+                "fontFamily": "font-sans",
+                "fontWeight": "font-semibold",
+                "color": "text-gray-900",
+                "fontSize": "text-xl",
+                "alignment": "center"
+              },
+              "profileImageWidth": 200,
+              "title": "Book With @beautybyjann",
+              "links": [
+                {
+                  "url": {
+                    "action": "link",
+                    "url": "https://linktr.ee/glamlink_app"
+                  },
+                  "label": "Book on Glamlink",
+                  "platform": "glamlink"
+                }
+              ]
+            },
+            "padding": 0,
+            "type": "SocialLinks",
+            "order": 8,
+            "backgroundColor": "transparent",
+            "enabled": true,
+            "borderWidth": 0,
+            "borderColor": "#e5e7eb",
+            "borderRadius": 0
+          }
+        ],
+        "subtitle2FontFamily": "font-sans",
+        "subtitleFontFamily": "font-sans",
+        "subtitle2FontSize": "text-xl md:text-2xl",
+        "subtitleAlignment": "center",
+        "sectionBorder": true
+      },
+      "issueId": "2025-09-02-388261",
+      "isCurrentUserLock": true,
+      "createdByEmail": "mohit@blockcod.com",
+      "type": "custom-section",
+      "lastModified": "2025-09-08T07:21:56.833Z"
+    }
+  ]
+}

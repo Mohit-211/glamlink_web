@@ -1,0 +1,368 @@
+/* Card base styles */
+.card {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Icon wrapper styles */
+.iconWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: all 0.3s ease;
+  filter: grayscale(0.2);
+}
+
+/* Icon wrapper hover state */
+.card:hover .iconWrapper {
+  filter: grayscale(0) drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+/* ============================================
+   NEW ANIMATIONS FOR FOR-CLIENTS FEATURES
+   ============================================ */
+
+/* 1. Scan Radar - For Discover Certified Professionals */
+@keyframes scan-radar {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes radar-wave {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-scan-radar {
+  position: relative;
+}
+
+.card:hover .animate-scan-radar {
+  animation: scan-radar 2s ease-in-out infinite;
+}
+
+.card:hover .animate-scan-radar::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #24bbcb;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: radar-wave 2s ease-out infinite;
+}
+
+/* 2. Flip Reveal - For Before & After Gallery */
+@keyframes flip-reveal {
+  0% {
+    transform: perspective(600px) rotateY(0deg);
+  }
+  50% {
+    transform: perspective(600px) rotateY(180deg);
+  }
+  100% {
+    transform: perspective(600px) rotateY(360deg);
+  }
+}
+
+.card:hover .animate-flip-reveal {
+  animation: flip-reveal 2s ease-in-out infinite;
+}
+
+/* 3. Play Pulse - For Expert Clips */
+@keyframes play-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.05);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  75% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-play-pulse {
+  position: relative;
+}
+
+.card:hover .animate-play-pulse {
+  animation: play-pulse 1.5s ease-in-out infinite;
+}
+
+/* 4. Stamp Approve - For Expert Approved Beauty Products */
+@keyframes stamp-approve {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.3) rotate(-5deg);
+  }
+  50% {
+    transform: scale(0.9) rotate(3deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.card:hover .animate-stamp-approve {
+  animation: stamp-approve 1s ease-out;
+}
+
+/* 5. Calendar Slide - For Booking Feature */
+@keyframes calendar-slide {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+  25% {
+    transform: translateX(-10px) scale(1.05);
+  }
+  50% {
+    transform: translateX(10px) scale(1.05);
+  }
+  75% {
+    transform: translateX(-5px) scale(1.02);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+.card:hover .animate-calendar-slide {
+  animation: calendar-slide 2s ease-in-out infinite;
+}
+
+/* 6. AI Scan - For AI Beauty Companion */
+@keyframes ai-scan {
+  0% {
+    transform: translateY(0);
+    filter: brightness(1) sepia(0) saturate(1) hue-rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px);
+    filter: brightness(0.8) sepia(1) saturate(2) hue-rotate(150deg) drop-shadow(0 0 20px rgba(0, 139, 139, 0.6));
+  }
+  100% {
+    transform: translateY(0);
+    filter: brightness(1) sepia(0) saturate(1) hue-rotate(0deg);
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.animate-ai-scan {
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover .animate-ai-scan {
+  animation: ai-scan 2s ease-in-out infinite;
+}
+
+.card:hover .animate-ai-scan::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #24bbcb, transparent);
+  animation: scan-line 2s linear infinite;
+}
+
+/* ============================================
+   EXISTING ANIMATIONS FROM FOR-PROFESSIONALS
+   ============================================ */
+
+/* Pulse Radar - For Geo-Discovery */
+@keyframes pulse-radar {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: scale(1.2); 
+    opacity: 0.7; 
+  }
+}
+
+.card:hover .animate-pulse-radar {
+  animation: pulse-radar 1.5s ease-in-out infinite;
+}
+
+/* Trust Badge Stamp - For Reviews */
+@keyframes trust-badge-stamp {
+  0% { 
+    transform: scale(1) rotate(0deg); 
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  30% { 
+    transform: scale(1.1) rotate(-15deg); 
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+  50% { 
+    transform: scale(1.25) rotate(-15deg); 
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+  }
+  70% { 
+    transform: scale(0.95) rotate(-5deg); 
+    filter: drop-shadow(0 1px 2px rgba(36, 187, 203, 0.3));
+  }
+  85% { 
+    transform: scale(1.05) rotate(-2deg); 
+    filter: drop-shadow(0 2px 12px rgba(36, 187, 203, 0.4));
+  }
+  100% { 
+    transform: scale(1) rotate(0deg); 
+    filter: drop-shadow(0 2px 8px rgba(36, 187, 203, 0.3));
+  }
+}
+
+.card:hover .animate-star-burst {
+  animation: trust-badge-stamp 1s ease-out forwards;
+}
+
+/* Bounce Cart - For E-Commerce */
+@keyframes bounce-cart {
+  0%, 100% { 
+    transform: translateY(0) scale(1); 
+  }
+  25% { 
+    transform: translateY(-15px) scale(1.05); 
+  }
+  75% { 
+    transform: translateY(5px) scale(0.95); 
+  }
+}
+
+.card:hover .animate-bounce-cart {
+  animation: bounce-cart 1.5s ease-in-out infinite;
+}
+
+/* Spin Social - For Social Media */
+@keyframes spin-social {
+  0% { 
+    transform: rotate(0deg) scale(1); 
+  }
+  100% { 
+    transform: rotate(360deg) scale(1.1); 
+  }
+}
+
+.card:hover .animate-spin-social {
+  animation: spin-social 1s ease-out;
+}
+
+/* Shine - For Founders Badge */
+@keyframes shine {
+  0% { 
+    transform: scale(1); 
+    filter: brightness(1) drop-shadow(0 0 0 transparent); 
+  }
+  50% { 
+    transform: scale(1.05); 
+    filter: brightness(1.4) drop-shadow(0 0 20px rgba(36, 187, 203, 0.5)); 
+  }
+  100% { 
+    transform: scale(1); 
+    filter: brightness(1) drop-shadow(0 0 0 transparent); 
+  }
+}
+
+.card:hover .animate-shine {
+  animation: shine 1.5s ease-in-out infinite;
+}
+
+/* Page Flip - For Glamlink Edit */
+@keyframes page-flip {
+  0% { 
+    transform: perspective(600px) rotateY(0deg) scale(1); 
+  }
+  50% { 
+    transform: perspective(600px) rotateY(20deg) scale(1.1); 
+  }
+  100% { 
+    transform: perspective(600px) rotateY(0deg) scale(1); 
+  }
+}
+
+.card:hover .animate-page-flip {
+  animation: page-flip 2s ease-in-out infinite;
+}
+
+/* Glitch - For AI Discovery */
+@keyframes glitch {
+  0%, 100% { 
+    transform: translate(0) scale(1); 
+    filter: hue-rotate(0deg); 
+  }
+  20% { 
+    transform: translate(-3px, 3px) scale(1.02); 
+    filter: hue-rotate(90deg); 
+  }
+  40% { 
+    transform: translate(-3px, -3px) scale(0.98); 
+    filter: hue-rotate(180deg); 
+  }
+  60% { 
+    transform: translate(3px, 3px) scale(1.02); 
+    filter: hue-rotate(270deg); 
+  }
+  80% { 
+    transform: translate(3px, -3px) scale(0.98); 
+    filter: hue-rotate(360deg); 
+  }
+}
+
+.card:hover .animate-glitch {
+  animation: glitch 0.8s ease-in-out infinite;
+}
+
+/* Chart Rise - For Business Growth Tools */
+@keyframes chart-rise {
+  0% { 
+    transform: translateY(0) rotate(0deg) scale(1); 
+  }
+  50% { 
+    transform: translateY(-15px) rotate(5deg) scale(1.1); 
+  }
+  100% { 
+    transform: translateY(0) rotate(0deg) scale(1); 
+  }
+}
+
+.card:hover .animate-chart-rise {
+  animation: chart-rise 2s ease-in-out infinite;
+}
