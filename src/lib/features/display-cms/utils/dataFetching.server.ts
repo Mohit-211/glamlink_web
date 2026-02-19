@@ -21,7 +21,7 @@ import type { PageConfig } from '../types';
 export async function getServerPageContent(page: string): Promise<PageConfig | null> {
   try {
     const { db, currentUser } = await getAuthenticatedAppForUser();
-
+console.log(currentUser,"currentuser")
     // Return null if no authentication or database
     if (!currentUser || !db) {
       console.warn('Server page content fetch requires authentication');

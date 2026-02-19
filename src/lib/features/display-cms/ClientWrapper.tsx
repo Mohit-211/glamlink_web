@@ -196,23 +196,23 @@ export function ClientWrapper({
       return;
     }
 
-    // const loadContent = async () => {
-    //   try {
-    //     setIsLoading(true);
-    //     setError(null);
+    const loadContent = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-    //     const data = await fetchPageContent(pageType);
-    //     setConfig(data);
-    //   } catch (err) {
-    //     const errorMessage = err instanceof Error ? err.message : 'Failed to load content';
-    //     setError(errorMessage);
-    //     console.error(`Error loading content for ${pageType}:`, err);
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // };
+        const data = await fetchPageContent(pageType);
+        setConfig(data);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load content';
+        setError(errorMessage);
+        console.error(`Error loading content for ${pageType}:`, err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // loadContent();
+    loadContent();
   }, [pageType, initialData]);
 
   // Loading state

@@ -25,7 +25,7 @@ export function DigitalCardPageWrapper({
 }: DigitalCardPageWrapperProps) {
   // Check submission cap status
   const { status: submissionStatus, isLoading: isCheckingStatus } = useSubmissionStatus();
-
+console.log(isCheckingStatus,"status: submissionStatus, isLoading: isCheckingStatus")
   // Form submission hook
   const { submitApplication, isLoading: isSubmitting, error: submitError, isSuccess } = useDigitalCardSubmission();
 

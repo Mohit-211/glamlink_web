@@ -16,11 +16,11 @@ export const revalidate = 60;
 export default async function ApplyDigitalCardPage() {
   // Fetch CMS page content server-side
   const pageConfig = await getServerPageContent('apply-digital-card');
-
+  console.log("hello")
   return (
     <DigitalCardPageWrapper
       pageType="apply-digital-card"
-      initialData={pageConfig}
+    initialData={pageConfig}
     />
   );
 }
