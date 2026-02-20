@@ -27,14 +27,14 @@ export default async function Article({
   console.log("Route Title:", title);
 
   const response = await getBlogsById(id);
-  console.log(response,"response")
+  console.log(response, "response")
   const article: BlogData = response?.data;
 
   if (!article) {
     return <div className="text-center py-20">Article not found.</div>;
   }
 
- console.log(article,"article")
+  console.log(article, "article")
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -55,7 +55,7 @@ export default async function Article({
           <div className="container mx-auto px-6 mb-12 md:mb-16">
             <div className="max-w-4xl mx-auto relative aspect-[16/9]">
               <Image
-
+                 unoptimized={process.env.NODE_ENV === "development"}
                 src={article.cover_image}
                 alt={article.title}
                 fill
@@ -73,7 +73,7 @@ export default async function Article({
               bio: "Passionate about writing and sharing insights.",
             }}
           /> */}
-          <RelatedArticles  category_id={article?.category_id}/>
+          <RelatedArticles category_id={article?.category_id} />
         </article>
       </main>
     </div>

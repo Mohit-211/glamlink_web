@@ -65,7 +65,7 @@ console.log(blogs,"blogs")
 
       {/* Featured */}
       {featured && (
-        <Link href={`/journal/${featured.id}/${featured.title}`} className="block">
+        <Link href={`/journal/${featured.id}/${slugify(featured.title)}`} className="block">
           <FeaturedPost
             image={featured?.cover_image}
             category="Blog"
