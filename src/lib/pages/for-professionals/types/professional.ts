@@ -25,6 +25,7 @@ export type { CondensedCardConfig };
 
 // Professional interface for comprehensive professional data management
 export interface Professional {
+  professional_title: any;
   id: string;
 
   // Ownership & Access Control

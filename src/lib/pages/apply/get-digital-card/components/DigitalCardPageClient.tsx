@@ -52,12 +52,12 @@ export default function DigitalCardPageClient() {
       <Hero formId="digital-card-form" />
 
       {/* Application Form with Split-View Preview */}
-      <div id="digital-card-form">
+      {/* <div id="digital-card-form">
         <DigitalCardFormWithPreview
           onSubmit={handleSubmit}
           isLoading={isLoading}
         />
-      </div>
+      </div> */}
 
       {/* Error Alert - positioned after form so user sees it after submitting */}
       {error && (

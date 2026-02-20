@@ -16,6 +16,7 @@ interface MapSectionProps {
 }
 
 export default function MapSection({ professional, sectionId, sectionProps = {} }: MapSectionProps) {
+  console.log(professional,"professional in map")
   // READ FROM REDUX - direct selector for live updates
   const reduxProps = useAppSelector(selectPropsByInnerSectionType('map'));
   const sections = useAppSelector(selectSections);

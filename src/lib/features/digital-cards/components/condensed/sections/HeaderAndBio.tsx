@@ -178,7 +178,7 @@ export default function HeaderAndBio({ professional, section }: HeaderAndBioProp
 
   // Merge props with Redux taking highest precedence
   const mergedProps = { ...section?.props, ...reduxProps };
-
+console.log(mergedProps,"mergedProps")
   // Extract props with defaults - these come from Redux via toggleGroup
   const showVerifiedBadge = mergedProps?.showVerifiedBadge ?? true;
   const showProfileImage = mergedProps?.showProfileImage ?? true;
@@ -239,12 +239,12 @@ export default function HeaderAndBio({ professional, section }: HeaderAndBioProp
           )}
 
           {/* Occupation/Title */}
-          {showTitle && professional.title && (
+          {showTitle && professional.professional_title && (
             <p
               className="text-glamlink-teal font-medium"
               style={{ fontSize: occupationFontSize }}
             >
-              {professional.title}
+              {professional.professional_title}
             </p>
           )}
 
@@ -311,12 +311,12 @@ export default function HeaderAndBio({ professional, section }: HeaderAndBioProp
           )}
 
           {/* Occupation/Title */}
-          {showTitle && professional.title && (
+          {showTitle && professional.professional_title && (
             <p
               className="text-glamlink-teal font-medium"
               style={{ fontSize: occupationFontSize }}
             >
-              {professional.title}
+              {professional.professional_title}
             </p>
           )}
 
