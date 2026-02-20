@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { forwardRef, AnchorHTMLAttributes } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/packages/utils";
 
 interface NavLinkProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {

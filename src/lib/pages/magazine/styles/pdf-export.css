@@ -1,0 +1,223 @@
+/* PDF Export Specific Styles for Digital Magazine Module */
+
+/* ============================= */
+/* Base PDF Export Mode Styles  */
+/* ============================= */
+
+/* Force white backgrounds for cards in PDF export */
+.pdf-export-mode .pdf-accolade-wrapper {
+  background-color: white !important;
+  background: white !important;
+}
+
+.pdf-export-mode .pdf-accolade-card {
+  background-color: white !important;
+  background: white !important;
+}
+
+/* Keep the section background as configured by user */
+.pdf-export-mode .pdf-accolades-section {
+  /* User-configured background is preserved */
+}
+
+.pdf-export-mode .pdf-white-bg {
+  background-color: white !important;
+  background: white !important;
+}
+
+.pdf-export-mode .pdf-quote-card {
+  background-color: white !important;
+  background: white !important;
+  backdrop-filter: none !important;
+}
+
+/* ============================= */
+/* Editor's Note Specific Styles */
+/* ============================= */
+
+/* Fix text spacing and paragraph issues in Editor's Note */
+.pdf-export-mode .editors-note-content {
+  font-size: 16px !important;
+  line-height: 1.8 !important;
+  color: #1f2937 !important;
+}
+
+.pdf-export-mode .editors-note-content p {
+  margin-bottom: 24px !important;
+  line-height: 1.8 !important;
+  display: block !important;
+  white-space: pre-wrap !important;
+}
+
+.pdf-export-mode .editors-note-content p:empty {
+  margin-bottom: 12px !important;
+  height: 12px !important;
+  display: block !important;
+}
+
+.pdf-export-mode .editors-note-content p:last-child {
+  margin-bottom: 0 !important;
+}
+
+.pdf-export-mode .editors-note-content strong {
+  font-weight: 700 !important;
+  color: #111827 !important;
+}
+
+.pdf-export-mode .editors-note-content em {
+  font-style: italic !important;
+}
+
+/* PDF-friendly button replacements */
+.pdf-export-mode .pdf-button-replacement {
+  display: inline-block !important;
+  padding: 12px 24px !important;
+  margin: 8px !important;
+  border: 2px solid #0d9488 !important;
+  border-radius: 9999px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  background-color: white !important;
+}
+
+.pdf-export-mode .pdf-button-users {
+  background-color: #0d9488 !important;
+  color: white !important;
+  border-color: #0d9488 !important;
+}
+
+.pdf-export-mode .pdf-button-professionals {
+  background-color: #111827 !important;
+  color: white !important;
+  border-color: #111827 !important;
+}
+
+/* Ensure proper spacing for Editor's Note title */
+.pdf-export-mode .editors-note-title {
+  font-size: 32px !important;
+  font-weight: bold !important;
+  margin-bottom: 24px !important;
+  color: #111827 !important;
+  line-height: 1.2 !important;
+}
+
+.pdf-export-mode .editors-note-subtitle {
+  font-size: 18px !important;
+  color: #4b5563 !important;
+  margin-bottom: 16px !important;
+  line-height: 1.5 !important;
+}
+
+/* ============================= */
+/* General PDF Text Formatting  */
+/* ============================= */
+
+/* Ensure all text content has proper spacing */
+.pdf-export-mode .prose {
+  line-height: 1.75 !important;
+}
+
+.pdf-export-mode .prose p {
+  margin-bottom: 1.5rem !important;
+}
+
+.pdf-export-mode .prose h1,
+.pdf-export-mode .prose h2,
+.pdf-export-mode .prose h3,
+.pdf-export-mode .prose h4 {
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+  line-height: 1.3 !important;
+}
+
+/* Ensure lists have proper spacing */
+.pdf-export-mode .prose ul,
+.pdf-export-mode .prose ol {
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+  padding-left: 1.5rem !important;
+}
+
+.pdf-export-mode .prose li {
+  margin-bottom: 0.5rem !important;
+}
+
+/* ============================= */
+/* PDF Canvas Container Styles  */
+/* ============================= */
+
+/* Ensure the PDF canvas container has proper settings */
+.pdf-export-mode.magazine-pdf-export {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+/* Remove shadows and effects that don't translate well to PDF */
+.pdf-export-mode * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Ensure images render properly */
+.pdf-export-mode img {
+  max-width: 100% !important;
+  display: block !important;
+}
+
+/* Special handling for professional profile images in PDF mode ONLY */
+/* Force the container to have a fixed aspect ratio in PDF mode */
+.pdf-export-mode .pdf-professional-container {
+  position: relative !important;
+  width: 100% !important;
+  padding-bottom: 56.25% !important; /* 16:9 aspect ratio */
+}
+
+/* Make the image fill the container properly in PDF mode */
+.pdf-export-mode .pdf-professional-container .pdf-professional-image {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important; /* Use contain to show the full image */
+  object-position: center !important;
+}
+
+/* Preserve aspect ratio containers during PDF generation */
+.pdf-export-mode [class*="aspect-"] {
+  position: relative !important;
+}
+
+.pdf-export-mode [class*="aspect-"] > img {
+  position: absolute !important;
+  width: 100% !important;
+  height: 100% !important;
+  inset: 0 !important;
+}
+
+/* ============================= */
+/* Hide Interactive Elements    */
+/* ============================= */
+
+/* Hide elements that shouldn't appear in PDF */
+.pdf-export-mode .no-pdf {
+  display: none !important;
+}
+
+.pdf-export-mode button.interactive-only {
+  display: none !important;
+}
+
+/* ============================= */
+/* PDF Page Break Helpers      */
+/* ============================= */
+
+.pdf-page-break {
+  page-break-after: always;
+  break-after: always;
+}
+
+.pdf-avoid-break {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}

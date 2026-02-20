@@ -1,0 +1,221 @@
+{
+  "customer": {
+    "firstName": "Sarah",
+    "lastName": "Johnson",
+    "email": "sarah.johnson@example.com"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/images/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Where Beauty Meets Innovation"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "editorial_showcase",
+    "utm_content": "new_sections_demo"
+  },
+  "theme": "standard",
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "Glamlink Editorial",
+      "subtitle": "Your Monthly Beauty & Wellness Guide"
+    },
+    {
+      "type": "quote",
+      "quote": "Beauty is not about perfection, it's about confidence and self-expression. When you feel good in your own skin, it radiates from within.",
+      "author": "Marie Marks",
+      "authorTitle": "Founder & CEO, Glamlink",
+      "style": "decorative",
+      "alignment": "center"
+    },
+    {
+      "type": "author-signature",
+      "authorName": "Marie Marks",
+      "authorTitle": "Founder & CEO",
+      "authorImage": "https://images.unsplash.com/photo-1494790108755-2616b612b6e6?w=400&h=400&fit=crop",
+      "authorBio": "Marie has over 15 years of experience in the beauty industry, helping thousands of entrepreneurs build successful beauty brands. She believes in the power of authentic beauty and empowering others to find their unique style.",
+      "socialLinks": [
+        {
+          "platform": "LinkedIn",
+          "url": "https://linkedin.com/in/mariemarks",
+          "handle": "mariemarks"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://instagram.com/mariemarks",
+          "handle": "@mariemarks"
+        }
+      ]
+    },
+    {
+      "type": "product-recommendations",
+      "title": "Marie's Picks",
+      "subtitle": "Handpicked favorites from this month's top performers",
+      "layout": "grid",
+      "products": [
+        {
+          "id": "serum-vitamin-c",
+          "name": "Brightening Vitamin C Serum",
+          "category": "Skincare",
+          "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
+          "price": "$29.99",
+          "originalPrice": "$39.99",
+          "link": "https://glamlink.net/products/vitamin-c-serum",
+          "badge": "Best Seller"
+        },
+        {
+          "id": "lipstick-coral",
+          "name": "Coral Crush Lipstick",
+          "category": "Makeup",
+          "image": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400&h=400&fit=crop",
+          "price": "$18.99",
+          "link": "https://glamlink.net/products/coral-crush-lipstick"
+        },
+        {
+          "id": "hair-mask",
+          "name": "Deep Hydration Hair Mask",
+          "category": "Hair Care",
+          "image": "https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=400&h=400&fit=crop",
+          "price": "$24.99",
+          "link": "https://glamlink.net/products/hair-mask",
+          "badge": "New"
+        },
+        {
+          "id": "eye-cream",
+          "name": "Anti-Aging Eye Cream",
+          "category": "Skincare",
+          "image": "https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=400&h=400&fit=crop",
+          "price": "$34.99",
+          "link": "https://glamlink.net/products/eye-cream"
+        },
+        {
+          "id": "foundation",
+          "name": "Flawless Coverage Foundation",
+          "category": "Makeup",
+          "image": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop",
+          "price": "$32.99",
+          "link": "https://glamlink.net/products/foundation"
+        },
+        {
+          "id": "body-oil",
+          "name": "Luxurious Body Oil",
+          "category": "Body Care",
+          "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop",
+          "price": "$19.99",
+          "link": "https://glamlink.net/products/body-oil"
+        }
+      ],
+      "viewAllLink": "https://glamlink.net/collections/maries-picks",
+      "viewAllText": "Shop All Marie's Picks"
+    },
+    {
+      "type": "tips-list",
+      "title": "5 Pro Beauty Tips",
+      "subtitle": "Expert advice from our top beauty professionals",
+      "style": "numbered",
+      "tips": [
+        {
+          "number": "1",
+          "title": "Start with Skincare",
+          "content": "Always begin your beauty routine with a clean, moisturized face. Great makeup starts with healthy skin as your canvas."
+        },
+        {
+          "number": "2",
+          "title": "Less is More",
+          "content": "Build your look gradually. You can always add more product, but it's harder to take away. Start light and build to your desired intensity."
+        },
+        {
+          "number": "3",
+          "title": "Invest in Quality Tools",
+          "content": "Good brushes and tools make a significant difference in application and finish. Clean them regularly to maintain performance."
+        },
+        {
+          "number": "4",
+          "title": "Color Match in Natural Light",
+          "content": "When choosing foundation or concealer, always test colors in natural lighting to ensure the perfect match for your skin tone."
+        },
+        {
+          "number": "5",
+          "title": "Practice Makes Perfect",
+          "content": "Don't be afraid to experiment and practice new techniques. Every professional started as a beginner. Document your favorites!"
+        }
+      ]
+    },
+    {
+      "type": "product-showcase",
+      "title": "Product Spotlight",
+      "subtitle": "This Month's Must-Have Beauty Innovation",
+      "productName": "24K Gold Face Mask",
+      "productDescription": "Indulge in luxury with our 24K gold-infused face mask. This premium treatment helps reduce fine lines, improves skin texture, and gives you an instant radiant glow. Perfect for special occasions or weekly self-care rituals.",
+      "productImage": "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=600&h=400&fit=crop",
+      "gallery": [
+        "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop"
+      ],
+      "price": "$89.99",
+      "originalPrice": "$119.99",
+      "discount": "25",
+      "rating": 4.8,
+      "reviewCount": 127,
+      "features": [
+        "24K gold flakes for luxurious treatment",
+        "Hyaluronic acid for deep hydration",
+        "Suitable for all skin types",
+        "Cruelty-free and vegan formula",
+        "Visible results in just 20 minutes"
+      ],
+      "ctaText": "Get Yours Now",
+      "ctaUrl": "https://glamlink.net/products/24k-gold-mask",
+      "badge": "Limited Edition"
+    },
+    {
+      "type": "social-cta",
+      "title": "Stay Connected",
+      "subtitle": "Join Our Beauty Community",
+      "description": "Follow us for daily beauty tips, tutorials, and exclusive behind-the-scenes content from beauty professionals worldwide.",
+      "style": "centered",
+      "socialLinks": [
+        {
+          "platform": "Instagram",
+          "url": "https://instagram.com/glamlink",
+          "handle": "@glamlink"
+        },
+        {
+          "platform": "TikTok",
+          "url": "https://tiktok.com/@glamlink",
+          "handle": "@glamlink"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://youtube.com/@glamlink",
+          "handle": "Glamlink Beauty"
+        }
+      ],
+      "qrCode": "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://glamlink.com/follow",
+      "ctaText": "Follow All Channels",
+      "ctaUrl": "https://glamlink.com/social"
+    },
+    {
+      "type": "app-download-cta",
+      "showUserSection": true,
+      "showProSection": true
+    },
+    {
+      "type": "footer",
+      "copyrightText": "© 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "https://glamlink.com/unsubscribe",
+      "preferencesUrl": "https://glamlink.com/preferences"
+    }
+  ]
+}

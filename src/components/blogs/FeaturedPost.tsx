@@ -17,6 +17,7 @@ const FeaturedPost = ({ image, category, title, excerpt, author, date }: Feature
       <div className="grid md:grid-cols-2 gap-8 items-center">
         <div className="relative overflow-hidden rounded-lg aspect-[4/3]">
   <Image
+   unoptimized={process.env.NODE_ENV === "development"}
     src={image}
     alt={title}
     fill

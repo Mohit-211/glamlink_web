@@ -1,0 +1,106 @@
+{
+  "customer": {
+    "firstName": "Sarah",
+    "lastName": "Johnson",
+    "email": "sarah.johnson@example.com"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/images/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Where Beauty Meets Innovation"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "product_showcase",
+    "utm_content": "january_2025_carousel"
+  },
+  "theme": "standard",
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "Glamlink",
+      "subtitle": "Discover Our Featured Beauty Collections"
+    },
+    {
+      "type": "carousel-items",
+      "headerTitle": "Welcome to Glamlink, Sarah",
+      "headerSubtitle": "Explore thousands of independent beauty brands",
+      "items": [
+        {
+          "id": "skincare",
+          "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
+          "title": "Skincare",
+          "subtitle": "Essentials",
+          "link": "https://glamlink.net/",
+          "modalType": "user"
+        },
+        {
+          "id": "makeup",
+          "image": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400&h=400&fit=crop",
+          "title": "Makeup",
+          "subtitle": "Trending",
+          "link": "https://glamlink.net/",
+          "modalType": "user"
+        },
+        {
+          "id": "haircare",
+          "image": "https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=400&h=400&fit=crop",
+          "title": "Hair Care",
+          "subtitle": "Professional",
+          "link": "https://glamlink.net/",
+          "modalType": "pro"
+        },
+        {
+          "id": "wellness",
+          "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop",
+          "title": "Wellness",
+          "subtitle": "Holistic",
+          "link": "https://glamlink.net/",
+          "modalType": "user"
+        },
+        {
+          "id": "tools",
+          "image": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop",
+          "title": "Beauty Tools",
+          "subtitle": "Pro Grade",
+          "link": "https://glamlink.net/",
+          "modalType": "pro"
+        }
+      ],
+      "viewAllLink": "https://glamlink.net/",
+      "viewAllText": "Browse All Categories"
+    },
+    {
+      "type": "text",
+      "content": "<p style='text-align: center; font-size: 14px;'>Join thousands of beauty professionals and enthusiasts discovering their next favorite products on Glamlink.</p>",
+      "alignment": "center"
+    },
+    {
+      "type": "button",
+      "text": "Start Shopping",
+      "url": "https://glamlink.net/shop",
+      "alignment": "center",
+      "style": "primary"
+    },
+    {
+      "type": "app-download-cta",
+      "showUserSection": true,
+      "showProSection": true
+    },
+    {
+      "type": "footer",
+      "copyrightText": "© 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "https://glamlink.com/unsubscribe",
+      "preferencesUrl": "https://glamlink.com/preferences"
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+/* Support Messaging Accessibility Styles */
+
+/* CSS Custom Properties for theming */
+:root {
+  --color-message-self: #9333ea; /* glamlink-purple */
+  --color-message-self-text: #ffffff;
+  --color-message-other: #f3f4f6; /* gray-100 */
+  --color-message-other-text: #111827; /* gray-900 */
+  --color-focus-ring: #9333ea; /* glamlink-purple */
+  --color-border: #e5e7eb; /* gray-200 */
+  --color-offline-bg: #fef3c7; /* yellow-100 */
+  --color-offline-text: #92400e; /* yellow-800 */
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: more) {
+  :root {
+    --color-message-self: #000000;
+    --color-message-self-text: #ffffff;
+    --color-message-other: #ffffff;
+    --color-message-other-text: #000000;
+    --color-focus-ring: #000000;
+    --color-border: #000000;
+    --color-offline-bg: #fef3c7;
+    --color-offline-text: #000000;
+  }
+
+  /* Ensure all message bubbles have strong borders in high contrast */
+  .message-bubble {
+    border: 2px solid var(--color-border) !important;
+  }
+
+  /* Stronger focus indicators */
+  .support-messaging-container *:focus-visible {
+    outline: 3px solid var(--color-focus-ring) !important;
+    outline-offset: 2px;
+  }
+
+  /* Ensure buttons have visible borders */
+  .support-messaging-container button {
+    border: 2px solid currentColor;
+  }
+
+  /* High contrast status badges */
+  .support-messaging-container .status-badge {
+    border: 2px solid currentColor;
+    font-weight: 700;
+  }
+
+  /* Ensure reaction buttons are visible */
+  .support-messaging-container .reaction-button {
+    border: 1px solid currentColor;
+  }
+
+  /* Typing indicator with stronger visibility */
+  .support-messaging-container .typing-indicator {
+    border: 2px solid var(--color-border);
+    background-color: #ffffff;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  /* Remove all animations within the messaging container */
+  .support-messaging-container * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .support-messaging-container .animate-bounce,
+  .support-messaging-container .animate-pulse,
+  .support-messaging-container .animate-spin {
+    animation: none !important;
+  }
+
+  .support-messaging-container .transition-colors,
+  .support-messaging-container .transition-all,
+  .support-messaging-container .transition-opacity {
+    transition: none !important;
+  }
+
+  /* Replace bouncing typing indicator with static dots */
+  .support-messaging-container .typing-dot {
+    animation: none !important;
+    opacity: 0.7;
+  }
+
+  /* Replace animated typing dots with static ellipsis */
+  .support-messaging-container .typing-indicator .typing-dot:nth-child(2),
+  .support-messaging-container .typing-indicator .typing-dot:nth-child(3) {
+    display: none;
+  }
+
+  .support-messaging-container .typing-indicator::after {
+    content: '...';
+    display: inline;
+    margin-left: 0.25rem;
+  }
+
+  /* Disable smooth scrolling */
+  .support-messaging-container {
+    scroll-behavior: auto !important;
+  }
+
+  /* Replace spinning loaders with static icons */
+  .support-messaging-container .loading-spinner,
+  .support-messaging-container [class*="animate-spin"] {
+    animation: none !important;
+  }
+}
+
+/* Motion-safe animation utilities */
+.motion-safe\:animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+.motion-safe\:animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.motion-safe\:animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe\:animate-bounce,
+  .motion-safe\:animate-pulse,
+  .motion-safe\:animate-spin {
+    animation: none !important;
+  }
+}
+
+/* Focus Visible Styles */
+.support-messaging-container .focusable-message:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Connection indicator styles */
+.connection-indicator {
+  background-color: var(--color-offline-bg);
+  color: var(--color-offline-text);
+}
+
+@media (prefers-contrast: more) {
+  .connection-indicator {
+    border: 2px solid var(--color-offline-text);
+    font-weight: 700;
+  }
+}

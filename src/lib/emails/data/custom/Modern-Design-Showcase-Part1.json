@@ -1,0 +1,76 @@
+{
+  "customer": {
+    "firstName": "Alex",
+    "lastName": "Kim",
+    "email": "alex@example.com"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Empowering Beauty Entrepreneurs"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "modern_design_showcase_part1",
+    "utm_content": "premium_features"
+  },
+  "theme": "standard",
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "sections": [
+    {
+      "type": "dark-cta-modal",
+      "title": "Level Up Your Beauty Game",
+      "subtitle": "Exclusive Access Awaits",
+      "description": "Join our elite community of beauty professionals and unlock advanced techniques, exclusive products, and personalized mentorship.",
+      "ctaText": "Claim Your Spot",
+      "ctaUrl": "https://glamlink.com/premium-access",
+      "secondaryCtaText": "Learn More",
+      "secondaryCtaUrl": "https://glamlink.com/premium-features",
+      "heroImage": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=600&h=300&fit=crop",
+      "features": [
+        {
+          "icon": "🎯",
+          "title": "Personalized Training",
+          "description": "Custom learning paths based on your goals and skill level"
+        },
+        {
+          "icon": "🌟",
+          "title": "Expert Mentorship",
+          "description": "1-on-1 guidance from industry-leading professionals"
+        },
+        {
+          "icon": "💎",
+          "title": "Exclusive Products",
+          "description": "Early access to premium beauty products and tools"
+        }
+      ],
+      "testimonial": {
+        "quote": "Glamlink Premium transformed my beauty business. The mentorship and exclusive access helped me increase my revenue by 300% in just 6 months!",
+        "author": "Sarah Rodriguez",
+        "role": "Certified Beauty Professional",
+        "avatar": "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=40&h=40&fit=crop&crop=faces"
+      },
+      "urgencyText": "Limited Time",
+      "badge": "Premium Access"
+    },
+    {
+      "type": "app-download-cta",
+      "showUserSection": true,
+      "showProSection": true
+    },
+    {
+      "type": "footer",
+      "copyrightText": "© 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "https://glamlink.com/unsubscribe",
+      "preferencesUrl": "https://glamlink.com/preferences"
+    }
+  ]
+}

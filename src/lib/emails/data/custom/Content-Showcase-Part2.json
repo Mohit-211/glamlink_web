@@ -1,0 +1,191 @@
+{
+  "customer": {
+    "firstName": "Maria",
+    "lastName": "Garcia",
+    "email": "maria@example.com"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Empowering Beauty Entrepreneurs"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "content_showcase_part2",
+    "utm_content": "events_gallery"
+  },
+  "theme": "standard",
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "✨ Beauty Events & Gallery",
+      "subtitle": "Join Events & Explore Our Gallery"
+    },
+    {
+      "type": "events-list",
+      "title": "Upcoming Events",
+      "subtitle": "Join our beauty community events",
+      "events": [
+        {
+          "title": "Winter Beauty Trends Workshop",
+          "date": "2025-01-25",
+          "location": "Los Angeles Beauty Center",
+          "description": "Learn the latest winter beauty trends from industry experts. Includes hands-on practice and exclusive product samples.",
+          "type": "Workshop",
+          "price": "Free for Members",
+          "eventUrl": "https://glamlink.com/events/winter-trends",
+          "registrationUrl": "https://glamlink.com/events/winter-trends/register",
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=100&h=100&fit=crop",
+          "isVirtual": false,
+          "capacity": 50,
+          "organizer": "Glamlink Education Team"
+        },
+        {
+          "title": "Virtual Skincare Consultation Hour",
+          "date": "2025-01-20",
+          "location": "Online (Zoom)",
+          "description": "Free 1-hour group consultation with certified dermatologist Dr. Sarah Kim. Ask questions and get expert advice.",
+          "type": "Consultation",
+          "price": "Free",
+          "eventUrl": "https://glamlink.com/events/skincare-consultation",
+          "registrationUrl": "https://glamlink.com/events/skincare-consultation/register",
+          "isVirtual": true,
+          "capacity": 100,
+          "organizer": "Dr. Sarah Kim"
+        },
+        {
+          "title": "Makeup Artist Certification Course",
+          "date": "2025-02-01",
+          "location": "New York Beauty Academy",
+          "description": "4-week intensive course leading to professional makeup artist certification. Perfect for aspiring beauty professionals.",
+          "type": "Course",
+          "price": "$1,200",
+          "eventUrl": "https://glamlink.com/events/certification-course",
+          "registrationUrl": "https://glamlink.com/events/certification-course/register",
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=100&h=100&fit=crop",
+          "isVirtual": false,
+          "capacity": 25,
+          "organizer": "NYC Beauty Academy"
+        }
+      ],
+      "showType": true,
+      "viewAllUrl": "https://glamlink.com/events",
+      "showImages": true
+    },
+    {
+      "type": "photo-gallery",
+      "title": "Beauty Gallery",
+      "subtitle": "Beauty moments captured by our community",
+      "photos": [
+        {
+          "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=200&h=200&fit=crop",
+          "title": "Golden Hour Glow",
+          "caption": "Natural makeup perfection",
+          "description": "Soft, natural makeup that enhances your natural beauty",
+          "alt": "Woman with natural golden hour makeup",
+          "photographer": "Sarah Chen",
+          "photoUrl": "https://glamlink.com/gallery/golden-hour-glow"
+        },
+        {
+          "image": "https://images.unsplash.com/photo-1583241800515-61b5b949c6f4?w=200&h=200&fit=crop",
+          "title": "Professional Tools",
+          "caption": "Quality makes all the difference",
+          "description": "Premium makeup brushes for professional results",
+          "alt": "Professional makeup brushes laid out on marble",
+          "photographer": "Emma Rodriguez",
+          "photoUrl": "https://glamlink.com/gallery/professional-tools"
+        },
+        {
+          "image": "https://images.unsplash.com/photo-1596178062862-1f1a7e1f3b1b?w=200&h=200&fit=crop",
+          "title": "Skincare Routine",
+          "caption": "Self-care Sunday vibes",
+          "description": "A relaxing skincare routine with luxury products",
+          "alt": "Skincare products arranged aesthetically",
+          "photographer": "Maria Lopez",
+          "photoUrl": "https://glamlink.com/gallery/skincare-routine"
+        },
+        {
+          "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop",
+          "title": "Bold Confidence",
+          "caption": "Express yourself fearlessly",
+          "description": "Bold makeup look that makes a statement",
+          "alt": "Woman with bold, colorful makeup",
+          "photographer": "Alex Thompson",
+          "photoUrl": "https://glamlink.com/gallery/bold-confidence"
+        },
+        {
+          "image": "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop",
+          "title": "Natural Beauty",
+          "caption": "Less is more",
+          "description": "Embracing natural beauty with minimal makeup",
+          "alt": "Woman with minimal natural makeup",
+          "photographer": "Grace Kim",
+          "photoUrl": "https://glamlink.com/gallery/natural-beauty"
+        },
+        {
+          "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop",
+          "title": "Evening Glamour",
+          "caption": "Ready for the night",
+          "description": "Sophisticated evening makeup for special occasions",
+          "alt": "Woman with elegant evening makeup",
+          "photographer": "Sophia Martinez",
+          "photoUrl": "https://glamlink.com/gallery/evening-glamour"
+        }
+      ],
+      "galleryLayout": "grid",
+      "columns": 3,
+      "showCaptions": true,
+      "showCredits": true,
+      "viewAllUrl": "https://glamlink.com/gallery"
+    },
+    {
+      "type": "cta-with-stats",
+      "title": "Join the Beauty Revolution",
+      "subtitle": "Be part of something amazing",
+      "description": "Connect with certified beauty professionals, learn new techniques, and grow your beauty business with our comprehensive platform.",
+      "ctaText": "Start Your Journey",
+      "ctaUrl": "https://glamlink.com/join",
+      "secondaryCtaText": "View Events",
+      "secondaryCtaUrl": "https://glamlink.com/events",
+      "stats": [
+        {
+          "value": "1,200+",
+          "label": "Certified Pros",
+          "icon": "⭐"
+        },
+        {
+          "value": "150+",
+          "label": "Events Hosted",
+          "icon": "🎓"
+        },
+        {
+          "value": "24/7",
+          "label": "Support",
+          "icon": "💬"
+        }
+      ],
+      "layout": "horizontal",
+      "showIcons": true
+    },
+    {
+      "type": "app-download-cta",
+      "showUserSection": true,
+      "showProSection": true
+    },
+    {
+      "type": "footer",
+      "copyrightText": "© 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "https://glamlink.com/unsubscribe",
+      "preferencesUrl": "https://glamlink.com/preferences"
+    }
+  ]
+}

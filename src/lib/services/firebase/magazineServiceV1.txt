@@ -1,0 +1,258 @@
+import { generateMockMagazineContent, generateMockClinicalTrials, generateMockUGC, generateMockBeautyBoxes } from "@/lib/pages/magazine/utils/mockDataGenerator";
+import { ExtendedMagazineContent } from "@/lib/pages/magazine/types/magazine";
+
+// ============================================
+// BASIC TYPE DEFINITIONS
+// ============================================
+
+interface CertifiedProvider {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
+interface Brand {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
+class MagazineService {
+  // Get trending providers across all brands
+  async getTrendingProviders(): Promise<(CertifiedProvider & { brandName: string; brandId: string })[]> {
+    try {
+      // Since brandReadService is not available, always return mock data
+      const brands = []; // Mock empty brands array
+
+      if (!brands || brands.length === 0) {
+        // Return mock data if no brands
+        const mockProviders = generateMockMagazineContent().trendingProviders;
+        return mockProviders.map((provider) => ({
+          ...provider,
+          brandName: "Sample Brand",
+          brandId: "sample-brand",
+        }));
+      }
+
+      // Aggregate all providers from all brands
+      const allProviders: (CertifiedProvider & { brandName: string; brandId: string })[] = [];
+
+      brands.forEach((brand) => {
+        if (brand.certifiedProviders && brand.certifiedProviders.length > 0) {
+          brand.certifiedProviders.forEach((provider) => {
+            allProviders.push({
+              ...provider,
+              brandName: brand.name,
+              brandId: brand.id,
+            });
+          });
+        }
+      });
+
+      // If no providers found, return mock data
+      if (allProviders.length === 0) {
+        const mockProviders = generateMockMagazineContent().trendingProviders;
+        return mockProviders.map((provider) => ({
+          ...provider,
+          brandName: "Sample Brand",
+          brandId: "sample-brand",
+        }));
+      }
+
+      // Sort by rating and review count to get trending
+      const sortedProviders = allProviders
+        .filter((provider) => provider.rating >= 4.5) // Only high-rated providers
+        .sort((a, b) => {
+          // First sort by rating
+          if (b.rating !== a.rating) {
+            return b.rating - a.rating;
+          }
+          // Then by review count
+          return b.reviewCount - a.reviewCount;
+        })
+        .slice(0, 8); // Get top 8
+
+      // If we don't have enough providers, supplement with mock data
+      if (sortedProviders.length < 8) {
+        const mockProviders = generateMockMagazineContent().trendingProviders;
+        const needed = 8 - sortedProviders.length;
+        sortedProviders.push(
+          ...mockProviders.slice(0, needed).map((provider) => ({
+            ...provider,
+            brandName: "Sample Brand",
+            brandId: "sample-brand",
+          }))
+        );
+      }
+
+      return sortedProviders;
+    } catch (error) {
+      console.error("Error fetching trending providers:", error);
+      // Return mock data on error
+      const mockProviders = generateMockMagazineContent().trendingProviders;
+      return mockProviders.map((provider) => ({
+        ...provider,
+        brandName: "Sample Brand",
+        brandId: "sample-brand",
+      }));
+    }
+  }
+
+  // Get new products from the last 30 days
+  async getNewProducts(): Promise<(Product & { brandName: string; brandId: string })[]> {
+    try {
+      const brands = []; // Mock empty brands array
+
+      if (!brands || brands.length === 0) {
+        return generateMockMagazineContent().newProducts;
+      }
+
+      // Get current date and 30 days ago
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      // Aggregate all products from all brands
+      const allProducts: (Product & { brandName: string; brandId: string })[] = [];
+
+      brands.forEach((brand) => {
+        if (brand.products && brand.products.length > 0) {
+          brand.products.forEach((product) => {
+            // Check if product was created in the last 30 days
+            const createdDate = new Date(product.createdAt);
+            if (createdDate >= thirtyDaysAgo) {
+              allProducts.push({
+                ...product,
+                brandName: brand.name,
+                brandId: brand.id,
+              });
+            }
+          });
+        }
+      });
+
+      // If no new products found, return mock data
+      if (allProducts.length === 0) {
+        return generateMockMagazineContent().newProducts;
+      }
+
+      // Sort by creation date (newest first) and take top 12
+      const sortedProducts = allProducts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 12);
+
+      // If we don't have enough products, supplement with mock data
+      if (sortedProducts.length < 12) {
+        const mockProducts = generateMockMagazineContent().newProducts;
+        const needed = 12 - sortedProducts.length;
+        sortedProducts.push(...mockProducts.slice(0, needed));
+      }
+
+      return sortedProducts;
+    } catch (error) {
+      console.error("Error fetching new products:", error);
+      // Return mock data on error
+      return generateMockMagazineContent().newProducts;
+    }
+  }
+
+  // Get spotlight/featured products
+  async getProductHighlights(): Promise<(Product & { brandName: string; brandId: string })[]> {
+    try {
+      const brands = []; // Mock empty brands array
+
+      if (!brands || brands.length === 0) {
+        return generateMockMagazineContent().productHighlights;
+      }
+
+      // Aggregate all spotlight products from all brands
+      const spotlightProducts: (Product & { brandName: string; brandId: string })[] = [];
+
+      brands.forEach((brand) => {
+        if (brand.products && brand.products.length > 0) {
+          brand.products
+            .filter((product) => product.isSpotlight)
+            .forEach((product) => {
+              spotlightProducts.push({
+                ...product,
+                brandName: brand.name,
+                brandId: brand.id,
+              });
+            });
+        }
+      });
+
+      // If no spotlight products found, return mock data
+      if (spotlightProducts.length === 0) {
+        return generateMockMagazineContent().productHighlights;
+      }
+
+      // Sort by rating and take top 6
+      const sortedHighlights = spotlightProducts
+        .sort((a, b) => {
+          // First sort by rating if available
+          if (a.rating && b.rating && b.rating !== a.rating) {
+            return b.rating - a.rating;
+          }
+          // Then by price (higher priced items often featured)
+          return b.price - a.price;
+        })
+        .slice(0, 6);
+
+      // If we don't have enough highlights, supplement with mock data
+      if (sortedHighlights.length < 6) {
+        const mockHighlights = generateMockMagazineContent().productHighlights;
+        const needed = 6 - sortedHighlights.length;
+        sortedHighlights.push(...mockHighlights.slice(0, needed));
+      }
+
+      return sortedHighlights;
+    } catch (error) {
+      console.error("Error fetching product highlights:", error);
+      // Return mock data on error
+      return generateMockMagazineContent().productHighlights;
+    }
+  }
+
+  // Get clinical trials data
+  async getClinicalTrials() {
+    // For now, return mock data
+    // In production, this would fetch from Firestore
+    return generateMockClinicalTrials();
+  }
+
+  // Get user-generated content
+  async getUserGeneratedContent() {
+    // For now, return mock data
+    // In production, this would fetch from Firestore
+    return generateMockUGC();
+  }
+
+  // Get beauty box subscriptions
+  async getBeautyBoxes() {
+    // For now, return mock data
+    // In production, this would fetch from Firestore
+    return generateMockBeautyBoxes();
+  }
+
+  // Get all magazine content at once
+  async getMagazineContent(): Promise<ExtendedMagazineContent> {
+    const [trendingProviders, newProducts, productHighlights, clinicalTrials, userContent, beautyBoxes] = await Promise.all([this.getTrendingProviders(), this.getNewProducts(), this.getProductHighlights(), this.getClinicalTrials(), this.getUserGeneratedContent(), this.getBeautyBoxes()]);
+
+    return {
+      trendingProviders,
+      newProducts,
+      productHighlights,
+      clinicalTrials,
+      userContent,
+      beautyBoxes,
+    };
+  }
+}
+
+// Export singleton instance
+const magazineService = new MagazineService();
+export default magazineService;

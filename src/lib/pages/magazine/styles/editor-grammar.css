@@ -1,0 +1,159 @@
+/* Grammar and Spelling Error Highlights */
+
+/* Grammar errors - bold yellow wavy underline */
+.tiptap-editor .grammar-error {
+  position: relative;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: #f59e0b;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Fallback for browsers that don't support text-decoration-style */
+@supports not (text-decoration-style: wavy) {
+  .tiptap-editor .grammar-error {
+    border-bottom: 2px solid #f59e0b;
+    text-decoration: none;
+    padding-bottom: 1px;
+  }
+}
+
+.tiptap-editor .grammar-error:hover {
+  background-color: rgba(245, 158, 11, 0.15);
+  border-radius: 2px;
+}
+
+/* Grammar warnings - bold amber wavy underline */
+.tiptap-editor .grammar-warning {
+  position: relative;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: #fbbf24;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Fallback for browsers that don't support text-decoration-style */
+@supports not (text-decoration-style: wavy) {
+  .tiptap-editor .grammar-warning {
+    border-bottom: 2px solid #fbbf24;
+    text-decoration: none;
+    padding-bottom: 1px;
+  }
+}
+
+.tiptap-editor .grammar-warning:hover {
+  background-color: rgba(251, 191, 36, 0.15);
+  border-radius: 2px;
+}
+
+/* Spelling errors - red wavy underline (native browser) */
+.tiptap-editor [spellcheck="true"] {
+  /* Browser handles this natively */
+}
+
+/* Alternative spelling error style if we detect them */
+.tiptap-editor .spelling-error {
+  position: relative;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: #ef4444;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Fallback for browsers that don't support text-decoration-style */
+@supports not (text-decoration-style: wavy) {
+  .tiptap-editor .spelling-error {
+    border-bottom: 2px solid #ef4444;
+    text-decoration: none;
+    padding-bottom: 1px;
+  }
+}
+
+.tiptap-editor .spelling-error:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-radius: 2px;
+}
+
+/* Add a help cursor on all error types to indicate they're interactive */
+.tiptap-editor .grammar-error,
+.tiptap-editor .grammar-warning,
+.tiptap-editor .spelling-error {
+  cursor: help;
+}
+
+/* Add a subtle tooltip on hover */
+.tiptap-editor .grammar-error::after,
+.tiptap-editor .grammar-warning::after {
+  content: "Click for suggestions";
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  font-size: 10px;
+  color: #666;
+  background: white;
+  padding: 2px 4px;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+.tiptap-editor .grammar-error:hover::after,
+.tiptap-editor .grammar-warning:hover::after {
+  opacity: 1;
+}
+
+/* Tooltip styling for grammar messages */
+.grammar-error[data-grammar-message],
+.grammar-warning[data-grammar-message],
+.spelling-error[data-grammar-message] {
+  position: relative;
+}
+
+/* Hide tooltips by default - we use the popover instead */
+.grammar-error[data-grammar-message]::after,
+.grammar-warning[data-grammar-message]::after,
+.spelling-error[data-grammar-message]::after {
+  display: none;
+}
+
+/* Animation for new highlights */
+@keyframes grammar-highlight-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.grammar-error,
+.grammar-warning,
+.spelling-error {
+  animation: grammar-highlight-fade 0.3s ease-in;
+}
+
+/* Ensure proper text wrapping with highlights */
+.tiptap-editor {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* Fix for overlapping highlights */
+.grammar-error + .grammar-error,
+.grammar-warning + .grammar-warning,
+.spelling-error + .spelling-error {
+  margin-left: 1px;
+}

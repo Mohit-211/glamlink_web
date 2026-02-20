@@ -1,0 +1,136 @@
+{
+  "customer": {
+    "firstName": "*|FNAME|*",
+    "lastName": "*|LNAME|*",
+    "email": "*|EMAIL|*"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1755778988565_GlamLink_Logo_Single%20Line%20Logo_Color.png?alt=media&token=f963c3a6-5f58-4da1-8a77-e37bb7a14e8e",
+    "website": "https://glamlink.net",
+    "supportEmail": "support@glamlink.net",
+    "tagline": "Your Beauty Marketplace"
+  },
+  "tracking": {
+    "utm_source": "mailchimp",
+    "utm_medium": "email",
+    "utm_campaign": "thank_you_order",
+    "utm_content": "post_purchase"
+  },
+  "theme": "standard",
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "Glamlink Magazine",
+      "subtitle": "Your Monthly Beauty Insider"
+    },
+    {
+      "type": "text",
+      "content": "<p style='font-size: 18px; line-height: 1.6;'>Hi *|FNAME|*! The next issue of <strong>Glamlink Magazine</strong> is on the way - arriving in just <strong>*|TIME_UNTIL_RELEASE|*</strong>.</p><p style='font-size: 16px; line-height: 1.6; margin-top: 15px;'>Our team is putting the finishing touches on this edition, filled with the latest beauty product edits, expert tips, and seasonal trends. Get ready to flip through curated product picks and meet the professionals behind the looks.</p>",
+      "alignment": "center"
+    },
+    {
+      "type": "button",
+      "text": "Preview Latest Issue",
+      "url": "https://glamlink.net/magazine?modal=user",
+      "alignment": "center",
+      "style": "primary"
+    },
+    {
+      "type": "explore-items",
+      "headerTitle": "Discover your next treatment",
+      "searchPlaceholder": "What beauty service are you looking for?",
+      "searchHelpText": "Not sure where to start?",
+      "popularSearchesTitle": "Popular services our customers love:",
+      "categories": [
+        {
+          "id": "facials",
+          "icon": "✨",
+          "title": "Facials"
+        },
+        {
+          "id": "massage",
+          "icon": "💆",
+          "title": "Massage"
+        },
+        {
+          "id": "hair",
+          "icon": "💇",
+          "title": "Hair"
+        },
+        {
+          "id": "lashes",
+          "icon": "👁",
+          "title": "Lashes"
+        },
+        {
+          "id": "body",
+          "icon": "🧘",
+          "title": "Body"
+        },
+        {
+          "id": "nails",
+          "icon": "💅",
+          "title": "Nails"
+        }
+      ],
+      "modalType": "user"
+    },
+    {
+      "type": "view-profiles",
+      "headerTitle": "Meet our featured professionals",
+      "subtitle": "Book your next appointment with confidence",
+      "profiles": [
+        {
+          "id": "jackie-stryker",
+          "name": "JACKIE STRYKER",
+          "title": "CEO OF RESHAPE BODY BAR",
+          "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1755771239481_content_1755187449263_55220.jpg?alt=media&token=e3449566-9f69-4fcd-a57f-4064fbc8c994",
+          "badge": "Verified Pro"
+        },
+        {
+          "id": "jann-nguyen",
+          "name": "JANN NGUYEN",
+          "title": "LAS VEGAS LASHES AND BROWS",
+          "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1755771277858_content_1755186723612_IMG_8213.jpg?alt=media&token=90e90bab-116a-4e03-8c07-ff893ddcb7c2",
+          "badge": "Top Rated"
+        },
+        {
+          "id": "kassandra-franco",
+          "name": "KASSANDRA FRANCO",
+          "title": "CERTIFIED BODY SCULPTING EXPERT",
+          "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1755771326437_content_1755187065113_IMG_8464.jpg?alt=media&token=d75c22d7-e920-4a78-8b45-cc51030049c9",
+          "badge": "Certified Expert"
+        },
+        {
+          "id": "trang-chen",
+          "name": "TRANG CHEN",
+          "title": "TECH @ POLISHED NAILS & SPA",
+          "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1755771387013_content_1755187509129_IMG_7310.jpg?alt=media&token=540478c9-d39d-45c1-84da-f63dad53ab83",
+          "badge": "Popular Choice"
+        }
+      ],
+      "viewAllText": "Explore All Professionals",
+      "viewAllLink": "https://glamlink.net/professionals",
+      "modalType": "user",
+      "filterText": "Available this week"
+    },
+    {
+      "type": "app-download-cta",
+      "showUserSection": true,
+      "showProSection": true
+    },
+    {
+      "type": "footer",
+      "copyrightText": "© 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "*|UNSUB|*",
+      "preferencesUrl": "*|UPDATE_PROFILE|*"
+    }
+  ]
+}

@@ -1,0 +1,487 @@
+{
+  "id": "rising-star",
+  "title": "Rising Star Feature",
+  "description": "Are you an emerging talent in the beauty industry? We want to showcase your journey, achievements, and potential to inspire others!",
+  "icon": "rocket",
+  "bannerColor": "bg-gradient-to-r from-indigo-600 to-purple-600",
+  "enabled": true,
+  "order": 3,
+  "sections": [
+    {
+      "id": "profile",
+      "title": "Profile Information",
+      "description": "Your basic contact and business information",
+      "layout": "grid",
+      "order": 1,
+      "fields": [
+        {
+          "id": "email",
+          "name": "email",
+          "type": "email",
+          "label": "Email",
+          "required": true,
+          "placeholder": "your@email.com",
+          "order": 1,
+          "validation": {
+            "minChars": 6,
+            "message": "Email must be at least 6 characters"
+          }
+        },
+        {
+          "id": "fullName",
+          "name": "fullName",
+          "type": "text",
+          "label": "Full Name",
+          "required": true,
+          "placeholder": "Enter your full name",
+          "order": 2,
+          "validation": {
+            "minChars": 2,
+            "message": "Full name must be at least 2 characters"
+          }
+        },
+        {
+          "id": "phone",
+          "name": "phone",
+          "type": "tel",
+          "label": "Phone Number",
+          "required": true,
+          "placeholder": "(555) 123-4567",
+          "order": 3,
+          "validation": {
+            "minChars": 10,
+            "message": "Phone number must be at least 10 digits"
+          }
+        },
+        {
+          "id": "businessName",
+          "name": "businessName",
+          "type": "text",
+          "label": "Business Name",
+          "required": true,
+          "placeholder": "Enter your business name",
+          "order": 4,
+          "validation": {
+            "minChars": 2,
+            "message": "Business name must be at least 2 characters"
+          }
+        },
+        {
+          "id": "businessAddress",
+          "name": "businessAddress",
+          "type": "text",
+          "label": "Business Address",
+          "required": true,
+          "placeholder": "Enter your business address",
+          "order": 5,
+          "validation": {
+            "minChars": 10,
+            "message": "Please enter a complete address"
+          }
+        },
+        {
+          "id": "instagramHandle",
+          "name": "instagramHandle",
+          "type": "text",
+          "label": "Instagram Handle",
+          "required": true,
+          "placeholder": "@yourhandle",
+          "order": 6,
+          "validation": {
+            "minChars": 2,
+            "message": "Instagram handle must be at least 2 characters"
+          }
+        },
+        {
+          "id": "primarySpecialties",
+          "name": "primarySpecialties",
+          "type": "multi-checkbox",
+          "label": "Primary Specialties",
+          "required": true,
+          "minSelections": 1,
+          "columns": 2,
+          "order": 7,
+          "options": [
+            {
+              "id": "hair_stylist",
+              "label": "Hair Stylist"
+            },
+            {
+              "id": "makeup_artist",
+              "label": "Makeup Artist"
+            },
+            {
+              "id": "esthetician",
+              "label": "Esthetician"
+            },
+            {
+              "id": "nail_tech",
+              "label": "Nail Tech"
+            },
+            {
+              "id": "massage_therapist",
+              "label": "Massage Therapist"
+            },
+            {
+              "id": "wellness",
+              "label": "Wellness"
+            },
+            {
+              "id": "other",
+              "label": "Other"
+            }
+          ],
+          "validation": {
+            "message": "Please select at least one specialty"
+          }
+        }
+      ]
+    },
+    {
+      "id": "career-background",
+      "title": "Career Background",
+      "description": "Your journey in the beauty industry",
+      "layout": "single",
+      "order": 2,
+      "fields": [
+        {
+          "id": "careerStartTime",
+          "name": "careerStartTime",
+          "type": "text",
+          "label": "When did you start your career in the beauty industry?",
+          "required": true,
+          "maxLength": 500,
+          "placeholder": "e.g., 2020, 3 years ago",
+          "order": 1,
+          "validation": {
+            "minChars": 4,
+            "message": "Career start time must be at least 4 characters"
+          }
+        },
+        {
+          "id": "backgroundStory",
+          "name": "backgroundStory",
+          "type": "textarea",
+          "label": "Your Background Story",
+          "required": true,
+          "maxLength": 8000,
+          "rows": 5,
+          "placeholder": "Tell us about your journey into the beauty industry. What inspired you to pursue this career?",
+          "order": 2,
+          "validation": {
+            "minChars": 80,
+            "message": "Background story must be at least 80 characters"
+          }
+        },
+        {
+          "id": "careerHighlights",
+          "name": "careerHighlights",
+          "type": "bullet-array",
+          "label": "Career Highlights",
+          "required": true,
+          "placeholder": "Enter a highlight",
+          "maxPoints": 5,
+          "helperText": "List your top 5 career highlights",
+          "order": 3,
+          "validation": {
+            "minChars": 10,
+            "message": "Each career highlight must be at least 10 characters"
+          }
+        },
+        {
+          "id": "uniqueApproach",
+          "name": "uniqueApproach",
+          "type": "textarea",
+          "label": "What makes your approach unique?",
+          "required": true,
+          "maxLength": 5000,
+          "rows": 3,
+          "placeholder": "Describe what sets you apart from others in your field...",
+          "order": 4,
+          "validation": {
+            "minChars": 50,
+            "message": "Unique approach description must be at least 50 characters"
+          }
+        }
+      ]
+    },
+    {
+      "id": "achievements-portfolio",
+      "title": "Achievements & Portfolio",
+      "description": "Showcase your best work and accomplishments",
+      "layout": "single",
+      "order": 3,
+      "fields": [
+        {
+          "id": "portfolioPhotos",
+          "name": "portfolioPhotos",
+          "type": "file-upload",
+          "label": "Portfolio Photos",
+          "required": true,
+          "helperText": "Upload 5-8 photos or videos showcasing your best work",
+          "order": 1,
+          "validation": {
+            "minFiles": 5,
+            "maxFiles": 8,
+            "maxSize": 100,
+            "accept": "image/*,video/*",
+            "message": "Please upload at least 5 portfolio photos (max 8, up to 100MB each)"
+          }
+        },
+        {
+          "id": "professionalPhotos",
+          "name": "professionalPhotos",
+          "type": "file-upload",
+          "label": "Professional Headshots",
+          "required": true,
+          "helperText": "Upload 2-3 professional photos of yourself",
+          "order": 2,
+          "validation": {
+            "minFiles": 2,
+            "maxFiles": 3,
+            "maxSize": 50,
+            "accept": "image/*,video/*",
+            "message": "Please upload at least 2 professional photos (max 3, up to 50MB each)"
+          }
+        },
+        {
+          "id": "clientTestimonials",
+          "name": "clientTestimonials",
+          "type": "textarea",
+          "label": "Client Testimonials",
+          "required": true,
+          "maxLength": 6000,
+          "rows": 4,
+          "placeholder": "Share some of the best feedback you've received from clients...",
+          "order": 3,
+          "validation": {
+            "minChars": 40,
+            "message": "Client testimonials must be at least 40 characters"
+          }
+        }
+      ]
+    },
+    {
+      "id": "industry-impact",
+      "title": "Industry Impact",
+      "description": "Your influence and innovations",
+      "layout": "single",
+      "order": 4,
+      "fields": [
+        {
+          "id": "innovations",
+          "name": "innovations",
+          "type": "textarea",
+          "label": "Innovations or New Techniques",
+          "required": true,
+          "maxLength": 5000,
+          "rows": 3,
+          "placeholder": "Have you developed any unique techniques or brought innovations to your field?",
+          "order": 1,
+          "validation": {
+            "minChars": 30,
+            "message": "Innovations description must be at least 30 characters"
+          }
+        },
+        {
+          "id": "futureGoals",
+          "name": "futureGoals",
+          "type": "textarea",
+          "label": "Future Goals and Aspirations",
+          "required": true,
+          "maxLength": 4000,
+          "rows": 3,
+          "placeholder": "Where do you see yourself in the next 5 years?",
+          "order": 2,
+          "validation": {
+            "minChars": 30,
+            "message": "Future goals must be at least 30 characters"
+          }
+        }
+      ]
+    },
+    {
+      "id": "mentorship-advice",
+      "title": "Mentorship & Advice",
+      "description": "Sharing knowledge with others",
+      "layout": "single",
+      "order": 5,
+      "fields": [
+        {
+          "id": "mentorshipOffer",
+          "name": "mentorshipOffer",
+          "type": "checkbox",
+          "label": "Do you currently offer training?",
+          "required": false,
+          "order": 1
+        },
+        {
+          "id": "mentorshipDetails",
+          "name": "mentorshipDetails",
+          "type": "textarea",
+          "label": "Training Details",
+          "required": false,
+          "maxLength": 5000,
+          "rows": 2,
+          "placeholder": "What trainings do you offer?",
+          "order": 2,
+          "validation": {
+            "minChars": 30,
+            "message": "If provided, training details must be at least 30 characters"
+          }
+        },
+        {
+          "id": "advice",
+          "name": "advice",
+          "type": "textarea",
+          "label": "Advice for Others",
+          "required": true,
+          "maxLength": 4000,
+          "rows": 3,
+          "placeholder": "What advice would you give to others starting in the beauty industry?",
+          "order": 3,
+          "validation": {
+            "minChars": 50,
+            "message": "Advice must be at least 50 characters"
+          }
+        }
+      ]
+    },
+    {
+      "id": "glamlink-closing",
+      "title": "Glamlink Integration",
+      "description": "Your feature connects to Glamlink.",
+      "layout": "single",
+      "order": 6,
+      "fields": [
+        {
+          "id": "excitementFeatures",
+          "name": "excitementFeatures",
+          "type": "multi-checkbox",
+          "label": "What excites you about Glamlink",
+          "required": true,
+          "minSelections": 1,
+          "columns": 2,
+          "order": 1,
+          "options": [
+            {
+              "id": "discovery",
+              "label": "Clients ability to discover pros nearby"
+            },
+            {
+              "id": "booking",
+              "label": "Seamless booking inside Glamlink"
+            },
+            {
+              "id": "ecommerce",
+              "label": "Pro shops & e-commerce"
+            },
+            {
+              "id": "magazine",
+              "label": "The Glamlink Edit magazine"
+            },
+            {
+              "id": "ai",
+              "label": "AI powered discovery (coming soon)"
+            },
+            {
+              "id": "community",
+              "label": "Community & networking with other pros"
+            }
+          ],
+          "validation": {
+            "message": "Please select at least one feature"
+          }
+        },
+        {
+          "id": "painPoints",
+          "name": "painPoints",
+          "type": "multi-checkbox",
+          "label": "Biggest pain points",
+          "required": true,
+          "minSelections": 1,
+          "columns": 2,
+          "order": 2,
+          "options": [
+            {
+              "id": "no-conversions",
+              "label": "Posting but no conversions"
+            },
+            {
+              "id": "dms-backforth",
+              "label": "DMs-too much back and forth"
+            },
+            {
+              "id": "no-shows",
+              "label": "No shows"
+            },
+            {
+              "id": "juggling-platforms",
+              "label": "Juggling too many platforms"
+            },
+            {
+              "id": "finding-clients",
+              "label": "Finding new clients"
+            },
+            {
+              "id": "no-pain-points",
+              "label": "None of the above"
+            }
+          ],
+          "validation": {
+            "message": "Please select at least one pain point"
+          }
+        },
+        {
+          "id": "instagramConsent",
+          "name": "instagramConsent",
+          "type": "checkbox",
+          "label": "I consent to have Glamlink create a free professional profile using publically available instagram content",
+          "required": true,
+          "order": 3,
+          "validation": {
+            "message": "Please consent to profile creation"
+          }
+        },
+        {
+          "id": "contentPlanningRadio",
+          "name": "contentPlanningRadio",
+          "type": "radio",
+          "label": "Content planning should be scheduled 2 weeks before being featured",
+          "required": true,
+          "order": 4,
+          "options": [
+            {
+              "id": "schedule-day",
+              "label": "Schedule a day for content"
+            },
+            {
+              "id": "create-video",
+              "label": "Create a video of your space or of a treatment"
+            }
+          ],
+          "validation": {
+            "message": "Please select a content planning option"
+          }
+        },
+        {
+          "id": "hearAboutLocalSpotlight",
+          "name": "hearAboutLocalSpotlight",
+          "type": "textarea",
+          "label": "How did you hear about Glamlink?",
+          "required": true,
+          "placeholder": "Tell us how you discovered Glamlink...",
+          "rows": 3,
+          "maxLength": 4000,
+          "order": 5,
+          "validation": {
+            "minChars": 10,
+            "message": "Please tell us how you heard about Glamlink"
+          }
+        }
+      ]
+    }
+  ],
+  "createdAt": "2025-01-15T00:00:00.000Z",
+  "updatedAt": "2025-01-15T00:00:00.000Z"
+}

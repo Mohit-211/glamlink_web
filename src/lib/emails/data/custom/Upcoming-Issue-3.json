@@ -1,0 +1,147 @@
+{
+  "customer": {
+    "firstName": "*|FNAME|*",
+    "lastName": "*|LNAME|*",
+    "email": "*|EMAIL|*"
+  },
+  "brand": {
+    "name": "Glamlink",
+    "logo": "https://glamlink.com/images/logo.png",
+    "website": "https://glamlink.com",
+    "supportEmail": "support@glamlink.com",
+    "tagline": "Where Beauty Meets Innovation"
+  },
+  "tracking": {
+    "utm_source": "email",
+    "utm_medium": "email",
+    "utm_campaign": "combined_showcase",
+    "utm_content": "magazine_and_products"
+  },
+  "theme": "standard",
+  "socialMedia": {
+    "instagram": "https://instagram.com/glamlink",
+    "facebook": "https://facebook.com/glamlink",
+    "twitter": "https://twitter.com/glamlink",
+    "tiktok": "https://tiktok.com/@glamlink"
+  },
+  "sections": [
+    {
+      "type": "header",
+      "title": "Glamlink Magazine",
+      "subtitle": "Your Monthly Beauty Insider"
+    },
+    {
+      "type": "text",
+      "content": "<h2 style='margin: 0 0 15px;'>Featured Stories & Collections</h2><p>Hi *|FNAME|*! We're releasing a new issue on Monday, September 22.</p><p>Be sure to check out some awesome content from our last magazine while you wait.</p>",
+      "alignment": "left"
+    },
+    {
+      "type": "preview-cta",
+      "primaryImage": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2F2025-09-02-388261%2Fbackground%2Fbackground_1757037555985_THE%20GLAMLINK%20EDIT%20revised%20final%20version.jpg?alt=media&token=1f872545-5a9c-421a-a7fe-34fec0327f47",
+      "primaryTitle": "Tricia Evans - Unapologetically Bold",
+      "primaryDescription": "From launching fighter jets off Navy decks to launching The Pretty Kitty empire. Discover Tricia Evans' inspiring journey from a small Iowa town to building 26 luxury waxing locations across the U.S.",
+      "primaryLinkUrl": "https://glamlink.net/magazine/issue-103/cover-feature-pro",
+      "primaryLinkText": "Read Full Interview",
+      "secondaryCards": [
+        {
+          "id": "card0",
+          "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcropped_image_1757270767466.jpg?alt=media&token=302313b6-2c0d-4690-968f-e7397b5d5dcd",
+          "title": "Cover Feature: Tricia Evans",
+          "description": "From Navy jets to beauty empire - the inspiring journey of The Pretty Kitty founder.",
+          "linkUrl": "https://glamlink.net/magazine/issue-103/cover-feature-pro",
+          "linkText": "Read Interview",
+          "isSelected": true
+        },
+        {
+          "id": "card1",
+          "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcropped_starImage_1757274870093.jpg?alt=media&token=953810c2-5525-4ca7-a466-4786359f2f6b",
+          "title": "Rising Star: Vicky LePage",
+          "description": "Las Vegas hairstylist bringing creativity and passion to every transformation.",
+          "linkUrl": "https://glamlink.net/magazine/issue-103/rising-star",
+          "linkText": "Discover"
+        },
+        {
+          "id": "card2",
+          "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1757048827052_shutterstock_1568859463.jpg?alt=media&token=e472ccb1-928c-42e1-8d98-afadea90862e",
+          "title": "Top Treatment: Waxing Secrets",
+          "description": "Professional tips and insider secrets for the perfect wax experience.",
+          "linkUrl": "https://glamlink.net/magazine/issue-103/top-treatment",
+          "linkText": "Learn More"
+        },
+        {
+          "id": "card3",
+          "image": "https://firebasestorage.googleapis.com/v0/b/glamlink-test.firebasestorage.app/o/magazine%2Ftemp%2Fcontent%2Fcontent_1757039609753_IMG_9024.jpg?alt=media&token=55535627-fab6-4c86-9c04-9384476bf3a5",
+          "title": "Local Spotlight: Vegas Beauty",
+          "description": "Polished Nails & Spa and Beauty by Jann - Vegas's premier destinations.",
+          "linkUrl": "https://glamlink.net/magazine/issue-103/localspotlight",
+          "linkText": "Explore"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "content": "<hr style='border: 0; height: 1px; margin: 30px 0;'>",
+      "alignment": "center"
+    },
+    {
+      "type": "carousel-items",
+      "headerTitle": "Shop Our Featured Collections",
+      "headerSubtitle": "Handpicked products from independent beauty brands",
+      "items": [
+        {
+          "id": "skincare",
+          "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
+          "title": "Skincare",
+          "subtitle": "Essentials",
+          "link": "https://glamlink.net/",
+          "modalType": "user"
+        },
+        {
+          "id": "makeup",
+          "image": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400&h=400&fit=crop",
+          "title": "Makeup",
+          "subtitle": "Trending",
+          "link": "https://glamlink.net/",
+          "modalType": "user"
+        },
+        {
+          "id": "haircare",
+          "image": "https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=400&h=400&fit=crop",
+          "title": "Hair Care",
+          "subtitle": "Professional",
+          "link": "https://glamlink.net/",
+          "modalType": "pro"
+        },
+        {
+          "id": "wellness",
+          "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop",
+          "title": "Wellness",
+          "subtitle": "Holistic",
+          "link": "https://glamlink.net/",
+          "modalType": "user"
+        },
+        {
+          "id": "tools",
+          "image": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop",
+          "title": "Beauty Tools",
+          "subtitle": "Pro Grade",
+          "link": "https://glamlink.net/",
+          "modalType": "pro"
+        }
+      ],
+      "viewAllLink": "https://glamlink.net/",
+      "viewAllText": "Browse All Categories"
+    },
+    {
+      "type": "app-download-cta",
+      "showUserSection": true,
+      "showProSection": true
+    },
+    {
+      "type": "footer",
+      "copyrightText": "� 2025 Glamlink. All rights reserved.",
+      "unsubscribeUrl": "https://glamlink.com/unsubscribe",
+      "preferencesUrl": "https://glamlink.com/preferences"
+    }
+  ]
+}

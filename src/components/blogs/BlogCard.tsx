@@ -34,6 +34,7 @@ const BlogCard = ({
         <Image
           // width={100}
           // height={100}
+           unoptimized={process.env.NODE_ENV === "development"}
           fill
           src={image || "/assets/blog-1.jpg"}  // ✅ fallback image
           alt={title}

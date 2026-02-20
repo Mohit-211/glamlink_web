@@ -1,0 +1,11 @@
+{
+    "lock": {
+        "userId": "asd9031293",
+        "info": {
+            "lockedAt": "2023-10-01T12:00:00Z",
+            "lockExpiresAt": "2023-10-01T12:05:00Z",
+            "lockPath": ["issue-1"],
+            "lockedTabId": "tab-1725026200000-abc123"
+        }
+    }
+}

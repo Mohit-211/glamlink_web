@@ -1,0 +1,125 @@
+{
+  "issues": [
+    {
+      "id": "2025-08-04",
+      "title": "The Glamlink Edit",
+      "subtitle": "Issue #1: The Launch Edition",
+      "featuredPerson": "MELANIE MARKS",
+      "featuredTitle": "Founder & CEO",
+      "issueNumber": 1,
+      "issueDate": "2025-08-04",
+      "coverImage": "/images/cover_1_edited.png",
+      "coverImageAlt": "Glamlink Magazine Issue 1 - Summer Glow Edition",
+      "description": "Welcome to the inaugural issue of The Glamlink Edit - your monthly guide to building a successful beauty business on Glamlink.",
+      "featured": false
+    },
+    {
+      "id": "2025-08-11",
+      "title": "Beauty Innovation Week",
+      "subtitle": "The Future of Beauty Technology",
+      "featuredPerson": "LISA WANG",
+      "featuredTitle": "Tech Beauty Expert",
+      "issueNumber": 2,
+      "issueDate": "2025-08-11",
+      "coverImage": "/images/cover_1_transparent.png",
+      "coverImageAlt": "Glamlink Magazine Issue 2 - Beauty Innovation",
+      "description": "Explore cutting-edge beauty technology, AI-powered skincare, and the latest innovations transforming the beauty industry.",
+      "featured": false,
+      "featuredPersonIssueHeight": {
+        "default": "320px",
+        "sm": "340px",
+        "md": "410px",
+        "lg": "340px",
+        "2xl": "300px"
+      },
+      "textPlacement": {
+        "verticalAlign": "center",
+        "horizontalAlign": "center",
+        "featuredPersonPosition": {
+          "default": {
+            "top": "75%",
+            "left": "5%",
+            "width": "150px"
+          },
+          "sm": {
+            "top": "73%",
+            "left": "3%",
+            "width": "170px"
+          },
+          "md": {
+            "top": "71%",
+            "left": "2%",
+            "width": "180px"
+          },
+          "lg": {
+            "top": "70%",
+            "left": "0%",
+            "width": "200px"
+          },
+          "2xl": {
+            "top": "68%",
+            "left": "0%",
+            "width": "200px"
+          }
+        },
+        "featuredTitlePosition": {
+          "default": {
+            "top": "85%",
+            "left": "43%"
+          },
+          "sm": {
+            "top": "84%",
+            "left": "42%"
+          },
+          "md": {
+            "top": "83%",
+            "left": "41%"
+          },
+          "lg": {
+            "top": "82%",
+            "left": "40%"
+          },
+          "2xl": {
+            "top": "80%",
+            "left": "50%"
+          }
+        },
+        "titlePosition": {
+          "default": {
+            "top": "92%",
+            "left": "50%"
+          },
+          "sm": {
+            "top": "91%",
+            "left": "50%"
+          },
+          "md": {
+            "top": "90%",
+            "left": "50%"
+          },
+          "lg": {
+            "top": "90%",
+            "left": "50%"
+          },
+          "2xl": {
+            "top": "88%",
+            "left": "50%"
+          }
+        }
+      }
+    },
+    {
+      "id": "2025-08-18",
+      "title": "Natural Beauty Special",
+      "subtitle": "Clean, Green, and Gorgeous",
+      "featuredPerson": "MAYA PATEL",
+      "featuredTitle": "Environmental Beauty Journalist",
+      "issueNumber": 3,
+      "issueDate": "2025-08-18",
+      "coverImage": "/images/cover_1_edited.png",
+      "coverImageAlt": "Glamlink Magazine Issue 3 - Natural Beauty",
+      "description": "A deep dive into sustainable beauty, eco-friendly products, and natural ingredients that deliver real results.",
+      "featured": true
+    }
+  ]
+}

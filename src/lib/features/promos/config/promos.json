@@ -1,0 +1,44 @@
+[
+  {
+    "id": "small-area-laser-giveaway",
+    "title": "Small-Area Laser Hair Removal Giveaway",
+    "description": "Enter to win a free small-area laser hair removal session! Perfect for eyebrows, upper lip, chin, or sideburns. Get smooth, hair-free skin just in time for summer.",
+    "image": "https://images.unsplash.com/photo-1626751432767-6c8d9f5c0c1e?w=600&h=400&fit=crop&crop=face&auto=format",
+    "link": "#enter-giveaway",
+    "ctaText": "Enter to Win",
+    "startDate": "2025-01-15",
+    "endDate": "2025-02-15",
+    "popupDisplay": "Small-Area Laser Giveaway",
+    "visible": true,
+    "featured": true,
+    "category": "Beauty Tools",
+    "discount": "FREE",
+    "priority": 10,
+    "submittedAt": "2025-01-15T00:00:00.000Z",
+    "metadata": {
+      "source": "file-system-fallback",
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    }
+  },
+  {
+    "id": "amazon-gift-card-giveaway",
+    "title": "$100 Amazon Gift Card Giveaway",
+    "description": "Win a $100 Amazon gift card to purchase your favorite beauty products! Stock up on skincare, makeup, or hair care essentials from top brands.",
+    "image": "https://images.unsplash.com/photo-1598457112258-68beed2c5c62?w=600&h=400&fit=crop&auto=format",
+    "link": "#win-gift-card",
+    "ctaText": "Enter Now",
+    "startDate": "2025-01-20",
+    "endDate": "2025-02-20",
+    "popupDisplay": "$100 Amazon Gift Card",
+    "visible": true,
+    "featured": true,
+    "category": "All",
+    "discount": "FREE",
+    "priority": 8,
+    "submittedAt": "2025-01-20T00:00:00.000Z",
+    "metadata": {
+      "source": "file-system-fallback",
+      "createdAt": "2025-01-20T00:00:00.000Z"
+    }
+  }
+]

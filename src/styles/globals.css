@@ -245,3 +245,104 @@
   border-bottom: 1px solid hsl(var(--border)) !important;
   background: hsl(var(--background)) !important;
 }
+
+/* ================= ARTICLE WRAPPER ================= */
+
+.prose-article {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #1f2937;
+}
+
+/* ================= HEADINGS ================= */
+
+.prose-article h1,
+.prose-article h2,
+.prose-article h3,
+.prose-article h4 {
+  font-weight: 600;
+  margin-top: 32px;
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+
+.prose-article h1 { font-size: 32px; }
+.prose-article h2 { font-size: 26px; }
+.prose-article h3 { font-size: 22px; }
+.prose-article h4 { font-size: 18px; }
+
+/* ================= PARAGRAPHS ================= */
+
+.prose-article p {
+  margin-bottom: 16px;
+}
+
+/* Remove empty paragraphs */
+.prose-article p:empty {
+  display: none;
+}
+
+/* ================= IMAGES ================= */
+
+.prose-article img {
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 12px;
+  margin: 24px 0;
+  display: block;
+}
+
+/* ================= LINKS ================= */
+
+.prose-article a {
+  color: #6366f1;
+  text-decoration: underline;
+  transition: 0.2s ease;
+}
+
+.prose-article a:hover {
+  color: #4f46e5;
+}
+
+/* ================= BLOCKQUOTE ================= */
+
+.prose-article blockquote {
+  border-left: 3px solid #BBE8EB; /* soft teal like screenshot */
+  margin: 32px 0;
+  padding-left: 20px;
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.7;
+  color: #1f2937; /* darker readable text */
+  background: transparent;
+  border-radius: 0;
+}
+/* ================= LISTS ================= */
+
+.prose-article ul,
+.prose-article ol {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.prose-article li {
+  margin-bottom: 8px;
+}
+
+/* ================= STRONG / BOLD ================= */
+
+.prose-article strong {
+  font-weight: 600;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+  .prose-article {
+    font-size: 15px;
+  }
+
+  .prose-article h1 { font-size: 26px; }
+  .prose-article h2 { font-size: 22px; }
+  .prose-article h3 { font-size: 20px; }
+}

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Two Column With Quote - v2 Fixed</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Georgia, serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .page-container {
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      margin: 0 auto;
+      padding: 32px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .article-title {
+      font-family: Arial, sans-serif;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .byline {
+      font-family: Arial, sans-serif;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: center;
+      color: #4b5563;
+      margin-bottom: 1.5rem;
+    }
+
+    .approach-label {
+      font-family: Arial, sans-serif;
+      font-size: 0.75rem;
+      color: #059669;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #059669;
+    }
+
+    /* ==========================================================================
+       FIXED APPROACH: Two columns with spacers that match quote position
+       ========================================================================== */
+
+    .two-column-wrapper {
+      position: relative;
+      display: flex;
+      gap: 2rem;
+    }
+
+    .column {
+      flex: 1;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    .column p {
+      margin-bottom: 1em;
+    }
+
+    /* Quote box - positioned absolutely in center */
+    .center-quote-wrapper {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50%;
+      z-index: 10;
+      background: #ffffff;
+    }
+
+    .center-quote {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      border-top: 2px solid #000;
+      border-bottom: 2px solid #000;
+      padding: 1.5rem 1rem;
+    }
+
+    .center-quote .quote-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+
+    .center-quote .quote-context {
+      font-size: 0.875rem;
+      color: #374151;
+    }
+
+    /* 
+     * SPACER STRATEGY:
+     * - Spacers float to create a "hole" in the text flow
+     * - They must be placed BEFORE the paragraph that should start wrapping
+     * - Height must match the quote height + some margin
+     * - Width creates how much the text indents
+     */
+
+    .left-spacer {
+      float: right;
+      clear: right;
+      width: 40%; /* How much to indent from right edge of left column */
+      height: 160px; /* Quote height + 24px padding */
+      margin-left: 8px;
+      shape-outside: inset(0);
+      /* Debug: remove background in production */
+      /* background: rgba(255,0,0,0.1); */
+    }
+
+    .right-spacer {
+      float: left;
+      clear: left;
+      width: 40%; /* How much to indent from left edge of right column */
+      height: 160px; /* Quote height + 24px padding */
+      margin-right: 8px;
+      shape-outside: inset(0);
+      /* Debug: remove background in production */
+      /* background: rgba(0,0,255,0.1); */
+    }
+
+    .section-divider {
+      margin: 3rem 0;
+      padding: 1rem;
+      background: #ecfdf5;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      color: #059669;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-container">
+    <div class="approach-label">v2 FIXED: Spacers positioned correctly to wrap around quote</div>
+
+    <h1 class="article-title">asdas</h1>
+    <p class="byline">CXZCZX</p>
+
+    <div class="two-column-wrapper">
+      <!-- 
+        QUOTE: Positioned at a specific pixel offset from top.
+        The spacers in each column must be placed so they START at this same position.
+      -->
+      <div class="center-quote-wrapper" style="top: 280px;">
+        <div class="center-quote">
+          <p class="quote-text">Sample quote here</p>
+          <p class="quote-context">Sample context here</p>
+        </div>
+      </div>
+
+      <!-- LEFT COLUMN -->
+      <div class="column">
+        <p><strong>Gloria Jones is quickly becoming one of the most talked-about rising estheticians in the beauty industry, a reputation built not on overnight virality but on a foundation of hard work, technical skill, and a sincere commitment to client care.</strong> Her journey reflects the evolution of modern skincare—where expertise, empathy, and innovation converge.</p>
+
+        <p>From a young age, Gloria had a natural fascination with skincare and wellness, first sparked by her own struggles with chronic breakouts in high school. Instead of settling for surface level solutions, she immersed herself in understanding why skin behaves the way it does.</p>
+
+        <!-- 
+          LEFT SPACER: Floats RIGHT, pushing text LEFT.
+          Placed HERE so text AFTER this point wraps around the quote.
+        -->
+        <div class="left-spacer" style="background: rgba(255,0,0,0.15);"></div>
+
+        <p>She began reading dermatology blogs, studying ingredient lists, and experimenting with at-home routines—not just for herself, but for friends and family. What began as curiosity became a passion, and it didn't take long before everyone around her recognized that she had both a knack and a genuine interest in helping others feel good in their skin.</p>
+
+        <p>Gloria's professional journey truly began when she enrolled in an accredited esthetics program, where she excelled in both theory and technique. She consistently topped her class in areas like skin analysis, advanced facial treatments, and product chemistry.</p>
+
+        <p>Instructors often praised her meticulous attention to detail and her intuitive ability to recognize a client's unique needs. Unlike many students who focused solely on practical technique, Gloria made it a priority to master the underlying science, giving her the type of deep foundational knowledge that now sets her apart in her field.</p>
+
+        <p>After receiving her license, Gloria entered the industry determined to build a career rooted in authenticity and education. She worked at several high-end spas and dermatology clinics, absorbing different philosophies and techniques along the way.</p>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="column">
+        <p>Perhaps I, at 46, am just not the likeliest client for these new modes of therapy. Those younger than me have "grown up with some sort of device as a fifth limb," points out Alana Phemsak, a social worker and the founder and CEO of WellVentures, a service that helps search people with a therapist.</p>
+
+        <p>Their first instinct for everything is their phone. Gen Z also spent formative years during the pandemic relying on smartphones and social media for connectivity.</p>
+
+        <!-- 
+          RIGHT SPACER: Floats LEFT, pushing text RIGHT.
+          Placed at same relative position as left spacer.
+        -->
+        <div class="right-spacer" style="background: rgba(0,0,255,0.15);"></div>
+
+        <p>AI can certainly bridge the gap for those in need of quick counsel. "With AI, when the thought strikes, you can immediately connect, or it helps capture that behavioral momentum," says Glover. And, she adds, it allows people to do work between their sessions with a human therapist.</p>
+
+        <p>A study published earlier this year positioned ChatGPT against a human therapist and found that participants could rarely tell the difference. The ChatGPT responses were also rated higher. More practically speaking, AI is able to swiftly and efficiently review medical records and documents.</p>
+
+        <p>Gloria's signature approach is a hybrid of science-based methodology and warm, personalized service. She is known for her customized facial protocols, which adapt to each client's skin type, lifestyle, and sensitivity thresholds.</p>
+
+        <p>She seamlessly integrates modern technologies—like LED therapy, gentle chemical peels, and enzyme treatments with traditional techniques such as lymphatic drainage massage.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider">--- How It Works ---</div>
+
+  <div class="page-container" style="min-height: auto; padding: 2rem;">
+    <h2 style="font-family: Arial, sans-serif; margin-bottom: 1rem;">Key Fixes in v2:</h2>
+
+    <div style="font-family: Arial, sans-serif; font-size: 0.875rem; line-height: 1.8;">
+      <ol style="margin: 1rem 0 1rem 2rem;">
+        <li><strong>Quote top position (280px)</strong> must align with where the spacers appear in the text flow</li>
+        <li><strong>Spacers placed BEFORE</strong> the paragraphs that should wrap around the quote</li>
+        <li><strong>Spacer height (140px)</strong> matches the quote box height</li>
+        <li><strong>Spacer width (35%)</strong> creates the indent so text doesn't go under the quote</li>
+        <li><strong>clear: right/left</strong> on spacers ensures they don't stack</li>
+      </ol>
+
+      <p style="margin-top: 1rem; padding: 1rem; background: #fef3c7; border-left: 4px solid #f59e0b;">
+        <strong>Important:</strong> The quote's <code>top</code> position and the spacer placement must be synchronized. 
+        If the quote moves, the spacers must be repositioned in the HTML to match.
+      </p>
+
+      <p style="margin-top: 1rem;"><strong>For React implementation:</strong></p>
+      <ul style="margin: 0.5rem 0 1rem 2rem;">
+        <li>Calculate quote top position based on <code>quotePosition</code> percentage</li>
+        <li>Insert spacer div after the paragraph at that same percentage point</li>
+        <li>Spacer height should be calculated or fixed based on quote content</li>
+      </ul>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,112 @@
+import { ContentComponentInfo } from './types';
+
+export const topTreatmentComponents: ContentComponentInfo[] = [
+  {
+    name: "BeforeAfterImages",
+    category: "top-treatment",
+    displayName: "Before/After Images",
+    description: "Media showcase with optional before/after comparison",
+    propFields: [
+      { 
+        name: "heroImage", 
+        label: "Hero Image", 
+        type: "image", 
+        required: true,
+        placeholder: "Main display image",
+        helperText: "Required as fallback when no video is selected",
+      },
+      {
+        name: "heroVideoSettings",
+        label: "Hero Video Settings",
+        type: "object",
+        fields: [
+          {
+            name: "videoType",
+            label: "Hero Video Type",
+            type: "select",
+            options: [
+              { value: "none", label: "No video" },
+              { value: "file", label: "Video file" },
+              { value: "youtube", label: "YouTube Video" },
+            ],
+            defaultValue: "none",
+            helperText: "Choose video source for hero section",
+          },
+          {
+            name: "video",
+            label: "Hero Video",
+            type: "video",
+            helperText: "Upload a video file (mp4, webm, mov)",
+          },
+          {
+            name: "videoUrl",
+            label: "YouTube Video Link",
+            type: "url",
+            placeholder: "https://www.youtube.com/watch?v=...",
+            helperText: "Enter a valid YouTube video URL",
+          },
+        ],
+      },
+      { name: "beforeImage", label: "Before Image", type: "image", placeholder: "Upload before image" },
+      { name: "afterImage", label: "After Image", type: "image", placeholder: "Upload after image" },
+      { name: "caption", label: "Caption", type: "text", placeholder: "Image/video caption" },
+    ],
+  },
+  {
+    name: "ProInsights",
+    category: "top-treatment",
+    displayName: "Pro Insights",
+    description: "Professional insights and tips",
+    propFields: [
+      { name: "title", label: "Section Title", type: "text", defaultValue: "Pro Insights" },
+      { name: "titleTypography", label: "Title Typography", type: "typography-group" },
+      {
+        name: "insights",
+        label: "Professional Insights",
+        type: "array",
+        itemType: "object",
+        maxItems: 5,
+        fields: [
+          { name: "quote", label: "Quote/Insight", type: "textarea", required: true, placeholder: "Enter the professional insight or tip" },
+          { name: "quoteTypography", label: "Quote Typography", type: "typography-group" },
+          { name: "author", label: "Professional Name", type: "text", placeholder: "Dr. Jane Smith" },
+          { name: "authorTypography", label: "Author Typography", type: "typography-group" },
+          { name: "title", label: "Professional Title", type: "text", placeholder: "Dermatologist" },
+          { name: "proImage", label: "Professional Image", type: "image", placeholder: "Optional professional photo" },
+        ],
+      },
+      { name: "backgroundColor", label: "Background", type: "background-color", placeholder: "bg-gradient-to-br from-glamlink-purple/5 to-glamlink-teal/5" },
+    ],
+  },
+  {
+    name: "TreatmentDetails",
+    category: "top-treatment",
+    displayName: "Treatment Details",
+    description: "Treatment information and benefits",
+    propFields: [
+      { name: "treatmentName", label: "Treatment Name", type: "text", placeholder: "Treatment name" },
+      { name: "nameTypography", label: "Treatment Name Typography", type: "typography-group" },
+      {
+        name: "treatmentStats",
+        label: "Treatment Statistics",
+        type: "array",
+        itemType: "object",
+        maxItems: 6,
+        fields: [
+          { name: "icon", label: "Icon", type: "icon", placeholder: "⏱️" },
+          { name: "label", label: "Label", type: "text", placeholder: "Duration" },
+          { name: "labelTypography", label: "Label Typography", type: "typography-group" },
+          { name: "value", label: "Value", type: "text", placeholder: "30-60 mins" },
+          { name: "valueTypography", label: "Value Typography", type: "typography-group" },
+          { name: "backgroundColor", label: "Background Color", type: "background-color", placeholder: "#bcecf1 or bg-gray-50" },
+        ],
+      },
+      { name: "description", label: "Description", type: "textarea", placeholder: "Treatment description" },
+      { name: "descriptionTypography", label: "Description Typography", type: "typography-group" },
+      { name: "benefitsTitle", label: "Benefits Title", type: "text", placeholder: "Key Benefits:", defaultValue: "Key Benefits:" },
+      { name: "benefitsTitleTypography", label: "Benefits Title Typography", type: "typography-group" },
+      { name: "benefits", label: "Benefits", type: "array", placeholder: "Add treatment benefits" },
+      { name: "treatmentBackground", label: "Section Background", type: "background-color", placeholder: "#ffffff or bg-white" },
+    ],
+  },
+];
