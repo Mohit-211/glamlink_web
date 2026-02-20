@@ -159,31 +159,120 @@ export default function DigitalCardFormWithPreview({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
 
-    if (isSubmitting || isLoading) return;
+  //   if (isSubmitting || isLoading) return;
 
-    if (!validateForm()) {
-      // Scroll to first error
-      const firstError = Object.keys(errors)[0];
-      if (firstError) {
-        const element = document.querySelector(`[name="${firstError}"]`);
-        element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  //   if (!validateForm()) {
+  //     // Scroll to first error
+  //     const firstError = Object.keys(errors)[0];
+  //     if (firstError) {
+  //       const element = document.querySelector(`[name="${firstError}"]`);
+  //       element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  //     }
+  //     return;
+  //   }
+
+  //   setIsSubmitting(true);
+
+  //   try {
+  //     await onSubmit(formData);
+  //   } catch (error) {
+  //     console.error('Form submission error:', error);
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (isSubmitting || isLoading) return;
+
+  setIsSubmitting(true);
+
+  try {
+    const apiFormData = new FormData();
+
+    /* ================= PROFILE IMAGE ================= */
+    if (formData.profile_image) {
+      apiFormData.append(
+        "profile_image",
+        formData.profile_image instanceof File ? formData.profile_image : formData.profile_image
+      );
+    }
+
+    /* ================= GALLERY IMAGES ================= */
+    formData.images?.forEach((file: File) => {
+      apiFormData.append("images", file);
+    });
+
+    /* ================= GALLERY META ================= */
+    if (formData.gallery_meta && formData.gallery_meta.length) {
+      apiFormData.append(
+        "gallery_meta",
+        JSON.stringify(formData.gallery_meta)
+      );
+    }
+
+    /* ================= OBJECT / ARRAY FIELDS ================= */
+    const jsonFields = [
+      "business_hour",
+      "social_media",
+      "important_info",
+      "excites_about_glamlink",
+      "biggest_pain_points",
+      "specialties",
+      "locations"
+    ] as const;
+
+    jsonFields.forEach((field) => {
+      const value = (formData as any)[field];
+      if (value !== undefined) {
+        apiFormData.append(field, JSON.stringify(value));
       }
-      return;
-    }
+    });
 
-    setIsSubmitting(true);
+    /* ================= PRIMITIVE FIELDS ================= */
+    const primitiveFields = [
+      "name",
+      "email",
+      "phone",
+      "business_name",
+      "professional_title",
+      "bio",
+      "preferred_booking_method",
+      "booking_link",
+      "offer_promotion",
+      "elite_setup",
+      "primary_specialty",
+      "custom_handle",
+      "website",
+      "promotion_details",
+    ] as const;
 
-    try {
-      await onSubmit(formData);
-    } catch (error) {
-      console.error('Form submission error:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    primitiveFields.forEach((field) => {
+      const value = (formData as any)[field];
+      if (value !== undefined && value !== null) {
+        apiFormData.append(field, String(value));
+      }
+    });
+
+    /* ================= API CALL ================= */
+    const res = await fetch("https://node.glamlink.net:5000/api/v1/businessCard", {
+      method: "POST",
+      body: apiFormData, // ✅ DO NOT set Content-Type
+    });
+
+    if (!res.ok) throw new Error("Failed to create GlamCard");
+    await res.json();
+    alert("Business Card created successfully!");
+  } catch (error) {
+    console.error("ERROR 👉", error);
+    alert("Failed to create Business Card");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   // Show loading state while fetching config
   if (isConfigLoading) {
@@ -599,38 +688,38 @@ export default function DigitalCardFormWithPreview({
           </div>
 
           {/* Submit Button */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-            <button
-              type="submit"
-              disabled={isLoading || isSubmitting}
-              className={`
-                w-full px-8 py-4 font-semibold rounded-full transition-all duration-200 text-lg
-                ${isLoading || isSubmitting
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-glamlink-teal text-white hover:bg-glamlink-teal-dark shadow-lg hover:shadow-xl transform hover:scale-105'
-                }
-              `}
-            >
-              {isSubmitting ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Submitting Application...
-                </span>
-              ) : isLoading ? (
-                'Loading...'
-              ) : (
-                'Submit Application'
-              )}
-            </button>
-            {Object.keys(errors).length > 0 && (
-              <p className="text-red-600 text-sm text-center mt-3">
-                Please fix the errors above before submitting
-              </p>
-            )}
-          </div>
+         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+  <button
+    type="submit"
+    disabled={isLoading || isSubmitting}
+    className={`
+      w-full px-4 py-4 font-semibold rounded-full transition-all duration-200 text-lg
+      ${isLoading || isSubmitting
+        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+        : 'bg-glamlink-teal text-black hover:bg-glamlink-teal-dark shadow-lg hover:shadow-xl transform hover:scale-105'
+      }
+    `}
+  >
+    {isSubmitting ? (
+      <span className="flex items-center justify-center">
+        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Submitting Application...
+      </span>
+    ) : isLoading ? (
+      'Loading...'
+    ) : (
+      'Submit Application'
+    )}
+  </button>
+  {Object.keys(errors).length > 0 && (
+    <p className="text-red-600 text-sm text-center mt-3">
+      Please fix the errors above before submitting
+    </p>
+  )}
+</div>
         </div>
 
         {/* RIGHT PANEL - Preview (60%) */}

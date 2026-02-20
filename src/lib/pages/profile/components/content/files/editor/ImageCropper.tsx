@@ -206,20 +206,20 @@ export function ImageCropper({ imageUrl, onCrop, onCancel }: ImageCropperProps) 
           ))}
         </div>
 
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 text-sm text-gray-300 hover:text-white"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleApplyCrop}
-            className="px-4 py-2 text-sm bg-pink-600 text-white rounded-lg hover:bg-pink-700"
-          >
-            Apply crop
-          </button>
-        </div>
+      <div className="flex items-center space-x-3">
+  <button
+    onClick={onCancel}
+    className="px-4 py-2 text-sm text-black hover:text-gray-700"
+  >
+    Cancel
+  </button>
+  <button
+    onClick={handleApplyCrop}
+    className="px-4 py-2 text-sm bg-pink-600 text-black rounded-lg hover:bg-pink-700 hover:text-black"
+  >
+    Apply crop
+  </button>
+</div>
       </div>
 
       {/* Crop Area */}
