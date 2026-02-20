@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAppSelector } from "@/store/hooks";
 import authService from "@/lib/services/firebase/authService";
 import { ADMIN_EMAILS } from "@/lib/features/auth/config";
+import { useAppSelector } from "../../../../../store/hooks";
 
 export interface SignupFormData {
   name: string;

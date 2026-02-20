@@ -15,7 +15,7 @@ import type { PositionConfig } from "@/lib/pages/admin/components/shared/editing
 import { EDIT_TABS, TAB_FIELDS } from "./fieldConfigs";
 import { ProfileCondensedCardEditor } from "@/lib/features/digital-cards/components/editor/profile";
 import { STYLING_SECTION_TYPES, setConfig } from "@/lib/features/digital-cards/store";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch } from "../../../../../../store/hooks";
 
 interface DigitalCardEditFormProps {
   professional: Professional;

@@ -10,6 +10,11 @@ interface BioSectionProps {
   professional: Partial<Professional>;
   sectionId: string;
 }
+interface Section {
+  props?: {
+    innerSectionType?: string;
+  };
+}
 
 export default function BioSection({ professional, sectionId }: BioSectionProps) {
   // READ FROM REDUX - direct selector for live updates
@@ -19,10 +24,11 @@ export default function BioSection({ professional, sectionId }: BioSectionProps)
 
   // Find the bio section in Redux to get its wrapper props (showCustomTitle, title, etc.)
   // Look for sections with innerSectionType of 'headerAndBio' or 'bio-preview'
-  const bioSection = sections.find((s: { props: { innerSectionType: string; }; }) =>
+ const bioSection = sections.find(
+  (s: Section) =>
     s.props?.innerSectionType === 'headerAndBio' ||
     s.props?.innerSectionType === 'bio-preview'
-  );
+);
   const sectionProps = bioSection?.props || {};
 
   // Title logic:

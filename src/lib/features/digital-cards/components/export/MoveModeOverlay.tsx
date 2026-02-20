@@ -12,8 +12,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { PositionConfig, DimensionValue } from '@/lib/pages/admin/components/shared/editing/fields/custom/positioning';
-import { useAppDispatch } from '@/store/hooks';
 import { updateSection } from '@/lib/features/digital-cards/store';
+import { useAppDispatch } from '../../../../../../store/hooks';
 
 // =============================================================================
 // TYPES

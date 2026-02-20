@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+
 import { clearPasswordResetRequirement, logout } from "@/lib/features/auth/authSlice";
 import authService from "@/lib/features/auth/utils/authService";
+import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 
 export interface ResetPasswordFormData {
   newPassword: string;

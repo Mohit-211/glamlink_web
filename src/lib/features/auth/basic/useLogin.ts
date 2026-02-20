@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { loginWithEmail, loginWithGoogle, clearError } from "@/lib/features/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 
 export interface LoginFormData {
   email: string;

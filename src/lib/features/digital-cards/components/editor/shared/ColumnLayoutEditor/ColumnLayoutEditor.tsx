@@ -27,8 +27,8 @@ import {
   moveSectionToPosition,
   normalizeRowOrders,
 } from './rowUtils';
-import { useAppDispatch } from '@/store/hooks';
 import { updateSection, updateSectionProps, setSections } from '@/lib/features/digital-cards/store';
+import { useAppDispatch } from '../../../../../../../../store/hooks';
 
 // =============================================================================
 // TYPES

@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginWithEmail, loginWithGoogle, clearError } from '@/lib/features/auth/authSlice';
 import { LoginFormState } from '../types';
+import { useAppDispatch, useAppSelector } from '../../../../../store/hooks';
 
 export default function LoginForm() {
   const dispatch = useAppDispatch();

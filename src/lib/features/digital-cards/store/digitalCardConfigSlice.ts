@@ -6,7 +6,7 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { RootState } from '@/store/store';
+import type { RootState } from 'store/store';
 import type { CondensedCardSectionInstance } from '../types/sections';
 import type { CondensedCardStyles, CondensedCardGradient } from '../types/styles';
 import type { CondensedCardDimensions } from '../types/dimensions';

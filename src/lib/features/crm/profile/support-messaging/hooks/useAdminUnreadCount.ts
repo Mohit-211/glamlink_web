@@ -13,7 +13,7 @@ import {
   setError,
 } from '../store/supportMessagingSlice';
 import { selectAdminUnreadCount, selectSupportMessaging } from '@/lib/features/store/hooks';
-import type { AppDispatch } from '@/store/store';
+import { AppDispatch } from 'store/store';
 
 export function useAdminUnreadCount(): UseAdminUnreadCountReturn {
   const { user } = useAuth();

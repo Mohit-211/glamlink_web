@@ -7,7 +7,7 @@ import { db as clientDb } from '@/lib/config/firebase';
 import type { Message, ConversationWithMessages } from '../../types';
 import { COLLECTION_PATHS, PAGINATION_CONFIG } from '../../config';
 import { setMessages, toSerializableMessage } from '../../store/supportMessagingSlice';
-import type { AppDispatch } from '@/store/store';
+import type { AppDispatch } from 'store/store';
 
 interface UseConversationPaginationProps {
   conversationId: string;

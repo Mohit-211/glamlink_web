@@ -1,6 +1,6 @@
 // Typed hooks for features Redux state
 import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
-import type { RootState, AppDispatch } from '@/store/store';
+import type { RootState, AppDispatch } from 'store/store';
 
 // Typed hooks for the features slice
 export const useFeaturesDispatch = () => useDispatch<AppDispatch>();

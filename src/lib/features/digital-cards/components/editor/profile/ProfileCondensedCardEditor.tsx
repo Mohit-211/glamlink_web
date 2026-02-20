@@ -26,8 +26,8 @@ import { useDerivedSections } from './useDerivedSections';
 import type { CondensedCardConfig, CondensedCardSectionInstance } from '@/lib/features/digital-cards/types/condensedCardConfig';
 import type { ProfessionalSectionConfig } from '@/lib/pages/for-professionals/types/professional';
 import { DEFAULT_CONDENSED_CARD_CONFIG } from '@/lib/features/digital-cards/types/condensedCardConfig';
-import { useAppDispatch } from '@/store/hooks';
 import { setConfig, setSections } from '@/lib/features/digital-cards/store';
+import { useAppDispatch } from '../../../../../../../store/hooks';
 
 // =============================================================================
 // TYPES

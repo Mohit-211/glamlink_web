@@ -26,7 +26,7 @@ import {
   fromSerializableConversation,
 } from '../store/supportMessagingSlice';
 import { selectConversations, selectSupportMessaging } from '@/lib/features/store/hooks';
-import type { AppDispatch } from '@/store/store';
+import type { AppDispatch } from 'store/store';
 
 export function useConversations(): UseConversationsReturn {
   const { user } = useAuth();

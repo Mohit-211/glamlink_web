@@ -3,9 +3,9 @@
 import { useEffect } from 'react';
 import { onIdTokenChanged } from 'firebase/auth';
 import { auth } from '@/lib/config/firebase';
-import { useAppDispatch } from '@/store/hooks';
 import { setUser } from './authSlice';
 import authService from '@/lib/services/firebase/authService';
+import { useAppDispatch } from '../../../../store/hooks';
 
 // Client-side cookie functions
 async function setSessionCookie(idToken: string) {

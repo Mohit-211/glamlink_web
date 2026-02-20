@@ -12,7 +12,7 @@ import {
   fromSerializableConversationWithMessages,
 } from '../../store/supportMessagingSlice';
 import { selectCurrentConversation, selectSupportMessaging } from '@/lib/features/store/hooks';
-import type { AppDispatch } from '@/store/store';
+import type { AppDispatch } from 'store/store';
 
 import { useConversationRealtime } from './useConversationRealtime';
 import { useConversationMessages } from './useConversationMessages';

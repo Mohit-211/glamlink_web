@@ -21,7 +21,7 @@ import {
   selectSupportBotIsLoading,
   selectSupportBotError,
 } from '@/lib/features/store/hooks';
-import type { AppDispatch } from '@/store/store';
+import type { AppDispatch } from 'store/store';
 
 export function useSupportChat(): UseSupportChatReturn {
   const dispatch = useDispatch<AppDispatch>();

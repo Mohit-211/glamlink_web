@@ -10,7 +10,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/lib/features/auth/useAuth";
-import { useAppDispatch } from "@/store/hooks";
 import { logout } from "@/lib/features/auth/authSlice";
 import { usePasswordChange } from "../usePasswordChange";
 import { useProfileEdit } from "../useProfileEdit";
@@ -36,6 +35,7 @@ import SupportBotSettingsSection from "./SupportBotSettingsSection";
 import MessagesSettingsSection from "./MessagesSettingsSection";
 import { getSectionById } from "../sectionsConfig";
 import type { ProfileSettingsVariant, SettingsSectionId } from "../types";
+import { useAppDispatch } from "../../../../../store/hooks";
 
 interface ProfileSettingsSectionPageProps {
   sectionId: SettingsSectionId;

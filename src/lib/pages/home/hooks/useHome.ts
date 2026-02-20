@@ -2,7 +2,6 @@
 
 import { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { 
   fetchHomeData,
   clearError,
@@ -10,6 +9,7 @@ import {
   updateFeaturedProjects,
 } from "../store/homeSlice";
 import { HomeStateInterface } from "../config";
+import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 
 export function useHome() {
   const dispatch = useAppDispatch();

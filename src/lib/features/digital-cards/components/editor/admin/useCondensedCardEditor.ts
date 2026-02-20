@@ -28,7 +28,7 @@ import {
 import { SECTION_REGISTRY, getSectionById } from '@/lib/features/digital-cards/config/sectionRegistry';
 import { STYLING_SECTION_TYPES, generateSectionInstanceId, setSections, setConfig as setReduxConfig } from '@/lib/features/digital-cards/store';
 import { createCondensedCardSection, hasCondensedMapping } from '@/lib/features/digital-cards/utils/sectionMapping';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch } from '../../../../../../../store/hooks';
 
 // =============================================================================
 // TYPES

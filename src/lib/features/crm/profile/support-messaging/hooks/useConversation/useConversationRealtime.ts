@@ -15,7 +15,7 @@ import {
   toSerializableConversation,
   toSerializableMessage,
 } from '../../store/supportMessagingSlice';
-import type { AppDispatch } from '@/store/store';
+import type { AppDispatch } from 'store/store';
 
 interface UseConversationRealtimeProps {
   conversationId: string;

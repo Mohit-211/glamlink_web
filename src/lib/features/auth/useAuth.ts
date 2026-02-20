@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { checkAuthStatus, setUser } from "./authSlice";
 import authService from "./utils/authService";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 
 export function useAuth(requireAdmin = false) {
   const dispatch = useAppDispatch();

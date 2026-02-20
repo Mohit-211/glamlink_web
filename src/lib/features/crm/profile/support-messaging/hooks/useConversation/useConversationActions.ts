@@ -13,7 +13,7 @@ import {
   updateConversationPriority,
   updateConversationTags,
 } from '../../store/supportMessagingSlice';
-import type { AppDispatch } from '@/store/store';
+import type { AppDispatch } from 'store/store';
 
 interface UseConversationActionsProps {
   conversationId: string;
