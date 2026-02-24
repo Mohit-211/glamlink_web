@@ -5,8 +5,7 @@ const DigitalCard: React.FC = () => {
   return (
     <div>
       {/* DigitalCard */}
-      {/* add for space */}
-      
+{/* remove for space */}
       <DigitalCardSection/>
       </div>
   );
