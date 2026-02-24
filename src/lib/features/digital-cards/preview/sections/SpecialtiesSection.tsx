@@ -21,7 +21,7 @@ export default function SpecialtiesSection({ professional, sectionId, qrCodeEnab
   const sections = useAppSelector(selectSections);
 
   // Find the specialties section in Redux to get wrapper props (showCustomTitle, title, etc.)
-  const specialtiesSection = sections.find((s: { props: { innerSectionType: string; }; }) => s.props?.innerSectionType === 'specialties');
+  const specialtiesSection = sections.find((s) => s.props?.innerSectionType === 'specialties');
   const wrapperProps = specialtiesSection?.props || {};
 
   // Merge props with Redux taking highest precedence

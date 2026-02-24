@@ -20,6 +20,11 @@ interface ImportantInfoSectionProps {
   /** Section props from condensed card config */
   sectionProps?: Record<string, any>;
 }
+interface Section {
+  props?: {
+    innerSectionType?: string;
+  };
+}
 
 const DEFAULT_QR_URL = 'https://apps.apple.com/us/app/glamlink/id6502334118';
 
@@ -37,10 +42,12 @@ export default function ImportantInfoSection({
   const sections = useAppSelector(selectSections);
 
   // Find the important info section in Redux to get wrapper props (showCustomTitle, title, etc.)
-  const infoSection = sections.find((s: { props: { innerSectionType: string; }; }) =>
+  
+   const infoSection = sections.find(
+  (s: Section) =>
     s.props?.innerSectionType === 'importantInfo' ||
     s.props?.innerSectionType === 'important-info'
-  );
+);
   const wrapperProps = infoSection?.props || {};
 
   // Merge props with Redux taking highest precedence

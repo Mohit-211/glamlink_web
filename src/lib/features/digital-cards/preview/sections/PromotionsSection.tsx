@@ -3,8 +3,10 @@ import type { Professional, Promotion } from '@/lib/pages/for-professionals/type
 import StyledSectionWrapper from '../components/StyledSectionWrapper';
 import { CurrentPromotions } from '@/lib/features/digital-cards/components/sections/promotions';
 import { useAppSelector } from '../../../../../../store/hooks';
-
-import { selectPropsByInnerSectionType, selectSections } from '@/lib/features/digital-cards/store';
+import {
+  selectPropsByInnerSectionType,
+  selectSections,
+} from '@/lib/features/digital-cards/store';
 
 interface PromotionsSectionProps {
   professional: Partial<Professional>;
@@ -14,28 +16,40 @@ interface PromotionsSectionProps {
   sectionProps?: Record<string, any>;
 }
 
-export default function PromotionsSection({ professional, sectionId, showPromo = false, promotionDetails, sectionProps = {} }: PromotionsSectionProps) {
-  // READ FROM REDUX - direct selector for live updates
-  const reduxProps = useAppSelector(selectPropsByInnerSectionType('current-promotions'));
+export default function PromotionsSection({
+  professional,
+  sectionId,
+  showPromo = false,
+  promotionDetails,
+  sectionProps = {},
+}: PromotionsSectionProps) {
+  // ✅ Read live props from Redux
+  const reduxProps = useAppSelector(
+    selectPropsByInnerSectionType('current-promotions')
+  );
   const sections = useAppSelector(selectSections);
 
-  // Find the promotions section in Redux to get wrapper props (showCustomTitle, title, etc.)
-  const promoSection = sections.find((s: { props: { innerSectionType: string; }; }) =>
-    s.props?.innerSectionType === 'current-promotions' ||
-    s.props?.innerSectionType === 'current-promotions-detailed'
+  // ✅ Find promotions section in Redux (no manual typing needed)
+  const promoSection = sections.find(
+    (s) =>
+      s.props?.innerSectionType === 'current-promotions' ||
+      s.props?.innerSectionType === 'current-promotions-detailed'
   );
-  const wrapperProps = promoSection?.props || {};
 
-  // Merge props with Redux taking highest precedence
+  const wrapperProps = promoSection?.props ?? {};
+
+  // ✅ Merge props (Redux takes priority)
   const mergedProps = { ...sectionProps, ...reduxProps };
 
-  // Title logic: showCustomTitle = false → default, showCustomTitle = true → custom
+  // ✅ Title logic
   const showCustomTitle = wrapperProps.showCustomTitle ?? false;
-  const customTitle = wrapperProps.title || '';
+  const customTitle = wrapperProps.title ?? '';
   const titleAlignment = wrapperProps.titleAlignment ?? 'center-with-lines';
-  const displayTitle = showCustomTitle ? customTitle : 'Current Promotions';
+  const displayTitle = showCustomTitle
+    ? customTitle
+    : 'Current Promotions';
 
-  // Typography props from Redux
+  // ✅ Typography props
   const titleFontFamily = wrapperProps.titleFontFamily;
   const titleFontSize = wrapperProps.titleFontSize;
   const titleFontWeight = wrapperProps.titleFontWeight;
@@ -45,25 +59,33 @@ export default function PromotionsSection({ professional, sectionId, showPromo =
 
   if (!showPromo) return null;
 
+  // ✅ Promotions logic
   const promotions: Promotion[] = useMemo(() => {
-    if (professional.promotions && professional.promotions.length > 0) {
+    if (professional.promotions?.length) {
       return professional.promotions;
     }
-    if (showPromo && promotionDetails) {
-      return [{
-        id: 'form-promotion',
-        title: promotionDetails,
-        isActive: true,
-        isFeatured: false,
-      }];
-    }
-    return [];
-  }, [professional.promotions, showPromo, promotionDetails]);
 
-  const professionalWithPromos = useMemo(() => ({
-    ...professional,
-    promotions,
-  }), [professional, promotions]);
+    if (showPromo && promotionDetails) {
+      return [
+        {
+          id: 'form-promotion',
+          title: promotionDetails,
+          isActive: true,
+          isFeatured: false,
+        },
+      ];
+    }
+
+    return [];
+  }, [professional, showPromo, promotionDetails]);
+
+  const professionalWithPromos = useMemo(
+    () => ({
+      ...professional,
+      promotions,
+    }),
+    [professional, promotions]
+  );
 
   return (
     <StyledSectionWrapper
@@ -76,6 +98,7 @@ export default function PromotionsSection({ professional, sectionId, showPromo =
       titleColor={titleColor}
       titleTextTransform={titleTextTransform}
       titleLetterSpacing={titleLetterSpacing}
+      {...mergedProps}
     >
       <CurrentPromotions
         professional={professionalWithPromos as Professional}
@@ -84,7 +107,13 @@ export default function PromotionsSection({ professional, sectionId, showPromo =
           sectionType: 'current-promotions',
           label: 'Promotions',
           visible: true,
-          position: { x: { value: 0, unit: '%' }, y: { value: 0, unit: '%' }, width: { value: 100, unit: '%' }, height: { value: 100, unit: '%' }, visible: true },
+          position: {
+            x: { value: 0, unit: '%' },
+            y: { value: 0, unit: '%' },
+            width: { value: 100, unit: '%' },
+            height: { value: 100, unit: '%' },
+            visible: true,
+          },
           props: {
             hideTitle: true,
             listFormat: true,
