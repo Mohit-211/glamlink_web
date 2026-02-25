@@ -1,10 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import GlamCardLivePreview from "../GlamCardLivePreview";
 import { initialGlamCardData } from "../initialGlamCardData";
 import GlamCardForm from "./GlamCardForm";
+import { GlamCardFormData } from "./types";
 
 const GlamCardApplication: React.FC = () => {
-  const [data, setData] = useState(initialGlamCardData);
+  const [data, setData] = useState<GlamCardFormData>({} as GlamCardFormData);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    initialGlamCardData().then((result) => {
+      setData(result);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
