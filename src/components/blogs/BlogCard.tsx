@@ -32,6 +32,8 @@ const BlogCard = ({
           }`}
       >
         <Image
+                         unoptimized={process.env.NODE_ENV === "development"}
+
           // width={100}
           // height={100}
           fill

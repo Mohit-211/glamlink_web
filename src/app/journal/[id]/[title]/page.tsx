@@ -55,6 +55,7 @@ export default async function Article({
           <div className="container mx-auto px-6 mb-12 md:mb-16">
             <div className="max-w-4xl mx-auto relative aspect-[16/9]">
               <Image
+                 unoptimized={process.env.NODE_ENV === "development"}
 
                 src={article.cover_image}
                 alt={article.title}
