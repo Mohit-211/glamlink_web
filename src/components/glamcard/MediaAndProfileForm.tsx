@@ -200,7 +200,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
             type="file"
             hidden
             multiple
-            accept="image/*"
+            accept="image/*,video/*"
             onChange={handleGalleryUpload}
           />
         </label>

@@ -98,7 +98,7 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
   };
   return (
     <>
-      <div className="h-[calc(90dvh)] overflow-y-auto pr-3">
+      <div className="h-[calc(95dvh-20px)] overflow-y-auto pr-3">
         <div className="space-y-10">
           <BasicInfoForm data={data} setData={setData} />
           <MediaAndProfileForm data={data} setData={setData} />
