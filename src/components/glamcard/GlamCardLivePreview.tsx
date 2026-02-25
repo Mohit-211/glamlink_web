@@ -263,11 +263,11 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
             {/* FEATURED WORK */}
             <Section title="Featured Work">
-              {data.intro_video && (
+              {/* {data.intro_video && (
                 <div className="mb-4">
                   <VideoPreview video={data.intro_video} mode={mode} />
                 </div>
-              )}
+              )} */}
 
               {normalizedImages.length > 0 && thumbnailIndex !== null ? (
                 <>
