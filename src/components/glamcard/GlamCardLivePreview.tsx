@@ -140,28 +140,18 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
   const galleryMeta = data?.gallery_meta || [];
 
-  const galleryPreviews = useMemo(() => {
-  if (!data?.images?.length) return [];
-
-  return data.images.map((item: any) => {
-    if (item instanceof File) {
-      return URL.createObjectURL(item);
-    }
-    if (typeof item === "string") return item;
-    return item?.file_uri || item?.url || "";
-  });
-}, [data?.images]);
-  // const galleryPreviews = useMemo(
-  //   () =>
-  //     mode === "live"
-  //       ? normalizedImages.map((item, idx) =>
-  //           isFile(data?.images?.[idx])
-  //             ? URL.createObjectURL(data.images[idx])
-  //             : item.url
-  //         )
-  //       : normalizedImages.map((item) => item.url),
-  //   [mode, normalizedImages, data?.images]
-  // );
+ 
+  const galleryPreviews = useMemo(
+    () =>
+      mode === "live"
+        ? normalizedImages.map((item, idx) =>
+            isFile(data?.images?.[idx])
+              ? URL.createObjectURL(data.images[idx])
+              : item.url
+          )
+        : normalizedImages.map((item) => item.url),
+    [mode, normalizedImages, data?.images]
+  );
 
   useEffect(() => {
     if (mode !== "live") return;

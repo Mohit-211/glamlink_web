@@ -18,14 +18,18 @@ const GlamCardApplication: React.FC = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-      {/* LEFT */}
-      <div className="rounded-xl border bg-white p-6 shadow">
-        <GlamCardForm data={data} setData={setData} />
+    <div className="flex gap-8 items-start">
+      {/* LEFT — form, sticky, scrollable, height matches preview */}
+      <div className="w-1/2 sticky top-0 h-screen overflow-hidden">
+        <div className="h-full rounded-xl border bg-white p-6 shadow overflow-y-auto">
+          <GlamCardForm data={data} setData={setData} />
+        </div>
       </div>
 
-      {/* RIGHT */}
-      <GlamCardLivePreview data={data} mode="live" />
+      {/* RIGHT — preview, natural height, scrolls with page */}
+      <div className="w-1/2">
+        <GlamCardLivePreview data={data} mode="live" />
+      </div>
     </div>
   );
 };

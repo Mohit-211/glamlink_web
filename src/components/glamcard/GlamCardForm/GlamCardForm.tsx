@@ -98,33 +98,33 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
   };
   return (
     <>
-      <div className="h-[calc(95dvh-20px)] overflow-y-auto pr-3">
-        <div className="space-y-10">
-          <BasicInfoForm data={data} setData={setData} />
-          <MediaAndProfileForm data={data} setData={setData} />
-          <ServicesAndBookingForm data={data} setData={setData} />
-          <GlamlinkIntegrationForm data={data} setData={setData} />
-          <div
-            className="mt-10 rounded-full text-sm font-semibold text-white shadow-lg"
-            style={{
-              background:
-                "linear-gradient(135deg, #23aeb8 0%, #53bec6 50%, #5cc2d6 100%)",
-            }}
-          >
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="w-full py-3 rounded-lg font-medium disabled:opacity-50"
-            >
-              {loading ? "Creating..." : "Create Business Card"}
-            </button>
-          </div>
-        </div>
-      </div>
-      <SuccessModal
-        open={showSuccess}
-        onClose={() => setShowSuccess(false)}
-      />
+     <div className="h-[90dvh] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+  <div className="space-y-10 pb-6">
+    <BasicInfoForm data={data} setData={setData} />
+    <MediaAndProfileForm data={data} setData={setData} />
+    <ServicesAndBookingForm data={data} setData={setData} />
+    <GlamlinkIntegrationForm data={data} setData={setData} />
+    <div
+      className="mt-10 rounded-full text-sm font-semibold text-white shadow-lg"
+      style={{
+        background: "linear-gradient(135deg, #23aeb8 0%, #53bec6 50%, #5cc2d6 100%)",
+      }}
+    >
+      <button
+        onClick={handleSubmit}
+        disabled={loading}
+        className="w-full py-3 rounded-lg font-medium disabled:opacity-50"
+      >
+        {loading ? "Creating..." : "Create Business Card"}
+      </button>
+    </div>
+  </div>
+</div>
+
+<SuccessModal
+  open={showSuccess}
+  onClose={() => setShowSuccess(false)}
+/>
     </>
   );
 };
