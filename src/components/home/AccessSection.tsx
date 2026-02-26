@@ -69,13 +69,18 @@ const AccessSection: React.FC = () => {
 
               {/* Card with modern phone-like presentation */}
               <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-black/15 border border-gray-200/60 bg-white transform transition-transform hover:scale-[1.02] duration-500">
-                <img
-                  src="/access-card-preview.png"
-                  alt="Glamlink Access Card Preview – clean professional profile"
-                  className="w-full max-w-[320px] sm:max-w-[360px] md:max-w-[380px] object-cover"
-                  loading="lazy"
-                />
-              </div>
+  <video
+    className="w-full max-w-[320px] sm:max-w-[360px] md:max-w-[380px] object-cover"
+    autoPlay
+    muted
+    loop
+    playsInline
+    preload="metadata"
+  >
+    <source src="magziens/6641.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
               {/* Optional subtle badge/ribbon (can remove if not wanted) */}
               <div className="absolute -top-3 -right-3 rotate-12 bg-[#24bbcb] text-white text-xs  px-4 py-1.5 rounded-full shadow-md">

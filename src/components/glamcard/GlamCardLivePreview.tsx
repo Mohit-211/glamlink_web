@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { GlamCardFormData } from "./GlamCardForm/types";
+import Logo from "../../../public/assets/ACCESS-3.png";
+import Image from "next/image";
+import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 
 /* ================= TYPES ================= */
 
@@ -7,6 +10,9 @@ interface Props {
   data: GlamCardFormData;
   sticky?: boolean;
   mode?: "live" | "view";
+  onClose?: () => void;
+  onDownload?: () => void;
+  onCopyLink?: () => void;
 }
 
 /* ================= REUSABLE SECTION ================= */
@@ -95,11 +101,7 @@ const VideoPreview: React.FC<{
           className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/40 backdrop-blur-sm transition"
         >
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-xl transition hover:scale-110">
-            <svg
-              viewBox="0 0 24 24"
-              fill="black"
-              className="ml-1 h-8 w-8"
-            >
+            <svg viewBox="0 0 24 24" fill="black" className="ml-1 h-8 w-8">
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>
@@ -114,12 +116,41 @@ const VideoPreview: React.FC<{
 const GlamCardLivePreview: React.FC<Props> = ({
   data,
   sticky = false,
-  mode = "live",
+  mode,
+  onClose,
+  onDownload,
+  onCopyLink,
 }) => {
   if (!data) return null;
+   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   const specialtiesArray = parseArray(data.specialties);
   const importantInfoArray = parseArray(data.important_info);
+
+  /* ================= PROFILE IMAGE FIX ================= */
+const handleDownload = async () => {
+    // Your existing download logic (e.g. html2canvas, jsPDF, API call, etc.)
+    console.log("Downloading...");
+    setIsDownloadModalOpen(false); // optionally close after download
+  };
+  const profileImageUrl = useMemo(() => {
+    if (!data?.profile_image) return "";
+    if (mode === "live" && isFile(data.profile_image)) {
+      return URL.createObjectURL(data.profile_image);
+    }
+    if (typeof data.profile_image === "string") {
+      return data.profile_image;
+    }
+    return "";
+  }, [data?.profile_image, mode]);
+
+  useEffect(() => {
+    return () => {
+      if (profileImageUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(profileImageUrl);
+      }
+    };
+  }, [profileImageUrl]);
 
   /* ================= IMAGE NORMALIZATION ================= */
 
@@ -140,7 +171,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
   const galleryMeta = data?.gallery_meta || [];
 
- 
   const galleryPreviews = useMemo(
     () =>
       mode === "live"
@@ -210,14 +240,28 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
   return (
     <div className="h-90dvh flex flex-col">
-    <div className="rounded-xl border bg-[#F4F7FB] p-4 shadow-md">
+      <div className="rounded-xl border bg-[#F4F7FB] p-4 shadow-md">
+
+        {/* ================= TOP ACTION BUTTONS ================= */}
+        {mode==="view"&&(
+        <div className="flex justify-end gap-2 mb-3">
+          <button onClick={onCopyLink} className="h-9 w-9 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50">
+            🔗
+          </button>
+          <button    onClick={() => setIsDownloadModalOpen(true)} className="h-9 w-9 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50">
+            ⬇️
+          </button>
+          <button onClick={onClose} className="h-9 w-9 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50">
+            ✕
+          </button>
+        </div>)
+}
+
+        {/* ================= LOGO ================= */}
         <div className="mb-6 text-center">
-          <h2 className="font-serif text-3xl tracking-widest text-gray-800">
-            ACCESS
-          </h2>
-          <p className="text-[11px] uppercase tracking-wide text-gray-400">
-            by glamlink
-          </p>
+          <div className="flex justify-center items-center">
+            <Image src={Logo} alt="access image" width={200} height={200} />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -264,12 +308,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
             {/* FEATURED WORK */}
             <Section title="Featured Work">
-              {/* {data.intro_video && (
-                <div className="mb-4">
-                  <VideoPreview video={data.intro_video} mode={mode} />
-                </div>
-              )} */}
-
               {normalizedImages.length > 0 && thumbnailIndex !== null ? (
                 <>
                   <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm">
@@ -330,13 +368,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
           {/* RIGHT */}
           <div className="space-y-5">
-            {/* LOCATION, HOURS, SPECIALTIES remain unchanged structurally */}
-            {/* Keeping all your original logic exactly same */}
-            
+
             {/* ---- LOCATION ---- */}
             <Section title="Location">
-              {/* Your full existing location code remains unchanged */}
-              {/* (kept exactly as you wrote) */}
               {data.locations?.length ? (
                 <>
                   {data.locations.length > 1 && (
@@ -353,7 +387,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     </select>
                   )}
 
-                   {selectedLocation ? (
+                  {selectedLocation ? (
                     <div className="space-y-3 text-sm">
                       {selectedLocation.business_name && (
                         <p className="font-semibold">{selectedLocation.business_name}</p>
@@ -480,7 +514,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
             </Section>
           </div>
         </div>
-          <div className="flex items-center gap-4 mt-8">
+
+        {/* SEND TEXT DIVIDER */}
+        <div className="flex items-center gap-4 mt-8">
           <div className="flex-1 h-[1px] bg-teal-400"></div>
           <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm font-semibold">
             SEND TEXT
@@ -493,9 +529,16 @@ const GlamCardLivePreview: React.FC<Props> = ({
           <span>g</span>
           <span>📷</span>
         </div>
+        
       </div>
-      
+      {/* <GlamCardDownloadModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        onDownload={handleDownload}
+        data={data}
+      /> */}
     </div>
+
   );
 };
 

@@ -63,62 +63,27 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
           </div>
 
           {/* Right Column - Mockup Card */}
-          <div className="flex justify-center lg:justify-end">
-            <div
-              className="
-              relative w-full max-w-md rounded-2xl bg-white 
-              shadow-xl border border-gray-200 overflow-hidden
-            "
-            >
-              {/* Header */}
-              <div className="px-8 pt-10 pb-6 text-center">
-                <h4 className="text-2xl font-semibold text-gray-900 leading-tight">
-                  Connected to Glamlink Directory + Map
-                </h4>
-                <p className="mt-3 text-sm uppercase tracking-wider text-gray-500 font-medium">
-                  INCLUDES A GLAMLINK PROFILE
-                </p>
-              </div>
-
-              {/* Search Bar */}
-              <div className="px-8 pb-8">
-                <div className="relative flex items-center">
-                  <input
-                    type="text"
-                    value="www.glamlink.net"
-                    readOnly
-                    className="
-                      w-full pl-5 pr-12 py-3.5 rounded-full border border-gray-300 
-                      bg-white text-gray-700 text-sm focus:outline-none
-                    "
-                  />
-                  <div className="absolute right-3 text-gray-500 text-xl">
-                    🔍
-                  </div>
-                </div>
-              </div>
-
-              {/* Mockups */}
-              <div className="relative px-8 pb-16">
-                <img
-                  src="/directory-laptop.png"
-                  alt="Directory Laptop Mockup"
-                  className="w-full rounded-xl shadow-lg"
-                />
-                <img
-                  src="/directory-mobile.png"
-                  alt="Directory Mobile Mockup"
-                  className="
-                    absolute -bottom-10 left-1/2 -translate-x-1/2 
-                    w-28 sm:w-32 rounded-xl shadow-2xl border-4 border-white
-                  "
-                />
-              </div>
-
-              {/* Subtle bottom accent */}
-              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#23aeb8]/10 to-transparent pointer-events-none" />
-            </div>
-          </div>
+         {/* Right Column - Video Only */}
+<div className="flex justify-center lg:justify-end">
+  <div
+    className="
+      relative w-full max-w-md rounded-2xl 
+      shadow-xl border border-gray-200 overflow-hidden
+    "
+  >
+    <video
+      className="w-full h-full object-cover"
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="metadata"
+    >
+      <source src="/magziens/6641.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</div>
         </div>
       </div>
     </section>

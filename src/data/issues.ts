@@ -18,9 +18,8 @@ export const issues2026: Issue[] = [
   {
     id: 1,
     slug: "the-glamlink-edit",
-    title: "The Glamlink Edit ",
-    cover:
-      "https://p6aqvvqp5i.execute-api.us-east-2.amazonaws.com/images/cover/992531/2357200",
+    title: "The Glamlink Edit",
+    cover: "/magziens/the_glamlink_edit.jpg",
     publuu: {
       accountId: 992531,
       flipbookId: 2357200,
@@ -30,24 +29,12 @@ export const issues2026: Issue[] = [
     id: 2,
     slug: "issue-110",
     title: "Issue 110",
-    cover:
-      "https://p6aqvvqp5i.execute-api.us-east-2.amazonaws.com/images/cover/992531/2328224",
+    cover: "/magziens/issue_110.jpg",
     publuu: {
       accountId: 992531,
       flipbookId: 2328224,
     },
   },
-  //   {
-  //     id: 2,
-  //     slug: "issue-111",
-  //     title: "Issue 111",
-  //     cover:
-  //         "https://p6aqvvqp5i.execute-api.us-east-2.amazonaws.com/images/cover/992531/2282294",
-  //     publuu: {
-  //       accountId: 992531,
-  //       flipbookId: 2282294,
-  //     },
-  //   },
 ];
 
 /* =======================
@@ -58,8 +45,7 @@ export const issues2025: Issue[] = [
     id: 1,
     slug: "issue-109",
     title: "Issue 109",
-    cover:
-      "https://p6aqvvqp5i.execute-api.us-east-2.amazonaws.com/images/cover/992531/2282294",
+    cover: "/magziens/issue_109.png",
     publuu: {
       accountId: 992531,
       flipbookId: 2282294,
@@ -69,8 +55,7 @@ export const issues2025: Issue[] = [
     id: 2,
     slug: "issue-108",
     title: "Issue 108",
-    cover:
-      "https://p6aqvvqp5i.execute-api.us-east-2.amazonaws.com/images/cover/992531/2236944",
+    cover: "/magziens/issue_108.jpg",
     publuu: {
       accountId: 992531,
       flipbookId: 2236944,
@@ -80,8 +65,7 @@ export const issues2025: Issue[] = [
     id: 3,
     slug: "issue-107",
     title: "Issue 107",
-    cover:
-      "https://p6aqvvqp5i.execute-api.us-east-2.amazonaws.com/images/cover/992531/2215355",
+    cover: "/magziens/issue_107.jpg",
     publuu: {
       accountId: 992531,
       flipbookId: 2215355,
@@ -91,8 +75,7 @@ export const issues2025: Issue[] = [
     id: 4,
     slug: "issue-106",
     title: "Issue 106",
-    cover:
-      "https://p6aqvvqp5i.execute-api.us-east-2.amazonaws.com/images/cover/992531/2186674",
+    cover: "/magziens/issue_106.jpg",
     publuu: {
       accountId: 992531,
       flipbookId: 2186674,
@@ -102,8 +85,7 @@ export const issues2025: Issue[] = [
     id: 5,
     slug: "issue-105",
     title: "Issue 105",
-    cover:
-      "https://p6aqvvqp5i.execute-api.us-east-2.amazonaws.com/images/cover/992531/2214784",
+    cover: "/magziens/issue_105.jpg",
     publuu: {
       accountId: 992531,
       flipbookId: 2214784,
@@ -113,8 +95,7 @@ export const issues2025: Issue[] = [
     id: 6,
     slug: "issue-104",
     title: "Issue 104",
-    cover:
-      "https://p6aqvvqp5i.execute-api.us-east-2.amazonaws.com/images/cover/992531/2214779",
+    cover: "/magziens/issue_104.jpg",
     publuu: {
       accountId: 992531,
       flipbookId: 2214779,
@@ -122,5 +103,4 @@ export const issues2025: Issue[] = [
   },
 ];
 
-/* Optional: full archive if needed */
 export const allIssues: Issue[] = [...issues2026, ...issues2025];

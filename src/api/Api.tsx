@@ -65,3 +65,8 @@ export const searchBusinessCard = async (params: {
 
   return response.data;
 };
+
+export const getBusinessProfile = async () => {
+  const response = await api.get("businessCard/getAllProfiles");
+  return response.data;
+};
