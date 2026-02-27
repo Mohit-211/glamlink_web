@@ -163,7 +163,41 @@ const ProfessionalsMarketplace = () => {
 
   /* GlamCardLivePreview state */
   const [selectedPro, setSelectedPro] = useState<Professional | null>(null);
+/* ================= MAPPER ================= */
 
+const mapProToGlamCardData = (pro: Professional): any => ({
+  // Identity
+  name: pro.name || "",
+  professional_title: pro.professional_title || "Beauty Expert",
+  profile_image: pro.profile_image || "",
+  profileImage: pro.profile_image || "",
+  instagram: pro.instagram || "",
+  location: pro.location || pro.locations?.[0]?.city
+    ? `${pro.locations?.[0]?.city}, ${pro.locations?.[0]?.state}`
+    : "",
+  specialty: pro.specialty || pro.professional_title || "",
+  role: pro.role || "",
+  is_founder: pro.is_founder || false,
+  locations: pro.locations || [],
+
+  // GlamCardFormData required fields with safe defaults
+  offer_promotion: false,
+  promotion_details: "",
+  booking_link: "",
+  bio: "",
+  services: [],
+  gallery: [],
+  certifications: [],
+  availability: [],
+  social_links: {},
+  phone: "",
+  email: "",
+  website: "",
+  years_of_experience: "",
+  languages: [],
+  payment_methods: [],
+  // Add any other required fields from GlamCardFormData here with defaults
+});
   useEffect(() => {
     const fetchProfessionals = async () => {
       try {
@@ -179,7 +213,6 @@ const ProfessionalsMarketplace = () => {
     };
     fetchProfessionals();
   }, []);
-  console.log(professionals,"professionals")
 
   useEffect(() => {
     setCurrentPage(1);
@@ -232,7 +265,7 @@ const ProfessionalsMarketplace = () => {
         .filter(Boolean)
     )
   ).sort();
-console.log(allSpecialties,"allSpecialties")
+console.log(allSpecialties,"")
   const allLocations = Array.from(
     new Set(
       professionals
@@ -544,7 +577,7 @@ console.log(allSpecialties,"allSpecialties")
               >
                 <X className="w-4 h-4" />
               </button>
-              {/* <GlamCardLivePreview data={selectedPro} mode="view" /> */}
+             <GlamCardLivePreview data={mapProToGlamCardData(selectedPro)} mode="view" />
             </div>
           </div>
         )}
