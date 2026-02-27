@@ -5,22 +5,14 @@ import logo from "../../../public/header_logo.png";
 import { Instagram, Twitter, Facebook, Linkedin, Youtube } from "lucide-react";
 
 const footerLinks = {
-  company: [
+  Quick_Links: [
     { label: "About Us", href: "#" },
-    { label: "Careers", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Community", href: "#" },
-  ],
-  support: [
-    { label: "Help Center", href: "#" },
+    { label: "Journals", href: "/journals" },
     { label: "Contact Us", href: "#" },
-    { label: "Safety", href: "#" },
-    { label: "Accessibility", href: "#" },
   ],
   legal: [
     { label: "Privacy Policy", href: "#" },
     { label: "Terms of Use", href: "#" },
-    { label: "Cookie Policy", href: "#" },
   ],
 };
 
@@ -36,11 +28,14 @@ const Footer = () => {
   return (
     <footer className="bg-gradient-to-b from-gray-950 to-black text-gray-100">
       <div className="container-glamlink px-5 sm:px-6 md:px-8 py-16 md:py-20">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-10">
+        
+        {/* ✅ 4 Column Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8 lg:gap-10 justify-items-center">
+          
           {/* Brand Column */}
-          <div className="col-span-2 sm:col-span-3 md:col-span-1 lg:col-span-1 space-y-6">
+          <div className="col-span-2 md:col-span-1 space-y-6">
             <a href="/" className="flex items-center gap-3 group">
-              <div className="relative w-full h-11 sm:w-full sm:h-12 rounded-2xl overflow-hidden shadow-lg shadow-[#24bbcb]/25 transition-transform group-hover:scale-105">
+              <div className="relative w-full h-11 sm:h-12 rounded-2xl overflow-hidden shadow-lg shadow-[#24bbcb]/25 transition-transform group-hover:scale-105">
                 <Image
                   src={logo}
                   alt="Glamlink"
@@ -52,7 +47,7 @@ const Footer = () => {
               </div>
             </a>
 
-            <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-md">
+            <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
               Connecting beauty professionals with clients who love them —
               beautifully, instantly, and trustfully.
             </p>
@@ -66,38 +61,19 @@ const Footer = () => {
                   className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/8 flex items-center justify-center text-gray-300 
                              hover:bg-[#24bbcb]/90 hover:text-white transition-all duration-300 hover:scale-110"
                 >
-                  <Icon className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+                  <Icon className="w-5 h-5" />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Company */}
+          {/* Quick Links */}
           <div>
             <h4 className="font-semibold text-base sm:text-lg mb-5 text-white">
-              Company
+              Quick Links
             </h4>
-            <ul className="space-y-3 sm:space-y-3.5 text-sm sm:text-base">
-              {footerLinks.company.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-gray-400 hover:text-[#24bbcb] transition-colors duration-200"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div>
-            <h4 className="font-semibold text-base sm:text-lg mb-5 text-white">
-              Support
-            </h4>
-            <ul className="space-y-3 sm:space-y-3.5 text-sm sm:text-base">
-              {footerLinks.support.map((link) => (
+            <ul className="space-y-3 text-sm sm:text-base">
+              {footerLinks.Quick_Links.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
@@ -111,11 +87,11 @@ const Footer = () => {
           </div>
 
           {/* Legal */}
-          <div className="hidden md:block">
+          <div>
             <h4 className="font-semibold text-base sm:text-lg mb-5 text-white">
               Legal
             </h4>
-            <ul className="space-y-3 sm:space-y-3.5 text-sm sm:text-base">
+            <ul className="space-y-3 text-sm sm:text-base">
               {footerLinks.legal.map((link) => (
                 <li key={link.label}>
                   <a
@@ -129,50 +105,36 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Newsletter – moved to full width on small screens */}
-          <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-1 space-y-5 lg:space-y-6">
+          {/* Newsletter */}
+          <div className="space-y-5">
             <h4 className="font-semibold text-base sm:text-lg text-white">
               Stay Updated
             </h4>
+
             <p className="text-gray-400 text-sm sm:text-base">
               Get the latest beauty tips, trends, and Glamlink updates.
             </p>
 
-            <form className="flex flex-col sm:flex-row gap-3">
+            <form className="flex flex-col gap-3">
               <input
                 type="email"
                 placeholder="Your email address"
-                className="flex-1 px-4 sm:px-5 py-3 rounded-xl bg-white/6 border border-white/12 text-white 
+                className="w-full px-4 py-3 rounded-xl bg-white/6 border border-white/12 text-white 
                            placeholder:text-gray-500 text-sm sm:text-base outline-none focus:border-[#24bbcb] 
-                           focus:ring-2 focus:ring-[#24bbcb]/25 transition-all duration-200 min-w-0"
+                           focus:ring-2 focus:ring-[#24bbcb]/25 transition-all duration-200"
               />
+
               <button
                 type="submit"
-                className="px-5 sm:px-6 py-3 rounded-xl bg-[#24bbcb] text-white font-medium text-sm sm:text-base whitespace-nowrap
+                className="w-full px-5 py-3 rounded-xl bg-[#24bbcb] text-white font-medium text-sm sm:text-base
                            hover:bg-[#1ea8b5] transition-all duration-300 shadow-md shadow-[#24bbcb]/20 
-                           hover:shadow-lg hover:shadow-[#24bbcb]/30 hover:scale-[1.02] flex items-center justify-center min-w-[110px]"
+                           hover:shadow-lg hover:shadow-[#24bbcb]/30 hover:scale-[1.02]"
               >
                 Subscribe
               </button>
             </form>
           </div>
 
-          {/* Legal on mobile – shown only on small screens */}
-          <div className="md:hidden col-span-2 sm:col-span-3 mt-4">
-            <h4 className="font-semibold text-base mb-4 text-white">Legal</h4>
-            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-              {footerLinks.legal.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-gray-400 hover:text-[#24bbcb] transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
 
         {/* Bottom Bar */}
@@ -191,6 +153,7 @@ const Footer = () => {
             </a>
           </div>
         </div>
+
       </div>
     </footer>
   );

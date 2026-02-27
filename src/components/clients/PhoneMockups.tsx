@@ -6,10 +6,14 @@ import { Button } from "@/components/ui/button";
 import phone1 from "../../../public/assets/phone1.jpg";
 import phone2 from "../../../public/assets/phone2.jpg";
 import phone3 from "../../../public/assets/phone3.jpg";
+import UserDownloadDialog from "../glamcard/UserDownloadDialog";
+import { useState } from "react";
 
 const images = [phone1, phone2, phone3];
 
 const PhoneMockups = () => {
+      const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <section className="relative py-16 md:py-20 lg:py-24 overflow-hidden bg-gradient-to-b from-white via-[#24bbcb]/2 to-white">
       {/* Softer background glows */}
@@ -98,6 +102,8 @@ const PhoneMockups = () => {
           <Button
             size="lg"
             className="group px-7 md:px-9 py-5 md:py-6 bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold text-base md:text-lg rounded-full shadow-lg shadow-[#24bbcb]/25 hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2.5 mx-auto"
+              onClick={() => setIsModalOpen(true)}
+          
           >
             <Download className="w-5 h-5 transition-transform group-hover:-translate-y-0.5" />
             Download Glamlink
@@ -109,6 +115,10 @@ const PhoneMockups = () => {
           </p>
         </div>
       </div>
+        <UserDownloadDialog
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </section>
   );
 };

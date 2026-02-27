@@ -31,7 +31,7 @@ const MagazineHero = () => {
 
           {/* Single-line friendly headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-light text-gray-950 tracking-tight leading-none mb-8 md:mb-10">
-            The Glamlink <span className="italic text-[#24bbcb]">Edit</span>
+            <span className="italic text-[#24bbcb]"> The Glamlink Edit</span>
           </h1>
 
           {/* Subtitle */}

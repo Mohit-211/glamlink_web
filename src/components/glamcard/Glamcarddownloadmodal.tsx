@@ -3,6 +3,7 @@ import { Download, X, Loader2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import GlamCardLivePreview from "./GlamCardLivePreview";
 import { GlamCardFormData } from "./GlamCardForm/types";
+ import { toPng, toJpeg } from "html-to-image";
 
 interface GlamCardDownloadModalProps {
   isOpen: boolean;
@@ -41,53 +42,82 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
     );
   };
 
-  const handleDownload = async () => {
-    if (!previewRef.current) return;
+const sanitizeUnsupportedColors = (element: HTMLElement) => {
+  const all = element.querySelectorAll("*");
+  const unsupportedColorRegex =
+    /\b(lab|lch|oklch|oklab|color|display-p3|hwb)\s*\(/gi;
 
-    setIsDownloading(true);
-    setErrorMsg(null);
+  const props = [
+    "color",
+    "backgroundColor",
+    "borderColor",
+    "borderTopColor",
+    "borderBottomColor",
+    "borderLeftColor",
+    "borderRightColor",
+    "outlineColor",
+    "boxShadow",
+    "textShadow",
+    "fill",
+    "stroke",
+  ] as const;
 
-    try {
-      // wait for images to fully load
-      await waitForImagesToLoad(previewRef.current);
+  all.forEach((el) => {
+    const htmlEl = el as HTMLElement;
+    const computed = window.getComputedStyle(htmlEl);
 
-      // small delay for fonts/layout
-      await new Promise((resolve) => setTimeout(resolve, 500));
+    props.forEach((prop) => {
+      const value = computed[prop];
+      if (value && unsupportedColorRegex.test(value)) {
+        // Reset to a safe fallback — tweak these as needed
+        (htmlEl.style as any)[prop] = prop.toLowerCase().includes("background")
+          ? "#ffffff"
+          : "#000000";
+      }
+      // reset regex lastIndex since it's global
+      unsupportedColorRegex.lastIndex = 0;
+    });
+  });
+};
+const handleDownload = async () => {
+  if (!previewRef.current) return;
 
-      const canvas = await html2canvas(previewRef.current, {
-        useCORS: true,
-        allowTaint: false,
-        scale: 2,
-        backgroundColor: format === "jpg" ? "#ffffff" : "#F4F7FB",
-        imageTimeout: 15000,
-        removeContainer: true,
-        foreignObjectRendering: false,
-      });
+  setIsDownloading(true);
+  setErrorMsg(null);
 
-      const mimeType =
-        format === "jpg" ? "image/jpeg" : "image/png";
-      const extension =
-        format === "jpg" ? "jpg" : "png";
+  try {
+    const element = previewRef.current;
 
-      const dataUrl = canvas.toDataURL(mimeType, 1.0);
+    await waitForImagesToLoad(element);
 
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `${
-        data?.name?.replace(/\s+/g, "_") || "glam_card"
-      }.${extension}`;
+    // ✅ Sanitize modern CSS colors html2canvas can't parse
+    sanitizeUnsupportedColors(element);
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (err) {
-      console.error("Download error:", err);
-      setErrorMsg("Download failed. Check console for details.");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: format === "jpg" ? "#ffffff" : null,
+      logging: false,
+    });
 
+    const mimeType = format === "jpg" ? "image/jpeg" : "image/png";
+    const quality = format === "jpg" ? 0.92 : 1.0;
+    const dataUrl = canvas.toDataURL(mimeType, quality);
+
+    const link = document.createElement("a");
+    link.download = `glam_card.${format}`;
+    link.href = dataUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error("Canvas error:", error);
+    setErrorMsg("Image conversion failed. Check console.");
+  } finally {
+    setIsDownloading(false);
+  }
+};
   if (!isOpen) return null;
 
   return (
@@ -115,11 +145,11 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         {/* Preview */}
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
           <div ref={previewRef}>
-            {/* <GlamCardLivePreview
+            <GlamCardLivePreview
               data={data}
               mode="download"
               sticky={false}
-            /> */}
+            />
           </div>
         </div>
 

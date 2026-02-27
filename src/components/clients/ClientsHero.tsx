@@ -1,8 +1,12 @@
 "use client";
 
 import { Sparkles, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import UserDownloadDialog from "../glamcard/UserDownloadDialog";
 
 const ClientsHero = () => {
+      const [isModalOpen, setIsModalOpen] = useState(false);
+  
   return (
     <section className="relative pt-[120px] md:pt-[140px] pb-16 md:pb-24 lg:pb-32 overflow-hidden bg-gradient-to-b from-white via-[#24bbcb]/3 to-white">
       {/* Decorative background orbs */}
@@ -40,7 +44,9 @@ const ClientsHero = () => {
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 animate-fade-up animation-delay-500">
             <a
-              href="#download"
+              href=""
+              onClick={() => setIsModalOpen(true)}
+
               className="group inline-flex items-center gap-3 px-8 py-4 md:py-5 bg-[#24bbcb] text-white font-semibold text-base md:text-lg rounded-full shadow-xl shadow-[#24bbcb]/30 hover:shadow-2xl hover:shadow-[#24bbcb]/40 transition-all duration-300 hover:scale-[1.03]"
             >
               <span>Download Glamlink</span>
@@ -72,6 +78,10 @@ const ClientsHero = () => {
           </div>
         </div>
       </div>
+        <UserDownloadDialog
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </section>
   );
 };

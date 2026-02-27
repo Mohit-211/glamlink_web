@@ -1,59 +1,101 @@
 import React from "react";
-import { GlamCardFormData, BusinessHour } from "../types";
+import { GlamCardFormData } from "../types";
 
 interface SectionProps {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
 }
 
-const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
-const inputClass = "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
+const sectionClass =
+  "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
 
-const BusinessHoursSection: React.FC<SectionProps> = ({ data, setData }) => {
-  const updateHour = (index: number, updates: Partial<BusinessHour>) => {
-    setData((prev) => {
-      const hours = [...prev.business_hour];
-      hours[index] = { ...hours[index], ...updates };
-      return { ...prev, business_hour: hours };
-    });
+const inputClass =
+  "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
+
+const buttonClass =
+  "rounded-lg bg-pink-500 px-4 py-2 text-sm font-medium text-white hover:bg-pink-600";
+
+const removeButtonClass =
+  "text-red-500 text-sm font-medium hover:underline";
+
+const BusinessHoursSection: React.FC<SectionProps> = ({
+  data,
+  setData,
+}) => {
+  const businessHours = data.business_hour || [];
+
+  const handleAddNote = () => {
+    setData((prev) => ({
+      ...prev,
+      business_hour: [...(prev.business_hour || []), { note: "" }],
+    }));
+  };
+
+  const handleNoteChange = (index: number, value: string) => {
+    const updated = [...businessHours];
+    updated[index].note = value;
+
+    setData((prev) => ({
+      ...prev,
+      business_hour: updated,
+    }));
+  };
+
+  const handleRemoveNote = (index: number) => {
+    const updated = businessHours.filter((_, i) => i !== index);
+
+    setData((prev) => ({
+      ...prev,
+      business_hour: updated,
+    }));
   };
 
   return (
     <section className={sectionClass}>
-      <h3 className="text-lg font-semibold">Business Hours</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Business Hours</h3>
 
-      {data.business_hour.map((hour, i) => (
-        <div key={hour.day} className="flex items-center gap-4">
-          <span className="w-24 font-medium">{hour.day}</span>
+        <button
+          type="button"
+          onClick={handleAddNote}
+          className={buttonClass}
+        >
+          + Add
+        </button>
+      </div>
 
-          <input
-            type="time"
-            className={inputClass}
-            style={{ width: "140px" }}
-            value={hour.open_time}
-            onChange={(e) => updateHour(i, { open_time: e.target.value })}
-          />
+      <div className="space-y-4">
+        {businessHours.length === 0 && (
+          <p className="text-sm text-gray-400">
+            No business hours added yet.
+          </p>
+        )}
 
-          <span className="text-gray-500">–</span>
-
-          <input
-            type="time"
-            className={inputClass}
-            style={{ width: "140px" }}
-            value={hour.close_time}
-            onChange={(e) => updateHour(i, { close_time: e.target.value })}
-          />
-
-          <label className="flex items-center gap-2 text-sm">
+        {businessHours.map((item, index) => (
+          <div
+            key={index}
+            className="flex items-center gap-3"
+          >
             <input
-              type="checkbox"
-              checked={hour.closed}
-              onChange={(e) => updateHour(i, { closed: e.target.checked })}
+              type="text"
+              placeholder="e.g. Mon-Fri: 10am - 7pm"
+              className={inputClass}
+              value={item.note || ""}
+              onChange={(e) =>
+                handleNoteChange(index, e.target.value)
+              }
             />
-            Closed
-          </label>
-        </div>
-      ))}
+
+            <button
+              type="button"
+              onClick={() => handleRemoveNote(index)}
+              className={removeButtonClass}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
     </section>
   );
 };

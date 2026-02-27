@@ -38,13 +38,9 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     important_info: ["Deposit required to secure booking"],
 
     business_hour: [
-      { day: "Monday",    open_time: "10:00", close_time: "19:00", closed: false },
-      { day: "Tuesday",   open_time: "10:00", close_time: "19:00", closed: false },
-      { day: "Wednesday", open_time: "10:00", close_time: "19:00", closed: false },
-      { day: "Thursday",  open_time: "10:00", close_time: "20:00", closed: false },
-      { day: "Friday",    open_time: "10:00", close_time: "20:00", closed: false },
-      { day: "Saturday",  open_time: "09:00", close_time: "17:00", closed: false },
-      { day: "Sunday",    open_time: "",      close_time: "",       closed: true  },
+      { note: "Mon-Fri: 10am - 7pm" },
+      { note: "Sat: 10am - 5pm" },
+      { note: "Sun: Closed" },
     ],
 
     locations: [

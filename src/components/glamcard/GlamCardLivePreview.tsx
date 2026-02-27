@@ -9,7 +9,7 @@ import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 interface Props {
   data: GlamCardFormData;
   sticky?: boolean;
-  mode?: "live" | "view";
+  mode?: "live" | "view" | "download";
   onClose?: () => void;
   onDownload?: () => void;
   onCopyLink?: () => void;
@@ -237,6 +237,8 @@ const handleDownload = async () => {
   }, [data.locations, selectedLocationId, primaryLocation]);
 
   /* ================= RENDER ================= */
+console.log(data?.business_hour)
+console.log(data)
 
   return (
     <div className="h-90dvh flex flex-col">
@@ -476,27 +478,22 @@ const handleDownload = async () => {
               )}
             </Section>
 
-            {/* HOURS */}
-            <Section title="Hours">
-              <ul className="space-y-1.5 text-sm">
-                {data?.business_hour?.length ? (
-                  data.business_hour.map((hour: any) => (
-                    <li key={hour.day} className="flex justify-between">
-                      <span className="font-medium text-gray-700">{hour.day}</span>
-                      <span>
-                        {hour.closed
-                          ? "Closed"
-                          : `${formatTime(hour.open_time)} – ${formatTime(hour.close_time)}`}
-                      </span>
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-gray-400">
-                    Business hours will appear here
-                  </li>
-                )}
-              </ul>
-            </Section>
+            {/* HOURS  */}
+           <Section title="Hours">
+  <ul className="space-y-1.5 text-sm">
+    {data?.business_hour&&data?.business_hour?.length ? (
+      data.business_hour.map((hour: any, index: number) => (
+        <li key={hour?.id ?? index} className="flex justify-between">
+          <span className="font-medium text-gray-700">{hour?.note}</span>
+        </li>
+      ))
+    ) : (
+      <li className="text-gray-400">
+        Business hours will appear here
+      </li>
+    )}
+  </ul>
+</Section>
 
             {/* SPECIALTIES */}
             <Section title="Specialties">
@@ -531,12 +528,11 @@ const handleDownload = async () => {
         </div>
         
       </div>
-      {/* <GlamCardDownloadModal
+      <GlamCardDownloadModal
         isOpen={isDownloadModalOpen}
         onClose={() => setIsDownloadModalOpen(false)}
-        onDownload={handleDownload}
         data={data}
-      /> */}
+      />
     </div>
 
   );

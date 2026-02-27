@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Search,
   Filter,
@@ -34,9 +34,9 @@ interface Professional {
   image?: string;
   badge?: string;
   instagram?: string;
-  is_founder?: boolean;  // API boolean flag
-  role?: string;         // e.g. "founder"
-  is_details?: boolean;  // if true → card is clickable, opens GlamCardDownloadModal
+  is_founder?: boolean;
+  role?: string;
+  is_details?: boolean;
 }
 
 /* ================= HELPERS ================= */
@@ -76,7 +76,6 @@ const ProfessionalCard = ({
           alt={pro.name}
           className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
         />
-        {/* Founder Badge */}
         {founderBadge && (
           <span className="absolute top-3 left-3 bg-[#24bbcb] text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md tracking-wide">
             {founderBadge}
@@ -113,7 +112,6 @@ const ProfessionalCard = ({
           </div>
         )}
 
-        {/* Stop propagation so button click doesn't bubble up to card click */}
         <Button
           onClick={(e) => e.stopPropagation()}
           className="mt-auto w-full bg-[#24bbcb] hover:bg-[#1ea8b5] text-white rounded-full py-5 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 gap-2"
@@ -129,20 +127,28 @@ const ProfessionalCard = ({
 /* ================= MAIN COMPONENT ================= */
 
 const ProfessionalsMarketplace = () => {
-  const [activeSort, setActiveSort] = useState("name");
+  const [activeSort, setActiveSort] = useState("");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [sortOpen, setSortOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  /* Close dropdowns on outside click */
+  const sortRef = useRef<HTMLDivElement>(null);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  /* Close dropdowns on outside click using refs */
   useEffect(() => {
-    const handleOutsideClick = () => {
-      setFilterOpen(false);
-      setSortOpen(false);
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+        setSortOpen(false);
+      }
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setFilterOpen(false);
+      }
     };
-    document.addEventListener("click", handleOutsideClick);
-    return () => document.removeEventListener("click", handleOutsideClick);
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
+
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -173,6 +179,7 @@ const ProfessionalsMarketplace = () => {
     };
     fetchProfessionals();
   }, []);
+  console.log(professionals,"professionals")
 
   useEffect(() => {
     setCurrentPage(1);
@@ -180,7 +187,6 @@ const ProfessionalsMarketplace = () => {
 
   const filteredProfessionals = professionals
     .filter((pro) => {
-      // Search filter
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const nameMatch = pro.name?.toLowerCase().includes(q);
@@ -189,12 +195,10 @@ const ProfessionalsMarketplace = () => {
         const titleMatch = pro.professional_title?.toLowerCase().includes(q);
         if (!nameMatch && !cityMatch && !stateMatch && !titleMatch) return false;
       }
-      // Specialty filter
       if (selectedSpecialties.length > 0) {
         const proSpecialty = pro.specialty || pro.professional_title || "Beauty Expert";
         if (!selectedSpecialties.includes(proSpecialty)) return false;
       }
-      // Location filter
       if (selectedLocations.length > 0) {
         const proLocation = pro.locations?.[0]?.city
           ? `${pro.locations[0].city}, ${pro.locations[0].state}`
@@ -204,7 +208,6 @@ const ProfessionalsMarketplace = () => {
       return true;
     })
     .sort((a, b) => {
-      // Founders always first
       if (a.is_founder && !b.is_founder) return -1;
       if (!a.is_founder && b.is_founder) return 1;
       let valA = "";
@@ -223,13 +226,21 @@ const ProfessionalsMarketplace = () => {
 
   /* Derive unique specialties and locations from data */
   const allSpecialties = Array.from(
-    new Set(professionals.map((p) => p.specialty || p.professional_title || "Beauty Expert").filter(Boolean))
+    new Set(
+      professionals
+        .map((p) => p.specialty || p.professional_title || "Beauty Expert")
+        .filter(Boolean)
+    )
   ).sort();
-
+console.log(allSpecialties,"allSpecialties")
   const allLocations = Array.from(
     new Set(
       professionals
-        .map((p) => p.locations?.[0]?.city ? `${p.locations[0].city}, ${p.locations[0].state}` : null)
+        .map((p) =>
+          p.locations?.[0]?.city
+            ? `${p.locations[0].city}, ${p.locations[0].state}`
+            : null
+        )
         .filter(Boolean) as string[]
     )
   ).sort();
@@ -274,17 +285,21 @@ const ProfessionalsMarketplace = () => {
             </div>
 
             {/* Sort Dropdown */}
-            <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <div className="relative" ref={sortRef}>
               <button
                 onClick={() => setSortOpen((o) => !o)}
                 className="inline-flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm hover:border-[#24bbcb] transition whitespace-nowrap"
               >
                 <ChevronsUpDown className="w-4 h-4 text-gray-400" />
-                Sort by {sortOptions.find((o) => o.value === activeSort)?.label}
-                {sortDir === "asc" ? (
-                  <ArrowUp className="w-4 h-4 text-[#24bbcb]" />
-                ) : (
-                  <ArrowDown className="w-4 h-4 text-[#24bbcb]" />
+                {/* FIX 1: Clean label — no "undefined" when nothing selected */}
+                {activeSort
+                  ? `Sort by ${sortOptions.find((o) => o.value === activeSort)?.label}`
+                  : "Sort by"}
+                {/* FIX 2: Only show arrow when a sort is active */}
+                {activeSort && (
+                  sortDir === "asc"
+                    ? <ArrowUp className="w-4 h-4 text-[#24bbcb]" />
+                    : <ArrowDown className="w-4 h-4 text-[#24bbcb]" />
                 )}
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
@@ -319,7 +334,7 @@ const ProfessionalsMarketplace = () => {
             </div>
 
             {/* Filters Button */}
-            <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <div className="relative" ref={filterRef}>
               <Button
                 variant="outline"
                 onClick={() => setFilterOpen((o) => !o)}
@@ -342,7 +357,6 @@ const ProfessionalsMarketplace = () => {
               {filterOpen && (
                 <div
                   className="absolute top-full mt-2 right-0 bg-white border border-gray-100 rounded-2xl shadow-xl z-30 w-72"
-                  onClick={(e) => e.stopPropagation()}
                 >
                   {/* Tabs */}
                   <div className="flex border-b border-gray-100">
@@ -361,40 +375,61 @@ const ProfessionalsMarketplace = () => {
                     ))}
                   </div>
 
-                  {/* Checkbox List */}
+                  {/* FIX 3: Checkbox List — changed <label onClick> to <div onClick> to prevent double-toggle */}
                   <div className="max-h-64 overflow-y-auto py-2">
                     {(activeFilterTab === "specialty" ? allSpecialties : allLocations).map((item) => {
-                      const selected = activeFilterTab === "specialty"
-                        ? selectedSpecialties.includes(item)
-                        : selectedLocations.includes(item);
+                      const selected =
+                        activeFilterTab === "specialty"
+                          ? selectedSpecialties.includes(item)
+                          : selectedLocations.includes(item);
+
                       const toggle = () => {
                         if (activeFilterTab === "specialty") {
                           setSelectedSpecialties((prev) =>
-                            prev.includes(item) ? prev.filter((s) => s !== item) : [...prev, item]
+                            prev.includes(item)
+                              ? prev.filter((s) => s !== item)
+                              : [...prev, item]
                           );
                         } else {
                           setSelectedLocations((prev) =>
-                            prev.includes(item) ? prev.filter((l) => l !== item) : [...prev, item]
+                            prev.includes(item)
+                              ? prev.filter((l) => l !== item)
+                              : [...prev, item]
                           );
                         }
                       };
+
                       return (
-                        <label
+                        <div
                           key={item}
                           onClick={toggle}
-                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer"
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer select-none"
                         >
-                          <div className={`w-4 h-4 rounded border-2 shrink-0 flex items-center justify-center transition ${
-                            selected ? "bg-[#24bbcb] border-[#24bbcb]" : "border-gray-300"
-                          }`}>
+                          <div
+                            className={`w-4 h-4 rounded border-2 shrink-0 flex items-center justify-center transition ${
+                              selected
+                                ? "bg-[#24bbcb] border-[#24bbcb]"
+                                : "border-gray-300"
+                            }`}
+                          >
                             {selected && (
-                              <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 10 10">
-                                <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              <svg
+                                className="w-2.5 h-2.5 text-white"
+                                fill="none"
+                                viewBox="0 0 10 10"
+                              >
+                                <path
+                                  d="M1.5 5l2.5 2.5 4.5-4.5"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
                               </svg>
                             )}
                           </div>
                           <span className="text-sm text-gray-700">{item}</span>
-                        </label>
+                        </div>
                       );
                     })}
                   </div>
@@ -403,7 +438,10 @@ const ProfessionalsMarketplace = () => {
                   {(selectedSpecialties.length + selectedLocations.length) > 0 && (
                     <div className="border-t border-gray-100 p-3 flex justify-end">
                       <button
-                        onClick={() => { setSelectedSpecialties([]); setSelectedLocations([]); }}
+                        onClick={() => {
+                          setSelectedSpecialties([]);
+                          setSelectedLocations([]);
+                        }}
                         className="text-xs text-gray-500 hover:text-red-500 transition"
                       >
                         Clear all
@@ -427,16 +465,26 @@ const ProfessionalsMarketplace = () => {
 
         {!loading && !error && (
           <>
+            {/* Empty state */}
+            {currentProfessionals.length === 0 && (
+              <div className="text-center py-16 text-gray-400">
+                <p className="text-lg font-medium">No professionals found.</p>
+                <p className="text-sm mt-1">Try adjusting your search or filters.</p>
+              </div>
+            )}
+
             {/* Grid */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
-              {currentProfessionals.map((pro) => (
-                <ProfessionalCard
-                  key={pro.id}
-                  pro={pro}
-                  onCardClick={(p) => setSelectedPro(p)}
-                />
-              ))}
-            </div>
+            {currentProfessionals.length > 0 && (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
+                {currentProfessionals.map((pro) => (
+                  <ProfessionalCard
+                    key={pro.id}
+                    pro={pro}
+                    onCardClick={(p) => setSelectedPro(p)}
+                  />
+                ))}
+              </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -480,7 +528,7 @@ const ProfessionalsMarketplace = () => {
           </>
         )}
 
-        {/* Modal — opens GlamCardLivePreview when a card with is_details=true is clicked */}
+        {/* Modal */}
         {selectedPro && (
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"

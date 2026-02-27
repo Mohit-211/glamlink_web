@@ -2,6 +2,8 @@
 
 import { Search, Play, ShoppingCart, Star, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import UserDownloadDialog from "../glamcard/UserDownloadDialog";
 
 const steps = [
   {
@@ -35,6 +37,8 @@ const steps = [
 ];
 
 const HowItWorks = () => {
+      const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <section className="relative py-20 md:py-28 bg-gradient-to-b from-gray-50/70 via-white to-gray-50/70 overflow-hidden">
       {/* Subtle background accents */}
@@ -118,7 +122,9 @@ const HowItWorks = () => {
           <Button
             size="lg"
             className="group px-8 md:px-10 py-6 md:py-7 bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold text-base md:text-lg rounded-full shadow-xl shadow-[#24bbcb]/25 hover:shadow-2xl hover:shadow-[#24bbcb]/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-3 mx-auto"
-          >
+                       onClick={() => setIsModalOpen(true)}
+
+         >
             Start Your Glow-Up Today
             <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
           </Button>
@@ -128,6 +134,10 @@ const HowItWorks = () => {
           </p>
         </div>
       </div>
+        <UserDownloadDialog
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </section>
   );
 };

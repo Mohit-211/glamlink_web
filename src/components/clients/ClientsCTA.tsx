@@ -2,8 +2,12 @@
 
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import UserDownloadDialog from "../glamcard/UserDownloadDialog";
+import { useState } from "react";
 
 const ClientsCTA = () => {
+      const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <section className="relative py-20 md:py-28 lg:py-32 overflow-hidden">
       {/* Very soft background gradient */}
@@ -53,7 +57,9 @@ const ClientsCTA = () => {
               <Button
                 size="lg"
                 className="group min-w-[240px] bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold text-base md:text-lg rounded-full shadow-xl shadow-[#24bbcb]/25 hover:shadow-2xl hover:shadow-[#24bbcb]/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-3 px-8 md:px-10 py-6 md:py-7"
-              >
+                           onClick={() => setIsModalOpen(true)}
+
+             >
                 Create Free Account
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1.5" />
               </Button>
@@ -65,6 +71,10 @@ const ClientsCTA = () => {
           </div>
         </div>
       </div>
+        <UserDownloadDialog
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </section>
   );
 };

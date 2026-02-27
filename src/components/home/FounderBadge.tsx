@@ -3,8 +3,11 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sparkles, ShieldCheck, ArrowRight, Download } from "lucide-react";
+import { useState } from "react";
+import UserDownloadDialog from "../glamcard/UserDownloadDialog";
 
 const FounderBadge = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <section className="py-20 md:py-28 bg-gradient-to-b from-white via-gray-50/70 to-white relative overflow-hidden">
       {/* Subtle background accent */}
@@ -100,9 +103,7 @@ const FounderBadge = () => {
                 </p>
               </div>
 
-              <div className="mt-8 flex justify-center">
-                <Download className="w-12 h-12 text-[#24bbcb]/30 group-hover:text-[#24bbcb]/60 transition-colors" />
-              </div>
+             
             </div>
 
             {/* Pros Card */}
@@ -122,17 +123,16 @@ const FounderBadge = () => {
                 </p>
               </div>
 
-              <div className="mt-8 flex justify-center">
-                <Download className="w-12 h-12 text-[#24bbcb]/30 group-hover:text-[#24bbcb]/60 transition-colors" />
-              </div>
+             
             </div>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5" >
             <Button
               size="lg"
               className="min-w-[220px] bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold text-base py-7 rounded-full shadow-lg shadow-[#24bbcb]/25 hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 group"
+              onClick={() => setIsModalOpen(true)}
             >
               <span>Download for Users</span>
               <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
@@ -142,13 +142,19 @@ const FounderBadge = () => {
               size="lg"
               variant="outline"
               className="min-w-[220px] border-2 border-gray-800 text-gray-900 hover:bg-gray-900 hover:text-white font-semibold text-base py-7 rounded-full transition-all duration-300 group"
-            >
+              onClick={() => setIsModalOpen(true)}
+           
+           >
               <span>Download for Pros</span>
               <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
         </div>
       </div>
+        <UserDownloadDialog
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </section>
   );
 };

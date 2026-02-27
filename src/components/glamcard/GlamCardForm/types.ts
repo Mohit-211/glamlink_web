@@ -1,10 +1,11 @@
 /* ================= SHARED TYPES ================= */
-export interface BusinessHour {
-  day: string;
-  open_time: string;
-  close_time: string;
-  closed?: boolean;
-}
+export type BusinessHour =
+ 
+  {
+      note: string;
+    };
+
+
 export interface Location {
   // id(id: any, arg1: { isOpen: boolean; }): void;
   isOpen: any;

@@ -10,13 +10,13 @@ import logo from "../../../public/header_logo.png"; // adjust path if needed
 const navLinks = [
   { label: "Home", href: "/", id: "home" },
   { label: "For Clients", href: "/for-clients", id: "for-clients" },
-  { label: "Journal", href: "/journal", id: "journal" },
   {
     label: "For Professionals",
     href: "/for-professionals",
     id: "for-professionals",
   },
   { label: "Magazine", href: "/magazine", id: "magazine" },
+  { label: "Journal", href: "/journal", id: "journal" },
   { label: "Promos", href: "/promos", id: "promos" },
 ];
 
@@ -72,12 +72,21 @@ const Header = ({ activeRoute }: HeaderProps) => {
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:block">
-            <Button className="bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold px-6 md:px-8 py-5 md:py-6 rounded-full shadow-lg shadow-[#24bbcb]/25 hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 text-base">
-              <Download className="w-4.5 h-4.5" />
-              Download App
-            </Button>
-          </div>
+    <div className="hidden lg:block">
+  <Button
+    asChild
+    className="bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold px-6 md:px-8 py-5 md:py-6 rounded-full shadow-lg shadow-[#24bbcb]/25 hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 text-base"
+  >
+    <a
+      href="https://linktr.ee/glamlink_app"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Download className="w-4.5 h-4.5" />
+      Download App
+    </a>
+  </Button>
+</div>
 
           {/* Mobile Menu Toggle */}
           <button
