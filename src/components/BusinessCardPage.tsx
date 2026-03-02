@@ -8,6 +8,7 @@ import GlamCardLivePreview from "./glamcard/GlamCardLivePreview";
 interface BusinessCardPageProps {
   slug?: string;
   mode?: "live" | "view" | "download";
+
 }
 
 const BusinessCardPage: React.FC<BusinessCardPageProps> = ({ slug, mode = "view" }) => {
@@ -26,7 +27,7 @@ const BusinessCardPage: React.FC<BusinessCardPageProps> = ({ slug, mode = "view"
       try {
         setLoading(true);
         const res = await getBusinessCardBySlug(slug);
-        setData(res);
+        setData(res?.data);
       } catch (err: any) {
         console.error(err);
         setError("Failed to load business card.");
@@ -44,7 +45,7 @@ const BusinessCardPage: React.FC<BusinessCardPageProps> = ({ slug, mode = "view"
 
   return (
     <GlamCardLivePreview
-      data={data?.data}
+      data={data}
       mode={mode}
       onClose={() => console.log("Close clicked")}
       onDownload={() => console.log("Download clicked")}
