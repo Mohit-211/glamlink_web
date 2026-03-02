@@ -12,34 +12,35 @@ interface Props {
 }
 
 const GlamCardDesign: React.FC<Props> = ({ slug }) => {
+  console.log(slug,"slug")
   const [data, setData] = useState<GlamCardFormData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      setLoading(true);
+// useEffect(() => {
+//   const fetchData = async () => {
+//     try {
+//       setLoading(true);
 
-      const res = await getBusinessCardBySlug(slug);
+//       const res = await getBusinessCardBySlug(slug);
 
-      if (res?.data) {
-        setData(res.data);
-      } else {
-        setError("No business card found.");
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load business card.");
-    } finally {
-      setLoading(false);
-    }
-  };
+//       if (res?.data) {
+//         setData(res.data);
+//       } else {
+//         setError("No business card found.");
+//       }
+//     } catch (err) {
+//       console.error(err);
+//       setError("Failed to load business card.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-  if (slug) {
-    fetchData();
-  }
-}, [slug]);
+//   if (slug) {
+//     fetchData();
+//   }
+// }, [slug]);
 
   if (loading) {
     return <p className="mt-20 text-center">Loading...</p>;
@@ -55,7 +56,7 @@ useEffect(() => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 mt-20">
-             <BusinessCardPage slug={data?.business_card_link.split('/').pop()} mode="view" />
+             <BusinessCardPage slug={slug} mode="view" />
 
       {/* <GlamCardLivePreview
         data={data}

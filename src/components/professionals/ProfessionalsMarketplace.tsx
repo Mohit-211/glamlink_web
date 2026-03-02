@@ -23,7 +23,7 @@ import BusinessCardPage from "../BusinessCardPage";
 /* ================= TYPES ================= */
 
 interface Professional {
-  business_card_link: any;
+  // business_card_link: any;
   locations: any;
   profile_image: string;
   id: number;

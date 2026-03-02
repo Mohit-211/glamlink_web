@@ -10,13 +10,14 @@ import BusinessCardPage from "../BusinessCardPage";
 interface GlamCardDownloadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  data: GlamCardFormData;
+  // data: GlamCardFormData;
+  datadownload:any
 }
 
 const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
   isOpen,
   onClose,
-  data,
+  datadownload,
 }) => {
   const previewRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -151,7 +152,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
           <div ref={previewRef}>
             {/* <GlamCardLivePreview data={data} mode="download" sticky={false} /> */}
-                         <BusinessCardPage slug={data?.business_card_link.split('/').pop()} mode="download" />
+                         <BusinessCardPage slug={datadownload?.business_card_link.split('/').pop()} mode="view" />
 
           </div>
         </div>

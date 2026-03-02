@@ -3,7 +3,6 @@ import GlamCardLivePreview from "../GlamCardLivePreview";
 import { initialGlamCardData } from "../initialGlamCardData";
 import GlamCardForm from "./GlamCardForm";
 import { GlamCardFormData } from "./types";
-import BusinessCardPage from "@/components/BusinessCardPage";
 
 const GlamCardApplication: React.FC = () => {
   const [data, setData] = useState<GlamCardFormData>({} as GlamCardFormData);

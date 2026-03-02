@@ -13,6 +13,7 @@ interface Props {
   onClose?: () => void;
   onDownload?: () => void;
   onCopyLink?: () => void;
+  
 }
 
 /* ================= REUSABLE SECTION ================= */
@@ -549,8 +550,7 @@ console.log(data)
       <GlamCardDownloadModal
         isOpen={isDownloadModalOpen}
         onClose={() => setIsDownloadModalOpen(false)}
-        data={data}
-      />
+        datadownload={data}     />
     </div>
 
   );
