@@ -3,6 +3,7 @@ import GlamCardLivePreview from "../GlamCardLivePreview";
 import { initialGlamCardData } from "../initialGlamCardData";
 import GlamCardForm from "./GlamCardForm";
 import { GlamCardFormData } from "./types";
+import BusinessCardPage from "@/components/BusinessCardPage";
 
 const GlamCardApplication: React.FC = () => {
   const [data, setData] = useState<GlamCardFormData>({} as GlamCardFormData);
@@ -29,6 +30,8 @@ const GlamCardApplication: React.FC = () => {
       {/* RIGHT — preview, natural height, scrolls with page */}
       <div className="w-1/2">
         <GlamCardLivePreview data={data} mode="live" />
+                     {/* <BusinessCardPage slug={data?.business_card_link.split('/').pop()} mode="view" /> */}
+
       </div>
     </div>
   );

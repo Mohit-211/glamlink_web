@@ -5,6 +5,7 @@ import { Search, MapPin, Loader2, UserCheck, AlertCircle } from "lucide-react";
 import { searchBusinessCard, getBusinessCardBySlug, getBusinessProfile } from "@/api/Api";
 import GlamCardLivePreview from "../glamcard/GlamCardLivePreview";
 import ProfessionalsMap from "./ProfessionalsMap";
+import BusinessCardPage from "../BusinessCardPage";
 
 // ─── Leaflet types (loaded dynamically) ───────────────────────────────────────
 declare global {
@@ -472,7 +473,7 @@ const Hero = () => {
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
 
             {/* ── Map panel (Leaflet, multi-marker) ── */}
-            <div className="rounded-2xl border border-gray-200/80 overflow-hidden bg-white shadow-sm h-[380px] md:h-[480px] flex flex-col">
+            <div className="rounded-2xl border border-gray-200/80 overflow-hidden bg-white shadow-sm h-[400px] md:h-[700px] flex flex-col">
               {/* Location selector when a professional is selected and has multiple locations */}
               {locations.length > 1 && (
                 <div className="p-4 border-b bg-gray-50/50">
@@ -492,18 +493,20 @@ const Hero = () => {
 
               {/* Map container */}
               <div className="relative flex-1">
-              <ProfessionalsMap
-  professionals={mapProfessionals} // your Hero state
-  onSelectProfessional={(pro) => setSelectedProfessional(pro)} // updates preview
-/>
+                <ProfessionalsMap
+                  professionals={mapProfessionals} // your Hero state
+                  onSelectProfessional={(pro) => setSelectedProfessional(pro)} // updates preview
+                />
               </div>
             </div>
 
             {/* Live preview panel */}
-            <div className="rounded-2xl border border-gray-200/80 overflow-hidden bg-white shadow-sm h-[380px] md:h-[480px] flex flex-col">
+            <div className="rounded-2xl border border-gray-200/80 overflow-hidden bg-white shadow-sm h-[400px] md:h-[700px] flex flex-col">
               {selectedProfessional ? (
                 <div className="flex-1 overflow-y-auto">
-                  <GlamCardLivePreview data={selectedProfessional} mode="view" />
+                  {/* <GlamCardLivePreview data={selectedProfessional} mode="view" /> */}
+                  <BusinessCardPage slug={selectedProfessional?.business_card_link.split('/').pop()} mode="view" />
+
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center px-6">

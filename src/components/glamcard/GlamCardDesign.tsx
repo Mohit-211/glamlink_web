@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import GlamCardLivePreview from "./GlamCardLivePreview";
 import { GlamCardFormData } from "./GlamCardForm/types";
 import { getBusinessCardBySlug } from "@/api/Api";
+import BusinessCardPage from "../BusinessCardPage";
 
 interface Props {
   slug: string; // Example: "alex-johnson-3916edda"
@@ -54,10 +55,12 @@ useEffect(() => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 mt-20">
-      <GlamCardLivePreview
+             <BusinessCardPage slug={data?.business_card_link.split('/').pop()} mode="view" />
+
+      {/* <GlamCardLivePreview
         data={data}
         mode="view"   // 🔥 IMPORTANT
-      />
+      /> */}
     </div>
   );
 };

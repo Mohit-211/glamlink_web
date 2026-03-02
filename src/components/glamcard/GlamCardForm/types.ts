@@ -32,6 +32,8 @@ export interface GalleryMetaItem {
   sort_order: number;
 }
 export interface GlamCardFormData {
+  business_card_link: any;
+  data: GlamCardFormData;
   promotion_details: string;
   offer_promotion: boolean | undefined;
   booking_link: string;

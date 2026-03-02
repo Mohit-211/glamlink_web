@@ -1,9 +1,11 @@
+"use client";
+
 import React, { useEffect, useRef, useState } from "react";
 import { Download, X, Loader2 } from "lucide-react";
-import html2canvas from "html2canvas";
+import { toPng, toJpeg } from "html-to-image";
 import GlamCardLivePreview from "./GlamCardLivePreview";
 import { GlamCardFormData } from "./GlamCardForm/types";
- import { toPng, toJpeg } from "html-to-image";
+import BusinessCardPage from "../BusinessCardPage";
 
 interface GlamCardDownloadModalProps {
   isOpen: boolean;
@@ -21,6 +23,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [format, setFormat] = useState<"png" | "jpg">("png");
 
+  // Prevent scrolling behind modal
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => {
@@ -28,6 +31,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
     };
   }, [isOpen]);
 
+  // Wait for all images in the preview to load
   const waitForImagesToLoad = async (element: HTMLElement) => {
     const images = Array.from(element.querySelectorAll("img"));
     await Promise.all(
@@ -42,95 +46,84 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
     );
   };
 
-const sanitizeUnsupportedColors = (element: HTMLElement) => {
-  const all = element.querySelectorAll("*");
-  const unsupportedColorRegex =
-    /\b(lab|lch|oklch|oklab|color|display-p3|hwb)\s*\(/gi;
+  // Fix unsupported CSS colors (for Tailwind / modern CSS)
+  const sanitizeUnsupportedColors = (element: HTMLElement) => {
+    const all = element.querySelectorAll("*");
+    const unsupportedColorRegex =
+      /\b(lab|lch|oklch|oklab|color|display-p3|hwb)\s*\(/gi;
 
-  const props = [
-    "color",
-    "backgroundColor",
-    "borderColor",
-    "borderTopColor",
-    "borderBottomColor",
-    "borderLeftColor",
-    "borderRightColor",
-    "outlineColor",
-    "boxShadow",
-    "textShadow",
-    "fill",
-    "stroke",
-  ] as const;
+    const props = [
+      "color",
+      "backgroundColor",
+      "borderColor",
+      "borderTopColor",
+      "borderBottomColor",
+      "borderLeftColor",
+      "borderRightColor",
+      "outlineColor",
+      "boxShadow",
+      "textShadow",
+      "fill",
+      "stroke",
+    ] as const;
 
-  all.forEach((el) => {
-    const htmlEl = el as HTMLElement;
-    const computed = window.getComputedStyle(htmlEl);
+    all.forEach((el) => {
+      const htmlEl = el as HTMLElement;
+      const computed = window.getComputedStyle(htmlEl);
 
-    props.forEach((prop) => {
-      const value = computed[prop];
-      if (value && unsupportedColorRegex.test(value)) {
-        // Reset to a safe fallback — tweak these as needed
-        (htmlEl.style as any)[prop] = prop.toLowerCase().includes("background")
-          ? "#ffffff"
-          : "#000000";
-      }
-      // reset regex lastIndex since it's global
-      unsupportedColorRegex.lastIndex = 0;
+      props.forEach((prop) => {
+        const value = computed[prop];
+        if (value && unsupportedColorRegex.test(value)) {
+          (htmlEl.style as any)[prop] = prop.toLowerCase().includes("background")
+            ? "#ffffff"
+            : "#000000";
+        }
+        unsupportedColorRegex.lastIndex = 0;
+      });
     });
-  });
-};
-// const handleDownload = async () => {
-//     if (!previewRef.current) return;
-//     setIsDownloading(true);
-//     setErrorMsg(null);
-// }
+  };
 
-const handleDownload = async () => {
-  if (!previewRef.current) return;
+  const handleDownload = async () => {
+    if (!previewRef.current) return;
 
-  try {
-    setIsDownloading(true);
-    setErrorMsg(null);
+    try {
+      setIsDownloading(true);
+      setErrorMsg(null);
 
-    const element = previewRef.current;
+      const element = previewRef.current;
 
-    // Wait for all images inside preview to load
-    await waitForImagesToLoad(element);
+      // Wait for all images to load
+      await waitForImagesToLoad(element);
 
-    // Fix unsupported CSS colors (important for modern Tailwind / oklch issues)
-    sanitizeUnsupportedColors(element);
+      // Sanitize unsupported CSS colors
+      sanitizeUnsupportedColors(element);
 
-    const fileName = `glam-card-${Date.now()}`;
+      const fileName = `glam-card-${Date.now()}`;
 
-    if (format === "png") {
-      const dataUrl = await toPng(element, {
-        cacheBust: true,
-        pixelRatio: 3, // Higher quality
-      });
+      // Exclude videos to prevent tainted canvas
+      const filterFn = (node: HTMLElement) => node.tagName !== "VIDEO";
 
-      const link = document.createElement("a");
-      link.download = `${fileName}.png`;
-      link.href = dataUrl;
-      link.click();
-    } else {
-      const dataUrl = await toJpeg(element, {
-        quality: 0.95,
-        cacheBust: true,
-        pixelRatio: 3,
-      });
-
-      const link = document.createElement("a");
-      link.download = `${fileName}.jpg`;
-      link.href = dataUrl;
-      link.click();
+      if (format === "png") {
+        const dataUrl = await toPng(element, { cacheBust: true, pixelRatio: 3, filter: filterFn });
+        const link = document.createElement("a");
+        link.download = `${fileName}.png`;
+        link.href = dataUrl;
+        link.click();
+      } else {
+        const dataUrl = await toJpeg(element, { cacheBust: true, quality: 0.95, pixelRatio: 3, filter: filterFn });
+        const link = document.createElement("a");
+        link.download = `${fileName}.jpg`;
+        link.href = dataUrl;
+        link.click();
+      }
+    } catch (error) {
+      console.error(error);
+      setErrorMsg("Something went wrong while generating the image.");
+    } finally {
+      setIsDownloading(false);
     }
-  } catch (error) {
-    console.error(error);
-    setErrorMsg("Something went wrong while generating the image.");
-  } finally {
-    setIsDownloading(false);
-  }
-};
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -141,7 +134,6 @@ const handleDownload = async () => {
       }}
     >
       <div className="relative flex flex-col bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
-
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-800">
@@ -158,11 +150,9 @@ const handleDownload = async () => {
         {/* Preview */}
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
           <div ref={previewRef}>
-            <GlamCardLivePreview
-              data={data}
-              mode="download"
-              sticky={false}
-            />
+            {/* <GlamCardLivePreview data={data} mode="download" sticky={false} /> */}
+                         <BusinessCardPage slug={data?.business_card_link.split('/').pop()} mode="download" />
+
           </div>
         </div>
 
@@ -174,16 +164,11 @@ const handleDownload = async () => {
 
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 font-medium">
-              Format:
-            </label>
+            <label className="text-sm text-gray-600 font-medium">Format:</label>
             <select
               value={format}
-              onChange={(e) =>
-                setFormat(e.target.value as "png" | "jpg")
-              }
+              onChange={(e) => setFormat(e.target.value as "png" | "jpg")}
               className="border border-gray-300 rounded-lg px-2 py-1 text-sm"
             >
               <option value="png">PNG (High Quality)</option>

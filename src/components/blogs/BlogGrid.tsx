@@ -110,7 +110,7 @@ console.log(blogs,"blogs")
         ))}
       </div>
 
-      <Pagination />
+      {/* <Pagination /> */}
     </section>
   );
 };

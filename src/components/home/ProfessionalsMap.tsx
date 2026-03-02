@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState } from "react";
 import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
-import GlamCardLivePreview from "../glamcard/GlamCardLivePreview";
 
 interface LocationType {
   latitude?: number | string;
@@ -24,8 +23,8 @@ interface ProfessionalType {
 }
 
 interface ProfessionalsMapProps {
-  professionals: ProfessionalType[]; // receive from Hero
-  onSelectProfessional?: (pro: ProfessionalType) => void; // callback to Hero
+  professionals: ProfessionalType[];
+  onSelectProfessional?: (pro: ProfessionalType) => void;
 }
 
 const ProfessionalsMap: React.FC<ProfessionalsMapProps> = ({
@@ -45,7 +44,7 @@ const ProfessionalsMap: React.FC<ProfessionalsMapProps> = ({
         .filter((loc) => {
           const lat = Number(loc?.latitude);
           const lng = Number(loc?.longitude);
-          return !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
+          return !isNaN(lat) && !isNaN(lng);
         })
         .map((loc) => {
           const lat = Number(loc.latitude);
@@ -60,7 +59,7 @@ const ProfessionalsMap: React.FC<ProfessionalsMapProps> = ({
           return {
             lat,
             lng,
-            professional: pro, // keep full object
+            professional: pro,
             name: pro?.name || "Business",
             address: fullAddress || "Address not available",
           };
@@ -68,40 +67,29 @@ const ProfessionalsMap: React.FC<ProfessionalsMapProps> = ({
     );
   }, [professionals]);
 
-  const center =
-    allLocations.length > 0
-      ? { lat: allLocations[0].lat, lng: allLocations[0].lng }
-      : { lat: 20.5937, lng: 78.9629 };
+  // Set center to first location, or undefined if none
+  const center = allLocations.length > 0 ? { lat: allLocations[0].lat, lng: allLocations[0].lng } : undefined;
 
   if (!isLoaded) return <p className="text-center">Loading map...</p>;
+  if (!center) return <p className="text-center">No locations available</p>;
 
   return (
     <div className="w-full h-full flex">
-      {/* Map */}
       <div className="w-full h-full">
-        <GoogleMap
-          mapContainerStyle={{ width: "100%", height: "100%" }}
-          center={center}
-          zoom={11}
-        >
+        <GoogleMap mapContainerStyle={{ width: "100%", height: "100%" }} center={center} zoom={11}>
           {allLocations.map((loc, index) => (
             <Marker
               key={index}
               position={{ lat: loc.lat, lng: loc.lng }}
               onMouseOver={() => setHoveredIndex(index)}
               onMouseOut={() => setHoveredIndex(null)}
-              onClick={() => onSelectProfessional?.(loc.professional)} // send to Hero
+              onClick={() => onSelectProfessional?.(loc.professional)}
             >
               {hoveredIndex === index && (
-                <InfoWindow
-                  position={{ lat: loc.lat, lng: loc.lng }}
-                  onCloseClick={() => setHoveredIndex(null)}
-                >
+                <InfoWindow position={{ lat: loc.lat, lng: loc.lng }} onCloseClick={() => setHoveredIndex(null)}>
                   <div style={{ minWidth: "220px" }}>
                     <div style={{ fontWeight: 600 }}>{loc.name}</div>
-                    <div style={{ fontSize: "13px", marginTop: "4px" }}>
-                      {loc.address}
-                    </div>
+                    <div style={{ fontSize: "13px", marginTop: "4px" }}>{loc.address}</div>
                   </div>
                 </InfoWindow>
               )}

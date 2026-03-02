@@ -17,11 +17,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { getBusinessProfile } from "@/api/Api";
 import GlamCardLivePreview from "../glamcard/GlamCardLivePreview";
+import BusinessCardPage from "../BusinessCardPage";
 
 
 /* ================= TYPES ================= */
 
 interface Professional {
+  business_card_link: any;
   locations: any;
   profile_image: string;
   id: number;
@@ -286,7 +288,7 @@ console.log(allSpecialties,"")
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
-
+console.log(professionals,"professionalsprofessionals")
   return (
     <section className="py-20 md:py-28 bg-gradient-to-b from-white via-gray-50/70 to-white">
       <div className="container-glamlink px-5 md:px-8">
@@ -577,7 +579,8 @@ console.log(allSpecialties,"")
               >
                 <X className="w-4 h-4" />
               </button>
-             <GlamCardLivePreview data={mapProToGlamCardData(selectedPro)} mode="view" />
+             {/* <GlamCardLivePreview data={mapProToGlamCardData(selectedPro)} mode="view" /> */}
+             <BusinessCardPage slug={selectedPro?.business_card_link.split('/').pop()} mode="view" />
             </div>
           </div>
         )}

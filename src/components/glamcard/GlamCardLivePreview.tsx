@@ -122,6 +122,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   onCopyLink,
 }) => {
   if (!data) return null;
+  console.log(data,"data")
    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   const specialtiesArray = parseArray(data.specialties);
@@ -309,49 +310,57 @@ console.log(data)
             </Section>
 
             {/* FEATURED WORK */}
-            <Section title="Featured Work">
-              {normalizedImages.length > 0 && thumbnailIndex !== null ? (
-                <>
-                  <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm">
-                    <img
-                      src={
-                        mode === "live"
-                          ? galleryPreviews[thumbnailIndex] || ""
-                          : normalizedImages[thumbnailIndex]?.url || ""
-                      }
-                      className="h-full w-full object-cover transition hover:scale-105 duration-300"
-                      alt="Featured work"
-                    />
-                  </div>
+           <Section title="Featured Work">
+  {normalizedImages.length > 0 && thumbnailIndex !== null ? (
+    <>
+      <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm">
+        {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
+          <video
+            src={galleryPreviews[thumbnailIndex]}
+            className="h-full w-full object-cover"
+            controls
+          />
+        ) : (
+          <img
+            src={galleryPreviews[thumbnailIndex]}
+            className="h-full w-full object-cover transition hover:scale-105 duration-300"
+            alt="Featured work"
+          />
+        )}
+      </div>
 
-                  {otherIndexes.length > 0 && (
-                    <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
-                      {otherIndexes.slice(0, 4).map((index) => (
-                        <button
-                          key={index}
-                          onClick={() => setThumbnailIndex(index)}
-                          className="h-14 w-14 overflow-hidden rounded-lg border shadow-sm hover:ring-2 hover:ring-pink-400 transition"
-                        >
-                          <img
-                            src={
-                              mode === "live"
-                                ? galleryPreviews[index] || ""
-                                : normalizedImages[index]?.url || ""
-                            }
-                            className="h-full w-full object-cover"
-                            alt={`Thumbnail ${index + 1}`}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </>
+      {otherIndexes.length > 0 && (
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+          {otherIndexes.slice(0, 4).map((index) => (
+            <button
+              key={index}
+              onClick={() => setThumbnailIndex(index)}
+              className="h-14 w-14 overflow-hidden rounded-lg border shadow-sm hover:ring-2 hover:ring-pink-400 transition"
+            >
+              {normalizedImages[index]?.file_type === "video" ? (
+                <video
+                  src={galleryPreviews[index]}
+                  className="h-full w-full object-cover"
+                  muted
+                />
               ) : (
-                <div className="flex aspect-[4/3] items-center justify-center text-xs text-gray-400">
-                  Featured work will appear here
-                </div>
+                <img
+                  src={galleryPreviews[index]}
+                  className="h-full w-full object-cover"
+                  alt={`Thumbnail ${index + 1}`}
+                />
               )}
-            </Section>
+            </button>
+          ))}
+        </div>
+      )}
+    </>
+  ) : (
+    <div className="flex aspect-[4/3] items-center justify-center text-xs text-gray-400">
+      Featured work will appear here
+    </div>
+  )}
+</Section>
 
             <Section title="Important Info">
               <ul className="text-sm space-y-1">
@@ -372,7 +381,7 @@ console.log(data)
           <div className="space-y-5">
 
             {/* ---- LOCATION ---- */}
-            {/* <Section title="Location">
+            <Section title="Location">
               {data.locations?.length ? (
                 <>
                   {data.locations.length > 1 && (
@@ -476,23 +485,32 @@ console.log(data)
                   Location details will appear here once set
                 </p>
               )}
-            </Section> */}
+            </Section>
 
             {/* HOURS  */}
            <Section title="Hours">
-  <ul className="space-y-1.5 text-sm">
-    {data?.business_hour&&data?.business_hour?.length ? (
-      data.business_hour.map((hour: any, index: number) => (
-        <li key={hour?.id ?? index} className="flex justify-between">
-          <span className="font-medium text-gray-700">{hour?.note}</span>
+ <ul className="space-y-1.5 text-sm">
+  {data?.business_hour && data.business_hour.length ? (
+    data.business_hour.map((hour: any, index: number) => {
+      const open = hour.open_time ? formatTime(hour.open_time) : "Closed";
+      const close = hour.close_time ? formatTime(hour.close_time) : "";
+      const timeText = open && close && open !== "Closed" ? `${open} - ${close}` : open;
+      
+      return (
+        <li key={hour.id ?? index} className="flex flex-col space-y-1">
+          <span className="font-medium text-gray-700">{hour.day}</span>
+          <span className="text-gray-500">
+            {timeText} {hour.note ? `(${hour.note})` : ""}
+          </span>
         </li>
-      ))
-    ) : (
-      <li className="text-gray-400">
-        Business hours will appear here
-      </li>
-    )}
-  </ul>
+      );
+    })
+  ) : (
+    <li className="text-gray-400">
+      Business hours will appear here
+    </li>
+  )}
+</ul>
 </Section>
 
             {/* SPECIALTIES */}
@@ -513,19 +531,19 @@ console.log(data)
         </div>
 
         {/* SEND TEXT DIVIDER */}
-        <div className="flex items-center gap-4 mt-8">
+        {/* <div className="flex items-center gap-4 mt-8">
           <div className="flex-1 h-[1px] bg-teal-400"></div>
           <button className="bg-teal-500 text-white px-6 py-2 rounded-md text-sm font-semibold">
             SEND TEXT
           </button>
           <div className="flex-1 h-[1px] bg-teal-400"></div>
-        </div>
+        </div> */}
 
         {/* SOCIAL */}
-        <div className="flex justify-end gap-4 mt-6 text-xl text-teal-600">
-          <span>g</span>
+        {/* <div className="flex justify-end gap-4 mt-6 text-xl text-teal-600">
+          <span></span>
           <span>📷</span>
-        </div>
+        </div> */}
         
       </div>
       <GlamCardDownloadModal
