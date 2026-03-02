@@ -1,3 +1,4 @@
+import Head from "next/head";
 import Hero from "@/components/home/Hero";
 import AccessSection from "@/components/home/AccessSection";
 import WhyGlamlinkSection from "@/components/home/WhyGlamlinkSection";
@@ -8,16 +9,21 @@ import ProfessionalsMarketplace from "@/components/professionals/ProfessionalsMa
 export default function HomePage() {
   return (
     <>
+      <Head>
+        <title>Glamlink</title>
+        <meta name="description" content="Glamlink Home Page" />
+        <link rel="icon" href="/assets/favicon.ico" />
+      </Head>
+
       <Hero />
       {/* <MapSection /> */}
       <AccessSection />
-       <ProfessionalsMarketplace/>
+      <ProfessionalsMarketplace />
       <WhyGlamlinkSection />
       <FounderBadge />
       <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAd0VnpJBpOS7iISBY2GIVBnEkgpcqXXV0"
-></script>
-
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAd0VnpJBpOS7iISBY2GIVBnEkgpcqXXV0"
+      ></script>
       {/* <DownloadCTA /> */}
     </>
   );
