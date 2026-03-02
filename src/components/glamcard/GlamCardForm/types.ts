@@ -7,20 +7,23 @@ export type BusinessHour =
 
 
 export interface Location {
-  // id(id: any, arg1: { isOpen: boolean; }): void;
-  isOpen: any;
   id: string;
   label: string;
   location_type: "exact_address" | "city_only";
   address: string;
+  area: string;
   city: string;
-  area?: string;
   state: string;
+
+  latitude?: number;     // ✅ ADD THIS
+  longitude?: number;     // ✅ ADD THIS
+  isSet?: boolean;  // optional helper
+
   business_name: string;
   phone: string;
   description: string;
   isPrimary: boolean;
-  // isOpen: boolean;
+  isOpen: boolean;
 }
 export interface GalleryMetaItem {
   id: string;

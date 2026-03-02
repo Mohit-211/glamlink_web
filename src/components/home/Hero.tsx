@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, MapPin, Loader2, UserCheck, AlertCircle } from "lucide-react";
 import { searchBusinessCard, getBusinessCardBySlug, getBusinessProfile } from "@/api/Api";
 import GlamCardLivePreview from "../glamcard/GlamCardLivePreview";
+import ProfessionalsMap from "./ProfessionalsMap";
 
 // ─── Leaflet types (loaded dynamically) ───────────────────────────────────────
 declare global {
@@ -31,155 +32,12 @@ const Hero = () => {
   const markersRef = useRef<any[]>([]);
   const selectedMarkerRef = useRef<any>(null);
   const leafletLoadedRef = useRef(false);
-
+  console.log(mapProfessionals, "mapProfessionals")
   // ─── Load Leaflet CSS + JS dynamically ───────────────────────────────────────
-  useEffect(() => {
-    if (leafletLoadedRef.current) return;
-    leafletLoadedRef.current = true;
 
-    // CSS
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    document.head.appendChild(link);
-
-    // JS
-    const script = document.createElement("script");
-    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    script.async = true;
-    script.onload = () => initMap();
-    document.head.appendChild(script);
-  }, []);
 
   // ─── Init Leaflet map ─────────────────────────────────────────────────────────
-  const initMap = useCallback(() => {
-    if (!mapContainerRef.current || mapInstanceRef.current) return;
-    const L = window.L;
 
-    const map = L.map(mapContainerRef.current, {
-      center: [36.1699, -115.1398], // Las Vegas default
-      zoom: 11,
-      zoomControl: true,
-      scrollWheelZoom: false,
-    });
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
-      maxZoom: 19,
-    }).addTo(map);
-
-    mapInstanceRef.current = map;
-
-    // Re-render markers if mapProfessionals already loaded
-    if (mapProfessionals.length) {
-      renderMapMarkers(map, mapProfessionals);
-    }
-  }, [mapProfessionals]);
-
-  // ─── Render markers for mapProfessionals ─────────────────────────────────────
-  const renderMapMarkers = useCallback((map: any, pros: any[]) => {
-    const L = window.L;
-    if (!L || !map) return;
-
-    // Clear existing markers
-    markersRef.current.forEach((m) => m.remove());
-    markersRef.current = [];
-
-    const bounds: [number, number][] = [];
-
-    pros.forEach((pro) => {
-      // Use index 0 location
-      const loc = pro.locations?.[0];
-      if (!loc) return;
-
-      const lat = parseFloat(loc.latitude || loc.lat);
-      const lng = parseFloat(loc.longitude || loc.lng || loc.lon);
-      if (isNaN(lat) || isNaN(lng)) return;
-
-      bounds.push([lat, lng]);
-
-      // Custom teal marker icon — teardrop shape matching screenshot
-      const initial = pro.name?.charAt(0)?.toUpperCase() || "?";
-      const icon = L.divIcon({
-        className: "",
-        html: `
-          <div style="position:relative; width:38px; height:46px; display:flex; flex-direction:column; align-items:center;">
-            <!-- Circle head -->
-            <div style="
-              width: 38px; height: 38px;
-              background: #24bbcb;
-              border-radius: 50%;
-              box-shadow: 0 4px 14px rgba(36,187,203,0.5);
-              display: flex; align-items: center; justify-content: center;
-              flex-shrink: 0;
-            ">
-              <span style="
-                color: #fff;
-                font-size: 15px;
-                font-weight: 700;
-                font-family: 'DM Sans', sans-serif;
-                line-height: 1;
-                letter-spacing: -0.02em;
-              ">${initial}</span>
-            </div>
-            <!-- Tail point -->
-            <div style="
-              width: 0; height: 0;
-              border-left: 6px solid transparent;
-              border-right: 6px solid transparent;
-              border-top: 10px solid #24bbcb;
-              margin-top: -1px;
-            "></div>
-          </div>
-        `,
-        iconSize: [38, 46],
-        iconAnchor: [19, 46],
-        popupAnchor: [0, -48],
-      });
-
-      const popupContent = `
-        <div style="font-family: 'DM Sans', sans-serif; min-width: 160px; padding: 2px 0;">
-          <div style="font-weight: 600; font-size: 14px; color: #1a2533;">${pro.name || "—"}</div>
-          ${pro.primary_specialty
-            ? `<div style="font-size: 12px; color: #24bbcb; margin-top: 2px;">${pro.primary_specialty}</div>`
-            : ""}
-          ${loc.city || loc.address
-            ? `<div style="font-size: 11px; color: #9aaabb; margin-top: 4px;">
-                 📍 ${loc.address || [loc.city, loc.state].filter(Boolean).join(", ")}
-               </div>`
-            : ""}
-        </div>
-      `;
-
-      const marker = L.marker([lat, lng], { icon })
-        .addTo(map)
-        .bindPopup(popupContent, {
-          closeButton: false,
-          className: "glam-popup",
-        });
-
-      marker.on("click", () => {
-        // Highlight selected
-        marker.openPopup();
-      });
-
-      markersRef.current.push(marker);
-    });
-
-    if (bounds.length === 1) {
-      map.setView(bounds[0], 14);
-    } else if (bounds.length > 1) {
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
-    }
-  }, []);
-
-  // ─── When mapProfessionals loads, add markers ─────────────────────────────────
-  useEffect(() => {
-    if (!mapProfessionals.length) return;
-    if (mapInstanceRef.current && window.L) {
-      renderMapMarkers(mapInstanceRef.current, mapProfessionals);
-    }
-  }, [mapProfessionals, renderMapMarkers]);
 
   // ─── When a professional is selected, fly to their location + highlight marker ─
   useEffect(() => {
@@ -261,7 +119,7 @@ const Hero = () => {
             map.flyTo([parseFloat(results[0].lat), parseFloat(results[0].lon)], 14, { duration: 1.2 });
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [selectedProfessional, selectedLocationIndex]);
 
@@ -365,53 +223,53 @@ const Hero = () => {
 
   // ─── Location selector for selected professional ──────────────────────────────
   const locations = selectedProfessional?.locations || [];
-  console.log(locations,"locations")
-const address = "7575 S Rainbow Blvd"
+  console.log(locations, "locations")
+  const address = "7575 S Rainbow Blvd"
   // ─── Avatar initial helper ───────────────────────────────────────────────────
   const getInitial = (name: string) =>
     name?.trim()?.charAt(0)?.toUpperCase() || "?";
-useEffect(() => {
-  if (!mapInstanceRef.current || !window.L) return;
-  if (!mapProfessionals.length) return;
+  useEffect(() => {
+    if (!mapInstanceRef.current || !window.L) return;
+    if (!mapProfessionals.length) return;
 
-  const L = window.L;
-  const map = mapInstanceRef.current;
+    const L = window.L;
+    const map = mapInstanceRef.current;
 
-  // Remove existing markers
-  markersRef.current.forEach((m) => m.remove());
-  markersRef.current = [];
+    // Remove existing markers
+    markersRef.current.forEach((m) => m.remove());
+    markersRef.current = [];
 
-  // Pick the first professional with a valid location
-  const proWithLocation = mapProfessionals.find(
-    (pro) => pro.locations && pro.locations.length > 0
-  );
-  if (!proWithLocation) return;
+    // Pick the first professional with a valid location
+    const proWithLocation = mapProfessionals.find(
+      (pro) => pro.locations && pro.locations.length > 0
+    );
+    if (!proWithLocation) return;
 
-  const loc = proWithLocation.locations[0]; // first location
-  const address = loc.address?.trim() || [loc.city, loc.state].filter(Boolean).join(", ");
+    const loc = proWithLocation.locations[0]; // first location
+    const address = loc.address?.trim() || [loc.city, loc.state].filter(Boolean).join(", ");
 
-  if (!address) return;
+    if (!address) return;
 
-  // Geocode dynamically
-  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`)
-    .then((res) => res.json())
-    .then((data) => {
-      if (!data || !data[0]) return;
+    // Geocode dynamically
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data || !data[0]) return;
 
-      const lat = parseFloat(data[0].lat);
-      const lon = parseFloat(data[0].lon);
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
 
-      const marker = L.marker([lat, lon]).addTo(map)
-        .bindPopup(`<b>${address}</b>`)
-        .openPopup();
+        const marker = L.marker([lat, lon]).addTo(map)
+          .bindPopup(`<b>${address}</b>`)
+          .openPopup();
 
-      markersRef.current.push(marker);
+        markersRef.current.push(marker);
 
-      // Center map on this dynamic pin
-      map.setView([lat, lon], 15);
-    })
-    .catch((err) => console.error("Geocode error:", err));
-}, [mapInstanceRef.current, mapProfessionals]);
+        // Center map on this dynamic pin
+        map.setView([lat, lon], 15);
+      })
+      .catch((err) => console.error("Geocode error:", err));
+  }, [mapInstanceRef.current, mapProfessionals]);
   return (
     <>
       <style>{`
@@ -634,44 +492,10 @@ useEffect(() => {
 
               {/* Map container */}
               <div className="relative flex-1">
-                <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
-
-                {/* Marker count badge */}
-                {mapProfessionals.length > 0 && (
-                  <div
-                    className="absolute top-3 left-3 z-[400] flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-                    style={{
-                      background: "rgba(255,255,255,0.92)",
-                      backdropFilter: "blur(10px)",
-                      border: "1px solid rgba(36,187,203,0.2)",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}
-                  >
-                    <MapPin className="w-3.5 h-3.5 text-[#24bbcb]" />
-                    <span style={{ fontSize: "12px", fontWeight: 600, color: "#24bbcb" }}>
-                      {mapProfessionals.length} professional{mapProfessionals.length !== 1 ? "s" : ""}
-                    </span>
-                  </div>
-                )}
-
-                {/* Get Directions button (only when professional is selected) */}
-                {selectedProfessional && (() => {
-                  const loc = locations[selectedLocationIndex] || locations[0];
-                  if (!loc) return null;
-                  const dest = loc.address?.trim() || [loc.city, loc.state].filter(Boolean).join(", ");
-                  return (
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute bottom-5 left-1/2 -translate-x-1/2 z-[400] bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-medium px-7 py-3.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300 text-sm md:text-base"
-                    >
-                      <MapPin className="w-4 h-4" />
-                      Get Directions
-                    </a>
-                  );
-                })()}
+              <ProfessionalsMap
+  professionals={mapProfessionals} // your Hero state
+  onSelectProfessional={(pro) => setSelectedProfessional(pro)} // updates preview
+/>
               </div>
             </div>
 

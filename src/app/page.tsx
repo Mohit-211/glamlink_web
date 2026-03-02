@@ -15,7 +15,7 @@ export default function HomePage() {
       <WhyGlamlinkSection />
       <FounderBadge />
       <script
-  src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAd0VnpJBpOS7iISBY2GIVBnEkgpcqXXV0"
 ></script>
 
       {/* <DownloadCTA /> */}

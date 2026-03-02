@@ -79,41 +79,54 @@ const sanitizeUnsupportedColors = (element: HTMLElement) => {
     });
   });
 };
+// const handleDownload = async () => {
+//     if (!previewRef.current) return;
+//     setIsDownloading(true);
+//     setErrorMsg(null);
+// }
+
 const handleDownload = async () => {
   if (!previewRef.current) return;
 
-  setIsDownloading(true);
-  setErrorMsg(null);
-
   try {
+    setIsDownloading(true);
+    setErrorMsg(null);
+
     const element = previewRef.current;
 
+    // Wait for all images inside preview to load
     await waitForImagesToLoad(element);
 
-    // ✅ Sanitize modern CSS colors html2canvas can't parse
+    // Fix unsupported CSS colors (important for modern Tailwind / oklch issues)
     sanitizeUnsupportedColors(element);
 
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: format === "jpg" ? "#ffffff" : null,
-      logging: false,
-    });
+    const fileName = `glam-card-${Date.now()}`;
 
-    const mimeType = format === "jpg" ? "image/jpeg" : "image/png";
-    const quality = format === "jpg" ? 0.92 : 1.0;
-    const dataUrl = canvas.toDataURL(mimeType, quality);
+    if (format === "png") {
+      const dataUrl = await toPng(element, {
+        cacheBust: true,
+        pixelRatio: 3, // Higher quality
+      });
 
-    const link = document.createElement("a");
-    link.download = `glam_card.${format}`;
-    link.href = dataUrl;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const link = document.createElement("a");
+      link.download = `${fileName}.png`;
+      link.href = dataUrl;
+      link.click();
+    } else {
+      const dataUrl = await toJpeg(element, {
+        quality: 0.95,
+        cacheBust: true,
+        pixelRatio: 3,
+      });
+
+      const link = document.createElement("a");
+      link.download = `${fileName}.jpg`;
+      link.href = dataUrl;
+      link.click();
+    }
   } catch (error) {
-    console.error("Canvas error:", error);
-    setErrorMsg("Image conversion failed. Check console.");
+    console.error(error);
+    setErrorMsg("Something went wrong while generating the image.");
   } finally {
     setIsDownloading(false);
   }

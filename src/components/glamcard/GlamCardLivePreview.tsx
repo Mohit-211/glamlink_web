@@ -241,7 +241,7 @@ console.log(data?.business_hour)
 console.log(data)
 
   return (
-    <div className="h-90dvh flex flex-col">
+    <div className={`${mode !== "download" ? "h-90dvh" : ""} flex flex-col`}>
       <div className="rounded-xl border bg-[#F4F7FB] p-4 shadow-md">
 
         {/* ================= TOP ACTION BUTTONS ================= */}
@@ -372,7 +372,7 @@ console.log(data)
           <div className="space-y-5">
 
             {/* ---- LOCATION ---- */}
-            <Section title="Location">
+            {/* <Section title="Location">
               {data.locations?.length ? (
                 <>
                   {data.locations.length > 1 && (
@@ -476,7 +476,7 @@ console.log(data)
                   Location details will appear here once set
                 </p>
               )}
-            </Section>
+            </Section> */}
 
             {/* HOURS  */}
            <Section title="Hours">

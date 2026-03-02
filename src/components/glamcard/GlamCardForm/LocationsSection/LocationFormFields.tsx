@@ -10,8 +10,8 @@ interface Location {
   business_name?: string;
   phone?: string;
   description?: string;
-  lat?: number;
-  lng?: number;
+  latitude?: number;     // ✅ UPDATED
+  longitude?: number;    // ✅ UPDATED
   isSet?: boolean;
 }
 
@@ -20,13 +20,21 @@ interface FieldsProps {
   onUpdate: (updates: Partial<Location>) => void;
 }
 
-const inputClass = "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
-const labelClass = "text-sm font-medium text-gray-700 block mb-1.5";
-const buttonClass = "min-w-[120px] rounded-lg px-5 py-2.5 text-sm font-medium text-white transition";
+const inputClass =
+  "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
 
-const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
+const labelClass = "text-sm font-medium text-gray-700 block mb-1.5";
+
+const buttonClass =
+  "min-w-[120px] rounded-lg px-5 py-2.5 text-sm font-medium text-white transition";
+
+const LocationFormFields: React.FC<FieldsProps> = ({
+  location,
+  onUpdate,
+}) => {
   const addressInputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const autocompleteRef =
+    useRef<google.maps.places.Autocomplete | null>(null);
 
   useEffect(() => {
     if (location.location_type !== "exact_address") return;
@@ -35,29 +43,29 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
     if (!(window as any).google?.maps?.places) return;
     if (autocompleteRef.current) return;
 
-    const autocomplete = new google.maps.places.Autocomplete(addressInputRef.current, {
-      types: ["geocode"],
-      // componentRestrictions: { country: ["us"] }, // optional
-    });
+    const autocomplete = new google.maps.places.Autocomplete(
+      addressInputRef.current,
+      {
+        types: ["geocode"],
+      }
+    );
 
-    // Important: tell Autocomplete we only want these fields (cheaper + enough)
     autocomplete.setFields(["formatted_address", "geometry", "name"]);
 
     autocomplete.addListener("place_changed", () => {
       const place = autocomplete.getPlace();
       if (!place.geometry?.location) return;
 
-      // This is the key fix → we get the nice full address
-      const fullAddress = place.formatted_address || place.name || "";
+      const fullAddress =
+        place.formatted_address || place.name || "";
 
       onUpdate({
         address: fullAddress,
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng(),
+        latitude: place.geometry.location.lat(),      // ✅ UPDATED
+        longitude: place.geometry.location.lng(),     // ✅ UPDATED
         isSet: true,
       });
 
-      // Force the input to show the full formatted address immediately
       if (addressInputRef.current) {
         addressInputRef.current.value = fullAddress;
       }
@@ -67,24 +75,31 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
 
     return () => {
       if (autocompleteRef.current) {
-        google.maps.event.clearInstanceListeners(autocompleteRef.current);
+        google.maps.event.clearInstanceListeners(
+          autocompleteRef.current
+        );
       }
     };
   }, [location.location_type, onUpdate]);
 
-  const canConfirmExact = location.location_type === "exact_address" && !!location.address?.trim();
+  const canConfirmExact =
+    location.location_type === "exact_address" &&
+    !!location.address?.trim();
 
-  const canSetCity = location.location_type === "city_only" && !!location.city?.trim() && !!location.state?.trim();
+  const canSetCity =
+    location.location_type === "city_only" &&
+    !!location.city?.trim() &&
+    !!location.state?.trim();
 
   const handleConfirmExact = () => {
     if (!canConfirmExact) return;
 
-    // If no lat/lng from autocomplete → fallback (demo coords)
-    if (!location.lat || !location.lng) {
+    // Fallback demo coordinates
+    if (!location.latitude || !location.longitude) {
       onUpdate({
         isSet: true,
-        lat: 36.1699,   // Las Vegas example
-        lng: -115.1398,
+        latitude: 36.1699,
+        longitude: -115.1398,
       });
     } else {
       onUpdate({ isSet: true });
@@ -96,22 +111,25 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
     onUpdate({ isSet: true });
   };
 
-  const handleTypeChange = (newType: "exact_address" | "city_only") => {
+  const handleTypeChange = (
+    newType: "exact_address" | "city_only"
+  ) => {
     onUpdate({
       location_type: newType,
       address: "",
       city: "",
       state: "",
       area: "",
-      lat: undefined,
-      lng: undefined,
+      latitude: undefined,     // ✅ UPDATED
+      longitude: undefined,    // ✅ UPDATED
       isSet: false,
     });
   };
-const WORD_LIMIT = 50;
 
-const getWordCount = (text: string) =>
-  text.trim() ? text.trim().split(/\s+/).length : 0;
+  const WORD_LIMIT = 50;
+
+  const getWordCount = (text: string) =>
+    text.trim() ? text.trim().split(/\s+/).length : 0;
 
   return (
     <div className="space-y-6">
@@ -123,8 +141,12 @@ const getWordCount = (text: string) =>
             <input
               type="radio"
               name="location-type"
-              checked={location.location_type === "exact_address"}
-              onChange={() => handleTypeChange("exact_address")}
+              checked={
+                location.location_type === "exact_address"
+              }
+              onChange={() =>
+                handleTypeChange("exact_address")
+              }
             />
             Exact Address
           </label>
@@ -132,8 +154,12 @@ const getWordCount = (text: string) =>
             <input
               type="radio"
               name="location-type"
-              checked={location.location_type === "city_only"}
-              onChange={() => handleTypeChange("city_only")}
+              checked={
+                location.location_type === "city_only"
+              }
+              onChange={() =>
+                handleTypeChange("city_only")
+              }
             />
             City / Area Only
           </label>
@@ -146,12 +172,14 @@ const getWordCount = (text: string) =>
         <input
           className={inputClass}
           value={location.label ?? ""}
-          onChange={(e) => onUpdate({ label: e.target.value })}
+          onChange={(e) =>
+            onUpdate({ label: e.target.value })
+          }
           placeholder="e.g. Main Studio, Downtown Location"
         />
       </div>
 
-      {/* Exact Address Flow */}
+      {/* Exact Address */}
       {location.location_type === "exact_address" && (
         <div className="space-y-5">
           <div>
@@ -160,15 +188,21 @@ const getWordCount = (text: string) =>
               <input
                 ref={addressInputRef}
                 className={inputClass}
-                value={location.address ?? ""}          // controlled by React
-                onChange={(e) => onUpdate({ address: e.target.value })} // allow manual edit too
+                value={location.address ?? ""}
+                onChange={(e) =>
+                  onUpdate({
+                    address: e.target.value,
+                  })
+                }
                 placeholder="Start typing address..."
               />
               <button
                 type="button"
                 disabled={!canConfirmExact}
                 className={`${buttonClass} ${
-                  canConfirmExact ? "bg-gray-600 hover:bg-gray-700" : "bg-gray-300 cursor-not-allowed"
+                  canConfirmExact
+                    ? "bg-gray-600 hover:bg-gray-700"
+                    : "bg-gray-300 cursor-not-allowed"
                 }`}
                 onClick={handleConfirmExact}
               >
@@ -177,19 +211,26 @@ const getWordCount = (text: string) =>
             </div>
           </div>
 
-          {location.isSet && location.lat && location.lng && (
-            <div className="rounded-lg bg-green-50 p-4 text-sm">
-              <p className="font-medium text-green-800">Location Confirmed</p>
-              <p className="mt-1 text-green-700">{location.address}</p>
-              <p className="mt-1 text-xs text-gray-600">
-                Lat: {location.lat.toFixed(5)} • Lng: {location.lng.toFixed(5)}
-              </p>
-            </div>
-          )}
+          {location.isSet &&
+            location.latitude &&
+            location.longitude && (
+              <div className="rounded-lg bg-green-50 p-4 text-sm">
+                <p className="font-medium text-green-800">
+                  Location Confirmed
+                </p>
+                <p className="mt-1 text-green-700">
+                  {location.address}
+                </p>
+                <p className="mt-1 text-xs text-gray-600">
+                  Lat: {location.latitude.toFixed(5)} •
+                  Lng: {location.longitude.toFixed(5)}
+                </p>
+              </div>
+            )}
         </div>
       )}
 
-      {/* City Only Flow – unchanged */}
+      {/* City Only */}
       {location.location_type === "city_only" && (
         <div className="space-y-5">
           <div className="grid md:grid-cols-2 gap-5">
@@ -197,9 +238,10 @@ const getWordCount = (text: string) =>
               <label className={labelClass}>City</label>
               <input
                 className={inputClass}
-                placeholder="e.g. Las Vegas"
                 value={location.city ?? ""}
-                onChange={(e) => onUpdate({ city: e.target.value })}
+                onChange={(e) =>
+                  onUpdate({ city: e.target.value })
+                }
               />
             </div>
             <div>
@@ -207,9 +249,13 @@ const getWordCount = (text: string) =>
               <select
                 className={inputClass}
                 value={location.state ?? ""}
-                onChange={(e) => onUpdate({ state: e.target.value })}
+                onChange={(e) =>
+                  onUpdate({ state: e.target.value })
+                }
               >
-                <option value="">Select state</option>
+                <option value="">
+                  Select state
+                </option>
                 <option value="AL">Alabama</option>
                 <option value="AK">Alaska</option>
                 <option value="AZ">Arizona</option>
@@ -225,62 +271,83 @@ const getWordCount = (text: string) =>
             type="button"
             disabled={!canSetCity}
             className={`w-full ${buttonClass} ${
-              canSetCity ? "bg-purple-600 hover:bg-purple-700" : "bg-gray-300 cursor-not-allowed"
+              canSetCity
+                ? "bg-purple-600 hover:bg-purple-700"
+                : "bg-gray-300 cursor-not-allowed"
             }`}
             onClick={handleSetCity}
           >
             Set Location
           </button>
 
-          {location.isSet && location.city && location.state && (
-            <div className="rounded-lg bg-green-50 p-4 text-sm">
-              <p className="font-medium text-green-800">Location Set</p>
-              <p className="mt-1 text-green-700">
-                {location.city.trim()}, {location.state.trim()}
-              </p>
-            </div>
-          )}
+          {location.isSet &&
+            location.city &&
+            location.state && (
+              <div className="rounded-lg bg-green-50 p-4 text-sm">
+                <p className="font-medium text-green-800">
+                  Location Set
+                </p>
+                <p className="mt-1 text-green-700">
+                  {location.city.trim()},{" "}
+                  {location.state.trim()}
+                </p>
+              </div>
+            )}
         </div>
       )}
 
-      {/* Shared fields – unchanged */}
+      {/* Shared Fields */}
       <div className="grid md:grid-cols-2 gap-5">
         <div>
-          <label className={labelClass}>Business Name (optional)</label>
+          <label className={labelClass}>
+            Business Name (optional)
+          </label>
           <input
             className={inputClass}
             value={location.business_name ?? ""}
-            onChange={(e) => onUpdate({ business_name: e.target.value })}
+            onChange={(e) =>
+              onUpdate({
+                business_name: e.target.value,
+              })
+            }
           />
         </div>
         <div>
-          <label className={labelClass}>Phone (optional)</label>
+          <label className={labelClass}>
+            Phone (optional)
+          </label>
           <input
             className={inputClass}
             value={location.phone ?? ""}
-            onChange={(e) => onUpdate({ phone: e.target.value })}
+            onChange={(e) =>
+              onUpdate({
+                phone: e.target.value,
+              })
+            }
           />
         </div>
       </div>
 
+      {/* Description */}
       <div>
-        <label className={labelClass}>Notes / Description (optional)</label>
+        <label className={labelClass}>
+          Notes / Description (optional)
+        </label>
         <textarea
-  rows={3}
-  className={inputClass}
-  value={location.description ?? ""}
-  placeholder="Additional info, parking notes, etc."
-  onChange={(e) => {
-    const value = e.target.value;
-    if (getWordCount(value) <= WORD_LIMIT) {
-      onUpdate({ description: value });
-    }
-  }}
-/>
-<p className="mt-1 text-right text-xs text-gray-500">
-  {getWordCount(location.description ?? "")} / 50 words
-</p>
-
+          rows={3}
+          className={inputClass}
+          value={location.description ?? ""}
+          placeholder="Additional info, parking notes, etc."
+          onChange={(e) => {
+            const value = e.target.value;
+            if (getWordCount(value) <= WORD_LIMIT) {
+              onUpdate({ description: value });
+            }
+          }}
+        />
+        <p className="mt-1 text-right text-xs text-gray-500">
+          {getWordCount(location.description ?? "")} / 50 words
+        </p>
       </div>
     </div>
   );

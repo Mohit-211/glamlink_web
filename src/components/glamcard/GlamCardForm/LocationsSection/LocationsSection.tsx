@@ -11,16 +11,17 @@ interface SectionProps {
 const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
 
 const createEmptyLocation = (index: number): Location => ({
-  id: nanoid(),                                 // ← FIXED: was missing
+  id: nanoid(),
   label: `Location ${index + 1}`,
   location_type: index === 0 ? "exact_address" : "city_only",
   address: "",
   area: "",
   city: "",
   state: "",
-  // lat: undefined,
-  // lng: undefined,
-  // isSet: false,
+
+  latitude: undefined,     // ✅ UPDATED
+  longitude: undefined,    // ✅ UPDATED
+
   business_name: "",
   phone: "",
   description: "",
