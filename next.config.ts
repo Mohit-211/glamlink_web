@@ -1,5 +1,5 @@
 // next.config.ts
-import { NextConfig } from "next";
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
@@ -14,11 +14,15 @@ const nextConfig: NextConfig = {
         hostname: "cdn.example.com",
         pathname: "/images/**",
       },
-      // Add glamlink.net
       {
         protocol: "https",
         hostname: "glamlink.net",
-        pathname: "/**", // allow all paths
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "node.glamlink.net",
+        pathname: "/**",
       },
     ],
   },
