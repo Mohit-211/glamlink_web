@@ -17,6 +17,16 @@ export interface Issue {
 export const issues2026: Issue[] = [
   {
     id: 1,
+    slug: "glamlinkedit_112",
+    title: "glamlinkedit_112",
+    cover: "/magziens/glamlinkedit_112.jpeg",
+    publuu: {
+      accountId: 992531,
+      flipbookId: 2383857,
+    },
+  },
+  {
+    id: 2,
     slug: "the-glamlink-edit",
     title: "The Glamlink Edit",
     cover: "/magziens/the_glamlink_edit.jpg",
@@ -26,7 +36,7 @@ export const issues2026: Issue[] = [
     },
   },
   {
-    id: 2,
+    id: 3,
     slug: "issue-110",
     title: "Issue 110",
     cover: "/magziens/issue_110.jpg",
@@ -35,6 +45,7 @@ export const issues2026: Issue[] = [
       flipbookId: 2328224,
     },
   },
+  
 ];
 
 /* =======================
