@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default function FeaturedProviders({ data }: Props) {
-  console.log(data,"data")
+  console.log(data,"datafeacturee")
 
   if (!data?.length) {
     return <p className="py-10">No providers found</p>

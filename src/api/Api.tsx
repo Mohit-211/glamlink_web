@@ -64,6 +64,19 @@ export const GetBeauticianListApi = async () => {
   )
   return res.data
 }
+export const GetAllCategoryApi = async () => {
+  const res = await api.get(
+    "businessCard/getAllDirectories"
+  )
+  return res.data
+}
+
+export const GetProfilesByDirectory = async (category_id: any) => {
+  const res = await api.get(
+    `businessCard/getProfilesByDirectory/${category_id}`
+  )
+  return res.data
+}
 export const GetBeauticianListDetailsApi = async (place_id: string) => {
   try {
 

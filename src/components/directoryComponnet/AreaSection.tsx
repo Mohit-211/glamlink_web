@@ -9,7 +9,6 @@ interface Props {
 }
 
 export default function AreaSection({ title, data }: Props) {
-  console.log(data,"datacheckkk")
 
   if (!data?.length) return null
 
@@ -17,11 +16,11 @@ export default function AreaSection({ title, data }: Props) {
 
     <section className="mb-16">
 
-      {/* <h2 className="text-2xl font-bold mb-6">
+      {/* <h2 className="text-2xl font-bold mb-8">
         {title}
       </h2> */}
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
         {data.map((item) => (
 
@@ -35,6 +34,5 @@ export default function AreaSection({ title, data }: Props) {
       </div>
 
     </section>
-
   )
 }
