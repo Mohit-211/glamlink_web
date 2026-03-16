@@ -31,6 +31,7 @@ export default function ProviderCard({ data, pagetype }: Props) {
       {data?.profile_image || googlePhoto ? (
         <div className="relative w-full h-56 overflow-hidden rounded-xl mb-4">
           <Image
+          unoptimized={process.env.NODE_ENV === "development"}
             src={data?.profile_image || googlePhoto}
             alt={data?.name || "provider"}
             fill
