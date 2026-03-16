@@ -9,6 +9,7 @@ interface Props {
   pagetype?: string;
 }
 
+
 export default function ProviderCard({ data, pagetype }: Props) {
   const specialties = data?.specialties ? JSON.parse(data.specialties) : [];
 
