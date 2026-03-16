@@ -24,10 +24,7 @@ const ProfessionalsCTA = () => {
           </Button>
 
           {/* Secondary */}
-          <Button
-            variant="outline"
-            className="border-2 border-white text-white hover:bg-white/10 px-10 py-6 text-lg rounded-full gap-2"
-          >
+          <Button className="border-2 border-white bg-transparent text-white hover:bg-white/10 px-10 py-6 text-lg rounded-full gap-2">
             Access E-Commerce Panel
             <ArrowRight className="w-5 h-5" />
           </Button>

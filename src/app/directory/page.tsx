@@ -1,5 +1,5 @@
-import DirectoryPage from "@/Page/directoryPage/DirectoryPage"
+import DirectoryPage from "@/app/directory/DirectoryPage";
 
 export default function DirectoryMainPage() {
-  return <DirectoryPage />
+  return <DirectoryPage />;
 }

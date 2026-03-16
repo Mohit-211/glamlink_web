@@ -63,27 +63,27 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
           </div>
 
           {/* Right Column - Mockup Card */}
-         {/* Right Column - Video Only */}
-<div className="flex justify-center lg:justify-end">
-  <div
-    className="
+          {/* Right Column - Video Only */}
+          <div className="flex justify-center lg:justify-end">
+            <div
+              className="
       relative w-full max-w-md rounded-2xl 
       shadow-xl border border-gray-200 overflow-hidden
     "
-  >
-    <video
-      className="w-full h-full object-cover"
-      autoPlay
-      muted
-      loop
-      playsInline
-      preload="metadata"
-    >
-      <source src="/magziens/6641.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-  </div>
-</div>
+            >
+              <video
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+              >
+                <source src="/magazine/6641.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
         </div>
       </div>
     </section>

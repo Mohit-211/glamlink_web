@@ -1,9 +1,11 @@
-import { getBlogsById } from '@/api/Api';
-import ArticleContent from '@/components/blogs/ArticleContent';
-import ArticleHeader from '@/components/blogs/ArticleHeader';
-import AuthorSection from '@/components/blogs/AuthorSection';
-import RelatedArticles from '@/components/blogs/RelatedArticles';
-import Image from 'next/image';
+import { Metadata } from "next";
+import Script from "next/script";
+import Image from "next/image";
+
+import { getBlogsById } from "@/api/Api";
+import ArticleContent from "@/components/blogs/ArticleContent";
+import ArticleHeader from "@/components/blogs/ArticleHeader";
+import RelatedArticles from "@/components/blogs/RelatedArticles";
 
 interface BlogData {
   category_id: any;
@@ -16,28 +18,147 @@ interface BlogData {
   slug?: string;
 }
 
+/* --------------------------------
+   Dynamic Metadata
+-------------------------------- */
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string; title: string };
+}): Promise<Metadata> {
+  const response = await getBlogsById(params.id);
+  const article: BlogData = response?.data;
+
+  if (!article) {
+    return {
+      title: "Article Not Found | Glamlink",
+    };
+  }
+
+  const articleUrl = `https://glamlink.com/journal/${params.id}/${params.title}`;
+
+  return {
+    title: article.title,
+    description: article.short_description,
+
+    alternates: {
+      canonical: articleUrl,
+    },
+
+    openGraph: {
+      title: article.title,
+      description: article.short_description,
+      url: articleUrl,
+      type: "article",
+      images: [
+        {
+          url: article.cover_image,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.short_description,
+      images: [article.cover_image],
+    },
+  };
+}
+
+/* --------------------------------
+   Page
+-------------------------------- */
+
 export default async function Article({
   params,
 }: {
-  params: Promise<{ id: string; title: string }>;
+  params: { id: string; title: string };
 }) {
-  const { id, title } = await params;
-
-  console.log("Route ID:", id);
-  console.log("Route Title:", title);
-
-  const response = await getBlogsById(id);
-  console.log(response,"response")
+  const response = await getBlogsById(params.id);
   const article: BlogData = response?.data;
 
   if (!article) {
     return <div className="text-center py-20">Article not found.</div>;
   }
 
- console.log(article,"article")
+  const articleUrl = `https://glamlink.com/journal/${params.id}/${params.title}`;
+
+  /* --------------------------------
+     Structured Data
+  -------------------------------- */
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: article.title,
+    description: article.short_description,
+    image: article.cover_image,
+    author: {
+      "@type": "Person",
+      name: "Glamlink Editorial",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Glamlink",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://glamlink.com/favicon.png",
+      },
+    },
+    datePublished: article.created_at,
+    mainEntityOfPage: articleUrl,
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://glamlink.com",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Journal",
+        item: "https://glamlink.com/journal",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: article.title,
+        item: articleUrl,
+      },
+    ],
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      {/* Article Schema */}
+      <Script
+        id="article-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(articleSchema),
+        }}
+      />
+
+      {/* Breadcrumb Schema */}
+      <Script
+        id="breadcrumb-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbSchema),
+        }}
+      />
+
       <main className="flex-1">
         <article className="py-12 md:py-30">
           <ArticleHeader
@@ -52,11 +173,11 @@ export default async function Article({
             })}
             readTime="5 min read"
           />
+
           <div className="container mx-auto px-6 mb-12 md:mb-16">
             <div className="max-w-4xl mx-auto relative aspect-[16/9]">
               <Image
-                 unoptimized={process.env.NODE_ENV === "development"}
-
+                unoptimized={process.env.NODE_ENV === "development"}
                 src={article.cover_image}
                 alt={article.title}
                 fill
@@ -65,16 +186,10 @@ export default async function Article({
               />
             </div>
           </div>
+
           <ArticleContent content={article.content} />
-          {/* <AuthorSection
-            author={{
-              name: "Admin",
-              role: "Content Writer",
-              avatar: "",
-              bio: "Passionate about writing and sharing insights.",
-            }}
-          /> */}
-          <RelatedArticles  category_id={article?.category_id}/>
+
+          <RelatedArticles category_id={article?.category_id} />
         </article>
       </main>
     </div>

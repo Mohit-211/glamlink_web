@@ -24,6 +24,10 @@ const nextConfig: NextConfig = {
         hostname: "node.glamlink.net",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "maps.googleapis.com",
+      },
     ],
   },
 };

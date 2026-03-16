@@ -7,7 +7,7 @@ import {
   useLoadScript,
 } from "@react-google-maps/api";
 
-const libraries: ("places")[] = ["places"];
+const libraries: "places"[] = ["places"];
 
 const mapContainerStyle = {
   height: "300px",
@@ -16,13 +16,9 @@ const mapContainerStyle = {
 
 interface AddressLookupProps {
   address?: string;
-  latitude?: number;   // ✅ using latitude
+  latitude?: number; // ✅ using latitude
   lng?: number;
-  onAddressChange: (
-    address: string,
-    latitude?: number,
-    lng?: number
-  ) => void;
+  onAddressChange: (address: string, latitude?: number, lng?: number) => void;
 }
 
 const AddressLookup: React.FC<AddressLookupProps> = ({
@@ -32,7 +28,7 @@ const AddressLookup: React.FC<AddressLookupProps> = ({
   onAddressChange,
 }) => {
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY!,
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
     libraries,
   });
 
@@ -41,11 +37,7 @@ const AddressLookup: React.FC<AddressLookupProps> = ({
   // 🔥 IMPORTANT: Google requires { lat, lng }
   const [markerPosition, setMarkerPosition] = useState<
     google.maps.LatLngLiteral | undefined
-  >(
-    latitude && lng
-      ? { lat: latitude, lng: lng }
-      : undefined
-  );
+  >(latitude && lng ? { lat: latitude, lng: lng } : undefined);
 
   const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>(
     latitude && lng
@@ -66,7 +58,7 @@ const AddressLookup: React.FC<AddressLookupProps> = ({
   const fetchAddress = async (lat: number, lng: number) => {
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
       );
       const data = await response.json();
 

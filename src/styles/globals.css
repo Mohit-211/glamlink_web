@@ -114,10 +114,6 @@
     border-color: hsl(var(--border));
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
-
   body {
     @apply bg-background text-foreground antialiased;
     font-family: "Inter", system-ui, -apple-system, sans-serif;
@@ -142,19 +138,59 @@
 ───────────────────────────────────────────────── */
 @layer components {
   .container-glamlink {
-    @apply mx-auto max-w-7xl px-5 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-[1280px] px-5 sm:px-6 lg:px-8;
+  }
+
+  .section-glamlink {
+    @apply py-20 md:py-28;
+  }
+
+  .page-soft {
+    background: radial-gradient(
+        circle at 10% 20%,
+        rgba(30, 168, 181, 0.05),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 90% 80%,
+        rgba(30, 168, 181, 0.04),
+        transparent 45%
+      ),
+      hsl(var(--background));
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:shadow-primary/35 active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 rounded-full
+    bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground
+    shadow-lg shadow-primary/25 transition-all duration-200;
+
+    transform: translateY(0);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(1px) scale(0.98);
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border bg-background px-6 py-3 text-sm font-semibold text-foreground transition-all hover:border-primary/50 hover:bg-primary/5;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border
+    bg-background px-6 py-3 text-sm font-semibold text-foreground
+    transition-all hover:border-primary/50 hover:bg-primary/5;
   }
 
   .card-glamlink {
-    @apply rounded-2xl border bg-card p-6 shadow-[var(--shadow-soft)] transition-all hover:shadow-[var(--shadow-medium)];
+    @apply rounded-2xl border bg-card p-6
+    shadow-[var(--shadow-soft)] transition-all duration-300;
+
+    transform: translateY(0);
+  }
+
+  .card-glamlink:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
   }
 
   .gradient-text {
@@ -162,7 +198,21 @@
   }
 
   .badge-soft {
-    @apply inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary;
+    @apply inline-flex items-center gap-1.5 rounded-full
+    bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary
+    border border-primary/20;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-semibold tracking-tight;
+  }
+
+  .section-subtitle {
+    @apply text-muted-foreground mt-4 max-w-2xl;
+  }
+
+  .divider-glamlink {
+    @apply my-20 border-t border-border/60;
   }
 }
 
@@ -230,7 +280,7 @@
 }
 
 /* ────────────────────────────────────────────────
-   CKEditor Overrides (FIXED — no theme())
+   CKEDITOR OVERRIDES
 ───────────────────────────────────────────────── */
 .ck-editor__editable {
   min-height: 160px !important;
@@ -246,15 +296,14 @@
   background: hsl(var(--background)) !important;
 }
 
-
-
+/* ────────────────────────────────────────────────
+   ARTICLE CONTENT
+───────────────────────────────────────────────── */
 .prose-article {
   font-size: 16px;
   line-height: 1.8;
   color: #1f2937;
 }
-
-/* ================= HEADINGS ================= */
 
 .prose-article h1,
 .prose-article h2,
@@ -266,23 +315,25 @@
   line-height: 1.3;
 }
 
-.prose-article h1 { font-size: 32px; }
-.prose-article h2 { font-size: 26px; }
-.prose-article h3 { font-size: 22px; }
-.prose-article h4 { font-size: 18px; }
-
-/* ================= PARAGRAPHS ================= */
+.prose-article h1 {
+  font-size: 32px;
+}
+.prose-article h2 {
+  font-size: 26px;
+}
+.prose-article h3 {
+  font-size: 22px;
+}
+.prose-article h4 {
+  font-size: 18px;
+}
 
 .prose-article p {
   margin-bottom: 16px;
 }
-
-/* Remove empty paragraphs */
 .prose-article p:empty {
   display: none;
 }
-
-/* ================= IMAGES ================= */
 
 .prose-article img {
   width: 100% !important;
@@ -291,8 +342,6 @@
   margin: 24px 0;
   display: block;
 }
-
-/* ================= LINKS ================= */
 
 .prose-article a {
   color: #6366f1;
@@ -304,20 +353,15 @@
   color: #4f46e5;
 }
 
-/* ================= BLOCKQUOTE ================= */
-
 .prose-article blockquote {
-  border-left: 3px solid #BBE8EB; /* soft teal like screenshot */
+  border-left: 3px solid #bbe8eb;
   margin: 32px 0;
   padding-left: 20px;
   font-style: italic;
   font-size: 20px;
   line-height: 1.7;
-  color: #1f2937; /* darker readable text */
-  background: transparent;
-  border-radius: 0;
+  color: #1f2937;
 }
-/* ================= LISTS ================= */
 
 .prose-article ul,
 .prose-article ol {
@@ -329,20 +373,21 @@
   margin-bottom: 8px;
 }
 
-/* ================= STRONG / BOLD ================= */
-
 .prose-article strong {
   font-weight: 600;
 }
-
-/* ================= RESPONSIVE ================= */
 
 @media (max-width: 768px) {
   .prose-article {
     font-size: 15px;
   }
-
-  .prose-article h1 { font-size: 26px; }
-  .prose-article h2 { font-size: 22px; }
-  .prose-article h3 { font-size: 20px; }
+  .prose-article h1 {
+    font-size: 26px;
+  }
+  .prose-article h2 {
+    font-size: 22px;
+  }
+  .prose-article h3 {
+    font-size: 20px;
+  }
 }

@@ -7,7 +7,7 @@ import { useState } from "react";
 import UserDownloadDialog from "../glamcard/UserDownloadDialog";
 
 const FounderBadge = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <section className="py-20 md:py-28 bg-gradient-to-b from-white via-gray-50/70 to-white relative overflow-hidden">
       {/* Subtle background accent */}
@@ -78,8 +78,8 @@ const FounderBadge = () => {
 
         {/* Download Glamlink Section */}
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl  tracking-tight text-gray-900 mb-5">
-            Download Glamlink <span className="text-[#24bbcb]">for Free</span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl  tracking-tight  mb-5 text-[#24bbcb]">
+            Download Glamlink for Free
           </h2>
 
           <p className="text-lg md:text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
@@ -102,8 +102,6 @@ const FounderBadge = () => {
                   and shop expert-approved products — all in one elegant app.
                 </p>
               </div>
-
-             
             </div>
 
             {/* Pros Card */}
@@ -122,13 +120,11 @@ const FounderBadge = () => {
                   beauty creators.
                 </p>
               </div>
-
-             
             </div>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5" >
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
             <Button
               size="lg"
               className="min-w-[220px] bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold text-base py-7 rounded-full shadow-lg shadow-[#24bbcb]/25 hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 group"
@@ -143,15 +139,14 @@ const FounderBadge = () => {
               variant="outline"
               className="min-w-[220px] border-2 border-gray-800 text-gray-900 hover:bg-gray-900 hover:text-white font-semibold text-base py-7 rounded-full transition-all duration-300 group"
               onClick={() => setIsModalOpen(true)}
-           
-           >
+            >
               <span>Download for Pros</span>
               <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
         </div>
       </div>
-        <UserDownloadDialog
+      <UserDownloadDialog
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />

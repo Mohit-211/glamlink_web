@@ -3,143 +3,125 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Download, ChevronDown } from "lucide-react";
+import { Menu, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import logo from "../../../public/header_logo.png"; // adjust path if needed
+import logo from "../../../public/header_logo.png";
+
 const navLinks = [
   { label: "Home", href: "/", id: "home" },
-  { label: "For Clients", href: "/for-clients", id: "for-clients" },
-  {
-    label: "For Professionals",
-    href: "/for-professionals",
-    id: "for-professionals",
-  },
+  { label: "For Clients", href: "/for-clients", id: "clients" },
+  { label: "For Professionals", href: "/for-professionals", id: "pros" },
   { label: "Magazine", href: "/magazine", id: "magazine" },
   { label: "Journal", href: "/journal", id: "journal" },
-  { label: "Promos", href: "/promos", id: "promos" },
+  { label: "Directory", href: "/directory", id: "directory" },
 ];
 
-interface HeaderProps {
-  activeRoute?: string;
-}
-
-const Header = ({ activeRoute }: HeaderProps) => {
+export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  const isActive = (link: (typeof navLinks)[number]) => {
-    if (activeRoute) return link.id === activeRoute;
-    return pathname === link.href;
-  };
+  const isActive = (href: string) => pathname === href;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100/80 shadow-sm transition-all duration-300">
-      <div className="container-glamlink px-5 md:px-8">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-border">
+      <div className="container-glamlink">
         <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative w-[110px] md:w-[140px] h-9 md:h-11 transition-transform duration-300 group-hover:scale-105">
-              <Image
-                src={logo}
-                alt="Glamlink"
-                fill
-                className="object-contain"
-                priority
-                quality={95}
-              />
-            </div>
+          {/* LOGO */}
+          <Link href="/" className="flex items-center">
+            <Image
+              src={logo}
+              alt="Glamlink"
+              width={140}
+              height={40}
+              className="object-contain"
+              priority
+            />
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-2 xl:gap-3">
+          {/* DESKTOP NAV */}
+          <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.id}
                 href={link.href}
-                className={`relative px-4 xl:px-5 py-2.5 text-sm xl:text-base font-medium rounded-lg transition-all duration-300 ${
-                  isActive(link)
-                    ? "text-[#24bbcb] bg-[#24bbcb]/5"
-                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-50/80"
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                ${
+                  isActive(link.href)
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
               >
                 {link.label}
-                {isActive(link) && (
-                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#24bbcb] rounded-full" />
-                )}
               </Link>
             ))}
           </nav>
 
-          {/* Desktop CTA */}
-    <div className="hidden lg:block">
-  <Button
-    asChild
-    className="bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold px-6 md:px-8 py-5 md:py-6 rounded-full shadow-lg shadow-[#24bbcb]/25 hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 text-base"
-  >
-    <a
-      href="https://linktr.ee/glamlink_app"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <Download className="w-4.5 h-4.5" />
-      Download App
-    </a>
-  </Button>
-</div>
+          {/* DESKTOP CTA */}
+          <div className="hidden lg:block">
+            <Button asChild className="btn-primary rounded-full px-6 text-sm">
+              <a
+                href="https://linktr.ee/glamlink_app"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download App
+              </a>
+            </Button>
+          </div>
 
-          {/* Mobile Menu Toggle */}
+          {/* MOBILE MENU BUTTON */}
           <button
-            className="lg:hidden p-2 -mr-2 rounded-lg hover:bg-gray-100/80 transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-muted"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? (
-              <X className="w-7 h-7 text-gray-700" />
+              <X className="w-6 h-6" />
             ) : (
-              <Menu className="w-7 h-7 text-gray-700" />
+              <Menu className="w-6 h-6" />
             )}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <div
-        className={`lg:hidden fixed inset-x-0 top-[64px] md:top-[80px] bottom-0 bg-white/95 backdrop-blur-lg border-t border-gray-100 transform transition-transform duration-300 ease-in-out ${
-          mobileMenuOpen ? "translate-y-0" : "-translate-y-full"
-        } overflow-y-auto z-40`}
-      >
-        <div className="container-glamlink px-5 py-8">
-          <nav className="flex flex-col gap-2">
+      {/* MOBILE MENU */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-t border-border bg-background">
+          <div className="container-glamlink py-6 flex flex-col gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.id}
                 href={link.href}
-                className={`px-5 py-4 text-lg font-medium rounded-xl transition-all ${
-                  isActive(link)
-                    ? "bg-[#24bbcb]/10 text-[#24bbcb]"
-                    : "text-gray-800 hover:bg-gray-50"
-                }`}
                 onClick={() => setMobileMenuOpen(false)}
+                className={`px-4 py-3 rounded-lg text-base font-medium
+                ${
+                  isActive(link.href)
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground hover:bg-muted"
+                }`}
               >
                 {link.label}
               </Link>
             ))}
-          </nav>
 
-          <div className="mt-8">
-            <Button
-              className="w-full bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold py-6 rounded-full shadow-lg shadow-[#24bbcb]/25 hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 text-lg flex items-center justify-center gap-2"
-              onClick={() => setMobileMenuOpen(false)}
+            {/* MOBILE CTA */}
+
+            <a
+              href="https://linktr.ee/glamlink_app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4"
             >
-              <Download className="w-5 h-5" />
-              Download App
-            </Button>
+              <Button className="btn-primary w-full rounded-full py-6">
+                <Download className="w-5 h-5 mr-2" />
+                Download App
+              </Button>
+            </a>
           </div>
         </div>
-      </div>
+      )}
     </header>
   );
-};
-
-export default Header;
+}

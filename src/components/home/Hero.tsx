@@ -2,8 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, MapPin, Loader2, UserCheck, AlertCircle } from "lucide-react";
-import { searchBusinessCard, getBusinessCardBySlug, getBusinessProfile } from "@/api/Api";
-import GlamCardLivePreview from "../glamcard/GlamCardLivePreview";
+import {
+  searchBusinessCard,
+  getBusinessCardBySlug,
+  getBusinessProfile,
+} from "@/api/Api";
 import ProfessionalsMap from "./ProfessionalsMap";
 import BusinessCardPage from "../BusinessCardPage";
 
@@ -33,12 +36,10 @@ const Hero = () => {
   const markersRef = useRef<any[]>([]);
   const selectedMarkerRef = useRef<any>(null);
   const leafletLoadedRef = useRef(false);
-  console.log(mapProfessionals, "mapProfessionals")
+  console.log(mapProfessionals, "mapProfessionals");
   // ─── Load Leaflet CSS + JS dynamically ───────────────────────────────────────
 
-
   // ─── Init Leaflet map ─────────────────────────────────────────────────────────
-
 
   // ─── When a professional is selected, fly to their location + highlight marker ─
   useEffect(() => {
@@ -83,7 +84,9 @@ const Hero = () => {
                 font-family: 'DM Sans', sans-serif;
                 line-height: 1;
                 letter-spacing: -0.02em;
-              ">${selectedProfessional.name?.charAt(0)?.toUpperCase() || "?"}</span>
+              ">${
+                selectedProfessional.name?.charAt(0)?.toUpperCase() || "?"
+              }</span>
             </div>
             <div style="
               width: 0; height: 0;
@@ -113,21 +116,32 @@ const Hero = () => {
       const parts = [loc.address, loc.city, loc.state].filter(Boolean);
       if (!parts.length) return;
       const query = parts.join(", ");
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+      fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          query
+        )}&limit=1`
+      )
         .then((r) => r.json())
         .then((results) => {
           if (results?.[0]) {
-            map.flyTo([parseFloat(results[0].lat), parseFloat(results[0].lon)], 14, { duration: 1.2 });
+            map.flyTo(
+              [parseFloat(results[0].lat), parseFloat(results[0].lon)],
+              14,
+              { duration: 1.2 }
+            );
           }
         })
-        .catch(() => { });
+        .catch(() => {});
     }
   }, [selectedProfessional, selectedLocationIndex]);
 
   // ─── Close dropdown on outside click ────────────────────────────────────────
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -156,11 +170,15 @@ const Hero = () => {
       try {
         let result: any[] = [];
 
-        const specialtyRes = await searchBusinessCard({ specialty: debouncedQuery });
+        const specialtyRes = await searchBusinessCard({
+          specialty: debouncedQuery,
+        });
         result = specialtyRes?.data?.data || specialtyRes?.data || [];
 
         if (!result.length) {
-          const locationRes = await searchBusinessCard({ location: debouncedQuery });
+          const locationRes = await searchBusinessCard({
+            location: debouncedQuery,
+          });
           result = locationRes?.data?.data || locationRes?.data || [];
         }
 
@@ -211,7 +229,9 @@ const Hero = () => {
       try {
         setLoading(true);
         const data = await getBusinessProfile();
-        const filtered = (data?.data || []).filter((pro: any) => pro.is_details === true);
+        const filtered = (data?.data || []).filter(
+          (pro: any) => pro.is_details === true
+        );
         setMapProfessionals(filtered);
       } catch (err) {
         console.error(err);
@@ -224,8 +244,8 @@ const Hero = () => {
 
   // ─── Location selector for selected professional ──────────────────────────────
   const locations = selectedProfessional?.locations || [];
-  console.log(locations, "locations")
-  const address = "7575 S Rainbow Blvd"
+  console.log(locations, "locations");
+  const address = "7575 S Rainbow Blvd";
   // ─── Avatar initial helper ───────────────────────────────────────────────────
   const getInitial = (name: string) =>
     name?.trim()?.charAt(0)?.toUpperCase() || "?";
@@ -247,12 +267,17 @@ const Hero = () => {
     if (!proWithLocation) return;
 
     const loc = proWithLocation.locations[0]; // first location
-    const address = loc.address?.trim() || [loc.city, loc.state].filter(Boolean).join(", ");
+    const address =
+      loc.address?.trim() || [loc.city, loc.state].filter(Boolean).join(", ");
 
     if (!address) return;
 
     // Geocode dynamically
-    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`)
+    fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        address
+      )}&limit=1`
+    )
       .then((res) => res.json())
       .then((data) => {
         if (!data || !data[0]) return;
@@ -260,7 +285,8 @@ const Hero = () => {
         const lat = parseFloat(data[0].lat);
         const lon = parseFloat(data[0].lon);
 
-        const marker = L.marker([lat, lon]).addTo(map)
+        const marker = L.marker([lat, lon])
+          .addTo(map)
           .bindPopup(`<b>${address}</b>`)
           .openPopup();
 
@@ -314,7 +340,6 @@ const Hero = () => {
 
       <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 bg-gradient-to-b from-white via-gray-50/50 to-white overflow-hidden">
         <div className="px-5 md:px-8">
-
           {/* Hero text block */}
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-2xl sm:text-2xl md:text-5xl tracking-tight text-gray-900 mb-5 leading-tight">
@@ -356,7 +381,8 @@ const Hero = () => {
                     WebkitBackdropFilter: "blur(20px)",
                     border: "1px solid rgba(36,187,203,0.18)",
                     borderRadius: "18px",
-                    boxShadow: "0 8px 40px rgba(36,187,203,0.10), 0 2px 12px rgba(0,0,0,0.07)",
+                    boxShadow:
+                      "0 8px 40px rgba(36,187,203,0.10), 0 2px 12px rgba(0,0,0,0.07)",
                     maxHeight: "340px",
                     overflowY: "auto",
                     fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif",
@@ -364,8 +390,17 @@ const Hero = () => {
                 >
                   {loading ? (
                     <div className="flex items-center justify-center py-10 gap-2.5">
-                      <Loader2 className="w-4 h-4 animate-spin" style={{ color: "#24bbcb" }} />
-                      <span style={{ fontSize: "13px", color: "#8a9aaa", letterSpacing: "0.01em" }}>
+                      <Loader2
+                        className="w-4 h-4 animate-spin"
+                        style={{ color: "#24bbcb" }}
+                      />
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          color: "#8a9aaa",
+                          letterSpacing: "0.01em",
+                        }}
+                      >
                         Finding professionals…
                       </span>
                     </div>
@@ -373,26 +408,36 @@ const Hero = () => {
                     <>
                       <div
                         className="flex items-center gap-1.5 px-[18px] py-3"
-                        style={{ borderBottom: "1px solid rgba(36,187,203,0.10)" }}
+                        style={{
+                          borderBottom: "1px solid rgba(36,187,203,0.10)",
+                        }}
                       >
-                        <UserCheck size={13} style={{ color: "#24bbcb", flexShrink: 0 }} />
-                        <span style={{
-                          fontSize: "11px",
-                          fontWeight: 600,
-                          color: "#24bbcb",
-                          letterSpacing: "0.08em",
-                          textTransform: "uppercase",
-                        }}>
+                        <UserCheck
+                          size={13}
+                          style={{ color: "#24bbcb", flexShrink: 0 }}
+                        />
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            fontWeight: 600,
+                            color: "#24bbcb",
+                            letterSpacing: "0.08em",
+                            textTransform: "uppercase",
+                          }}
+                        >
                           Professionals
                         </span>
-                        <span className="ml-auto" style={{
-                          fontSize: "11px",
-                          fontWeight: 500,
-                          color: "#aabbcc",
-                          background: "rgba(36,187,203,0.08)",
-                          borderRadius: "99px",
-                          padding: "1px 8px",
-                        }}>
+                        <span
+                          className="ml-auto"
+                          style={{
+                            fontSize: "11px",
+                            fontWeight: 500,
+                            color: "#aabbcc",
+                            background: "rgba(36,187,203,0.08)",
+                            borderRadius: "99px",
+                            padding: "1px 8px",
+                          }}
+                        >
                           {professionals.length}
                         </span>
                       </div>
@@ -405,46 +450,84 @@ const Hero = () => {
                           onMouseLeave={() => setHoveredIndex(null)}
                           className="w-full text-left flex items-center gap-3 px-[18px] py-3"
                           style={{
-                            background: hoveredIndex === i ? "rgba(36,187,203,0.05)" : "transparent",
+                            background:
+                              hoveredIndex === i
+                                ? "rgba(36,187,203,0.05)"
+                                : "transparent",
                             border: "none",
-                            borderBottom: i < professionals.length - 1
-                              ? "1px solid rgba(0,0,0,0.04)"
-                              : "none",
+                            borderBottom:
+                              i < professionals.length - 1
+                                ? "1px solid rgba(0,0,0,0.04)"
+                                : "none",
                             cursor: "pointer",
-                            transform: hoveredIndex === i ? "translateX(2px)" : "translateX(0)",
-                            transition: "background 0.14s ease, transform 0.12s ease",
+                            transform:
+                              hoveredIndex === i
+                                ? "translateX(2px)"
+                                : "translateX(0)",
+                            transition:
+                              "background 0.14s ease, transform 0.12s ease",
                           }}
                         >
-                          <div style={{
-                            width: "36px", height: "36px", borderRadius: "50%",
-                            background: hoveredIndex === i ? "rgba(36,187,203,0.15)" : "rgba(36,187,203,0.08)",
-                            border: `1.5px solid ${hoveredIndex === i ? "rgba(36,187,203,0.4)" : "rgba(36,187,203,0.15)"}`,
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            flexShrink: 0, transition: "all 0.14s",
-                          }}>
-                            <span style={{
-                              fontSize: "13px", fontWeight: 600,
-                              color: hoveredIndex === i ? "#17a9b7" : "#5ac8d4",
-                              letterSpacing: "-0.01em",
-                            }}>
+                          <div
+                            style={{
+                              width: "36px",
+                              height: "36px",
+                              borderRadius: "50%",
+                              background:
+                                hoveredIndex === i
+                                  ? "rgba(36,187,203,0.15)"
+                                  : "rgba(36,187,203,0.08)",
+                              border: `1.5px solid ${
+                                hoveredIndex === i
+                                  ? "rgba(36,187,203,0.4)"
+                                  : "rgba(36,187,203,0.15)"
+                              }`,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0,
+                              transition: "all 0.14s",
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: "13px",
+                                fontWeight: 600,
+                                color:
+                                  hoveredIndex === i ? "#17a9b7" : "#5ac8d4",
+                                letterSpacing: "-0.01em",
+                              }}
+                            >
                               {getInitial(pro.name)}
                             </span>
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{
-                              fontSize: "14px", fontWeight: 500,
-                              color: hoveredIndex === i ? "#17a9b7" : "#1a2533",
-                              letterSpacing: "-0.01em",
-                              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                              transition: "color 0.14s",
-                            }}>
+                            <div
+                              style={{
+                                fontSize: "14px",
+                                fontWeight: 500,
+                                color:
+                                  hoveredIndex === i ? "#17a9b7" : "#1a2533",
+                                letterSpacing: "-0.01em",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                transition: "color 0.14s",
+                              }}
+                            >
                               {pro.name || "—"}
                             </div>
-                            <div style={{
-                              fontSize: "12px", color: "#9aaabb", fontWeight: 400,
-                              marginTop: "1px",
-                              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                            }}>
+                            <div
+                              style={{
+                                fontSize: "12px",
+                                color: "#9aaabb",
+                                fontWeight: 400,
+                                marginTop: "1px",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
                               {pro.primary_specialty || "—"}
                             </div>
                           </div>
@@ -454,8 +537,12 @@ const Hero = () => {
                   ) : (
                     <div className="flex flex-col items-center justify-center gap-2 py-10">
                       <AlertCircle size={20} style={{ color: "#d0dce8" }} />
-                      <span style={{ fontSize: "13px", color: "#9aaabb" }}>No professionals found</span>
-                      <span style={{ fontSize: "12px", color: "#c0ccd8" }}>Try a different name or specialty</span>
+                      <span style={{ fontSize: "13px", color: "#9aaabb" }}>
+                        No professionals found
+                      </span>
+                      <span style={{ fontSize: "12px", color: "#c0ccd8" }}>
+                        Try a different name or specialty
+                      </span>
                     </div>
                   )}
                 </div>
@@ -465,13 +552,14 @@ const Hero = () => {
             <p className="text-sm text-gray-500">
               {selectedProfessional
                 ? "Professional selected — view profile below"
-                : `Showing ${mapProfessionals.length} professional${mapProfessionals.length !== 1 ? "s" : ""} on map`}
+                : `Showing ${mapProfessionals.length} professional${
+                    mapProfessionals.length !== 1 ? "s" : ""
+                  } on map`}
             </p>
           </div>
 
           {/* Map + Preview grid */}
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
-
             {/* ── Map panel (Leaflet, multi-marker) ── */}
             <div className="rounded-2xl border border-gray-200/80 overflow-hidden bg-white shadow-sm h-[400px] md:h-[700px] flex flex-col">
               {/* Location selector when a professional is selected and has multiple locations */}
@@ -479,7 +567,9 @@ const Hero = () => {
                 <div className="p-4 border-b bg-gray-50/50">
                   <select
                     value={selectedLocationIndex}
-                    onChange={(e) => setSelectedLocationIndex(Number(e.target.value))}
+                    onChange={(e) =>
+                      setSelectedLocationIndex(Number(e.target.value))
+                    }
                     className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-[#24bbcb]/30 focus:border-[#24bbcb]/60 transition"
                   >
                     {locations.map((loc: any, idx: number) => (
@@ -505,8 +595,12 @@ const Hero = () => {
               {selectedProfessional ? (
                 <div className="flex-1 overflow-y-auto">
                   {/* <GlamCardLivePreview data={selectedProfessional} mode="view" /> */}
-                  <BusinessCardPage slug={selectedProfessional?.business_card_link.split('/').pop()} mode="view" />
-
+                  <BusinessCardPage
+                    slug={selectedProfessional?.business_card_link
+                      .split("/")
+                      .pop()}
+                    mode="view"
+                  />
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
@@ -517,12 +611,12 @@ const Hero = () => {
                     Select a Professional
                   </h3>
                   <p className="text-sm text-gray-500 max-w-xs">
-                    Search above or browse curated talent to see their digital card instantly
+                    Search above or browse curated talent to see their digital
+                    card instantly
                   </p>
                 </div>
               )}
             </div>
-
           </div>
         </div>
       </section>

@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  Marker,
+  InfoWindow,
+  useJsApiLoader,
+} from "@react-google-maps/api";
 
 interface LocationType {
   latitude?: number | string;
@@ -68,7 +73,10 @@ const ProfessionalsMap: React.FC<ProfessionalsMapProps> = ({
   }, [professionals]);
 
   // Set center to first location, or undefined if none
-  const center = allLocations.length > 0 ? { lat: allLocations[0].lat, lng: allLocations[0].lng } : undefined;
+  const center =
+    allLocations.length > 0
+      ? { lat: allLocations[0].lat, lng: allLocations[0].lng }
+      : undefined;
 
   if (!isLoaded) return <p className="text-center">Loading map...</p>;
   if (!center) return <p className="text-center">No locations available</p>;
@@ -76,7 +84,11 @@ const ProfessionalsMap: React.FC<ProfessionalsMapProps> = ({
   return (
     <div className="w-full h-full flex">
       <div className="w-full h-full">
-        <GoogleMap mapContainerStyle={{ width: "100%", height: "100%" }} center={center} zoom={11}>
+        <GoogleMap
+          mapContainerStyle={{ width: "100%", height: "100%" }}
+          center={center}
+          zoom={11}
+        >
           {allLocations.map((loc, index) => (
             <Marker
               key={index}
@@ -86,10 +98,15 @@ const ProfessionalsMap: React.FC<ProfessionalsMapProps> = ({
               onClick={() => onSelectProfessional?.(loc.professional)}
             >
               {hoveredIndex === index && (
-                <InfoWindow position={{ lat: loc.lat, lng: loc.lng }} onCloseClick={() => setHoveredIndex(null)}>
+                <InfoWindow
+                  position={{ lat: loc.lat, lng: loc.lng }}
+                  onCloseClick={() => setHoveredIndex(null)}
+                >
                   <div style={{ minWidth: "220px" }}>
                     <div style={{ fontWeight: 600 }}>{loc.name}</div>
-                    <div style={{ fontSize: "13px", marginTop: "4px" }}>{loc.address}</div>
+                    <div style={{ fontSize: "13px", marginTop: "4px" }}>
+                      {loc.address}
+                    </div>
                   </div>
                 </InfoWindow>
               )}
