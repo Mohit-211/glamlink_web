@@ -17,7 +17,7 @@ const navLinks = [
   { label: "Directory", href: "/directory", id: "directory" },
 ];
 
-export default function Header() {
+export default function Header({activeRoute}:any) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
