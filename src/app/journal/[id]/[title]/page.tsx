@@ -25,18 +25,20 @@ interface BlogData {
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string; title: string };
+  params: Promise<{ id: string; title: string }>;
 }): Promise<Metadata> {
-  const response = await getBlogsById(params.id);
+  const { id, title } = await params;
+
+  const response = await getBlogsById(id);
   const article: BlogData = response?.data;
 
   if (!article) {
-    return {
-      title: "Article Not Found | Glamlink",
-    };
+    return { title: "Article Not Found | Glamlink" };
   }
 
-  const articleUrl = `https://glamlink.com/journal/${params.id}/${params.title}`;
+  const articleUrl = `https://glamlink.com/journal/${id}/${title}`;
+  const imageUrl =
+    article.cover_image || "https://glamlink.com/default-blog.jpg";
 
   return {
     title: article.title,
@@ -53,7 +55,7 @@ export async function generateMetadata({
       type: "article",
       images: [
         {
-          url: article.cover_image,
+          url: imageUrl,
           width: 1200,
           height: 630,
           alt: article.title,
@@ -65,7 +67,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: article.title,
       description: article.short_description,
-      images: [article.cover_image],
+      images: [imageUrl],
     },
   };
 }
@@ -77,16 +79,27 @@ export async function generateMetadata({
 export default async function Article({
   params,
 }: {
-  params: { id: string; title: string };
+  params: Promise<{ id: string; title: string }>;
 }) {
-  const response = await getBlogsById(params.id);
+  const { id, title } = await params;
+
+  const response = await getBlogsById(id);
   const article: BlogData = response?.data;
 
   if (!article) {
     return <div className="text-center py-20">Article not found.</div>;
   }
 
-  const articleUrl = `https://glamlink.com/journal/${params.id}/${params.title}`;
+  const articleUrl = `https://glamlink.com/journal/${id}/${title}`;
+  const imageUrl = article.cover_image || "/assets/fallback-blog.jpg";
+
+  const formattedDate = article.created_at
+    ? new Date(article.created_at).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "";
 
   /* --------------------------------
      Structured Data
@@ -97,7 +110,7 @@ export default async function Article({
     "@type": "BlogPosting",
     headline: article.title,
     description: article.short_description,
-    image: article.cover_image,
+    image: imageUrl,
     author: {
       "@type": "Person",
       name: "Glamlink Editorial",
@@ -166,11 +179,7 @@ export default async function Article({
             title={article.title}
             subtitle={article.short_description}
             author="Admin"
-            date={new Date(article.created_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            date={formattedDate}
             readTime="5 min read"
           />
 
@@ -178,7 +187,7 @@ export default async function Article({
             <div className="max-w-4xl mx-auto relative aspect-[16/9]">
               <Image
                 unoptimized={process.env.NODE_ENV === "development"}
-                src={article.cover_image}
+                src={imageUrl}
                 alt={article.title}
                 fill
                 className="object-cover rounded-xl"
@@ -187,7 +196,7 @@ export default async function Article({
             </div>
           </div>
 
-          <ArticleContent content={article.content} />
+          <ArticleContent content={article.content || ""} />
 
           <RelatedArticles category_id={article?.category_id} />
         </article>
