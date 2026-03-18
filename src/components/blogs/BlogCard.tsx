@@ -4,11 +4,11 @@ import Image from "next/image";
 
 interface BlogCardProps {
   image?: string;
-  category: string;
+  category?: string;
   title: string;
-  excerpt: string;
-  author: string;
-  date: string;
+  excerpt?: string;
+  author?: string;
+  date?: string;
   featured?: boolean;
 }
 
@@ -21,54 +21,74 @@ const BlogCard = ({
   date,
   featured = false,
 }: BlogCardProps) => {
-  console.log(image,"==========")
   return (
-    <article
-      className={`blog-card group cursor-pointer ${featured ? "md:col-span-2" : ""
-        }`}
-    >
-      <div
-        className={`relative overflow-hidden ${featured ? "aspect-[2/1]" : "aspect-[4/3]"
-          }`}
-      >
-        <Image
-                         unoptimized={process.env.NODE_ENV === "development"}
+    <article className="group cursor-pointer flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300">
 
-          // width={100}
-          // height={100}
+      {/* Image */}
+     {/* Image */}
+<div className="relative w-full aspect-video overflow-hidden flex-shrink-0">
+        <Image
+          unoptimized={process.env.NODE_ENV === "development"}
           fill
-          src={image || "/assets/blog-1.jpg"}  // ✅ fallback image
+          src={image || "/assets/blog-1.jpg"}
           alt={title}
-          className="w-full h-full object-cover"
+          className="object-cover group-hover:scale-[1.05] transition-transform duration-700"
         />
 
-        <div className="absolute top-4 left-4">
-          <span className="caption-text bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-primary">
-            {category}
-          </span>
-        </div>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+
+        {/* Category pill */}
+        {category && (
+          <div className="absolute top-3 left-3">
+            <span
+              className="text-[10px] font-medium tracking-widest uppercase text-[#23AEB8] px-3 py-1.5 rounded-full"
+              style={{
+                background: "rgba(255,255,255,0.93)",
+                border: "1px solid rgba(35,174,184,0.2)",
+              }}
+            >
+              {category}
+            </span>
+          </div>
+        )}
       </div>
 
-      <div className={`p-6 ${featured ? "md:p-8" : ""}`}>
-        <h3
-          className={`font-editorial font-medium mb-3 text-headline group-hover:text-primary transition-colors duration-200 ${featured ? "text-2xl md:text-3xl" : "text-xl"
-            }`}
-        >
+      {/* Body */}
+      <div className="flex flex-col flex-1 p-5">
+
+        {/* Title */}
+        <h3 className="font-serif text-gray-900 text-[18px] leading-[1.35] mb-2 group-hover:text-[#23AEB8] transition-colors duration-200 line-clamp-2">
           {title}
         </h3>
 
-        <p
-          className={`text-body leading-relaxed mb-4 line-clamp-2 ${featured ? "md:line-clamp-3" : ""
-            }`}
-        >
-          {excerpt}
-        </p>
+        {/* Excerpt */}
+        {excerpt && (
+          <p className="text-[13px] leading-relaxed text-gray-400 font-light line-clamp-2 flex-1 mb-4">
+            {excerpt}
+          </p>
+        )}
 
-        <div className="flex items-center gap-3 text-sm">
-          <span className="font-medium text-foreground">{author}</span>
-          <span className="w-1 h-1 rounded-full bg-border" />
-          <span className="text-caption">{date}</span>
-        </div>
+        {/* Author + Date */}
+        {(author || date) && (
+          <div className="flex items-center gap-2 pt-3 border-t border-gray-100 mt-auto">
+            {author && (
+              <div className="w-7 h-7 rounded-full bg-[#23AEB8] text-white flex items-center justify-center text-[11px] font-medium flex-shrink-0">
+                {author.charAt(0)}
+              </div>
+            )}
+            {author && (
+              <span className="text-[12px] font-medium text-gray-700 truncate">{author}</span>
+            )}
+            {author && date && (
+              <span className="w-1 h-1 rounded-full bg-gray-200 flex-shrink-0 mx-1" />
+            )}
+            {date && (
+              <span className="text-[11px] text-gray-400 whitespace-nowrap">{date}</span>
+            )}
+          </div>
+        )}
+
       </div>
     </article>
   );

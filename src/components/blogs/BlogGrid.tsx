@@ -3,11 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import BlogCard from './BlogCard';
-import Pagination from './Pagination';
 import { getAllBlogs } from '@/api/Api';
 import FeaturedPost from './FeaturedPost';
 import slugify from "slugify";
+
 interface BlogPost {
+  journal_author: any;
+  journal_category: any;
   id: number;
   title: string;
   short_description: string;
@@ -15,10 +17,16 @@ interface BlogPost {
   created_at: string;
 }
 
-const BlogGrid: React.FC = () => {
-  const [blogs, setBlogs] = useState<BlogPost[]>([]);
+interface Props {
+  activeCategory: string;
+}
+
+const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
+  const [allBlogs, setAllBlogs] = useState<BlogPost[]>([]);
+  const [filteredBlogs, setFilteredBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 Fetch once
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
@@ -28,10 +36,12 @@ const BlogGrid: React.FC = () => {
           ? response.data.rows
           : [];
 
-        setBlogs(blogArray);
+        setAllBlogs(blogArray);
+        setFilteredBlogs(blogArray);
       } catch (error) {
         console.error("Error fetching blogs:", error);
-        setBlogs([]);
+        setAllBlogs([]);
+        setFilteredBlogs([]);
       } finally {
         setLoading(false);
       }
@@ -39,6 +49,19 @@ const BlogGrid: React.FC = () => {
 
     fetchBlogs();
   }, []);
+
+  // 🔥 Filter when category changes
+  useEffect(() => {
+    if (activeCategory === "All") {
+      setFilteredBlogs(allBlogs);
+    } else {
+      const filtered = allBlogs.filter(
+        (blog) =>
+          blog?.journal_category?.title === activeCategory
+      );
+      setFilteredBlogs(filtered);
+    }
+  }, [activeCategory, allBlogs]);
 
   if (loading) {
     return (
@@ -48,30 +71,33 @@ const BlogGrid: React.FC = () => {
     );
   }
 
-  if (!blogs.length) {
+  if (!filteredBlogs.length) {
     return (
       <section className="container mx-auto px-6 py-12">
         <p className="text-center">No blogs found.</p>
       </section>
     );
   }
-console.log(blogs,"blogs")
-  const featured = blogs[1]; // example: first blog as featured
-  console.log(featured,"featured")
-  // const regularPosts = blogs.slice(1);
-  console.log(blogs, "blogs")
+
+  const featured = filteredBlogs[0];
+
   return (
     <section className="container mx-auto px-6 py-12">
 
       {/* Featured */}
       {featured && (
-        <Link href={`/journal/${featured.id}/${featured.title}`} className="block">
+        <Link
+          href={`/journal/${featured.id}/${slugify(featured.title, {
+            lower: true,
+            strict: true,
+          })}`}
+        >
           <FeaturedPost
-            image={featured?.cover_image}
-            category="Blog"
+            image={featured.cover_image}
+            category={featured?.journal_category?.title}
             title={featured.title}
             excerpt={featured.short_description}
-            author="Admin"
+            author={featured?.journal_author?.name}
             date={new Date(featured.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
@@ -83,9 +109,9 @@ console.log(blogs,"blogs")
 
       {/* Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
-        {blogs?.map((item, index) => (
+        {filteredBlogs.map((item, index) => (
           <Link
-            key={item?.id}
+            key={item.id}
             href={`/journal/${item.id}/${slugify(item.title, {
               lower: true,
               strict: true,
@@ -93,13 +119,12 @@ console.log(blogs,"blogs")
             className="block animate-fade-in-up"
             style={{ animationDelay: `${0.1 * (index + 1)}s` }}
           >
-            
             <BlogCard
-              image={item?.cover_image}
-              category="Blog"
+              image={item.cover_image}
+              category={item?.journal_category?.title}
               title={item.title}
-              excerpt={item?.short_description}
-              author="Admin"
+              excerpt={item.short_description}
+              author={item?.journal_author?.name}
               date={new Date(item.created_at).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
@@ -109,8 +134,6 @@ console.log(blogs,"blogs")
           </Link>
         ))}
       </div>
-
-      {/* <Pagination /> */}
     </section>
   );
 };

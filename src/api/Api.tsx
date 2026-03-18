@@ -20,7 +20,9 @@ export const getAllBlogs = async () => {
 // 📌 Get Blog By ID
 // =============================
 export const getBlogsById = async (id: any) => {
+  // console.log(id,"findJournalById")
   const response = await api.get(`journal/findJournalById/${id}`);
+  console.log(response,"responseresponse")
   return response.data;
 };
 // =============================

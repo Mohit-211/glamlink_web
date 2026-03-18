@@ -32,7 +32,6 @@ const FeaturedPost = ({ image, category, title, excerpt, author, date }: Feature
         <div className="py-4">
           <div className="flex items-center gap-4 mb-4">
             <span className="caption-text text-primary">{category}</span>
-            <span className="caption-text text-caption">Editor's Pick</span>
           </div>
 
           <h2 className="font-editorial text-3xl md:text-4xl font-medium mb-4 text-headline group-hover:text-primary transition-colors duration-200 leading-tight">
