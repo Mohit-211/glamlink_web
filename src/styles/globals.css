@@ -336,7 +336,7 @@
 }
 
 .prose-article img {
-  width: 100% !important;
+  /* width: 100% !important; */
   height: auto !important;
   border-radius: 12px;
   margin: 24px 0;
