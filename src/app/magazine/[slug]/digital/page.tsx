@@ -21,8 +21,13 @@ export default function IssuePage() {
     );
   }
 
-  const { accountId, flipbookId } = issue.publuu;
-  const flipbookUrl = `https://publuu.com/flip-book/${accountId}/${flipbookId}/page/1?embed`;
+const accountId = issue.publuu?.accountId;
+const flipbookId = issue.publuu?.flipbookId;
+
+const flipbookUrl =
+  accountId && flipbookId
+    ? `https://publuu.com/flip-book/${accountId}/${flipbookId}/page/1?embed`
+    : issue.flipbookUrl ?? null;
 
   const schema = {
     "@context": "https://schema.org",
@@ -51,7 +56,7 @@ export default function IssuePage() {
       />
 
       <h1 className="text-3xl mb-6">{issue.title}</h1>
-
+{flipbookUrl&&
       <iframe
         src={flipbookUrl}
         width="100%"
@@ -62,6 +67,7 @@ export default function IssuePage() {
         allowFullScreen
         className="rounded-lg shadow-lg"
       />
+}
     </div>
   );
 }
