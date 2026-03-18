@@ -2,13 +2,17 @@
 
 export interface Issue {
   id: number;
-  slug: string;
   title: string;
+  slug: string;
   cover?: string;
-  publuu: {
+
+  // ✅ FIXED STRUCTURE
+  publuu?: {
     accountId: number;
     flipbookId: number;
   };
+
+  flipbookUrl?: string;
 }
 
 /* =======================
