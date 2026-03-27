@@ -6,6 +6,7 @@ import AccessSection from "@/components/home/AccessSection";
 import WhyGlamlinkSection from "@/components/home/WhyGlamlinkSection";
 import FounderBadge from "@/components/home/FounderBadge";
 import ProfessionalsMarketplace from "@/components/professionals/ProfessionalsMarketplace";
+import DirectoryApplySection from "@/components/home/DirectoryApplySection";
 
 /* --------------------------------
    Page Metadata
@@ -72,6 +73,7 @@ export default function HomePage() {
 
       <Hero />
       <AccessSection />
+      <DirectoryApplySection/>
       <ProfessionalsMarketplace />
       <WhyGlamlinkSection />
       <FounderBadge />

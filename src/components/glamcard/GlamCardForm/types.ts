@@ -73,3 +73,53 @@ export interface GlamCardFormData {
   elite_setup: boolean;
   
 }
+export type PriceRange = '$' | '$$' | '$$$' | '$$$$' | ''
+export type BookingMethod = 'Online booking' | 'Phone / text' | 'Walk-ins welcome' | 'By appointment only' | ''
+export type YearsInBusiness = 'Less than 1 year' | '1–3 years' | '3–5 years' | '5–10 years' | '10+ years' | ''
+
+export interface FormData {
+  // Section 1 – Business Info
+  businessName: string
+  fullName: string
+  email: string
+  phone: string
+  website: string
+  instagram: string
+  bio: string
+
+  // Section 2 – Location
+  address: string
+  city: string
+  state: string
+  zip: string
+  country: string
+
+  // Section 3 – Specialty
+  specialties: string[]
+  otherSpecialty: string
+
+  // Section 4 – Treatments
+  treatments: string[]
+
+  // Section 5 – Media
+  profilePhoto: File | null
+  studioPhoto: File | null
+  logo: File | null
+
+  // Section 6 – Details
+  yearsInBusiness: YearsInBusiness
+  priceRange: PriceRange
+  bookingMethod: BookingMethod
+  certifications: string
+  howHeard: string
+
+  // Access card opt-in
+  createAccessCard: boolean
+}
+
+export interface Specialty {
+  label: string
+  icon: string
+}
+
+export type FormSection = 1 | 2 | 3 | 4 | 5 | 6

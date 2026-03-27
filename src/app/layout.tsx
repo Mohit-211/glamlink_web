@@ -6,7 +6,7 @@ import Footer from "@/components/common/Footer";
 import Providers from "./providers";
 import ScrollToTop from "@/components/ScrollToTop";
 
-import "@/styles/globals.css";
+import "../styles/globals.css"
 
 /* -------------------------
    Global Metadata

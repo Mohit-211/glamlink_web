@@ -15,6 +15,8 @@ const navLinks = [
   { label: "Magazine", href: "/magazine", id: "magazine" },
   { label: "Journal", href: "/journal", id: "journal" },
   { label: "Directory", href: "/directory", id: "directory" },
+  { label: "Media kit", href: "/media-kit", id: "media-kit" },
+
 ];
 
 export default function Header({activeRoute}:any) {

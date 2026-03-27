@@ -36,7 +36,6 @@ const Hero = () => {
   const markersRef = useRef<any[]>([]);
   const selectedMarkerRef = useRef<any>(null);
   const leafletLoadedRef = useRef(false);
-  console.log(mapProfessionals, "mapProfessionals");
   // ─── Load Leaflet CSS + JS dynamically ───────────────────────────────────────
 
   // ─── Init Leaflet map ─────────────────────────────────────────────────────────
@@ -244,7 +243,6 @@ const Hero = () => {
 
   // ─── Location selector for selected professional ──────────────────────────────
   const locations = selectedProfessional?.locations || [];
-  console.log(locations, "locations");
   const address = "7575 S Rainbow Blvd";
   // ─── Avatar initial helper ───────────────────────────────────────────────────
   const getInitial = (name: string) =>

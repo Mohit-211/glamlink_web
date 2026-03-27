@@ -289,7 +289,6 @@ console.log(allSpecialties,"")
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
-console.log(professionals,"professionalsprofessionals")
   return (
     <section className="py-20 md:py-28 bg-gradient-to-b from-white via-gray-50/70 to-white">
       <div className="container-glamlink px-5 md:px-8">

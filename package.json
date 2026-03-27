@@ -49,6 +49,7 @@
     "date-fns": "^4.1.0",
     "dompurify": "^3.3.3",
     "embla-carousel-react": "^8.6.0",
+    "enhanced-resolve": "^5.20.1",
     "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
     "input-otp": "^1.4.2",
