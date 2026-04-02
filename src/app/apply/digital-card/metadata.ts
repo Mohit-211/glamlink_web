@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Apply for Glamlink Digital Access Card",
 
+  
   description:
     "Apply for your Glamlink Digital Access Card and showcase your beauty business online. Create a professional profile, connect with clients, and grow your beauty brand.",
 
