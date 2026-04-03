@@ -1,15 +1,19 @@
 .
+├── .DS_Store
 ├── api
 │   └── Api.tsx
 ├── app
 │   ├── apply
 │   │   └── digital-card
+│   │       ├── metadata.ts
 │   │       └── page.tsx
 │   ├── business-card
 │   │   └── [slug]
 │   │       └── page.tsx
 │   ├── directory
 │   │   ├── DirectoryPage.tsx
+│   │   └── page.tsx
+│   ├── directory-form-apply
 │   │   └── page.tsx
 │   ├── for-clients
 │   │   └── page.tsx
@@ -27,6 +31,8 @@
 │   │   │   │   └── page.tsx
 │   │   │   └── page.tsx
 │   │   └── page.tsx
+│   ├── media-kit
+│   │   └── page.tsx
 │   ├── not-found.tsx
 │   ├── page.tsx
 │   ├── privacy
@@ -34,10 +40,13 @@
 │   ├── promos
 │   │   └── page.tsx
 │   ├── providers.tsx
+│   ├── robots.ts
+│   ├── sitemap.ts
 │   └── terms
 │       └── page.tsx
 ├── components
 │   ├── BusinessCardPage.tsx
+│   ├── ScrollToTop.tsx
 │   ├── SuccessModal.tsx
 │   ├── blogs
 │   │   ├── ArticleContent.tsx
@@ -48,6 +57,7 @@
 │   │   ├── CategoryNav.tsx
 │   │   ├── FeaturedPost.tsx
 │   │   ├── HeroSection.tsx
+│   │   ├── JournalClient.tsx
 │   │   ├── Pagination.tsx
 │   │   └── RelatedArticles.tsx
 │   ├── clients
@@ -70,6 +80,15 @@
 │   │   ├── HeroSection.tsx
 │   │   ├── ProviderCard.tsx
 │   │   └── ServicesTabs.tsx
+│   ├── directoryForm
+│   │   ├── Accesscardtoggle.tsx
+│   │   ├── Formfield.tsx
+│   │   ├── Sectioncard.tsx
+│   │   ├── Specialtychip.tsx
+│   │   ├── Successmodal.tsx
+│   │   ├── Treatmenttagger.tsx
+│   │   ├── Uploadzone.tsx
+│   │   └── directoryForm.tsx
 │   ├── glamcard
 │   │   ├── GlamCardDesign.tsx
 │   │   ├── GlamCardForm
@@ -99,7 +118,7 @@
 │   │   └── initialGlamCardData.ts
 │   ├── home
 │   │   ├── AccessSection.tsx
-│   │   ├── DownloadCTA.tsx
+│   │   ├── DirectoryApplySection.tsx
 │   │   ├── FounderBadge.tsx
 │   │   ├── Hero.tsx
 │   │   ├── NavLink.tsx
@@ -108,9 +127,16 @@
 │   ├── magazine
 │   │   ├── MagazineHero.tsx
 │   │   └── MagazineIssues.tsx
+│   ├── mediaKit
+│   │   ├── BusinessSpotlightAdForm.tsx
+│   │   ├── CoverFeatureForm.tsx
+│   │   ├── FeatureFormModal.tsx
+│   │   ├── InspiringStoriesForm.tsx
+│   │   ├── MediaKit.tsx
+│   │   ├── ProSpotlightForm.tsx
+│   │   └── TopTreatmentForm.tsx
 │   ├── professionals
 │   │   ├── CapabilitiesGrid.tsx
-│   │   ├── PassionToPower.tsx
 │   │   ├── ProfessionalsCTA.tsx
 │   │   ├── ProfessionalsMarketplace.tsx
 │   │   ├── ProfileCards.tsx
@@ -164,16 +190,15 @@
 │       └── tooltip.tsx
 ├── data
 │   └── issues.ts
-├── folderstructure.txt
+├── folder_structure.txt
 ├── hooks
 │   ├── use-mobile.tsx
 │   └── use-toast.ts
 ├── lib
 │   └── utils.ts
 ├── styles
-│   ├── globals.css
-│   └── globals_old.css
+│   └── globals.css
 └── types
     └── provider.ts
 
-38 directories, 139 files
+42 directories, 160 files
