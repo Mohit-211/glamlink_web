@@ -13,9 +13,9 @@ const navLinks = [
   { label: "For Clients", href: "/for-clients", id: "clients" },
   { label: "For Professionals", href: "/for-professionals", id: "pros" },
   { label: "Magazine", href: "/magazine", id: "magazine" },
-  { label: "Journal", href: "/journal", id: "journal" },
-  { label: "Directory", href: "/directory", id: "directory" },
-  { label: "Media kit", href: "/media-kit", id: "media-kit" },
+  // { label: "Journal", href: "/journal", id: "journal" },
+  // { label: "Directory", href: "/directory", id: "directory" },
+  // { label: "Media kit", href: "/media-kit", id: "media-kit" },
 
 ];
 

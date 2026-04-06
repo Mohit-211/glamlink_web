@@ -7,12 +7,12 @@ import { Instagram, Twitter, Facebook, Linkedin, Youtube } from "lucide-react";
 
 const footerLinks = {
   navigation: [
-    { label: "Clients", href: "/for-clients" },
-    { label: "Professionals", href: "/for-professionals" },
+
     { label: "Directory", href: "/directory" },
     { label: "Magazine", href: "/magazine" },
     { label: "Journal", href: "/journal" },
-    { label: "promos", href: "/promos" },
+    { label: "Media-kit", href: "/media-kit" },
+    { label: "Podcast", href: "/podcast" },
   ],
   company: [
     { label: "Privacy Policy", href: "/privacy" },
