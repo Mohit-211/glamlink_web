@@ -28,6 +28,13 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "maps.googleapis.com",
       },
+
+      // ✅ ADD THIS (IMPORTANT for YouTube thumbnails)
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+        pathname: "/**",
+      },
     ],
   },
 };
