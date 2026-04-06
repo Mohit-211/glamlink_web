@@ -1,75 +1,60 @@
 import React, { useState } from "react";
 import { GlamCardFormData } from "./types";
-
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
 }
-
 const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
-
 const labelClass = "text-sm font-medium text-gray-700";
-
 const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm " +
   "text-gray-900 placeholder-gray-400 transition " +
   "focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200";
-
 const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
   if (!data) return null;
-
   const [specialtyInput, setSpecialtyInput] = useState("");
   const [infoInput, setInfoInput] = useState("");
-
   const addSpecialty = () => {
     if (!specialtyInput.trim()) return;
     if (data.specialties.length >= 5) return;
-
     setData((prev) => ({
       ...prev,
       specialties: [...prev.specialties, specialtyInput.trim()],
     }));
     setSpecialtyInput("");
   };
-
   const removeSpecialty = (index: number) => {
     setData((prev) => ({
       ...prev,
       specialties: prev.specialties.filter((_, i) => i !== index),
     }));
   };
-
   const addInfo = () => {
     if (!infoInput.trim()) return;
-
     setData((prev) => ({
       ...prev,
       important_info: [...prev.important_info, infoInput.trim()],
     }));
     setInfoInput("");
   };
-
   const removeInfo = (index: number) => {
     setData((prev) => ({
       ...prev,
       important_info: prev.important_info.filter((_, i) => i !== index),
     }));
   };
-
   const formatInstagram = (value: string) => {
     if (!value.trim()) return "";
     if (value.startsWith("http")) return value.trim();
     const clean = value.replace(/^@/, "").trim();
     return `https://www.instagram.com/${clean}`;
   };
-
   const formatTikTok = (value: string) => {
     if (!value.trim()) return "";
     if (value.startsWith("http")) return value.trim();
     const clean = value.replace(/^@/, "").trim();
     return `https://www.tiktok.com/@${clean}`;
   };
-
   return (
     <section className={sectionClass}>
       <header className="space-y-1">
@@ -78,7 +63,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           Your specialties and how clients can reach you
         </p>
       </header>
-
       {/* Primary Specialty */}
       <div>
         <label className={labelClass}>Primary Specialty *</label>
@@ -91,11 +75,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           }
         />
       </div>
-
       {/* Specialties */}
       <div className="space-y-3">
         <label className={labelClass}>Additional Specialties</label>
-
         <div className="flex gap-2">
           <input
             className={inputClass}
@@ -107,20 +89,17 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             type="button"
             onClick={addSpecialty}
             disabled={data.specialties.length >= 5 || !specialtyInput.trim()}
-            className={`rounded-lg px-5 text-sm font-medium transition ${
-              data.specialties.length >= 5 || !specialtyInput.trim()
+            className={`rounded-lg px-5 text-sm font-medium transition ${data.specialties.length >= 5 || !specialtyInput.trim()
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                 : "bg-teal-600 text-white hover:bg-teal-700"
-            }`}
+              }`}
           >
             + Add
           </button>
         </div>
-
         <p className="text-xs text-gray-500">
           Max 5 specialties (showing your expertise)
         </p>
-
         {data.specialties.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {data.specialties.map((item, i) => (
@@ -141,7 +120,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           </div>
         )}
       </div>
-
       {/* Custom Handle */}
       <div>
         <label className={labelClass}>Claim Your Custom Handle</label>
@@ -157,7 +135,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           Example: glamqueen_indore → glamlink.net/glamqueen_indore
         </p>
       </div>
-
       {/* Social Media */}
       <div className="grid gap-4 md:grid-cols-2">
         <div>
@@ -171,7 +148,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             }
           />
         </div>
-
         <div>
           <label className={labelClass}>Instagram</label>
           <input
@@ -190,7 +166,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           />
         </div>
       </div>
-
       <div>
         <label className={labelClass}>TikTok</label>
         <input
@@ -208,11 +183,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           }
         />
       </div>
-
       {/* Preferred Booking Method */}
       <div>
         <label className={labelClass}>Preferred Booking Method</label>
-
         <select
           className={inputClass}
           value={data.preferred_booking_method || ""}
@@ -229,13 +202,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
         >
           <option value="">Select booking method...</option>
           <option value="Go_to_Booking_Link">Go to Booking Link</option>
-          {/* Add more options later if needed: WhatsApp, DM, Phone, etc. */}
+          <option value="CALL_TEXT">Call / Text</option>
+          <option value="DM_INSTAGRAM">DM on Instagram</option>
         </select>
-
         <p className="mt-1 text-xs text-gray-500">
           How clients should book appointments with you
         </p>
-
         {data.preferred_booking_method === "Go_to_Booking_Link" && (
           <div className="mt-4">
             <label className={labelClass}>Booking Link</label>
@@ -257,11 +229,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           </div>
         )}
       </div>
-
       {/* Important Info */}
       <div className="space-y-3">
         <label className={labelClass}>Important Information</label>
-
         {data.important_info.length > 0 && (
           <div className="space-y-2">
             {data.important_info.map((item, i) => (
@@ -282,7 +252,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             ))}
           </div>
         )}
-
         <div className="flex gap-2">
           <input
             className={inputClass}
@@ -298,7 +267,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             + Add
           </button>
         </div>
-
         <p className="text-xs text-gray-500">
           Key details clients should know before contacting you
         </p>
@@ -306,5 +274,4 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
     </section>
   );
 };
-
 export default ServicesAndBookingForm;

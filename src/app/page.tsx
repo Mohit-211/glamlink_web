@@ -7,6 +7,7 @@ import WhyGlamlinkSection from "@/components/home/WhyGlamlinkSection";
 import FounderBadge from "@/components/home/FounderBadge";
 import ProfessionalsMarketplace from "@/components/professionals/ProfessionalsMarketplace";
 import DirectoryApplySection from "@/components/home/DirectoryApplySection";
+import ConditionalGetFeatured from "@/components/mediaKit/ConditionalGetFeatured";
 
 /* --------------------------------
    Page Metadata
@@ -77,6 +78,8 @@ export default function HomePage() {
       <ProfessionalsMarketplace />
       <WhyGlamlinkSection />
       <FounderBadge />
+             <ConditionalGetFeatured/>
+      
     </>
   );
 }

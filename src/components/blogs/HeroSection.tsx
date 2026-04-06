@@ -55,6 +55,7 @@ const HeroSection = () => {
           {/* IMAGE */}
           <div className="relative overflow-hidden rounded-xl aspect-[16/10]">
             <Image
+              unoptimized={process.env.NODE_ENV === "development"}
               src={featured.cover_image}
               alt={featured.title}
               fill

@@ -725,9 +725,9 @@ const removeLocation = (index: number) => {
                   options={[
                     { value: '', label: 'Select…' },
                     { value: 'Go to Booking Link', label: 'Go to Booking Link' },
-                    { value: 'Phone / text', label: 'Phone / text' },
-                    { value: 'Walk-ins welcome', label: 'Walk-ins welcome' },
-                    { value: 'By appointment only', label: 'By appointment only' },
+                    { value: 'Call / text', label: 'Call / text' },
+                    { value: 'DM on Instagram', label: 'DM on_Instagram' },
+                   
                   ]}
                 />
               </FormField>
