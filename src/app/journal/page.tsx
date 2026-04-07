@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 
-import HeroSection from "@/components/blogs/HeroSection";
 import JournalClient from "@/components/blogs/JournalClient";
+import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
 
-/* ✅ Metadata works now */
 export const metadata: Metadata = {
   title: "Beauty Industry Journal & Insights",
   description:
@@ -14,7 +13,6 @@ export const metadata: Metadata = {
 export default function JournalPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-
       <Script
         id="journal-schema"
         type="application/ld+json"
@@ -28,10 +26,9 @@ export default function JournalPage() {
       />
 
       <main className="flex-1">
-        <HeroSection />
-
-        {/* 👇 Client logic moved here */}
+        {/* 👇 Everything handled inside client now */}
         <JournalClient />
+        <ConditionalGetFeatured />
       </main>
     </div>
   );

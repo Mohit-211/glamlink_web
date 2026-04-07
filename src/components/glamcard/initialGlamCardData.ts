@@ -74,6 +74,5 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     promotion_details: "",
     excites_about_glamlink: [],
     biggest_pain_points: [],
-    profileImage: profileImg.src,
   };
 }

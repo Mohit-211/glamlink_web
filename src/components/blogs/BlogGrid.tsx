@@ -1,20 +1,19 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import BlogCard from './BlogCard';
-import { getAllBlogs } from '@/api/Api';
-import FeaturedPost from './FeaturedPost';
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import BlogCard from "./BlogCard";
+import { getAllBlogs } from "@/api/Api";
 import slugify from "slugify";
 
 interface BlogPost {
-  journal_author: any;
-  journal_category: any;
+  journal_author?: { name?: string };
+  journal_category?: { title?: string };
   id: number;
-  title: string;
-  short_description: string;
-  cover_image: string;
-  created_at: string;
+  title?: string;
+  short_description?: string;
+  cover_image?: string;
+  created_at?: string;
 }
 
 interface Props {
@@ -26,7 +25,6 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
   const [filteredBlogs, setFilteredBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 Fetch once
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
@@ -50,89 +48,76 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
     fetchBlogs();
   }, []);
 
-  // 🔥 Filter when category changes
   useEffect(() => {
-    if (activeCategory === "All") {
+    if (!activeCategory || activeCategory === "All") {
       setFilteredBlogs(allBlogs);
-    } else {
-      const filtered = allBlogs.filter(
-        (blog) =>
-          blog?.journal_category?.title === activeCategory
-      );
-      setFilteredBlogs(filtered);
+      return;
     }
+
+    const filtered = allBlogs.filter((blog) =>
+      blog?.journal_category?.title
+        ?.toLowerCase()
+        .trim()
+        .includes(activeCategory.toLowerCase().trim())
+    );
+
+    setFilteredBlogs(filtered);
   }, [activeCategory, allBlogs]);
 
   if (loading) {
     return (
-      <section className="container mx-auto px-6 py-12">
-        <p className="text-center">Loading blogs...</p>
-      </section>
+      <p className="text-center py-16 text-sm text-muted-foreground">
+        Loading articles...
+      </p>
     );
   }
 
   if (!filteredBlogs.length) {
     return (
-      <section className="container mx-auto px-6 py-12">
-        <p className="text-center">No blogs found.</p>
-      </section>
+      <p className="text-center py-16 text-sm text-muted-foreground">
+        No articles found.
+      </p>
     );
   }
 
-  const featured = filteredBlogs[0];
-
   return (
-    <section className="container mx-auto px-6 py-12">
+    <section className="mt-10">
+      <div className="grid md:grid-cols-2 xl:grid-cols-2 gap-x-12 gap-y-16">
+        {filteredBlogs.map((item, index) => {
+          const title = item.title || "Untitled";
+          const author = item?.journal_author?.name || "Unknown";
+          const category = item?.journal_category?.title || "General";
+          const image = item.cover_image || "/assets/fallback.jpg";
+          const excerpt = item.short_description || "";
+          const date = new Date(
+            item.created_at || Date.now()
+          ).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
 
-      {/* Featured */}
-      {featured && (
-        <Link
-          href={`/journal/${featured.id}/${slugify(featured.title, {
-            lower: true,
-            strict: true,
-          })}`}
-        >
-          <FeaturedPost
-            image={featured.cover_image}
-            category={featured?.journal_category?.title}
-            title={featured.title}
-            excerpt={featured.short_description}
-            author={featured?.journal_author?.name}
-            date={new Date(featured.created_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          />
-        </Link>
-      )}
-
-      {/* Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
-        {filteredBlogs.map((item, index) => (
-          <Link
-            key={item.id}
-            href={`/journal/${item.id}/${slugify(item.title, {
-              lower: true,
-              strict: true,
-            })}`}
-            className="block animate-fade-in-up"
-            style={{ animationDelay: `${0.1 * (index + 1)}s` }}
-          >
-            <BlogCard
-              image={item.cover_image}
-              category={item?.journal_category?.title}
-              title={item.title}
-              excerpt={item.short_description}
-              author={item?.journal_author?.name}
-              date={new Date(item.created_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            />
-          </Link>
-        ))}
+          return (
+            <Link
+              key={item.id}
+              href={`/journal/${item.id}/${slugify(title, {
+                lower: true,
+                strict: true,
+              })}`}
+              className="block group animate-fade-up"
+              style={{ animationDelay: `${0.06 * index}s` }}
+            >
+              <BlogCard
+                image={image}
+                category={category}
+                title={title}
+                excerpt={excerpt}
+                author={author}
+                date={date}
+              />
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

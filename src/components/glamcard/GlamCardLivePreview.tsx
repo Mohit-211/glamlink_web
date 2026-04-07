@@ -270,7 +270,7 @@ console.log(data)
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* LEFT */}
-          <div className="space-y-5">
+          <div className="flex flex-col justify-between h-full">
             <Section title={`About ${data.name || "Your Name"}`}>
               <div className="flex gap-4">
                 <div className="h-16 w-16 overflow-hidden rounded-full bg-gray-200 ring-2 ring-white shadow">
@@ -379,7 +379,7 @@ console.log(data)
           </div>
 
           {/* RIGHT */}
-          <div className="space-y-5">
+          <div className="flex flex-col justify-between h-full">
 
             {/* ---- LOCATION ---- */}
             <Section title="Location">
@@ -501,7 +501,7 @@ console.log(data)
         <li key={hour.id ?? index} className="flex flex-col space-y-1">
           <span className="font-medium text-gray-700">{hour.day}</span>
           <span className="text-gray-500">
-            {timeText} {hour.note ? `(${hour.note})` : ""}
+            {hour.note ? `${hour.note}` : ""}
           </span>
         </li>
       );

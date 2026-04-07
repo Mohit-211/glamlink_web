@@ -128,6 +128,7 @@ export default function IssuePage({ params }: { params: { slug: string } }) {
 
         <img src={issue.cover} alt={issue.title} className="rounded-xl mb-10" />
       </div>
+      
     </section>
   );
 }

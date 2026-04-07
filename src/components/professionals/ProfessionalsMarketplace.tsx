@@ -173,7 +173,6 @@ const mapProToGlamCardData = (pro: Professional): any => ({
   name: pro.name || "",
   professional_title: pro.professional_title || "Beauty Expert",
   profile_image: pro.profile_image || "",
-  profileImage: pro.profile_image || "",
   instagram: pro.instagram || "",
   location: pro.location || pro.locations?.[0]?.city
     ? `${pro.locations?.[0]?.city}, ${pro.locations?.[0]?.state}`

@@ -37,7 +37,6 @@ export interface GlamCardFormData {
   promotion_details: string;
   offer_promotion: boolean | undefined;
   booking_link: string;
-  profileImage: string | Blob | undefined;
   /* BASIC INFO */
   name: string;
   business_name: string;

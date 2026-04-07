@@ -6,6 +6,7 @@ import PhoneMockups from "@/components/clients/PhoneMockups";
 import FeaturesGrid from "@/components/clients/FeaturesGrid";
 import HowItWorks from "@/components/clients/HowItWorks";
 import ClientsCTA from "@/components/clients/ClientsCTA";
+import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
 
 /* --------------------------------
    Page Metadata
@@ -79,6 +80,7 @@ export default function ForClients() {
         <FeaturesGrid />
         <HowItWorks />
         <ClientsCTA />
+        <ConditionalGetFeatured />
       </main>
     </div>
   );

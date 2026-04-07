@@ -11,12 +11,14 @@ interface BusinessCardPageProps {
 
 }
 
-const BusinessCardPage: React.FC<BusinessCardPageProps> = ({ slug, mode = "view" }) => {
+const BusinessCardPage: React.FC<BusinessCardPageProps> = ({ slug, mode}) => {
+  console.log(slug,mode,"==== slug and mode in business card page")
   const [data, setData] = useState<GlamCardFormData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log(slug,"slug on business card page")
     if (!slug) {
       setError("No slug provided.");
       setLoading(false);
@@ -24,9 +26,11 @@ const BusinessCardPage: React.FC<BusinessCardPageProps> = ({ slug, mode = "view"
     }
 
     const fetchData = async () => {
+      console.log("hit api")
       try {
         setLoading(true);
         const res = await getBusinessCardBySlug(slug);
+        console.log(res,"res")
         setData(res?.data);
       } catch (err: any) {
         console.error(err);

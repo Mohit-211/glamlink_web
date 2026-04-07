@@ -152,7 +152,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
           <div ref={previewRef}>
             {/* <GlamCardLivePreview data={data} mode="download" sticky={false} /> */}
-                         <BusinessCardPage slug={datadownload?.business_card_link.split('/').pop()} mode="view" />
+                         <BusinessCardPage slug={datadownload?.business_card_link.split('/').pop()} mode="download" />
 
           </div>
         </div>
