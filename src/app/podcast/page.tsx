@@ -1,13 +1,14 @@
-import PodcastMain from '@/components/Podcast/PodcastPage'
-import React from 'react'
+import PodcastMain from "@/components/Podcast/PodcastPage";
+import React from "react";
+import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
 
 const PodcastPage = () => {
   return (
     <div>
-        <PodcastMain/>
-
+      <PodcastMain />
+      <ConditionalGetFeatured />
     </div>
-  )
-}
+  );
+};
 
-export default PodcastPage
+export default PodcastPage;

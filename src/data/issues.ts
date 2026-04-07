@@ -18,9 +18,20 @@ export interface Issue {
 /* =======================
    2026 ISSUES
 ======================= */
+
 export const issues2026: Issue[] = [
   {
     id: 1,
+    slug: "glamlinkedit_113",
+    title: "glamlinkedit_113",
+    cover: "/magazine/issue_113.jpeg",
+    publuu: {
+      accountId: 992531,
+      flipbookId: 2418451,
+    },
+  },
+  {
+    id: 2,
     slug: "glamlinkedit_112",
     title: "glamlinkedit_112",
     cover: "/magazine/glamlinkedit_112.jpeg",
@@ -30,7 +41,7 @@ export const issues2026: Issue[] = [
     },
   },
   {
-    id: 2,
+    id: 3,
     slug: "the-glamlink-edit",
     title: "The Glamlink Edit",
     cover: "/magazine/the_glamlink_edit.jpg",
@@ -40,7 +51,7 @@ export const issues2026: Issue[] = [
     },
   },
   {
-    id: 3,
+    id: 4,
     slug: "issue-110",
     title: "Issue 110",
     cover: "/magazine/issue_110.jpg",

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 
 import JournalClient from "@/components/blogs/JournalClient";
+import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
 
 export const metadata: Metadata = {
   title: "Beauty Industry Journal & Insights",
@@ -27,6 +28,7 @@ export default function JournalPage() {
       <main className="flex-1">
         {/* 👇 Everything handled inside client now */}
         <JournalClient />
+        <ConditionalGetFeatured />
       </main>
     </div>
   );

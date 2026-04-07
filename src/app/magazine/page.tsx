@@ -3,7 +3,7 @@ import Script from "next/script";
 
 import MagazineHero from "@/components/magazine/MagazineHero";
 import MagazineIssues from "@/components/magazine/MagazineIssues";
-import ConditionalGetFeatured from "@/components/mediaKit/ConditionalGetFeatured";
+import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
 
 /* --------------------------------
    Page Metadata
@@ -92,7 +92,7 @@ export default function Magazine() {
         <MagazineHero />
         <MagazineIssues />
       </main>
-      <ConditionalGetFeatured/>
+      <ConditionalGetFeatured />
     </div>
   );
 }

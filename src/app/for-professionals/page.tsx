@@ -7,6 +7,7 @@ import SalesSection from "@/components/professionals/SalesSection";
 import PromoBanner from "@/components/professionals/PromoBanner";
 import CapabilitiesGrid from "@/components/professionals/CapabilitiesGrid";
 import ProfessionalsCTA from "@/components/professionals/ProfessionalsCTA";
+import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
 
 /* --------------------------------
    Page Metadata
@@ -82,6 +83,7 @@ export default function ForProfessionals() {
         <PromoBanner />
         <CapabilitiesGrid />
         <ProfessionalsCTA />
+        <ConditionalGetFeatured />
       </main>
     </div>
   );
