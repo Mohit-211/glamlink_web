@@ -1,0 +1,402 @@
+@import "tailwindcss";
+
+/* Tell Tailwind to generate utilities from your tokens */
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+}
+
+/* ────────────────────────────────────────────────
+   THEME VARIABLES (light + dark mode)
+───────────────────────────────────────────────── */
+:root {
+  --radius: 0.75rem;
+
+  /* Primary */
+  --primary: 184 68% 43%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Surfaces */
+  --background: 0 0% 100%;
+  --foreground: 220 20% 15%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 220 20% 15%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 20% 15%;
+
+  --secondary: 220 15% 96%;
+  --secondary-foreground: 220 20% 25%;
+
+  --muted: 220 15% 96%;
+  --muted-foreground: 220 10% 50%;
+
+  --accent: 184 68% 95%;
+  --accent-foreground: 184 68% 30%;
+
+  --destructive: 0 84% 60%;
+  --border: 220 15% 90%;
+  --input: 220 15% 90%;
+  --ring: 184 68% 43%;
+
+  /* Sidebar */
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 184 68% 43%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 184 50% 95%;
+  --sidebar-border: 220 15% 90%;
+
+  /* Shadows */
+  --shadow-soft: 0 2px 8px -2px hsl(220 20% 15% / 0.08);
+  --shadow-medium: 0 4px 16px -4px hsl(220 20% 15% / 0.12);
+  --shadow-large: 0 8px 32px -8px hsl(220 20% 15% / 0.16);
+  --shadow-primary: 0 4px 20px -4px hsl(184 68% 43% / 0.35);
+}
+
+/* Dark mode overrides */
+.dark {
+  --background: 220 20% 8%;
+  --foreground: 220 15% 95%;
+
+  --card: 220 20% 12%;
+  --card-foreground: 220 15% 95%;
+
+  --popover: 220 20% 12%;
+  --popover-foreground: 220 15% 95%;
+
+  --secondary: 220 15% 15%;
+  --secondary-foreground: 220 15% 85%;
+
+  --muted: 220 15% 18%;
+  --muted-foreground: 220 10% 60%;
+
+  --accent: 184 40% 15%;
+  --accent-foreground: 184 68% 70%;
+
+  --border: 220 15% 20%;
+  --input: 220 15% 20%;
+
+  --sidebar-background: 220 20% 10%;
+  --sidebar-foreground: 220 15% 85%;
+  --sidebar-accent: 184 40% 15%;
+  --sidebar-border: 220 15% 20%;
+}
+
+/* ────────────────────────────────────────────────
+   BASE STYLES
+───────────────────────────────────────────────── */
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  .font-display {
+    font-family: "Playfair Display", Georgia, serif;
+  }
+}
+
+/* ────────────────────────────────────────────────
+   COMPONENTS
+───────────────────────────────────────────────── */
+@layer components {
+  .container-glamlink {
+    @apply mx-auto w-full max-w-[1280px] px-5 sm:px-6 lg:px-8;
+  }
+
+  .section-glamlink {
+    @apply py-20 md:py-28;
+  }
+
+  .page-soft {
+    background: radial-gradient(
+        circle at 10% 20%,
+        rgba(30, 168, 181, 0.05),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 90% 80%,
+        rgba(30, 168, 181, 0.04),
+        transparent 45%
+      ),
+      hsl(var(--background));
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full
+    bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground
+    shadow-lg shadow-primary/25 transition-all duration-200;
+
+    transform: translateY(0);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(1px) scale(0.98);
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border
+    bg-background px-6 py-3 text-sm font-semibold text-foreground
+    transition-all hover:border-primary/50 hover:bg-primary/5;
+  }
+
+  .card-glamlink {
+    @apply rounded-2xl border bg-card p-6
+    shadow-[var(--shadow-soft)] transition-all duration-300;
+
+    transform: translateY(0);
+  }
+
+  .card-glamlink:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-[#1ea8b5] to-primary bg-clip-text text-transparent;
+  }
+
+  .badge-soft {
+    @apply inline-flex items-center gap-1.5 rounded-full
+    bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary
+    border border-primary/20;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-semibold tracking-tight;
+  }
+
+  .section-subtitle {
+    @apply text-muted-foreground mt-4 max-w-2xl;
+  }
+
+  .divider-glamlink {
+    @apply my-20 border-t border-border/60;
+  }
+}
+
+/* ────────────────────────────────────────────────
+   UTILITIES / ANIMATIONS
+───────────────────────────────────────────────── */
+@layer utilities {
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.8s ease-out forwards;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.75;
+      transform: scale(1.05);
+    }
+  }
+
+  .animation-delay-150 {
+    animation-delay: 0.15s;
+  }
+  .animation-delay-300 {
+    animation-delay: 0.3s;
+  }
+  .animation-delay-500 {
+    animation-delay: 0.5s;
+  }
+  .animation-delay-700 {
+    animation-delay: 0.7s;
+  }
+}
+
+/* ────────────────────────────────────────────────
+   CKEDITOR OVERRIDES
+───────────────────────────────────────────────── */
+.ck-editor__editable {
+  min-height: 160px !important;
+  padding: 16px !important;
+  font-size: 1rem;
+  line-height: 1.6;
+  border: none !important;
+}
+
+.ck.ck-toolbar {
+  border: none !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--background)) !important;
+}
+
+/* ────────────────────────────────────────────────
+   ARTICLE CONTENT
+───────────────────────────────────────────────── */
+.prose-article {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #1f2937;
+}
+
+.prose-article h1,
+.prose-article h2,
+.prose-article h3,
+.prose-article h4 {
+  font-weight: 600;
+  margin-top: 32px;
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+
+.prose-article h1 {
+  font-size: 32px;
+}
+.prose-article h2 {
+  font-size: 26px;
+}
+.prose-article h3 {
+  font-size: 22px;
+}
+.prose-article h4 {
+  font-size: 18px;
+}
+
+.prose-article p {
+  margin-bottom: 16px;
+}
+.prose-article p:empty {
+  display: none;
+}
+
+.prose-article img {
+  /* width: 100% !important; */
+  height: auto !important;
+  border-radius: 12px;
+  margin: 24px 0;
+  display: block;
+}
+
+.prose-article a {
+  color: #6366f1;
+  text-decoration: underline;
+  transition: 0.2s ease;
+}
+
+.prose-article a:hover {
+  color: #4f46e5;
+}
+
+.prose-article blockquote {
+  border-left: 3px solid #bbe8eb;
+  margin: 32px 0;
+  padding-left: 20px;
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.7;
+  color: #1f2937;
+}
+
+.prose-article ul,
+.prose-article ol {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.prose-article li {
+  margin-bottom: 8px;
+}
+
+.prose-article strong {
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .prose-article {
+    font-size: 15px;
+  }
+  .prose-article h1 {
+    font-size: 26px;
+  }
+  .prose-article h2 {
+    font-size: 22px;
+  }
+  .prose-article h3 {
+    font-size: 20px;
+  }
+}
+.prose-article ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+.prose-article ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
