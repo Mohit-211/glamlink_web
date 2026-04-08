@@ -123,14 +123,22 @@ const MagazineSidebar = ({
   activeIssue: Issue | null;
   onIssueClick: (issue: Issue) => void;
 }) => {
-  // 👉 Pick ONLY latest issues (hard or dynamic)
-  const latestIssues = [...issues2026, ...issues2025]
-    .sort((a, b) => Number(b.id) - Number(a.id))
-    .slice(0, 3); // 112, 111, 110
+  // 👉 Extract issue number safely
+  const getIssueNumber = (issue: Issue) => {
+    return Number(issue.title.match(/\d+/)?.[0] || 0);
+  };
+const router = useRouter();
+  // 👉 Merge + sort ALL issues correctly
+  const sortedIssues = [...issues2026, ...issues2025].sort(
+    (a, b) => getIssueNumber(b) - getIssueNumber(a)
+  );
+
+  // 👉 Latest 3 issues (113, 112, 111)
+  const latestIssues = sortedIssues.slice(0, 3);
 
   return (
     <div className="border border-border/40 rounded-xl bg-background shadow-sm overflow-hidden">
-      {/* 🔥 HEADER (brand voice) */}
+      {/* HEADER */}
       <div className="px-4 pt-5 pb-4 border-b border-border/30">
         <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">
           The Glamlink Edit
@@ -145,11 +153,11 @@ const MagazineSidebar = ({
         </p>
       </div>
 
-      {/* 🔥 CURATED ISSUES */}
+      {/* CURATED ISSUES */}
       <div className="p-3 space-y-2">
         {latestIssues.map((issue) => {
           const isActive = activeIssue?.slug === issue.slug;
-          const issueNum = issue.title.match(/Issue\s*(\d+)/i)?.[1] || issue.id;
+          const issueNum = getIssueNumber(issue);
 
           return (
             <div
@@ -185,6 +193,7 @@ const MagazineSidebar = ({
                 <span className="block text-[11px] font-semibold text-[#24bbcb]">
                   Issue {issueNum}
                 </span>
+
                 <p className="text-xs font-medium line-clamp-2 text-foreground group-hover:text-[#24bbcb]">
                   {issue.title}
                 </p>
@@ -194,15 +203,18 @@ const MagazineSidebar = ({
         })}
       </div>
 
-      {/* 🔥 FOOTER CTA */}
-      <div className="px-4 py-3 border-t border-border/30 bg-muted/5">
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full rounded-full text-xs border-[#24bbcb]/40 hover:border-[#24bbcb] hover:text-[#24bbcb]"
-        >
-          View All Issues
-        </Button>
+      {/* FOOTER CTA */}
+     <div className="px-4 py-3 border-t border-border/30 bg-muted/5">
+
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={() => router.push("/magazine")}
+    className="w-full rounded-full text-xs border-[#24bbcb]/40 hover:border-[#24bbcb] hover:text-[#24bbcb]"
+  >
+    View All Issues
+  </Button>
+
       </div>
     </div>
   );

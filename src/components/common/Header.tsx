@@ -10,10 +10,12 @@ import logo from "../../../public/header_logo.png";
 
 const navLinks = [
   { label: "Home", href: "/", id: "home" },
-  { label: "For Clients", href: "/for-clients", id: "clients" },
-  { label: "For Professionals", href: "/for-professionals", id: "pros" },
+  // { label: "For Clients", href: "/for-clients", id: "clients" },
+  // { label: "For Professionals", href: "/for-professionals", id: "pros" },
   { label: "Magazine", href: "/magazine", id: "magazine" },
-  // { label: "Journal", href: "/journal", id: "journal" },
+  { label: "Podcast", href: "/podcast", id: "podcast" },
+  { label: "Journal", href: "/journal", id: "journal" },
+
   // { label: "Directory", href: "/directory", id: "directory" },
   // { label: "Media kit", href: "/media-kit", id: "media-kit" },
 

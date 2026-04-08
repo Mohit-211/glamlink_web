@@ -20,14 +20,7 @@ const MagazineHero = () => {
 
       <div className="container-glamlink px-5 md:px-8 relative z-10">
         <div className="max-w-5xl mx-auto text-center">
-          {/* Era marker */}
-          <div className="flex items-center justify-center gap-10 mb-8 md:mb-10">
-            <div className="h-px w-20 bg-gray-300" />
-            <span className="text-xs md:text-sm font-medium tracking-[0.5em] uppercase text-gray-500">
-              ESTABLISHED 2025
-            </span>
-            <div className="h-px w-20 bg-gray-300" />
-          </div>
+         
 
           {/* Single-line friendly headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-light text-gray-950 tracking-tight leading-none mb-8 md:mb-10">
@@ -36,10 +29,7 @@ const MagazineHero = () => {
 
           {/* Subtitle */}
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-12 md:mb-16">
-            Your weekly curator of beauty excellence — spotlighting industry
-            visionaries, rising talent, transformative treatments, hand-selected
-            products, and exclusive insider perspectives from the world of
-            aesthetics and wellness.
+         The Glamlink Edit is your inside look at beauty and wellness. Where top professionals, top treatments and evolving innovation are spotlighted. Stories go deeper and insight actually mean something. Watch, shop beauty products and connect with professionals behind the stories.
           </p>
 
           {/* Newsletter form – aligned heights, clean layout */}
@@ -79,7 +69,7 @@ const MagazineHero = () => {
             </form>
 
             <p className="mt-5 text-sm text-gray-500">
-              Join 12,000+ beauty enthusiasts • Unsubscribe anytime
+              Join beauty enthusiasts • Unsubscribe anytime
             </p>
           </div>
         </div>

@@ -1,29 +1,24 @@
 // src/data/issues.ts
-
 export interface Issue {
   id: number;
   title: string;
   slug: string;
   cover?: string;
-
   // ✅ FIXED STRUCTURE
   publuu?: {
     accountId: number;
     flipbookId: number;
   };
-
   flipbookUrl?: string;
 }
-
 /* =======================
    2026 ISSUES
 ======================= */
-
 export const issues2026: Issue[] = [
   {
     id: 1,
-    slug: "glamlinkedit_113",
-    title: "glamlinkedit_113",
+    slug: "issue-113",
+    title: "Issue 113",
     cover: "/magazine/issue_113.jpeg",
     publuu: {
       accountId: 992531,
@@ -32,8 +27,8 @@ export const issues2026: Issue[] = [
   },
   {
     id: 2,
-    slug: "glamlinkedit_112",
-    title: "glamlinkedit_112",
+    slug: "issue-112",
+    title: "Issue 112",
     cover: "/magazine/glamlinkedit_112.jpeg",
     publuu: {
       accountId: 992531,
@@ -42,8 +37,8 @@ export const issues2026: Issue[] = [
   },
   {
     id: 3,
-    slug: "the-glamlink-edit",
-    title: "The Glamlink Edit",
+    slug: "issue-111",
+    title: "Issue 111",
     cover: "/magazine/the_glamlink_edit.jpg",
     publuu: {
       accountId: 992531,
@@ -61,7 +56,6 @@ export const issues2026: Issue[] = [
     },
   },
 ];
-
 /* =======================
    2025 ISSUES
 ======================= */
@@ -127,5 +121,4 @@ export const issues2025: Issue[] = [
     },
   },
 ];
-
 export const allIssues: Issue[] = [...issues2026, ...issues2025];

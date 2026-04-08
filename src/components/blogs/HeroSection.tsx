@@ -19,17 +19,28 @@ interface BlogPost {
 const HeroSection = () => {
   const [featured, setFeatured] = useState<BlogPost | null>(null);
 
+  console.log(featured, "featured");
+
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
         const response = await getAllBlogs();
 
+        console.log(response, "response=====>");
+
         const blogs = Array.isArray(response?.data?.rows)
           ? response.data.rows
           : [];
 
-        if (blogs.length > 0) {
-          setFeatured(blogs[0]);
+        // ✅ Find Cover Feature blog
+        const featuredBlog =
+        blogs.find(
+          (blog: BlogPost) =>
+            blog?.journal_category?.title?.trim().toLowerCase() ===
+            "cover feature"
+        ) || blogs[0];
+        if (featuredBlog) {
+          setFeatured(featuredBlog);
         }
       } catch (error) {
         console.error("Error fetching featured blog:", error);
@@ -40,7 +51,7 @@ const HeroSection = () => {
   }, []);
 
   if (!featured) return null;
-
+console.log(featured)
   return (
     <section className="relative bg-[#fafafa] rounded-2xl px-6 md:px-10 py-10 md:py-12">
       <Link
@@ -73,16 +84,12 @@ const HeroSection = () => {
               The Glamlink Journal
             </p>
 
-            {/* 🔥 FIXED (ACTUALLY SMALL NOW) */}
             <h1 className="font-display text-xl md:text-2xl leading-snug tracking-tight">
-              Inside Beauty, Business,{" "}
-              <span className="italic">and Influence</span>
+              {featured.title}
             </h1>
 
             <p className="text-muted-foreground text-sm leading-relaxed max-w-sm">
-              Stories from the forefront of the beauty industry. Featuring
-              professionals, emerging trends, marketing insights, and the
-              creators shaping what comes next.
+              {featured.short_description}
             </p>
           </div>
         </div>
