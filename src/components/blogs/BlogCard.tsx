@@ -3,6 +3,7 @@
 import Image from "next/image";
 
 interface BlogCardProps {
+  
   image?: string;
   category?: string;
   title: string;
