@@ -6,7 +6,6 @@ import PublicationSection from "@/components/mediaKit/PublicationSection";
 import DistributionSection from "@/components/mediaKit/DistributionSection";
 import AudienceSection from "@/components/mediaKit/AudienceSection";
 import FeatureOpportunitiesSection from "@/components/mediaKit/FeatureOpportunitiesSection";
-import AdvertisingSection from "@/components/mediaKit/AdvertisingSection";
 import CommunitySection from "@/components/mediaKit/CommunitySection";
 import WhySection from "@/components/mediaKit/WhySection";
 import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
@@ -126,8 +125,7 @@ export default function MediaKitPage() {
         <PublicationSection />
         <DistributionSection />
         <AudienceSection />
-        {/* <FeatureOpportunitiesSection /> */}
-        {/* <AdvertisingSection /> */}
+        <FeatureOpportunitiesSection />
         <CommunitySection />
         <WhySection />
         <ConditionalGetFeatured />

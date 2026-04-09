@@ -2,28 +2,29 @@
 
 import SectionLabel from "./shared/SectionLabel";
 import SectionHeading from "./shared/SectionHeading";
+import { Briefcase, Hospital, Sparkles, Users } from "lucide-react";
 
 export default function AudienceSection() {
   const audience = [
     {
       title: "Professionals",
       desc: "Beauty, wellness & aesthetic experts building authority",
-      icon: "💼",
+      icon: Briefcase,
     },
     {
       title: "Clinics",
       desc: "Medical spas and treatment-led businesses",
-      icon: "🏥",
+      icon: Hospital,
     },
     {
       title: "Brands",
       desc: "Skincare and aesthetic brands seeking visibility",
-      icon: "🧴",
+      icon: Sparkles,
     },
     {
       title: "Clients",
       desc: "People actively exploring treatments and providers",
-      icon: "✨",
+      icon: Users,
     },
   ];
 
@@ -45,22 +46,26 @@ export default function AudienceSection() {
 
       {/* CARDS */}
       <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {audience.map((item) => (
-          <div key={item.title} className="card-glamlink p-6 text-left group">
-            {/* ICON */}
-            <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-primary/10 text-lg mb-4">
-              {item.icon}
+        {audience.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <div key={item.title} className="card-glamlink p-6 text-left group">
+              {/* ICON */}
+              <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-primary/10 mb-4">
+                <Icon className="w-5 h-5 text-primary" />
+              </div>
+
+              {/* TITLE */}
+              <h3 className="text-base font-medium mb-1">{item.title}</h3>
+
+              {/* DESC */}
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {item.desc}
+              </p>
             </div>
-
-            {/* TITLE */}
-            <h3 className="text-base font-medium mb-1">{item.title}</h3>
-
-            {/* DESC */}
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {item.desc}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

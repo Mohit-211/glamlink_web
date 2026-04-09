@@ -2,26 +2,27 @@
 
 import SectionLabel from "./shared/SectionLabel";
 import SectionHeading from "./shared/SectionHeading";
+import { BookOpen, Printer, Globe, Smartphone } from "lucide-react";
 
 export default function DistributionSection() {
   const platforms = [
     {
-      icon: "📖",
+      icon: BookOpen,
       title: "Digital Magazine",
       description: "Interactive flipbook with clickable, immersive content",
     },
     {
-      icon: "🖨️",
+      icon: Printer,
       title: "Print Edition",
       description: "Placed at premium local touchpoints and industry hubs",
     },
     {
-      icon: "🌐",
+      icon: Globe,
       title: "Web Editorial",
       description: "Searchable articles designed for long-term discovery",
     },
     {
-      icon: "📱",
+      icon: Smartphone,
       title: "Social Media",
       description: "Amplified reach across curated audience channels",
     },
@@ -44,34 +45,37 @@ export default function DistributionSection() {
           </p>
         </div>
 
-        {/* RIGHT — BEAUTIFUL ROWS */}
+        {/* RIGHT */}
         <div className="space-y-6">
-          {platforms.map((p, i) => (
-            <div key={p.title} className="flex items-start gap-4 group">
-              {/* ICON */}
-              <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-primary/10 text-xl">
-                {p.icon}
-              </div>
+          {platforms.map((p, i) => {
+            const Icon = p.icon;
 
-              {/* CONTENT */}
-              <div className="flex-1 border-b border-border pb-5">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base md:text-lg font-medium">
-                    {p.title}
-                  </h3>
-
-                  {/* NUMBER */}
-                  <span className="text-xs text-muted-foreground">
-                    0{i + 1}
-                  </span>
+            return (
+              <div key={p.title} className="flex items-start gap-4 group">
+                {/* ICON */}
+                <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-primary/10">
+                  <Icon className="w-5 h-5 text-primary" />
                 </div>
 
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  {p.description}
-                </p>
+                {/* CONTENT */}
+                <div className="flex-1 border-b border-border pb-5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base md:text-lg font-medium">
+                      {p.title}
+                    </h3>
+
+                    <span className="text-xs text-muted-foreground">
+                      0{i + 1}
+                    </span>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                    {p.description}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
