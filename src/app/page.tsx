@@ -37,6 +37,14 @@ export const metadata: Metadata = {
     description:
       "Explore verified beauty professionals, book services, and discover beauty insights on Glamlink.",
     url: "https://glamlink.com",
+    images: [
+      {
+        url: "https://glamlink.com/oglayout.png", // ✅ absolute URL
+        width: 1200,
+        height: 630,
+        alt: "Glamlink Beauty & Wellness Platform",
+      },
+    ],
   },
 };
 

@@ -8,9 +8,12 @@ import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
 -------------------------------- */
 export const metadata: Metadata = {
   metadataBase: new URL("https://glamlink.com"),
+
   title: "Beauty Magazine & Industry Stories | Glamlink",
+
   description:
     "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
+
   keywords: [
     "beauty magazine",
     "beauty industry insights",
@@ -20,33 +23,42 @@ export const metadata: Metadata = {
     "salon professionals stories",
     "wellness industry content",
   ],
+
   alternates: {
-    canonical: "/magazine",
+    canonical: "https://glamlink.com/magazine",
   },
+
   openGraph: {
     type: "website",
-    url: "/magazine",
+    url: "https://glamlink.com/magazine", // ✅ FIXED
+
     title: "Glamlink Beauty Magazine",
+
     description:
       "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
+
     images: [
       {
-        url: "/assets/magazine-og.png", // 👈 YOU MUST CREATE THIS
+        url: "https://glamlink.com/assets/magazine-og.png", // ✅ FIXED
         width: 1200,
         height: 630,
         alt: "Glamlink Magazine - Beauty Trends and Industry Insights",
       },
     ],
+
     siteName: "Glamlink",
     locale: "en_IN",
   },
+
   twitter: {
     card: "summary_large_image",
     title: "Glamlink Beauty Magazine",
     description:
       "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
-    images: ["/assets/magazine-og.png"],
+
+    images: ["https://glamlink.com/assets/magazine-og.png"], // ✅ FIXED
   },
+
   robots: {
     index: true,
     follow: true,
