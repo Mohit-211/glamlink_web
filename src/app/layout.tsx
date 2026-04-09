@@ -85,6 +85,9 @@ export const metadata: Metadata = {
   },
 
   category: "business",
+  other: {
+  "google-adsense-account": "ca-pub-2781788508074958",
+},
 };
 
 /* -------------------------
