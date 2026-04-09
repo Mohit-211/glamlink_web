@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: "https://glamlink.com/assets/magazine-og.png", // ✅ FIXED
+        url: "https://glamlink.com/public/assets/magazine-og.png", // ✅ FIXED
         width: 1200,
         height: 630,
         alt: "Glamlink Magazine - Beauty Trends and Industry Insights",
@@ -56,9 +56,8 @@ export const metadata: Metadata = {
     description:
       "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
 
-    images: ["https://glamlink.com/assets/magazine-og.png"], // ✅ FIXED
+    images: ["https://glamlink.com/public/assets/magazine-og.png"], // ✅ FIXED
   },
-
   robots: {
     index: true,
     follow: true,
