@@ -1,11 +1,9 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getAllBlogs } from "@/api/Api";
 import slugify from "slugify";
-
 interface BlogPost {
   journal_author: any;
   journal_category: any;
@@ -15,30 +13,24 @@ interface BlogPost {
   cover_image: string;
   created_at: string;
 }
-
 const HeroSection = () => {
   const [featured, setFeatured] = useState<BlogPost | null>(null);
-
   console.log(featured, "featured");
-
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
         const response = await getAllBlogs();
-
         console.log(response, "response=====>");
-
         const blogs = Array.isArray(response?.data?.rows)
           ? response.data.rows
           : [];
-
         // ✅ Find Cover Feature blog
         const featuredBlog =
-        blogs.find(
-          (blog: BlogPost) =>
-            blog?.journal_category?.title?.trim().toLowerCase() ===
-            "cover feature"
-        ) || blogs[0];
+          blogs.find(
+            (blog: BlogPost) =>
+              blog?.journal_category?.title?.trim().toLowerCase() ===
+              "cover feature"
+          ) || blogs[0];
         if (featuredBlog) {
           setFeatured(featuredBlog);
         }
@@ -46,12 +38,10 @@ const HeroSection = () => {
         console.error("Error fetching featured blog:", error);
       }
     };
-
     fetchFeatured();
   }, []);
-
   if (!featured) return null;
-console.log(featured)
+  console.log(featured)
   return (
     <section className="relative bg-[#fafafa] rounded-2xl px-6 md:px-10 py-10 md:py-12">
       <Link
@@ -72,35 +62,29 @@ console.log(featured)
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
-
-            <span className="absolute top-3 left-3 bg-white/90 text-black text-[10px] px-2.5 py-1 rounded">
+            {/* <span className="absolute top-3 left-3 bg-white/90 text-black text-[10px] px-2.5 py-1 rounded">
               {featured?.journal_category?.title}
-            </span>
+            </span> */}
           </div>
-
           {/* CONTENT */}
           <div className="space-y-4">
-            <p className="text-[10px] uppercase tracking-widest text-primary">
-              The Glamlink Journal
+            <p className="text-[10px] uppercase tracking-widest text-primary mb-1">
+              {featured?.journal_category?.title}
             </p>
-
             <h1 className="font-display text-xl md:text-2xl leading-snug tracking-tight">
               {featured.title}
             </h1>
-
             <p className="text-muted-foreground text-sm leading-relaxed max-w-sm">
               {featured.short_description}
             </p>
           </div>
         </div>
-
         {/* BOTTOM */}
         <div className="pt-4 border-t border-border/40 space-y-2">
           {/* FEATURE TITLE */}
           <h2 className="font-display text-lg md:text-xl leading-snug text-primary group-hover:opacity-80 transition">
             {featured.title}
           </h2>
-
           {/* META */}
           <div className="flex items-center gap-3 text-xs">
             <span className="font-medium">
@@ -120,5 +104,4 @@ console.log(featured)
     </section>
   );
 };
-
 export default HeroSection;

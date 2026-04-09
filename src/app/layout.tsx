@@ -54,14 +54,16 @@ export const metadata: Metadata = {
       "Find trusted beauty and wellness professionals. Explore services, digital business cards, magazines, and insights from Glamlink.",
     url: "https://glamlink.com",
     siteName: "Glamlink",
+
     images: [
       {
-        url: "/og-image.png",
+        url: "https://glamlink.com/oglayout.png", // ✅ absolute URL
         width: 1200,
         height: 630,
         alt: "Glamlink Beauty & Wellness Platform",
       },
     ],
+
     locale: "en_US",
     type: "website",
   },
@@ -70,8 +72,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Glamlink | Beauty & Wellness Professionals",
     description:
-      "Discover beauty and wellness professionals, services, and industry insights on Glamlink.",
-    images: ["/og-image.png"],
+      "Discover beauty and wellness professionals, services, and industry insights on Glamlink",
+
+    images: ["https://glamlink.com/oglayout.png"], // ✅ same image
   },
 
   icons: {
@@ -85,9 +88,10 @@ export const metadata: Metadata = {
   },
 
   category: "business",
+
   other: {
-  "google-adsense-account": "ca-pub-2781788508074958",
-},
+    "google-adsense-account": "ca-pub-2781788508074958",
+  },
 };
 
 /* -------------------------

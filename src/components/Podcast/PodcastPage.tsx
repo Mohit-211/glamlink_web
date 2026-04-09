@@ -1,9 +1,7 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import PodcastImage from "../../../public/podcastcover.png";
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Video {
   id: string;
@@ -12,36 +10,32 @@ interface Video {
   publishedAt: string;
   duration?: string;
 }
-
 // ─── Config ───────────────────────────────────────────────────────────────────
 const YOUTUBE_API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY || "";
-
 const YOUTUBE_PLAYLIST_ID = "PLJPmuOJKw5YbrNAxnyi7SuQx9gNisadgY";
 const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@YourChannel";
 const YOUTUBE_PLAYLIST_URL = `https://www.youtube.com/playlist?list=${YOUTUBE_PLAYLIST_ID}`;
-const SPOTIFY_URL = "https://open.spotify.com/show/YOUR_SHOW_ID";
-const APPLE_PODCASTS_URL = "https://podcasts.apple.com/podcast/YOUR_PODCAST";
+const SPOTIFY_URL =
+  "https://open.spotify.com/show/0GEWcvRT3PFalAaN2faX4z?si=OWqOPcyZSZqNn7ATTnGJng";
+const APPLE_PODCASTS_URL =
+  "https://podcasts.apple.com/us/podcast/the-beauty-vault/id1885669168";
 const GUEST_FORM_URL = "https://your-guest-form-link.com";
-
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const YouTubeIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
   </svg>
 );
-
 const SpotifyIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
     <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
   </svg>
 );
-
 const ApplePodcastsIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
     <path d="M5.34 0A5.328 5.328 0 0 0 0 5.34v13.32A5.328 5.328 0 0 0 5.34 24h13.32A5.328 5.328 0 0 0 24 18.66V5.34A5.328 5.328 0 0 0 18.66 0zm7.006 2.06c3.106 0 5.633 1.02 7.585 3.026 1.773 1.802 2.7 4.198 2.7 6.942 0 5.747-3.9 9.847-9.378 9.847-5.478 0-9.385-4.1-9.385-9.847 0-2.744.927-5.14 2.7-6.942 1.958-2.006 4.477-3.026 7.583-3.026zm0 1.99c-2.617 0-4.73.882-6.228 2.55-1.397 1.558-2.13 3.64-2.13 5.993 0 4.835 3.136 7.96 7.758 7.96 4.623 0 7.752-3.125 7.752-7.96 0-2.354-.733-4.435-2.13-5.993-1.498-1.668-3.61-2.55-6.22-2.55zm.008 3.08c1.65 0 2.99 1.34 2.99 2.99s-1.34 2.99-2.99 2.99-2.99-1.34-2.99-2.99 1.34-2.99 2.99-2.99zm0 1.5a1.49 1.49 0 1 0 0 2.98 1.49 1.49 0 0 0 0-2.98zm0 4.79c2.26 0 4.09 1.83 4.09 4.09h-1.5a2.59 2.59 0 0 0-2.59-2.59 2.59 2.59 0 0 0-2.59 2.59H9.264c0-2.26 1.83-4.09 4.09-4.09z" />
   </svg>
 );
-
 // ─── Fallback Episodes ─────────────────────────────────────────────────────────
 const FALLBACK_EPISODES: Video[] = [
   {
@@ -69,24 +63,19 @@ const FALLBACK_EPISODES: Video[] = [
     publishedAt: "2025-01-22",
   },
 ];
-
 // ─── Fetch Helper — respects playlist position ordering ───────────────────────
 async function fetchPlaylistVideos(
   playlistId: string
 ): Promise<{ videos: Video[]; totalCount: number }> {
   if (!YOUTUBE_API_KEY) return { videos: [], totalCount: 0 };
-
   const allItems: Video[] = [];
   let pageToken = "";
-
   // Page through all results to get the full playlist in order
   do {
     const pageParam = pageToken ? `&pageToken=${pageToken}` : "";
     const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}${pageParam}`;
-
     const res = await fetch(url);
     if (!res.ok) break;
-
     const data = await res.json();
     const items: Video[] = (data.items || [])
       // Filter out deleted/private videos
@@ -106,18 +95,15 @@ async function fetchPlaylistVideos(
           "",
         publishedAt: item.snippet.publishedAt,
       }));
-
     allItems.push(...items);
     pageToken = data.nextPageToken || "";
   } while (pageToken);
-
   // totalCount = real playlist length; videos = last 6 reversed so newest is first
   return {
     videos: [...allItems].slice(-6),
     totalCount: allItems.length,
   };
 }
-
 // ─── Video Modal ──────────────────────────────────────────────────────────────
 function VideoModal({
   video,
@@ -139,7 +125,6 @@ function VideoModal({
       document.body.style.overflow = "";
     };
   }, [onClose]);
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
@@ -161,7 +146,6 @@ function VideoModal({
           </svg>
           Close
         </button>
-
         {/* 16:9 iframe wrapper */}
         <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
           <iframe
@@ -173,7 +157,6 @@ function VideoModal({
             style={{ border: "none" }}
           />
         </div>
-
         {/* Title below player */}
         <p
           className="mt-4 text-sm font-medium text-white/80 text-center leading-snug"
@@ -184,7 +167,6 @@ function VideoModal({
     </div>
   );
 }
-
 // ─── Episode Card ──────────────────────────────────────────────────────────────
 function EpisodeCard({
   video,
@@ -200,7 +182,6 @@ function EpisodeCard({
   // Use real playlist episode number if provided, else fallback to position
   const episodeNum = String(episodeNumber ?? index + 1).padStart(2, "0");
   const isFallback = video.id.startsWith("fallback");
-
   return (
     <div className="group block">
       {/* Thumbnail */}
@@ -224,7 +205,6 @@ function EpisodeCard({
             </span>
           </div>
         )}
-
         {/* Play overlay — only for real videos */}
         {!isFallback && (
           <div
@@ -242,7 +222,6 @@ function EpisodeCard({
           </div>
         )}
       </div>
-
       {/* Meta */}
       <div>
         <span
@@ -261,14 +240,12 @@ function EpisodeCard({
     </div>
   );
 }
-
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function PodcastMain() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [activeVideo, setActiveVideo] = useState<Video | null>(null);
-
   useEffect(() => {
     fetchPlaylistVideos(YOUTUBE_PLAYLIST_ID)
       .then(({ videos, totalCount }) => {
@@ -277,10 +254,8 @@ export default function PodcastMain() {
       })
       .finally(() => setLoading(false));
   }, []);
-
   const finalVideos = videos.length > 0 ? videos : FALLBACK_EPISODES;
   const episodeCount = totalCount > 0 ? totalCount : FALLBACK_EPISODES.length;
-
   return (
     <main
       className="min-h-screen text-[hsl(210_30%_10%)]"
@@ -289,11 +264,9 @@ export default function PodcastMain() {
         fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif",
       }}
     >
-
       {/* ── HERO ───────────────────────────────────────────────────────────── */}
       <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-20">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-12 md:gap-16">
-
           {/* Cover Art */}
           <div className="flex-shrink-0">
             <div className="w-44 h-44 md:w-56 md:h-56 rounded-2xl overflow-hidden relative shadow-[0_8px_32px_-8px_hsl(210_30%_10%/0.16)] border border-[hsl(204_14%_88%)]">
@@ -304,7 +277,6 @@ export default function PodcastMain() {
               />
             </div>
           </div>
-
           {/* Text + Buttons */}
           <div className="flex-1 text-center md:text-left">
             {/* Glamlink-style teal eyebrow label */}
@@ -314,21 +286,18 @@ export default function PodcastMain() {
             >
               A Podcast by Glamlink
             </p>
-
             <h1
               className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-4 leading-[1.05]"
               style={{ color: "hsl(210 30% 10%)" }}
             >
               The Beauty Vault
             </h1>
-
             <p
               className="text-sm md:text-base font-normal leading-relaxed max-w-sm mb-8 mx-auto md:mx-0"
               style={{ color: "hsl(210 12% 48%)" }}
             >
               Conversations with the professionals shaping beauty&nbsp;&amp;&nbsp;wellness.
             </p>
-
             {/* Platform Buttons */}
             <div className="flex flex-wrap gap-3 justify-center md:justify-start">
               <a
@@ -341,7 +310,6 @@ export default function PodcastMain() {
                 <YouTubeIcon />
                 YouTube
               </a>
-
               <a
                 href={SPOTIFY_URL}
                 target="_blank"
@@ -352,7 +320,6 @@ export default function PodcastMain() {
                 <SpotifyIcon />
                 Spotify
               </a>
-
               <a
                 href={APPLE_PODCASTS_URL}
                 target="_blank"
@@ -363,7 +330,6 @@ export default function PodcastMain() {
                 <ApplePodcastsIcon />
                 Apple Podcasts
               </a>
-
               {/* Glamlink-style teal CTA pill */}
               <a
                 href={GUEST_FORM_URL}
@@ -378,12 +344,10 @@ export default function PodcastMain() {
           </div>
         </div>
       </section>
-
       {/* ── DIVIDER ────────────────────────────────────────────────────────── */}
       <div className="max-w-5xl mx-auto px-6">
         <div className="border-t border-[hsl(204_14%_88%)]" />
       </div>
-
       {/* ── Episodes Grid ─────────────────────────────────────────────────── */}
       <section className="py-20 px-6 max-w-5xl mx-auto">
         <div className="flex items-baseline justify-between mb-12">
@@ -408,7 +372,6 @@ export default function PodcastMain() {
             New episodes weekly
           </p>
         </div>
-
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
             {[...Array(6)].map((_, i) => (
@@ -426,7 +389,6 @@ export default function PodcastMain() {
             ))}
           </div>
         )}
-
         {/* View All */}
         <div className="mt-16 text-center">
           <a
@@ -449,7 +411,6 @@ export default function PodcastMain() {
           </a>
         </div>
       </section>
-
       {/* ── About Strip ───────────────────────────────────────────────────── */}
       <section
         className="py-16 px-6"
@@ -491,7 +452,6 @@ export default function PodcastMain() {
           </div>
         </div>
       </section>
-
       {/* ── Video Modal ───────────────────────────────────────────────────── */}
       {activeVideo && (
         <VideoModal video={activeVideo} onClose={() => setActiveVideo(null)} />
