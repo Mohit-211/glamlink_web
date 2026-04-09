@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     title: "Grow Your Beauty Business | Glamlink",
     description:
       "Join Glamlink and showcase your beauty expertise. Connect with new clients, grow your brand, and manage bookings with powerful tools.",
-    url: "https://glamlink.com/for-professionals",
+    url: "https://glamlink.net/for-professionals",
   },
 };
 
@@ -50,13 +50,13 @@ const webpageSchema = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Glamlink For Beauty Professionals",
-  url: "https://glamlink.com/for-professionals",
+  url: "https://glamlink.net/for-professionals",
   description:
     "A platform for beauty and wellness professionals to grow their brand, attract clients, and manage services through Glamlink.",
   isPartOf: {
     "@type": "WebSite",
     name: "Glamlink",
-    url: "https://glamlink.com",
+    url: "https://glamlink.net",
   },
 };
 

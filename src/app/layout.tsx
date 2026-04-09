@@ -13,7 +13,7 @@ import "../styles/globals.css"
 --------------------------*/
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://glamlink.com"),
+  metadataBase: new URL("https://glamlink.net"),
 
   title: {
     default: "Glamlink | Discover Beauty & Wellness Professionals",
@@ -52,12 +52,12 @@ export const metadata: Metadata = {
     title: "Glamlink | Discover Beauty & Wellness Professionals",
     description:
       "Find trusted beauty and wellness professionals. Explore services, digital business cards, magazines, and insights from Glamlink.",
-    url: "https://glamlink.com",
+    url: "https://glamlink.net",
     siteName: "Glamlink",
 
     images: [
       {
-        url: "https://glamlink.com/oglayout.png", // ✅ absolute URL
+        url: "https://glamlink.net/oglayout.png", // ✅ absolute URL
         width: 1200,
         height: 630,
         alt: "Glamlink Beauty & Wellness Platform",
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     description:
       "Discover beauty and wellness professionals, services, and industry insights on Glamlink",
 
-    images: ["https://glamlink.com/oglayout.png"], // ✅ same image
+    images: ["https://glamlink.net/oglayout.png"], // ✅ same image
   },
 
   icons: {
@@ -84,7 +84,7 @@ export const metadata: Metadata = {
   },
 
   alternates: {
-    canonical: "https://glamlink.com",
+    canonical: "https://glamlink.net",
   },
 
   category: "business",
@@ -141,8 +141,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "Glamlink",
-              url: "https://glamlink.com",
-              logo: "https://glamlink.com/favicon.png",
+              url: "https://glamlink.net",
+              logo: "https://glamlink.net/favicon.png",
               sameAs: [
                 "https://instagram.com/",
                 "https://facebook.com/",

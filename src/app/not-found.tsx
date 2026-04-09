@@ -30,11 +30,11 @@ export default async function NotFound() {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: "404 Page Not Found",
-    url: `https://glamlink.com${pathname}`,
+    url: `https://glamlink.net${pathname}`,
     isPartOf: {
       "@type": "WebSite",
       name: "Glamlink",
-      url: "https://glamlink.com",
+      url: "https://glamlink.net",
     },
   };
 

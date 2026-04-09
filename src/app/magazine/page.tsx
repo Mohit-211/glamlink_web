@@ -7,7 +7,7 @@ import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
    Page Metadata
 -------------------------------- */
 export const metadata: Metadata = {
-  metadataBase: new URL("https://glamlink.com"),
+  metadataBase: new URL("https://glamlink.net"),
 
   title: "Beauty Magazine & Industry Stories | Glamlink",
 
@@ -25,12 +25,12 @@ export const metadata: Metadata = {
   ],
 
   alternates: {
-    canonical: "https://glamlink.com/magazine",
+    canonical: "https://glamlink.net/magazine",
   },
 
   openGraph: {
     type: "website",
-    url: "https://glamlink.com/magazine", // ✅ FIXED
+    url: "https://glamlink.net/magazine", // ✅ FIXED
 
     title: "Glamlink Beauty Magazine",
 
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: "https://glamlink.com/public/assets/magazine-og.png", // ✅ FIXED
+        url: "https://glamlink.net/public/assets/magazine-og.png", // ✅ FIXED
         width: 1200,
         height: 630,
         alt: "Glamlink Magazine - Beauty Trends and Industry Insights",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     description:
       "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
 
-    images: ["https://glamlink.com/public/assets/magazine-og.png"], // ✅ FIXED
+    images: ["https://glamlink.net/public/assets/magazine-og.png"], // ✅ FIXED
   },
   robots: {
     index: true,
@@ -72,11 +72,11 @@ const magazineSchema = {
   name: "Glamlink Magazine",
   description:
     "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
-  url: "https://glamlink.com/magazine",
+  url: "https://glamlink.net/magazine",
   publisher: {
     "@type": "Organization",
     name: "Glamlink",
-    url: "https://glamlink.com",
+    url: "https://glamlink.net",
   },
 };
 const collectionSchema = {
@@ -85,7 +85,7 @@ const collectionSchema = {
   name: "Glamlink Magazine Issues",
   description:
     "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
-  url: "https://glamlink.com/magazine",
+  url: "https://glamlink.net/magazine",
 };
 /* --------------------------------
    Page

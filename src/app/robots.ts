@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://glamlink.com/sitemap.xml",
+    sitemap: "https://glamlink.net/sitemap.xml",
   };
 }

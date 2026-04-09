@@ -33,7 +33,7 @@ export default function DigitalApplyPage() {
     provider: {
       "@type": "Organization",
       name: "Glamlink",
-      url: "https://glamlink.com",
+      url: "https://glamlink.net",
     },
     areaServed: {
       "@type": "Country",

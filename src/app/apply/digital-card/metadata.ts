@@ -24,6 +24,6 @@ export const metadata: Metadata = {
     title: "Apply for Glamlink Digital Access Card",
     description:
       "Create your Glamlink Digital Access Card and showcase your beauty services to clients.",
-    url: "https://glamlink.com/apply/digital-card",
+    url: "https://glamlink.net/apply/digital-card",
   },
 };

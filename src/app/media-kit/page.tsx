@@ -27,17 +27,17 @@ export const metadata: Metadata = {
     "beauty publication advertising",
   ],
   alternates: {
-    canonical: "https://glamlink.com/media-kit",
+    canonical: "https://glamlink.net/media-kit",
   },
   openGraph: {
     title: "Media Kit | The Glamlink Edit",
     description:
       "Feature your brand, clinic, or expertise in The Glamlink Edit — a modern beauty & wellness publication.",
-    url: "https://glamlink.com/media-kit",
+    url: "https://glamlink.net/media-kit",
     siteName: "Glamlink",
     images: [
       {
-        url: "https://glamlink.com/default-blog.jpg",
+        url: "https://glamlink.net/default-blog.jpg",
         width: 1200,
         height: 630,
         alt: "The Glamlink Edit Media Kit",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     title: "Media Kit | The Glamlink Edit",
     description:
       "Advertise and get featured in The Glamlink Edit — built for visibility and real business growth.",
-    images: ["https://glamlink.com/default-blog.jpg"],
+    images: ["https://glamlink.net/default-blog.jpg"],
   },
   robots: {
     index: true,
@@ -67,13 +67,13 @@ const pageSchema = {
   name: "Media Kit | The Glamlink Edit",
   description:
     "Advertising and feature opportunities in The Glamlink Edit beauty & wellness publication.",
-  url: "https://glamlink.com/media-kit",
+  url: "https://glamlink.net/media-kit",
   publisher: {
     "@type": "Organization",
     name: "Glamlink",
     logo: {
       "@type": "ImageObject",
-      url: "https://glamlink.com/favicon.png",
+      url: "https://glamlink.net/favicon.png",
     },
   },
 };
@@ -86,19 +86,19 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       position: 1,
       name: "Home",
-      item: "https://glamlink.com",
+      item: "https://glamlink.net",
     },
     {
       "@type": "ListItem",
       position: 2,
       name: "Magazine",
-      item: "https://glamlink.com/magazine",
+      item: "https://glamlink.net/magazine",
     },
     {
       "@type": "ListItem",
       position: 3,
       name: "Media Kit",
-      item: "https://glamlink.com/media-kit",
+      item: "https://glamlink.net/media-kit",
     },
   ],
 };

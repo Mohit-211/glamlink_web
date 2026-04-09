@@ -14,7 +14,7 @@ import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
 -------------------------------- */
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://glamlink.com"),
+  metadataBase: new URL("https://glamlink.net"),
 
   title: "Discover Beauty Professionals Near You",
 
@@ -38,10 +38,10 @@ export const metadata: Metadata = {
     title: "Discover Beauty Professionals Near You | Glamlink",
     description:
       "Explore verified beauty professionals, book services, and discover beauty insights on Glamlink.",
-    url: "https://glamlink.com",
+    url: "https://glamlink.net",
     images: [
       {
-        url: "https://glamlink.com/assets/oglayout.png",
+        url: "https://glamlink.net/assets/oglayout.png",
         width: 1200,
         height: 630,
         alt: "Glamlink Beauty & Wellness Platform",
@@ -58,10 +58,10 @@ const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Glamlink",
-  url: "https://glamlink.com",
+  url: "https://glamlink.net",
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://glamlink.com/directory?search={search_term_string}",
+    target: "https://glamlink.net/directory?search={search_term_string}",
     "query-input": "required name=search_term_string",
   },
 };

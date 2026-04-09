@@ -37,9 +37,9 @@ export async function generateMetadata({
     return { title: "Article Not Found | Glamlink" };
   }
 
-  const articleUrl = `https://glamlink.com/journal/${id}/${title}`;
+  const articleUrl = `https://glamlink.net/journal/${id}/${title}`;
   const imageUrl =
-    article.cover_image || "https://glamlink.com/default-blog.jpg";
+    article.cover_image || "https://glamlink.net/default-blog.jpg";
 
   return {
     title: article.title,
@@ -88,7 +88,7 @@ export default async function Article({
     return <div className="text-center py-20">Article not found.</div>;
   }
 
-  const articleUrl = `https://glamlink.com/journal/${id}/${title}`;
+  const articleUrl = `https://glamlink.net/journal/${id}/${title}`;
   const imageUrl = article.cover_image || "/assets/fallback-blog.jpg";
 
   const formattedDate = article.created_at
@@ -114,7 +114,7 @@ export default async function Article({
       name: "Glamlink",
       logo: {
         "@type": "ImageObject",
-        url: "https://glamlink.com/favicon.png",
+        url: "https://glamlink.net/favicon.png",
       },
     },
     datePublished: article.created_at,
@@ -129,13 +129,13 @@ export default async function Article({
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://glamlink.com",
+        item: "https://glamlink.net",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Journal",
-        item: "https://glamlink.com/journal",
+        item: "https://glamlink.net/journal",
       },
       {
         "@type": "ListItem",

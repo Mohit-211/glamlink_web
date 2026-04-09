@@ -33,11 +33,11 @@ const flipbookUrl =
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     name: issue.title,
-    url: `https://glamlink.com/magazine/${issue.slug}/digital`,
+    url: `https://glamlink.net/magazine/${issue.slug}/digital`,
     isPartOf: {
       "@type": "CreativeWorkSeries",
       name: "Glamlink Magazine",
-      url: "https://glamlink.com/magazine",
+      url: "https://glamlink.net/magazine",
     },
     publisher: {
       "@type": "Organization",

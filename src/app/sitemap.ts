@@ -6,7 +6,7 @@ import { issues2025, issues2026 } from "@/data/issues";
 import { getAllBlogs } from "@/api/Api";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://glamlink.com";
+  const baseUrl = "https://glamlink.net";
   const appDir = path.join(process.cwd(), "src/app");
 
   /* ----------------------------------

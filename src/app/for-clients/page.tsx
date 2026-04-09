@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: "Discover & Book Beauty Professionals | Glamlink",
     description:
       "Browse verified beauty experts, discover services, and book professionals easily with Glamlink.",
-    url: "https://glamlink.com/for-clients",
+    url: "https://glamlink.net/for-clients",
   },
 };
 
@@ -48,13 +48,13 @@ const webpageSchema = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Glamlink For Clients",
-  url: "https://glamlink.com/for-clients",
+  url: "https://glamlink.net/for-clients",
   description:
     "A platform for clients to discover, explore, and book trusted beauty and wellness professionals.",
   isPartOf: {
     "@type": "WebSite",
     name: "Glamlink",
-    url: "https://glamlink.com",
+    url: "https://glamlink.net",
   },
 };
 
