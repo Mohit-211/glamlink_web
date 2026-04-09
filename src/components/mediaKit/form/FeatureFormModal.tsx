@@ -1,145 +1,78 @@
 "use client";
 import { useState } from "react";
-import CoverFeatureForm from "./CoverFeatureForm";
-import ProSpotlightForm from "./ProSpotlightForm";
-import TopTreatmentForm from "./TopTreatmentForm";
-import InspiringStoriesForm from "./InspiringStoriesForm";
-import BusinessSpotlightAdForm from "./BusinessSpotlightAdForm";
 
 interface Props {
     onClose: () => void;
 }
 
-const FEATURE_TYPES = [
+const INTEREST_OPTIONS = [
     "Cover Feature",
     "Pro Spotlight",
     "Top Treatment",
     "Inspiring Stories",
-    "Business Spotlight Ad",
+    "Innovation Feature",
 ] as const;
 
-type FeatureType = (typeof FEATURE_TYPES)[number];
-
-type FieldKey =
-    | "name"
-    | "brand"
-    | "profession"
-    | "location"
-    | "bookingLink"
-    | "social";
+type InterestOption = (typeof INTEREST_OPTIONS)[number];
 
 interface FormState {
     name: string;
-    brand: string;
-    profession: string;
-    location: string;
-    bookingLink: string;
-    social: string;
-    featureType: FeatureType | "";
+    specialty: string;
+    email: string;
+    phone: string;
+    city: string;
+    interest: InterestOption | "";
 }
 
-const FIELDS: { key: FieldKey; label: string; required?: boolean }[] = [
-    {
-        key: "name",
-        label: "Name as you'd like it to appear in the feature?",
-        required: true,
-    },
-    {
-        key: "brand",
-        label: "Business/Brand Name",
-        required: true,
-    },
-    {
-        key: "profession",
-        label: "Profession/Specialty (Founder, Wellness Practitioner, Medspa Owner, Nurse Injector, Esthetician, Hair Brand, PMU Artist, etc)",
-        required: true,
-    },
-    {
-        key: "location",
-        label: "City & State you are based in",
-        required: true,
-    },
-    {
-        key: "bookingLink",
-        label: "Where can readers book your services or shop your products? Paste your direct link below.",
-        required: true,
-    },
-    {
-        key: "social",
-        label: "What are your social handles? Instagram? Tiktok?",
-        required: true,
-    },
-];
+type FieldKey = keyof FormState;
+
+const INITIAL_FORM: FormState = {
+    name: "",
+    specialty: "",
+    email: "",
+    phone: "",
+    city: "",
+    interest: "",
+};
 
 export default function FeatureFormModal({ onClose }: Props) {
-    const [step, setStep] = useState<1 | 2 | 3>(1);
-    const [form, setForm] = useState<FormState>({
-        name: "",
-        brand: "",
-        profession: "",
-        location: "",
-        bookingLink: "",
-        social: "",
-        featureType: "",
-    });
-    const [touched, setTouched] = useState<Partial<Record<FieldKey | "featureType", boolean>>>({});
+    const [step, setStep] = useState<1 | 2>(1);
+    const [form, setForm] = useState<FormState>(INITIAL_FORM);
+    const [touched, setTouched] = useState<Partial<Record<FieldKey, boolean>>>({});
     const [submitAttempted, setSubmitAttempted] = useState(false);
 
-    const handleChange = (key: keyof FormState, value: string) => {
+    const handleChange = (key: FieldKey, value: string) => {
         setForm((prev) => ({ ...prev, [key]: value }));
     };
 
-    const handleBlur = (key: FieldKey | "featureType") => {
+    const handleBlur = (key: FieldKey) => {
         setTouched((prev) => ({ ...prev, [key]: true }));
     };
 
     const handleClear = () => {
-        setForm({
-            name: "",
-            brand: "",
-            profession: "",
-            location: "",
-            bookingLink: "",
-            social: "",
-            featureType: "",
-        });
+        setForm(INITIAL_FORM);
         setTouched({});
         setSubmitAttempted(false);
     };
 
-    const isFieldInvalid = (key: FieldKey | "featureType") => {
+    const isEmailValid = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
+    const isFieldInvalid = (key: FieldKey): boolean => {
         const value = form[key];
+        if (key === "email") return !isEmailValid(value);
         return !value.trim();
     };
 
-    const showError = (key: FieldKey | "featureType") => {
-        return (touched[key] || submitAttempted) && isFieldInvalid(key);
-    };
+    const showError = (key: FieldKey) =>
+        (touched[key] || submitAttempted) && isFieldInvalid(key);
 
-    const isFormValid = () => {
-        const allFieldsFilled = FIELDS.every(({ key }) => form[key].trim() !== "");
-        return allFieldsFilled && form.featureType !== "";
-    };
+    const isFormValid = () =>
+        (Object.keys(INITIAL_FORM) as FieldKey[]).every((key) => !isFieldInvalid(key));
 
-    const handleNext = () => {
+    const handleSubmit = () => {
         setSubmitAttempted(true);
         if (!isFormValid()) return;
         setStep(2);
-    };
-
-    const handleSubmit = () => setStep(3);
-
-    const renderFeatureForm = () => {
-        const commonProps = { onBack: () => setStep(1), onSubmit: handleSubmit };
-        switch (form.featureType) {
-            case "Cover Feature":         return <CoverFeatureForm {...commonProps} />;
-            case "Pro Spotlight":         return <ProSpotlightForm {...commonProps} />;
-            case "Top Treatment":         return <TopTreatmentForm {...commonProps} />;
-            case "Inspiring Stories":     return <InspiringStoriesForm {...commonProps} />;
-            case "Business Spotlight Ad": return <BusinessSpotlightAdForm {...commonProps} />;
-            default:
-                return <p style={{ fontSize: 14, color: "#888" }}>Please go back and select a feature type.</p>;
-        }
     };
 
     return (
@@ -189,93 +122,156 @@ export default function FeatureFormModal({ onClose }: Props) {
                     </button>
                 </div>
 
-                {/* STEP 1 */}
+                {/* STEP 1 — Form */}
                 {step === 1 && (
-                    <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px", display: "flex", flexDirection: "column", gap: 10 }}>
-
+                    <div style={{
+                        flex: 1, overflowY: "auto", padding: "20px 24px",
+                        display: "flex", flexDirection: "column", gap: 10,
+                    }}>
                         <p style={{ fontSize: 13, color: "#444", lineHeight: 1.6, marginBottom: 4 }}>
                             Apply to be featured in The Glamlink Edit, our editorial platform highlighting
                             standout beauty and wellness professionals. Select the type of feature you'd
                             like to be considered for — from Cover Feature and expert interviews to
-                            trending Treatments, or a powerful client impact moments.
+                            trending Treatments, or powerful client impact moments.
                         </p>
 
                         <p style={{ fontSize: 12, color: "#d93025", marginBottom: 4 }}>
                             * Indicates required question
                         </p>
 
-                        {/* Text fields */}
-                        {FIELDS.map(({ key, label }) => (
+                        {/* Name + Specialty */}
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                             <QuestionCard
-                                key={key}
-                                label={label}
+                                label="Name as you'd like it to appear"
                                 required
-                                error={showError(key) ? "This field is required." : undefined}
+                                error={showError("name") ? "This field is required." : undefined}
                             >
                                 <AutoTextarea
-                                    value={form[key]}
-                                    onChange={(v) => handleChange(key, v)}
-                                    onBlur={() => handleBlur(key)}
-                                    hasError={showError(key)}
+                                    value={form.name}
+                                    onChange={(v) => handleChange("name", v)}
+                                    onBlur={() => handleBlur("name")}
+                                    hasError={showError("name")}
                                 />
                             </QuestionCard>
-                        ))}
 
-                        {/* Feature type radio */}
+                            <QuestionCard
+                                label="Specialty"
+                                required
+                                error={showError("specialty") ? "This field is required." : undefined}
+                            >
+                                <AutoTextarea
+                                    value={form.specialty}
+                                    placeholder="Nurse Injector, Esthetician…"
+                                    onChange={(v) => handleChange("specialty", v)}
+                                    onBlur={() => handleBlur("specialty")}
+                                    hasError={showError("specialty")}
+                                />
+                            </QuestionCard>
+                        </div>
+
+                        {/* Email + Phone */}
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                            <QuestionCard
+                                label="Email"
+                                required
+                                error={showError("email") ? "Please enter a valid email." : undefined}
+                            >
+                                <AutoTextarea
+                                    value={form.email}
+                                    placeholder="jane@example.com"
+                                    onChange={(v) => handleChange("email", v)}
+                                    onBlur={() => handleBlur("email")}
+                                    hasError={showError("email")}
+                                />
+                            </QuestionCard>
+
+                            <QuestionCard
+                                label="Phone Number"
+                                required
+                                error={showError("phone") ? "This field is required." : undefined}
+                            >
+                                <AutoTextarea
+                                    value={form.phone}
+                                    placeholder="+1 555 000 0000"
+                                    onChange={(v) => handleChange("phone", v)}
+                                    onBlur={() => handleBlur("phone")}
+                                    hasError={showError("phone")}
+                                />
+                            </QuestionCard>
+                        </div>
+
+                        {/* City */}
                         <QuestionCard
-                            label="What type of feature are you applying for?"
+                            label="City"
                             required
-                            error={showError("featureType") ? "Please select a feature type." : undefined}
+                            error={showError("city") ? "This field is required." : undefined}
                         >
-                            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
-                                {FEATURE_TYPES.map((type) => (
-                                    <label key={type} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, cursor: "pointer" }}>
-                                        <input
-                                            type="radio"
-                                            name="featureType"
-                                            checked={form.featureType === type}
-                                            onChange={() => {
-                                                handleChange("featureType", type);
-                                                handleBlur("featureType");
-                                            }}
-                                            style={{ width: 16, height: 16, accentColor: "#5b4bb5", cursor: "pointer" }}
-                                        />
-                                        {type}
-                                    </label>
+                            <AutoTextarea
+                                value={form.city}
+                                placeholder="Los Angeles, CA"
+                                onChange={(v) => handleChange("city", v)}
+                                onBlur={() => handleBlur("city")}
+                                hasError={showError("city")}
+                            />
+                        </QuestionCard>
+
+                        {/* Interest dropdown */}
+                        <QuestionCard
+                            label="What are you interested in?"
+                            required
+                            error={showError("interest") ? "Please select a feature type." : undefined}
+                        >
+                            <select
+                                value={form.interest}
+                                onChange={(e) => {
+                                    handleChange("interest", e.target.value);
+                                    handleBlur("interest");
+                                }}
+                                onBlur={() => handleBlur("interest")}
+                                style={{
+                                    width: "100%",
+                                    border: "none",
+                                    borderBottom: `1.5px solid ${showError("interest") ? "#d93025" : "#c8c7c0"}`,
+                                    borderRadius: 0,
+                                    padding: "5px 0",
+                                    fontSize: 14,
+                                    color: form.interest ? "#1a1a1a" : "#999",
+                                    background: "transparent",
+                                    outline: "none",
+                                    fontFamily: "inherit",
+                                    cursor: "pointer",
+                                    appearance: "auto",
+                                }}
+                            >
+                                <option value="" disabled>Select a feature type…</option>
+                                {INTEREST_OPTIONS.map((opt) => (
+                                    <option key={opt} value={opt}>{opt}</option>
                                 ))}
-                            </div>
+                            </select>
                         </QuestionCard>
 
                         {/* Actions */}
                         <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
-                            
-                            <button onClick={handleNext} style={{ ...primaryBtnStyle }}>
-                                Next
+                            <button onClick={handleSubmit} style={primaryBtnStyle}>
+                                Submit
                             </button>
                             <button onClick={handleClear} style={clearBtnStyle}>Clear form</button>
                         </div>
                     </div>
                 )}
 
-                {/* STEP 2 */}
+                {/* STEP 2 — Thank You */}
                 {step === 2 && (
-                    <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px" }}>
-                        {renderFeatureForm()}
-                    </div>
-                )}
-
-                {/* STEP 3 — Thank You */}
-                {step === 3 && (
                     <div style={{
                         flex: 1, overflowY: "auto", padding: 40,
                         textAlign: "center", display: "flex", flexDirection: "column",
                         alignItems: "center", justifyContent: "center", gap: 16,
                     }}>
                         <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>
-                            Thank You For Applying ✨
+                            Thank You! ✨
                         </h3>
                         <p style={{ fontSize: 14, color: "#888", margin: 0 }}>
-                            Please allow 1–3 business days for review.
+                            We'll review your submission and reach out shortly.
                         </p>
                         <button onClick={onClose} style={{ ...primaryBtnStyle, marginTop: 8 }}>
                             Close
@@ -326,16 +322,18 @@ function AutoTextarea({
     onChange,
     onBlur,
     hasError,
+    placeholder,
 }: {
     value: string;
     onChange: (v: string) => void;
     onBlur?: () => void;
     hasError?: boolean;
+    placeholder?: string;
 }) {
     return (
         <textarea
             value={value}
-            placeholder="Your answer"
+            placeholder={placeholder ?? "Your answer"}
             rows={1}
             onChange={(e) => onChange(e.target.value)}
             onBlur={onBlur}

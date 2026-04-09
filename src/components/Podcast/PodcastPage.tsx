@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import PodcastImage from "../../../public/podcastcover.png";
-import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Video {
@@ -71,75 +70,117 @@ const FALLBACK_EPISODES: Video[] = [
   },
 ];
 
-// ─── Fetch Helper ──────────────────────────────────────────────────────────────
-async function fetchPlaylistVideos(playlistId: string): Promise<Video[]> {
-  if (!YOUTUBE_API_KEY) return [];
-  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=6&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) return [];
-  const data = await res.json();
-  return (data.items || []).map((item: any) => ({
-    id: item.snippet.resourceId.videoId,
-    title: item.snippet.title,
-    thumbnail:
-      item.snippet.thumbnails?.maxres?.url ||
-      item.snippet.thumbnails?.high?.url ||
-      item.snippet.thumbnails?.medium?.url ||
-      "",
-    publishedAt: item.snippet.publishedAt,
-  }));
+// ─── Fetch Helper — respects playlist position ordering ───────────────────────
+async function fetchPlaylistVideos(
+  playlistId: string
+): Promise<{ videos: Video[]; totalCount: number }> {
+  if (!YOUTUBE_API_KEY) return { videos: [], totalCount: 0 };
+
+  const allItems: Video[] = [];
+  let pageToken = "";
+
+  // Page through all results to get the full playlist in order
+  do {
+    const pageParam = pageToken ? `&pageToken=${pageToken}` : "";
+    const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}${pageParam}`;
+
+    const res = await fetch(url);
+    if (!res.ok) break;
+
+    const data = await res.json();
+    const items: Video[] = (data.items || [])
+      // Filter out deleted/private videos
+      .filter(
+        (item: any) =>
+          item.snippet?.resourceId?.videoId &&
+          item.snippet.title !== "Deleted video" &&
+          item.snippet.title !== "Private video"
+      )
+      .map((item: any) => ({
+        id: item.snippet.resourceId.videoId,
+        title: item.snippet.title,
+        thumbnail:
+          item.snippet.thumbnails?.maxres?.url ||
+          item.snippet.thumbnails?.high?.url ||
+          item.snippet.thumbnails?.medium?.url ||
+          "",
+        publishedAt: item.snippet.publishedAt,
+      }));
+
+    allItems.push(...items);
+    pageToken = data.nextPageToken || "";
+  } while (pageToken);
+
+  // totalCount = real playlist length; videos = last 6 reversed (newest first)
+  return {
+    videos: allItems.slice(-6).reverse(),
+    totalCount: allItems.length,
+  };
 }
 
 // ─── Episode Card ──────────────────────────────────────────────────────────────
 function EpisodeCard({ video, index }: { video: Video; index: number }) {
+  const [playing, setPlaying] = useState(false);
   const episodeNum = String(index + 1).padStart(2, "0");
-  const ytUrl = video.id.startsWith("fallback")
-    ? YOUTUBE_PLAYLIST_URL
-    : `https://www.youtube.com/watch?v=${video.id}&list=${YOUTUBE_PLAYLIST_ID}`;
+  const isFallback = video.id.startsWith("fallback");
+
+  const handlePlay = () => {
+    if (isFallback) return;
+    setPlaying(true);
+  };
 
   return (
-    <a
-      href={ytUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block"
-    >
-      {/* Thumbnail */}
+    <div className="group block">
+      {/* Thumbnail / Player */}
       <div className="relative aspect-video bg-white rounded-xl overflow-hidden mb-4 border border-[hsl(204_14%_88%)] shadow-[0_2px_8px_-2px_hsl(210_30%_10%/0.06)] transition-shadow duration-300 group-hover:shadow-[0_6px_20px_-4px_hsl(210_30%_10%/0.12)]">
-        {video.thumbnail ? (
-          <img
-            src={video.thumbnail}
-            alt={video.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        {playing ? (
+          <iframe
+            src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
+            title={video.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="w-full h-full"
+            style={{ border: "none" }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-[hsl(204_18%_94%)]">
-            <span
-              className="text-5xl font-light"
-              style={{
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-                color: "hsl(184 40% 70%)",
-              }}
-            >
-              {episodeNum}
-            </span>
-          </div>
+          <>
+            {video.thumbnail ? (
+              <img
+                src={video.thumbnail}
+                alt={video.title}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-[hsl(204_18%_94%)]">
+                <span
+                  className="text-5xl font-light"
+                  style={{
+                    fontFamily: "'Cormorant Garamond', Georgia, serif",
+                    color: "hsl(184 40% 70%)",
+                  }}
+                >
+                  {episodeNum}
+                </span>
+              </div>
+            )}
+            {/* Play overlay — only show for real videos */}
+            {!isFallback && (
+              <div
+                className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center cursor-pointer"
+                onClick={handlePlay}
+              >
+                <div
+                  className="w-11 h-11 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0"
+                  style={{ background: "hsl(184 70% 41%)" }}
+                >
+                  <svg viewBox="0 0 24 24" fill="white" className="w-5 h-5 ml-0.5">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+            )}
+          </>
         )}
-        {/* Play overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
-          <div
-            className="w-11 h-11 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0"
-            style={{ background: "hsl(184 70% 41%)" }}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="white"
-              className="w-5 h-5 ml-0.5"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
-        </div>
       </div>
 
       {/* Meta */}
@@ -157,16 +198,27 @@ function EpisodeCard({ video, index }: { video: Video; index: number }) {
           {video.title}
         </h3>
       </div>
-    </a>
+    </div>
   );
 }
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function PodcastMain() {
-  const { videos, loading } = useYouTubeVideos(YOUTUBE_PLAYLIST_ID);
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPlaylistVideos(YOUTUBE_PLAYLIST_ID)
+      .then(({ videos, totalCount }) => {
+        setVideos(videos);
+        setTotalCount(totalCount);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const finalVideos = videos.length > 0 ? videos : FALLBACK_EPISODES;
-  const episodeCount = finalVideos.length;
+  const episodeCount = totalCount > 0 ? totalCount : FALLBACK_EPISODES.length;
 
   return (
     <main
@@ -375,20 +427,6 @@ export default function PodcastMain() {
               className="w-px h-10"
               style={{ background: "hsl(204 14% 80%)" }}
             />
-            {/* <div>
-              <p
-                className="text-3xl font-semibold"
-                style={{ color: "hsl(210 30% 10%)" }}
-              >
-                3
-              </p>
-              <p
-                className="text-[10px] tracking-widest uppercase mt-1"
-                style={{ color: "hsl(210 12% 52%)" }}
-              >
-                Platforms
-              </p>
-            </div> */}
           </div>
         </div>
       </section>
