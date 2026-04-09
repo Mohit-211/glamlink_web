@@ -111,75 +111,135 @@ async function fetchPlaylistVideos(
     pageToken = data.nextPageToken || "";
   } while (pageToken);
 
-  // totalCount = real playlist length; videos = last 6 reversed (newest first)
+  // totalCount = real playlist length; videos = last 6 reversed so newest is first
   return {
-    videos: allItems.slice(-6).reverse(),
+    videos: [...allItems].slice(-6),
     totalCount: allItems.length,
   };
 }
 
-// ─── Episode Card ──────────────────────────────────────────────────────────────
-function EpisodeCard({ video, index }: { video: Video; index: number }) {
-  const [playing, setPlaying] = useState(false);
-  const episodeNum = String(index + 1).padStart(2, "0");
-  const isFallback = video.id.startsWith("fallback");
-
-  const handlePlay = () => {
-    if (isFallback) return;
-    setPlaying(true);
-  };
+// ─── Video Modal ──────────────────────────────────────────────────────────────
+function VideoModal({
+  video,
+  onClose,
+}: {
+  video: Video;
+  onClose: () => void;
+}) {
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    // Prevent body scroll while modal is open
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handler);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
 
   return (
-    <div className="group block">
-      {/* Thumbnail / Player */}
-      <div className="relative aspect-video bg-white rounded-xl overflow-hidden mb-4 border border-[hsl(204_14%_88%)] shadow-[0_2px_8px_-2px_hsl(210_30%_10%/0.06)] transition-shadow duration-300 group-hover:shadow-[0_6px_20px_-4px_hsl(210_30%_10%/0.12)]">
-        {playing ? (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
+      style={{ background: "rgba(0,0,0,0.92)" }}
+      onClick={onClose}
+    >
+      {/* Modal box — stop propagation so clicking video doesn't close */}
+      <div
+        className="relative w-full max-w-5xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute -top-10 right-0 flex items-center gap-1.5 text-white/70 hover:text-white transition-colors text-xs tracking-widest uppercase"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          Close
+        </button>
+
+        {/* 16:9 iframe wrapper */}
+        <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
           <iframe
             src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
             title={video.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            className="w-full h-full"
+            className="absolute inset-0 w-full h-full rounded-xl"
             style={{ border: "none" }}
           />
+        </div>
+
+        {/* Title below player */}
+        <p
+          className="mt-4 text-sm font-medium text-white/80 text-center leading-snug"
+        >
+          {video.title}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Episode Card ──────────────────────────────────────────────────────────────
+function EpisodeCard({
+  video,
+  index,
+  episodeNumber,
+  onPlay,
+}: {
+  video: Video;
+  index: number;
+  episodeNumber?: number;
+  onPlay: (video: Video) => void;
+}) {
+  // Use real playlist episode number if provided, else fallback to position
+  const episodeNum = String(episodeNumber ?? index + 1).padStart(2, "0");
+  const isFallback = video.id.startsWith("fallback");
+
+  return (
+    <div className="group block">
+      {/* Thumbnail */}
+      <div className="relative aspect-video bg-white rounded-xl overflow-hidden mb-4 border border-[hsl(204_14%_88%)] shadow-[0_2px_8px_-2px_hsl(210_30%_10%/0.06)] transition-shadow duration-300 group-hover:shadow-[0_6px_20px_-4px_hsl(210_30%_10%/0.12)]">
+        {video.thumbnail ? (
+          <img
+            src={video.thumbnail}
+            alt={video.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
         ) : (
-          <>
-            {video.thumbnail ? (
-              <img
-                src={video.thumbnail}
-                alt={video.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-[hsl(204_18%_94%)]">
-                <span
-                  className="text-5xl font-light"
-                  style={{
-                    fontFamily: "'Cormorant Garamond', Georgia, serif",
-                    color: "hsl(184 40% 70%)",
-                  }}
-                >
-                  {episodeNum}
-                </span>
-              </div>
-            )}
-            {/* Play overlay — only show for real videos */}
-            {!isFallback && (
-              <div
-                className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center cursor-pointer"
-                onClick={handlePlay}
-              >
-                <div
-                  className="w-11 h-11 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0"
-                  style={{ background: "hsl(184 70% 41%)" }}
-                >
-                  <svg viewBox="0 0 24 24" fill="white" className="w-5 h-5 ml-0.5">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </div>
-            )}
-          </>
+          <div className="w-full h-full flex items-center justify-center bg-[hsl(204_18%_94%)]">
+            <span
+              className="text-5xl font-light"
+              style={{
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                color: "hsl(184 40% 70%)",
+              }}
+            >
+              {episodeNum}
+            </span>
+          </div>
+        )}
+
+        {/* Play overlay — only for real videos */}
+        {!isFallback && (
+          <div
+            className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center cursor-pointer"
+            onClick={() => onPlay(video)}
+          >
+            <div
+              className="w-11 h-11 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0"
+              style={{ background: "hsl(184 70% 41%)" }}
+            >
+              <svg viewBox="0 0 24 24" fill="white" className="w-5 h-5 ml-0.5">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
         )}
       </div>
 
@@ -207,6 +267,7 @@ export default function PodcastMain() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const [activeVideo, setActiveVideo] = useState<Video | null>(null);
 
   useEffect(() => {
     fetchPlaylistVideos(YOUTUBE_PLAYLIST_ID)
@@ -361,7 +422,7 @@ export default function PodcastMain() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
             {finalVideos.map((video, i) => (
-              <EpisodeCard key={video.id} video={video} index={i} />
+              <EpisodeCard key={video.id} video={video} index={i} episodeNumber={totalCount - i} onPlay={setActiveVideo} />
             ))}
           </div>
         )}
@@ -431,6 +492,10 @@ export default function PodcastMain() {
         </div>
       </section>
 
+      {/* ── Video Modal ───────────────────────────────────────────────────── */}
+      {activeVideo && (
+        <VideoModal video={activeVideo} onClose={() => setActiveVideo(null)} />
+      )}
     </main>
   );
 }
