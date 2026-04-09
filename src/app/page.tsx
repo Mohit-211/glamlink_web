@@ -14,6 +14,8 @@ import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
 -------------------------------- */
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://glamlink.com"),
+
   title: "Discover Beauty Professionals Near You",
 
   description:
@@ -39,7 +41,7 @@ export const metadata: Metadata = {
     url: "https://glamlink.com",
     images: [
       {
-        url: "https://glamlink.com/oglayout.png", // ✅ absolute URL
+        url: "https://glamlink.com/assets/oglayout.png",
         width: 1200,
         height: 630,
         alt: "Glamlink Beauty & Wellness Platform",
