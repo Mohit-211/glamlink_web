@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, ShieldCheck, ArrowRight, Download } from "lucide-react";
 import { useState } from "react";
 import UserDownloadDialog from "../glamcard/UserDownloadDialog";
-
+import shieldImage from "@/assets/shield.jpg";
 const FounderBadge = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
