@@ -118,6 +118,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   const specialtiesArray = parseArray(data.specialties);
   const importantInfoArray = parseArray(data.important_info);
 
+  
   /* ================= DOWNLOAD ================= */
 
   const handleDownload = async () => {
@@ -181,22 +182,25 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
   /* ================= THUMBNAIL ================= */
 
-  const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(null);
+  const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(0);
 
-  useEffect(() => {
-    if (!normalizedImages.length) {
-      setThumbnailIndex(null);
-      return;
-    }
+ useEffect(() => {
+  if (!normalizedImages.length) {
+    setThumbnailIndex(null);
+    return;
+  }
+
+  // 👉 only set if not already selected
+  if (thumbnailIndex === null) {
     const metaIndex = galleryMeta.findIndex((g) => g.is_thumbnail);
     setThumbnailIndex(metaIndex !== -1 ? metaIndex : 0);
-  }, [normalizedImages, galleryMeta]);
+  }
+}, [normalizedImages, galleryMeta, thumbnailIndex]);
 
-  const otherIndexes = useMemo(
-    () =>
-      normalizedImages.map((_, i) => i).filter((i) => i !== thumbnailIndex),
-    [normalizedImages, thumbnailIndex]
-  );
+ const otherIndexes = useMemo(
+  () => normalizedImages.map((_, i) => i),
+  [normalizedImages]
+);
 
   /* ================= LOCATION ================= */
 
@@ -366,31 +370,33 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         />
                       )}
                     </div>
-                    {otherIndexes.length > 0 && (
-                      <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-                        {otherIndexes.slice(0, 4).map((index) => (
-                          <button
-                            key={index}
-                            onClick={() => setThumbnailIndex(index)}
-                            className="h-14 w-14 overflow-hidden rounded-lg border shadow-sm hover:ring-2 hover:ring-teal-400 transition flex-shrink-0"
-                          >
-                            {normalizedImages[index]?.file_type === "video" ? (
-                              <video
-                                src={galleryPreviews[index]}
-                                className="h-full w-full object-cover"
-                                muted
-                              />
-                            ) : (
-                              <img
-                                src={galleryPreviews[index]}
-                                className="h-full w-full object-cover"
-                                alt={`Thumbnail ${index + 1}`}
-                              />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                {otherIndexes.length > 0 && (
+  <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+    {otherIndexes.slice(0, 4).map((index) => (
+      <button
+        key={index}
+        onClick={() => setThumbnailIndex(index)}
+        className={`h-14 w-14 overflow-hidden rounded-lg border shadow-sm flex-shrink-0
+          ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}
+        `}
+      >
+        {normalizedImages[index]?.file_type === "video" ? (
+          <video
+            src={galleryPreviews[index]}
+            className="h-full w-full object-cover"
+            muted
+          />
+        ) : (
+          <img
+            src={galleryPreviews[index]}
+            className="h-full w-full object-cover"
+            alt={`Thumbnail ${index + 1}`}
+          />
+        )}
+      </button>
+    ))}
+  </div>
+)}
                   </>
                 ) : (
                   <div className="flex aspect-[4/3] items-center justify-center text-xs text-gray-400">
