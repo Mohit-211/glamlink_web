@@ -4,6 +4,62 @@ import Logo from "../../../public/assets/ACCESS-3.png";
 import Image from "next/image";
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 
+/* ================= VCF GENERATOR ================= */
+
+function generateVCF(data: GlamCardFormData): string {
+  const escape = (s?: string) =>
+    (s || "").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\n/g, "\\n");
+
+  const lines: string[] = [
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    `FN:${escape(data.name)}`,
+    `ORG:${escape(data.business_name)}`,
+    `TITLE:${escape(data.professional_title)}`,
+  ];
+
+  const primary =
+    data.locations?.find((l: any) => l.is_primary) || data.locations?.[0];
+
+  if (primary?.phone) lines.push(`TEL;TYPE=WORK,VOICE:${primary.phone}`);
+
+  if (primary?.address) {
+    lines.push(
+      `ADR;TYPE=WORK:;;${escape(primary.address)};${escape(
+        primary.city
+      )};${escape(primary.state)};;;`
+    );
+  } else if (primary?.city || primary?.state || primary?.area) {
+    const locality = [primary.city, primary.area].filter(Boolean).join(", ");
+    lines.push(`ADR;TYPE=WORK:;;${locality};${escape(primary.state)};;;`);
+  }
+
+  if (data.bio) {
+    const plainBio = data.bio.replace(/<[^>]+>/g, "").trim();
+    lines.push(`NOTE:${escape(plainBio)}`);
+  }
+
+  if (typeof data.profile_image === "string" && data.profile_image) {
+    lines.push(`PHOTO;VALUE=URI:${data.profile_image}`);
+  }
+
+  lines.push("END:VCARD");
+  return lines.join("\r\n");
+}
+
+function downloadVCF(data: GlamCardFormData) {
+  const vcf = generateVCF(data);
+  const blob = new Blob([vcf], { type: "text/vcard;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${(data.name || "contact").replace(/\s+/g, "_")}.vcf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 /* ================= TYPES ================= */
 
 interface Props {
@@ -14,6 +70,7 @@ interface Props {
   onDownload?: () => void;
   onCopyLink?: () => void;
 }
+
 
 /* ================= REUSABLE SECTION BOX ================= */
 
@@ -118,7 +175,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   const specialtiesArray = parseArray(data.specialties);
   const importantInfoArray = parseArray(data.important_info);
 
-  
+
   /* ================= DOWNLOAD ================= */
 
   const handleDownload = async () => {
@@ -274,6 +331,29 @@ const GlamCardLivePreview: React.FC<Props> = ({
           {/* ===== TOP ACTION BUTTONS (view mode only) ===== */}
           {mode === "view" && (
             <div className="flex justify-end gap-2 mb-3">
+
+              {/* Save Contact — VCF download */}
+              <button
+                onClick={() => downloadVCF(data)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap"
+                title="Save Contact"
+              >
+                <svg
+                  className="w-4 h-4 flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z" />
+                  <polyline points="9 21 9 13 15 13 15 21" />
+                  <polyline points="9 7 12 7" />
+                </svg>
+                Save Contact
+              </button>
+
               <button
                 onClick={onCopyLink}
                 className="h-9 w-9 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50"
@@ -643,6 +723,30 @@ const GlamCardLivePreview: React.FC<Props> = ({
             </div>
           </div> */}
 
+<SectionBox title="Specialties" titleAlign="center">
+  <div className="flex justify-between items-start gap-4">
+    <DotList
+      items={specialtiesArray}
+      placeholder="Your specialties will appear here"
+    />
+
+    {/* {qrValue && (
+      <div className="flex flex-col items-center flex-shrink-0">
+        <QRCodeCanvas
+          value={qrValue}
+          size={90}
+          bgColor="#ffffff"
+          fgColor="#000000"
+          level="H"
+          includeMargin={true}
+        />
+        <p className="text-[10px] text-gray-500 mt-1 text-center">
+          Scan me
+        </p>
+      </div>
+    )} */}
+  </div>
+</SectionBox>
         </div>
       </div>
 </div>
