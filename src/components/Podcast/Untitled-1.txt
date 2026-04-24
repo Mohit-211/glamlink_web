@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import PodcastImage from "../../../public/podcastcover.png";
 import GuestModal from "./GuestModal";
-import UpcomingSchedule from "./UpcomingSchedule";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Video {
@@ -15,11 +16,13 @@ interface Video {
 // ─── Config ───────────────────────────────────────────────────────────────────
 const YOUTUBE_API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY || "";
 const YOUTUBE_PLAYLIST_ID = "PLJPmuOJKw5YbrNAxnyi7SuQx9gNisadgY";
+const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@YourChannel";
 const YOUTUBE_PLAYLIST_URL = `https://www.youtube.com/playlist?list=${YOUTUBE_PLAYLIST_ID}`;
 const SPOTIFY_URL =
   "https://open.spotify.com/show/0GEWcvRT3PFalAaN2faX4z?si=OWqOPcyZSZqNn7ATTnGJng";
 const APPLE_PODCASTS_URL =
   "https://podcasts.apple.com/us/podcast/the-beauty-vault/id1885669168";
+const GUEST_FORM_URL = "https://your-guest-form-link.com";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const YouTubeIcon = () => (
@@ -40,7 +43,7 @@ const ApplePodcastsIcon = () => (
   </svg>
 );
 
-// ─── Fallback Episodes ────────────────────────────────────────────────────────
+// ─── Fallback Episodes ─────────────────────────────────────────────────────────
 const FALLBACK_EPISODES: Video[] = [
   {
     id: "fallback-1",
@@ -106,7 +109,10 @@ async function fetchPlaylistVideos(
     pageToken = data.nextPageToken || "";
   } while (pageToken);
 
-  return { videos: [...allItems], totalCount: allItems.length };
+  return {
+    videos: [...allItems].slice(),
+    totalCount: allItems.length,
+  };
 }
 
 // ─── Video Modal ──────────────────────────────────────────────────────────────
@@ -129,7 +135,10 @@ function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
       style={{ background: "rgba(0,0,0,0.92)" }}
       onClick={onClose}
     >
-      <div className="relative w-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="relative w-full max-w-5xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={onClose}
           className="absolute -top-10 right-0 flex items-center gap-1.5 text-white/70 hover:text-white transition-colors text-xs tracking-widest uppercase"
@@ -139,6 +148,7 @@ function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
           </svg>
           Close
         </button>
+
         <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
           <iframe
             src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
@@ -149,6 +159,7 @@ function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
             style={{ border: "none" }}
           />
         </div>
+
         <p className="mt-4 text-sm font-medium text-white/80 text-center leading-snug">
           {video.title}
         </p>
@@ -169,6 +180,7 @@ function EpisodeCard({
   episodeNumber?: number;
   onPlay: (video: Video) => void;
 }) {
+  // ✅ FIX: Guard against 0 or negative episode numbers
   const episodeNum = String(Math.max(1, episodeNumber ?? index + 1)).padStart(2, "0");
   const isFallback = video.id.startsWith("fallback");
 
@@ -185,12 +197,16 @@ function EpisodeCard({
           <div className="w-full h-full flex items-center justify-center bg-[hsl(204_18%_94%)]">
             <span
               className="text-5xl font-light"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: "hsl(184 40% 70%)" }}
+              style={{
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                color: "hsl(184 40% 70%)",
+              }}
             >
               {episodeNum}
             </span>
           </div>
         )}
+
         {!isFallback && (
           <div
             className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center cursor-pointer"
@@ -207,6 +223,7 @@ function EpisodeCard({
           </div>
         )}
       </div>
+
       <div>
         <span
           className="text-[10px] tracking-[0.2em] font-medium uppercase mb-2 block"
@@ -231,8 +248,7 @@ export default function PodcastMain() {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [activeVideo, setActiveVideo] = useState<Video | null>(null);
-  const [guestModalOpen, setGuestModalOpen] = useState(false);
-
+const [guestModalOpen, setGuestModalOpen] = useState(false);
   useEffect(() => {
     fetchPlaylistVideos(YOUTUBE_PLAYLIST_ID)
       .then(({ videos, totalCount }) => {
@@ -243,6 +259,8 @@ export default function PodcastMain() {
   }, []);
 
   const finalVideos = videos.length > 0 ? videos : FALLBACK_EPISODES;
+
+  // ✅ FIX: Safe episodeCount with fallback — prevents totalCount being 0
   const episodeCount = totalCount > 0 ? totalCount : FALLBACK_EPISODES.length;
 
   return (
@@ -253,59 +271,86 @@ export default function PodcastMain() {
         fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif",
       }}
     >
-      {/* ── UPCOMING SCHEDULE ────────────────────────────────────────────── */}
-      <UpcomingSchedule />
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-20">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-12 md:gap-16">
+          <div className="flex-shrink-0">
+            <div className="w-44 h-44 md:w-56 md:h-56 rounded-2xl overflow-hidden relative shadow-[0_8px_32px_-8px_hsl(210_30%_10%/0.16)] border border-[hsl(204_14%_88%)]">
+              <Image
+                src={PodcastImage}
+                alt="The Beauty Vault"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
 
-      {/* ── LISTEN ON strip ──────────────────────────────────────────────── */}
-      <div
-        className="border-b border-[hsl(204_14%_88%)]"
-        style={{ background: "hsl(204 18% 97%)" }}
-      >
-        <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap items-center gap-3 justify-between">
-          <p
-            className="text-[10px] tracking-[0.22em] uppercase font-semibold"
-            style={{ color: "hsl(184 70% 38%)" }}
-          >
-            Listen On
-          </p>
-          <div className="flex flex-wrap gap-3 items-center">
-            <a
-              href={YOUTUBE_PLAYLIST_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs tracking-wide font-medium transition-all duration-200 bg-white border border-[hsl(204_14%_86%)] hover:border-[hsl(184_70%_41%)] hover:text-[hsl(184_70%_38%)]"
-              style={{ color: "hsl(210 25% 30%)" }}
+          <div className="flex-1 text-center md:text-left">
+            <p
+              className="text-[11px] tracking-[0.18em] uppercase mb-4 font-medium"
+              style={{ color: "hsl(184 70% 38%)" }}
             >
-              <YouTubeIcon /> YouTube
-            </a>
-            <a
-              href={SPOTIFY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs tracking-wide font-medium transition-all duration-200 bg-white border border-[hsl(204_14%_86%)] hover:border-[hsl(184_70%_41%)] hover:text-[hsl(184_70%_38%)]"
-              style={{ color: "hsl(210 25% 30%)" }}
+              A Podcast by Glamlink
+            </p>
+            <h1
+              className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-4 leading-[1.05]"
+              style={{ color: "hsl(210 30% 10%)" }}
             >
-              <SpotifyIcon /> Spotify
-            </a>
-            <a
-              href={APPLE_PODCASTS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs tracking-wide font-medium transition-all duration-200 bg-white border border-[hsl(204_14%_86%)] hover:border-[hsl(184_70%_41%)] hover:text-[hsl(184_70%_38%)]"
-              style={{ color: "hsl(210 25% 30%)" }}
+              The Beauty Vault
+            </h1>
+            <p
+              className="text-sm md:text-base font-normal leading-relaxed max-w-sm mb-8 mx-auto md:mx-0"
+              style={{ color: "hsl(210 12% 48%)" }}
             >
-              <ApplePodcastsIcon /> Apple Podcasts
-            </a>
+              Conversations with the professionals shaping beauty&nbsp;&amp;&nbsp;wellness.
+            </p>
+
+            <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+              <a
+                href={YOUTUBE_PLAYLIST_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs tracking-wide font-medium transition-all duration-200 bg-white border border-[hsl(204_14%_86%)] hover:border-[hsl(184_70%_41%)] hover:text-[hsl(184_70%_38%)]"
+                style={{ color: "hsl(210 25% 30%)" }}
+              >
+                <YouTubeIcon />
+                YouTube
+              </a>
+              <a
+                href={SPOTIFY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs tracking-wide font-medium transition-all duration-200 bg-white border border-[hsl(204_14%_86%)] hover:border-[hsl(184_70%_41%)] hover:text-[hsl(184_70%_38%)]"
+                style={{ color: "hsl(210 25% 30%)" }}
+              >
+                <SpotifyIcon />
+                Spotify
+              </a>
+              <a
+                href={APPLE_PODCASTS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs tracking-wide font-medium transition-all duration-200 bg-white border border-[hsl(204_14%_86%)] hover:border-[hsl(184_70%_41%)] hover:text-[hsl(184_70%_38%)]"
+                style={{ color: "hsl(210 25% 30%)" }}
+              >
+                <ApplePodcastsIcon />
+                Apple Podcasts
+              </a>
             <button
-              type="button"
-              onClick={() => setGuestModalOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs tracking-wide font-semibold text-white transition-all duration-200 hover:brightness-110"
-              style={{ background: "hsl(184 70% 41%)" }}
-            >
-              Wanna Be a Guest?
-            </button>
+  type="button"
+  onClick={() => setGuestModalOpen(true)}
+  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs tracking-wide font-semibold text-white transition-all duration-200 hover:brightness-110"
+  style={{ background: "hsl(184 70% 41%)" }}
+>
+  Wanna Be a Guest?
+</button>
+            </div>
           </div>
         </div>
+      </section>
+
+      {/* ── DIVIDER ──────────────────────────────────────────────────────── */}
+      <div className="max-w-5xl mx-auto px-6">
+        <div className="border-t border-[hsl(204_14%_88%)]" />
       </div>
 
       {/* ── Episodes Grid ────────────────────────────────────────────────── */}
@@ -318,7 +363,10 @@ export default function PodcastMain() {
             >
               Now Playing
             </p>
-            <h2 className="text-[28px] font-semibold" style={{ color: "hsl(210 30% 10%)" }}>
+            <h2
+              className="text-[28px] font-semibold"
+              style={{ color: "hsl(210 30% 10%)" }}
+            >
               Latest Episodes
             </h2>
           </div>
@@ -363,7 +411,13 @@ export default function PodcastMain() {
             style={{ background: "hsl(184 70% 41%)" }}
           >
             View All Episodes
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="w-4 h-4"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
             </svg>
           </a>
@@ -371,7 +425,10 @@ export default function PodcastMain() {
       </section>
 
       {/* ── About Strip ──────────────────────────────────────────────────── */}
-      <section className="py-16 px-6" style={{ background: "hsl(204 18% 89%)" }}>
+      <section
+        className="py-16 px-6"
+        style={{ background: "hsl(204 18% 89%)" }}
+      >
         <div className="max-w-2xl mx-auto text-center">
           <p
             className="text-[10px] tracking-[0.25em] uppercase mb-4 font-medium"
@@ -379,31 +436,43 @@ export default function PodcastMain() {
           >
             About the Show
           </p>
-          <p className="text-[18px] leading-relaxed font-normal" style={{ color: "hsl(210 25% 22%)" }}>
+          <p
+            className="text-[18px] leading-relaxed font-normal"
+            style={{ color: "hsl(210 25% 22%)" }}
+          >
             Unfiltered conversations with the professionals, founders, and innovators
             actively shaping the future of beauty and wellness.
           </p>
           <div className="mt-8 flex items-center justify-center gap-8 text-center">
             <div>
-              <p className="text-3xl font-semibold" style={{ color: "hsl(210 30% 10%)" }}>
+              <p
+                className="text-3xl font-semibold"
+                style={{ color: "hsl(210 30% 10%)" }}
+              >
                 {episodeCount}+
               </p>
-              <p className="text-[10px] tracking-widest uppercase mt-1" style={{ color: "hsl(210 12% 52%)" }}>
+              <p
+                className="text-[10px] tracking-widest uppercase mt-1"
+                style={{ color: "hsl(210 12% 52%)" }}
+              >
                 Episodes
               </p>
             </div>
-            <div className="w-px h-10" style={{ background: "hsl(204 14% 80%)" }} />
+            <div
+              className="w-px h-10"
+              style={{ background: "hsl(204 14% 80%)" }}
+            />
           </div>
         </div>
       </section>
 
-      {/* ── Modals ───────────────────────────────────────────────────────── */}
+      {/* ── Video Modal ──────────────────────────────────────────────────── */}
       {activeVideo && (
         <VideoModal video={activeVideo} onClose={() => setActiveVideo(null)} />
       )}
       {guestModalOpen && (
-        <GuestModal open={guestModalOpen} onClose={() => setGuestModalOpen(false)} />
-      )}
+  <GuestModal open={guestModalOpen} onClose={() => setGuestModalOpen(false)} />
+)}
     </main>
   );
 }
