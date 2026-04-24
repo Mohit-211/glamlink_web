@@ -4,6 +4,12 @@ import { Mail, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const MagazineHero = () => {
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    window.open("https://mailchi.mp/glamlink/subscribe", "_blank");
+  };
+
   return (
     <section className="relative pt-18 pb-18 md:pt-20 md:pb-20 overflow-hidden bg-white">
       {/* Very subtle luxury texture */}
@@ -21,7 +27,6 @@ const MagazineHero = () => {
       <div className="container-glamlink px-5 md:px-8 relative z-10">
         <div className="max-w-5xl mx-auto text-center">
          
-
           {/* Single-line friendly headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-light text-gray-950 tracking-tight leading-none mb-8 md:mb-10">
             <span className="italic text-[#24bbcb]"> The Glamlink Edit</span>
@@ -34,7 +39,10 @@ const MagazineHero = () => {
 
           {/* Newsletter form – aligned heights, clean layout */}
           <div className="max-w-xl mx-auto">
-            <form className="flex flex-col sm:flex-row items-stretch gap-4">
+            <form
+              onSubmit={handleSubscribe}
+              className="flex flex-col sm:flex-row items-stretch gap-4"
+            >
               {/* Input wrapper */}
               <div className="relative flex-1 min-w-0">
                 <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />

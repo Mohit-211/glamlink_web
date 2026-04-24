@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import PodcastImage from "../../../public/podcastcover.png";
+import GuestModal from "./GuestModal";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Video {
@@ -247,7 +248,7 @@ export default function PodcastMain() {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [activeVideo, setActiveVideo] = useState<Video | null>(null);
-
+const [guestModalOpen, setGuestModalOpen] = useState(false);
   useEffect(() => {
     fetchPlaylistVideos(YOUTUBE_PLAYLIST_ID)
       .then(({ videos, totalCount }) => {
@@ -334,15 +335,14 @@ export default function PodcastMain() {
                 <ApplePodcastsIcon />
                 Apple Podcasts
               </a>
-              <a
-                href={GUEST_FORM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs tracking-wide font-semibold text-white transition-all duration-200 hover:brightness-110"
-                style={{ background: "hsl(184 70% 41%)" }}
-              >
-                Want to Be a Guest?
-              </a>
+            <button
+  type="button"
+  onClick={() => setGuestModalOpen(true)}
+  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs tracking-wide font-semibold text-white transition-all duration-200 hover:brightness-110"
+  style={{ background: "hsl(184 70% 41%)" }}
+>
+  Wanna Be a Guest?
+</button>
             </div>
           </div>
         </div>
@@ -470,6 +470,9 @@ export default function PodcastMain() {
       {activeVideo && (
         <VideoModal video={activeVideo} onClose={() => setActiveVideo(null)} />
       )}
+      {guestModalOpen && (
+  <GuestModal open={guestModalOpen} onClose={() => setGuestModalOpen(false)} />
+)}
     </main>
   );
 }
