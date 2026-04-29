@@ -1,8 +1,8 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import QRCode from "react-qr-code";
-
+import { QRCode } from "react-qr-code";
+// import QRCode from "react-qr-code";
 const PublicCard = () => {
   const params = useParams();
   const username = params?.username as string;

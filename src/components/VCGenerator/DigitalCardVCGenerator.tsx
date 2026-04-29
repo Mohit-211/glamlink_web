@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import QRCode from "react-qr-code";
-
+import {QRCode} from "react-qr-code";
 const BASE_URL = "https://glamlink.net/card/";
 
 const THEME_COLORS = [
