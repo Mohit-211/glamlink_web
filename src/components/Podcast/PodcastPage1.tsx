@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import GuestModal from "./GuestModal";
-import UpcomingSchedule from "./UpcomingSchedule";
+import UpcomingSchedule1 from "./UpcomingSchedule1";
 import HeroSection from "./HeroSection";
 import NotifySection from "./Notifysection";
 
@@ -228,7 +228,7 @@ function EpisodeCard({
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
-export default function PodcastMain() {
+export default function PodcastMain1() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -255,14 +255,14 @@ export default function PodcastMain() {
         fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif",
       }}
     >
-      <div style={{marginTop:"50px"}}>
-
-      <HeroSection onGuestClick={() => setGuestModalOpen(true)}/>
-      </div>
+          <div style={{marginTop:"50px"}}>
+    
+          <HeroSection onGuestClick={() => setGuestModalOpen(true)}/>
+          </div>
       {/* ── UPCOMING SCHEDULE ────────────────────────────────────────────── */}
-      <UpcomingSchedule />
+      <UpcomingSchedule1 />
 
-     
+    
 
       {/* ── Episodes Grid ────────────────────────────────────────────────── */}
       <section className="py-20 px-6 max-w-5xl mx-auto">

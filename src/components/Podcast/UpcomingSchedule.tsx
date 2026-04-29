@@ -200,7 +200,7 @@ export default function UpcomingSchedule() {
       style={{
         background:
           "radial-gradient(circle at top, hsl(184 45% 30%) 0%, hsl(184 50% 18%) 100%)",
-        padding: "60px 0" ,marginTop: "60px",
+        padding: "60px 0"
       }}
     >
       {/* Header */}
