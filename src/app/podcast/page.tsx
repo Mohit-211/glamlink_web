@@ -1,11 +1,28 @@
-import PodcastMain from "@/components/Podcast/PodcastPage";
+// import PodcastMain from "@/components/Podcast/PodcastPage";
+// import React from "react";
+// import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
+
+// const PodcastPage = () => {
+//   return (
+//     <div>
+//       <PodcastMain />
+//       <ConditionalGetFeatured />
+//     </div>
+//   );
+// };
+
+// export default PodcastPage;
+
+
 import React from "react";
 import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
+
+import PodcastMain2 from "@/components/Podcast/PodcastPage2";
 
 const PodcastPage = () => {
   return (
     <div>
-      <PodcastMain />
+      <PodcastMain2 />
       <ConditionalGetFeatured />
     </div>
   );

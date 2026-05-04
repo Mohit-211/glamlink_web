@@ -17,26 +17,16 @@ export interface Issue {
 export const issues2026: Issue[] = [
   {
     id: 1,
-    slug: "issue-113",
-    title: "Issue 113",
-    cover: "/magazine/issue_113.jpeg",
+    slug: "issue-110",
+    title: "Issue 110",
+    cover: "/magazine/issue_110.jpg",
     publuu: {
       accountId: 992531,
-      flipbookId: 2418451,
+      flipbookId: 2328224,
     },
   },
   {
     id: 2,
-    slug: "issue-112",
-    title: "Issue 112",
-    cover: "/magazine/glamlinkedit_112.jpeg",
-    publuu: {
-      accountId: 992531,
-      flipbookId: 2383857,
-    },
-  },
-  {
-    id: 3,
     slug: "issue-111",
     title: "Issue 111",
     cover: "/magazine/the_glamlink_edit.jpg",
@@ -46,13 +36,33 @@ export const issues2026: Issue[] = [
     },
   },
   {
-    id: 4,
-    slug: "issue-110",
-    title: "Issue 110",
-    cover: "/magazine/issue_110.jpg",
+    id: 3,
+    slug: "issue-112",
+    title: "Issue 112",
+    cover: "/magazine/glamlinkedit_112.jpeg",
     publuu: {
       accountId: 992531,
-      flipbookId: 2328224,
+      flipbookId: 2383857,
+    },
+  },
+  {
+    id: 4,
+    slug: "issue-113",
+    title: "Issue 113",
+    cover: "/magazine/issue_113.jpeg",
+    publuu: {
+      accountId: 992531,
+      flipbookId: 2418451,
+    },
+  },
+   {
+    id: 5,
+    slug: "issue-114",
+    title: "Issue 114",
+    cover: "/magazine/issue_114.jpeg",
+    publuu: {
+      accountId: 992531,
+      flipbookId: 2453514,
     },
   },
 ];
