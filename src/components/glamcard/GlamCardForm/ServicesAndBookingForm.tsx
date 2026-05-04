@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { GlamCardFormData } from "./types";
+import { BOOKING_METHODS, BookingMethod, GlamCardFormData } from "./types";
 
 interface Props {
   data: GlamCardFormData;
@@ -110,11 +110,10 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             type="button"
             onClick={addSpecialty}
             disabled={data.specialties.length >= 5 || !specialtyInput.trim()}
-            className={`rounded-lg px-5 text-sm font-medium transition ${
-              data.specialties.length >= 5 || !specialtyInput.trim()
+            className={`rounded-lg px-5 text-sm font-medium transition ${data.specialties.length >= 5 || !specialtyInput.trim()
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                 : "bg-teal-600 text-white hover:bg-teal-700"
-            }`}
+              }`}
           >
             + Add
           </button>
@@ -178,7 +177,8 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             className={inputClass}
             placeholder="@yourusername or full URL"
             value={data.social_media?.instagram || ""}
-            required={data.preferred_booking_method === "DM_INSTAGRAM"}
+            // required={data.preferred_booking_method === "DM_INSTAGRAM"}
+            required={data.preferred_booking_method === BOOKING_METHODS.INSTAGRAM}
             onChange={(e) =>
               setData((prev) => ({
                 ...prev,
@@ -217,7 +217,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           className={inputClass}
           placeholder="Enter phone number"
           value={data.phone || ""}
-          required={data.preferred_booking_method === "CALL_TEXT"}
+          required={data.preferred_booking_method === BOOKING_METHODS.CALL}
           onChange={(e) =>
             setData((prev) => ({
               ...prev,
@@ -252,23 +252,23 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
 
         <select
           className={inputClass}
-          value={data.preferred_booking_method || ""}
-          onChange={(e) =>
+          value={data.preferred_booking_method}
+          onChange={(e) => {
+            const value = e.target.value as BookingMethod;
+
             setData((prev) => ({
               ...prev,
-              preferred_booking_method: e.target.value,
+              preferred_booking_method: value,
               booking_link:
-                e.target.value === "Go_to_Booking_Link"
-                  ? prev.booking_link
-                  : "",
-            }))
-          }
+                value === BOOKING_METHODS.LINK ? prev.booking_link : "",
+            }));
+          }}
           required
         >
           <option value="">Select booking method...</option>
-          <option value="Go_to_Booking_Link">Go to Booking Link</option>
-          <option value="CALL_TEXT">Call / Text</option>
-          <option value="DM_INSTAGRAM">DM on Instagram</option>
+          <option value={BOOKING_METHODS.LINK}>Go to Booking Link</option>
+          <option value={BOOKING_METHODS.CALL}>Call / Text</option>
+          <option value={BOOKING_METHODS.INSTAGRAM}>DM on Instagram</option>
         </select>
 
         {data.preferred_booking_method === "Go_to_Booking_Link" && (

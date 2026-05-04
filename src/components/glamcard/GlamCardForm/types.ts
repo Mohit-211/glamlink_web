@@ -79,14 +79,7 @@ export interface GlamCardFormData {
     youtube?: string;
   };
 
-  /* BOOKING */
-  preferred_booking_method:
-    | "instagram"
-    | "phone"
-    | "website"
-    | "walk-in"
-    | "other";
-
+preferred_booking_method: BookingMethod;
   booking_link?: string;
   important_info: string[];
 
@@ -104,13 +97,14 @@ export interface GlamCardFormData {
 
 export type PriceRange = "$" | "$$" | "$$$" | "$$$$" | "";
 
-export type BookingMethod =
-  | "Online booking"
-  | "Phone / text"
-  | "Walk-ins welcome"
-  | "By appointment only"
-  | "";
+export const BOOKING_METHODS = {
+  LINK: "Go_to_Booking_Link",
+  CALL: "CALL_TEXT",
+  INSTAGRAM: "DM_INSTAGRAM",
+} as const;
 
+export type BookingMethod =
+  (typeof BOOKING_METHODS)[keyof typeof BOOKING_METHODS];
 export type YearsInBusiness =
   | "Less than 1 year"
   | "1–3 years"
