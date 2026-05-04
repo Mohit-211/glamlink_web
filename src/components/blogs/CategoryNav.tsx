@@ -94,7 +94,7 @@ const CategoryNav = ({
 
   return (
     <nav className="lg:hidden sticky top-[60px] z-50 bg-white border-b border-gray-200">
-      <div className="w-full px-4">
+      <div className="w-full px-4 mt-5">
         <div className="flex items-center gap-3 overflow-x-auto py-3 whitespace-nowrap scrollbar-hide">
           
           {/* ALL */}
