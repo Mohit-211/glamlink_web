@@ -1,4 +1,4 @@
-import { GlamCardFormData } from "./GlamCardForm/types";
+import { BOOKING_METHODS, GlamCardFormData } from "./GlamCardForm/types";
 
 import profileImg from "../../../public/fashion/pexels-decembrenell-3317434.jpg";
 import galleryImg1 from "../../../public/fashion/pexels-element5-973403.jpg";
@@ -57,7 +57,7 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     },
 
     /* BOOKING */
-    preferred_booking_method: "instagram",
+    preferred_booking_method: BOOKING_METHODS.INSTAGRAM,
     booking_link: "",
     important_info: ["Deposit required to secure booking"],
 
