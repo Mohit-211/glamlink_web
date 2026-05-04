@@ -3,13 +3,10 @@ import { GlamCardFormData } from "./GlamCardForm/types";
 import Logo from "../../../public/assets/ACCESS-3.png";
 import Image from "next/image";
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
-
 /* ================= VCF GENERATOR ================= */
-
 function generateVCF(data: GlamCardFormData): string {
   const escape = (s?: string) =>
     (s || "").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\n/g, "\\n");
-
   const lines: string[] = [
     "BEGIN:VCARD",
     "VERSION:3.0",
@@ -17,12 +14,9 @@ function generateVCF(data: GlamCardFormData): string {
     `ORG:${escape(data.business_name)}`,
     `TITLE:${escape(data.professional_title)}`,
   ];
-
   const primary =
     data.locations?.find((l: any) => l.is_primary) || data.locations?.[0];
-
   if (primary?.phone) lines.push(`TEL;TYPE=WORK,VOICE:${primary.phone}`);
-
   if (primary?.address) {
     lines.push(
       `ADR;TYPE=WORK:;;${escape(primary.address)};${escape(
@@ -33,20 +27,16 @@ function generateVCF(data: GlamCardFormData): string {
     const locality = [primary.city, primary.area].filter(Boolean).join(", ");
     lines.push(`ADR;TYPE=WORK:;;${locality};${escape(primary.state)};;;`);
   }
-
   if (data.bio) {
     const plainBio = data.bio.replace(/<[^>]+>/g, "").trim();
     lines.push(`NOTE:${escape(plainBio)}`);
   }
-
   if (typeof data.profile_image === "string" && data.profile_image) {
     lines.push(`PHOTO;VALUE=URI:${data.profile_image}`);
   }
-
   lines.push("END:VCARD");
   return lines.join("\r\n");
 }
-
 function downloadVCF(data: GlamCardFormData) {
   const vcf = generateVCF(data);
   const blob = new Blob([vcf], { type: "text/vcard;charset=utf-8" });
@@ -59,9 +49,7 @@ function downloadVCF(data: GlamCardFormData) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-
 /* ================= TYPES ================= */
-
 interface Props {
   data: GlamCardFormData;
   sticky?: boolean;
@@ -70,30 +58,17 @@ interface Props {
   onDownload?: () => void;
   onCopyLink?: () => void;
 }
-
-
 /* ================= REUSABLE SECTION BOX ================= */
-
-/**
- * SectionBox — gradient-bordered rounded wrapper
- * titleAlign="left"   → bold left-aligned title (e.g. "About …")
- * titleAlign="center" → title with horizontal rules on each side
- */
 const SectionBox: React.FC<{
   title: string;
   titleAlign?: "left" | "center";
   children: React.ReactNode;
 }> = ({ title, titleAlign = "left", children }) => (
-  <div
-    className="rounded-2xl p-[3px]   "
-    // style={{ background: "linear-gradient(135deg, #a8edea, #c3cfe2, #a8edea)" }}
-  >
+  <div className="rounded-2xl p-[3px]">
     <div
-  className="rounded-2xl p-4 h-full"
-  style={{
-    background: "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)"
-  }}
->
+      className="rounded-2xl p-4 h-full"
+      style={{ background: "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)" }}
+    >
       {titleAlign === "center" ? (
         <div className="flex items-center gap-2 mb-3">
           <span className="flex-1 h-px bg-gray-400/60" />
@@ -103,17 +78,13 @@ const SectionBox: React.FC<{
           <span className="flex-1 h-px bg-gray-400/60" />
         </div>
       ) : (
-        <p className="mb-3 text-sm font-bold tracking-wide text-gray-800">
-          {title}
-        </p>
+        <p className="mb-3 text-sm font-bold tracking-wide text-gray-800">{title}</p>
       )}
       <div className="rounded-xl bg-white p-4 shadow-sm">{children}</div>
     </div>
   </div>
 );
-
 /* ================= HELPERS ================= */
-
 const formatTime = (time: string) => {
   if (!time) return "";
   const [h, m] = time.split(":");
@@ -122,7 +93,6 @@ const formatTime = (time: string) => {
   const formattedHour = hour % 12 || 12;
   return `${formattedHour}:${m} ${ampm}`;
 };
-
 const parseArray = (value: string | string[] | undefined): string[] => {
   if (!value) return [];
   if (Array.isArray(value)) return value;
@@ -134,12 +104,9 @@ const parseArray = (value: string | string[] | undefined): string[] => {
   }
   return [];
 };
-
 const isFile = (v: any): v is File => v instanceof File;
-
 /* ================= TEAL DOT BULLET LIST ================= */
-
-const DotList: React.FC<{ items: string[]; placeholder: string }> = ({
+const DotList: React.FC<{ items: any[]; placeholder: string }> = ({
   items,
   placeholder,
 }) => (
@@ -148,7 +115,11 @@ const DotList: React.FC<{ items: string[]; placeholder: string }> = ({
       items.map((item, i) => (
         <li key={i} className="flex items-start gap-2">
           <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0" />
-          <span className="text-gray-700">{item}</span>
+          <span className="text-gray-700">
+            {typeof item === "string"
+              ? item
+              : item?.note || item?.text || ""}
+          </span>
         </li>
       ))
     ) : (
@@ -156,9 +127,8 @@ const DotList: React.FC<{ items: string[]; placeholder: string }> = ({
     )}
   </ul>
 );
-
+  
 /* ================= COMPONENT ================= */
-
 const GlamCardLivePreview: React.FC<Props> = ({
   data,
   sticky = false,
@@ -168,23 +138,14 @@ const GlamCardLivePreview: React.FC<Props> = ({
   onCopyLink,
 }) => {
   if (!data) return null;
-  console.log(data, "data");
-
+  // ── State ────────────────────────────────────────────────
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
-
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(0);
+  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const specialtiesArray = parseArray(data.specialties);
   const importantInfoArray = parseArray(data.important_info);
-
-
-  /* ================= DOWNLOAD ================= */
-
-  const handleDownload = async () => {
-    console.log("Downloading...");
-    setIsDownloadModalOpen(false);
-  };
-
   /* ================= PROFILE IMAGE ================= */
-
   const profileImageUrl = useMemo(() => {
     if (!data?.profile_image) return "";
     if (mode === "live" && isFile(data.profile_image))
@@ -192,16 +153,12 @@ const GlamCardLivePreview: React.FC<Props> = ({
     if (typeof data.profile_image === "string") return data.profile_image;
     return "";
   }, [data?.profile_image, mode]);
-
   useEffect(() => {
     return () => {
-      if (profileImageUrl?.startsWith("blob:"))
-        URL.revokeObjectURL(profileImageUrl);
+      if (profileImageUrl?.startsWith("blob:")) URL.revokeObjectURL(profileImageUrl);
     };
   }, [profileImageUrl]);
-
   /* ================= IMAGE NORMALIZATION ================= */
-
   const normalizedImages = useMemo(() => {
     const rawImages = data?.images || [];
     return rawImages.map((item: any, index: number) => {
@@ -213,21 +170,18 @@ const GlamCardLivePreview: React.FC<Props> = ({
       };
     });
   }, [data?.images]);
-
   const galleryMeta = data?.gallery_meta || [];
-
   const galleryPreviews = useMemo(
     () =>
       mode === "live"
         ? normalizedImages.map((item, idx) =>
-            isFile(data?.images?.[idx])
-              ? URL.createObjectURL(data.images[idx])
-              : item.url
-          )
+          isFile(data?.images?.[idx])
+            ? URL.createObjectURL(data.images[idx])
+            : item.url
+        )
         : normalizedImages.map((item) => item.url),
     [mode, normalizedImages, data?.images]
   );
-
   useEffect(() => {
     if (mode !== "live") return;
     return () => {
@@ -236,57 +190,38 @@ const GlamCardLivePreview: React.FC<Props> = ({
       });
     };
   }, [galleryPreviews, mode]);
-
   /* ================= THUMBNAIL ================= */
-
-  const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(0);
-
- useEffect(() => {
-  if (!normalizedImages.length) {
-    setThumbnailIndex(null);
-    return;
-  }
-
-  // 👉 only set if not already selected
-  if (thumbnailIndex === null) {
-    const metaIndex = galleryMeta.findIndex((g) => g.is_thumbnail);
-    setThumbnailIndex(metaIndex !== -1 ? metaIndex : 0);
-  }
-}, [normalizedImages, galleryMeta, thumbnailIndex]);
-
- const otherIndexes = useMemo(
-  () => normalizedImages.map((_, i) => i),
-  [normalizedImages]
-);
-
+  useEffect(() => {
+    if (!normalizedImages.length) {
+      setThumbnailIndex(null);
+      return;
+    }
+    if (thumbnailIndex === null) {
+      const metaIndex = galleryMeta.findIndex((g) => g.is_thumbnail);
+      setThumbnailIndex(metaIndex !== -1 ? metaIndex : 0);
+    }
+  }, [normalizedImages, galleryMeta, thumbnailIndex]);
+  const otherIndexes = useMemo(
+    () => normalizedImages.map((_, i) => i),
+    [normalizedImages]
+  );
   /* ================= LOCATION ================= */
-
   const primaryLocation = useMemo(
-    () =>
-      data.locations?.find((l: any) => l.is_primary) || data.locations?.[0],
+    () => data.locations?.find((l: any) => l.is_primary) || data.locations?.[0],
     [data.locations]
   );
-
-  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(
-    null
-  );
-
   useEffect(() => {
     if (!selectedLocationId && primaryLocation?.id)
       setSelectedLocationId(String(primaryLocation.id));
   }, [primaryLocation?.id, selectedLocationId]);
-
   const selectedLocation = useMemo(() => {
     if (!data.locations?.length) return null;
     return (
-      data.locations.find(
-        (l: any) => String(l.id) === selectedLocationId
-      ) || primaryLocation
+      data.locations.find((l: any) => String(l.id) === selectedLocationId) ||
+      primaryLocation
     );
   }, [data.locations, selectedLocationId, primaryLocation]);
-
   /* ================= MAP SRC ================= */
-
   const mapQuery = useMemo(() => {
     if (!selectedLocation) return "";
     if (selectedLocation.location_type === "exact_address")
@@ -301,45 +236,338 @@ const GlamCardLivePreview: React.FC<Props> = ({
         .join(", ") || ""
     );
   }, [selectedLocation]);
-
-  const mapZoom =
-    selectedLocation?.location_type === "exact_address" ? 15 : 12;
+  const mapZoom = selectedLocation?.location_type === "exact_address" ? 15 : 12;
   const mapSrc = mapQuery
-    ? `https://maps.google.com/maps?q=${encodeURIComponent(
-        mapQuery
-      )}&z=${mapZoom}&output=embed`
+    ? `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=${mapZoom}&output=embed`
     : "";
-
   /* ================= RENDER ================= */
-
+  const socialMedia = useMemo(() => {
+    if (!data?.social_media) return {};
+    if (typeof data.social_media === "string") {
+      try {
+        return JSON.parse(data.social_media);
+      } catch {
+        return {};
+      }
+    }
+    return data.social_media;
+  }, [data.social_media]);
   return (
     <div className={`${mode !== "download" ? "h-90dvh" : ""} flex flex-col`}>
-
-      {/* ===== OUTER CARD — teal gradient border ===== */}
-     <div className="p-4 bg-[#F4F9FF] min-h-screen flex items-center justify-center">
-  
-  {/* Gradient Border */}
-  <div
-    className="p-[2px] rounded-2xl"
-    style={{
-      background:
-        "linear-gradient(135deg, #2dd4bf, #a8edea 50%, #2dd4bf)",
-    }}
-  >
-    {/* Inner Card */}
-    <div className="rounded-2xl bg-[#F4F9FF] p-6 shadow-sm">
-          {/* ===== TOP ACTION BUTTONS (view mode only) ===== */}
-          {mode === "view" && (
-            <div className="flex justify-end gap-2 mb-3">
-
-              {/* Save Contact — VCF download */}
+      {/* ===== OUTER CARD ===== */}
+      <div className="p-4 bg-[#F4F9FF] min-h-screen flex items-center justify-center">
+        <div
+          className="p-[2px] rounded-2xl"
+          style={{ background: "linear-gradient(135deg, #2dd4bf, #a8edea 50%, #2dd4bf)" }}
+        >
+          <div className="rounded-2xl bg-[#F4F9FF] p-6 shadow-sm">
+            {/* ===== TOP ACTION BUTTONS (view mode only) ===== */}
+            {mode === "view" && (
+              <div className="flex justify-end gap-2 mb-3">
+                <button
+                  onClick={() => downloadVCF(data)}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap"
+                  title="Save Contact"
+                >
+                  <svg
+                    className="w-4 h-4 flex-shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z" />
+                    <polyline points="9 21 9 13 15 13 15 21" />
+                    <polyline points="9 7 12 7" />
+                  </svg>
+                  Save Contact
+                </button>
+                <button
+                  onClick={onCopyLink}
+                  className="h-9 w-9 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50"
+                >
+                  🔗
+                </button>
+                <button
+                  onClick={() => setIsDownloadModalOpen(true)}
+                  className="h-9 w-9 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50"
+                >
+                  ⬇️
+                </button>
+                <button
+                  onClick={onClose}
+                  className="h-9 w-9 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+            {/* ===== LOGO ===== */}
+            <div className="mb-6 text-center">
+              <div className="flex justify-center items-center">
+                <Image src={Logo} alt="access image" width={200} height={200} />
+              </div>
+            </div>
+            {/* ===== TWO COLUMN GRID ===== */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* ---- LEFT COLUMN ---- */}
+              <div className="flex flex-col gap-5">
+                {/* ABOUT */}
+                <SectionBox title={`About ${data.name || "Your Name"}`} titleAlign="left">
+                  <div className="flex gap-4">
+                    <div className="h-16 w-16 overflow-hidden rounded-full bg-gray-200 ring-2 ring-white shadow flex-shrink-0">
+                      {data?.profile_image && (
+                        <img
+                          src={
+                            mode === "live" && isFile(data.profile_image)
+                              ? URL.createObjectURL(data.profile_image)
+                              : typeof data.profile_image === "string"
+                                ? data.profile_image
+                                : ""
+                          }
+                          className="h-full w-full object-cover"
+                          alt="Profile"
+                        />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-800">{data.name || "Your Name"}</p>
+                      <p className="text-sm text-sky-500 font-medium">
+                        {data.professional_title || "Professional Title"}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {data.business_name || "Business Name"}
+                      </p>
+                    </div>
+                  </div>
+                  {data.bio && (
+                    <div
+                      className="prose prose-sm mt-4 text-gray-700"
+                      dangerouslySetInnerHTML={{ __html: data.bio }}
+                    />
+                  )}
+                </SectionBox>
+                {/* SIGNATURE WORK */}
+                <SectionBox title="Signature Work" titleAlign="center">
+                  {normalizedImages.length > 0 && thumbnailIndex !== null ? (
+                    <>
+                      <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm">
+                        {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
+                          <video
+                            src={galleryPreviews[thumbnailIndex]}
+                            className="h-full w-full object-cover"
+                            controls
+                          />
+                        ) : (
+                          <img
+                            src={galleryPreviews[thumbnailIndex]}
+                            className="h-full w-full object-cover transition hover:scale-105 duration-300"
+                            alt="Featured work"
+                          />
+                        )}
+                      </div>
+                      {otherIndexes.length > 0 && (
+                        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                          {otherIndexes.slice(0, 4).map((index) => (
+                            <button
+                              key={index}
+                              onClick={() => setThumbnailIndex(index)}
+                              className={`h-14 w-14 overflow-hidden rounded-lg border shadow-sm flex-shrink-0
+                                ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}
+                              `}
+                            >
+                              {normalizedImages[index]?.file_type === "video" ? (
+                                <video
+                                  src={galleryPreviews[index]}
+                                  className="h-full w-full object-cover"
+                                  muted
+                                />
+                              ) : (
+                                <img
+                                  src={galleryPreviews[index]}
+                                  className="h-full w-full object-cover"
+                                  alt={`Thumbnail ${index + 1}`}
+                                />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex aspect-[4/3] items-center justify-center text-xs text-gray-400">
+                      Featured work will appear here
+                    </div>
+                  )}
+                </SectionBox>
+              </div>
+              {/* ---- RIGHT COLUMN ---- */}
+              <div className="flex flex-col gap-5">
+                {/* LOCATION + BUSINESS HOURS */}
+                <div className="rounded-2xl p-[3px]">
+                  <div
+                    className="rounded-2xl p-4 h-full"
+                    style={{ background: "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)" }}
+                  >
+                    {/* MAP AREA */}
+                    <div>
+                      {data.locations?.length ? (
+                        <>
+                          {data.locations.length > 1 && (
+                            <select
+                              className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-200"
+                              value={selectedLocationId || ""}
+                              onChange={(e) => setSelectedLocationId(e.target.value)}
+                            >
+                              {data.locations.map((loc: any) => (
+                                <option key={loc.id} value={loc.id}>
+                                  {loc.label || `Location ${loc.id}`}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                          {selectedLocation && (
+                            <div className="text-sm mb-3 space-y-1">
+                              {selectedLocation.business_name && (
+                                <p className="font-semibold text-gray-800">
+                                  {selectedLocation.business_name}
+                                </p>
+                              )}
+                              <p className="text-gray-600 leading-relaxed">
+                                {selectedLocation.location_type === "exact_address"
+                                  ? selectedLocation.address?.trim() || "Address not provided"
+                                  : [
+                                    selectedLocation.city?.trim(),
+                                    selectedLocation.state?.trim(),
+                                    selectedLocation.area?.trim(),
+                                  ]
+                                    .filter(Boolean)
+                                    .join(", ") || "Location not fully set"}
+                              </p>
+                              {selectedLocation.phone && (
+                                <p className="text-gray-600">📞 {selectedLocation.phone}</p>
+                              )}
+                              {selectedLocation.description && (
+                                <p className="text-xs text-gray-500 italic">
+                                  {selectedLocation.description}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          {mapSrc ? (
+                            <div className="relative rounded-xl overflow-hidden shadow-sm">
+                              <iframe
+                                title="Business Location Map"
+                                className="w-full h-48 sm:h-52"
+                                style={{ border: 0, display: "block" }}
+                                loading="lazy"
+                                allowFullScreen
+                                referrerPolicy="no-referrer-when-downgrade"
+                                src={mapSrc}
+                              />
+                              <a
+                                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 text-sm whitespace-nowrap"
+                              >
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>
+                                Get Directions
+                              </a>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-gray-400 italic">
+                              Map will appear here once location is set
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-xs text-gray-400 italic">
+                          Location details will appear here once set
+                        </p>
+                      )}
+                    </div>
+                    {/* BUSINESS HOURS */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-3 mt-3">
+                        <span className="flex-1 h-px bg-gray-400/60" />
+                        <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
+                          Business Hours
+                        </p>
+                        <span className="flex-1 h-px bg-gray-400/60" />
+                      </div>
+                      <div className="rounded-xl bg-white p-4 shadow-sm">
+                        <ul className="space-y-1.5 text-sm">
+                          {data?.business_hour && data.business_hour.length ? (
+                            data.business_hour.map((hour: any, index: number) => {
+                              const open = hour.open_time ? formatTime(hour.open_time) : "Closed";
+                              const close = hour.close_time ? formatTime(hour.close_time) : "";
+                              const timeText =
+                                open && close && open !== "Closed"
+                                  ? `${open} - ${close}`
+                                  : open;
+                              return (
+                                <li key={hour.id ?? index} className="flex items-start gap-2">
+                                  <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0" />
+                                  <span className="text-gray-700">
+                                    {hour.note ? hour.note : timeText}
+                                  </span>
+                                </li>
+                              );
+                            })
+                          ) : (
+                            <li className="text-gray-400 text-xs">
+                              Business hours will appear here
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* SPECIALTIES */}
+                <SectionBox title="Specialties" titleAlign="center">
+                  <DotList
+                    items={specialtiesArray}
+                    placeholder="Your specialties will appear here"
+                  />
+                </SectionBox>
+              </div>
+            </div>
+            {/* ===== IMPORTANT INFO — FULL WIDTH ===== */}
+            <div className="rounded-2xl p-[3px] mt-5">
+              <div
+                className="rounded-2xl p-4"
+                style={{ background: "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)" }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="flex-1 h-px bg-gray-400/60" />
+                  <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
+                    Important Info
+                  </p>
+                  <span className="flex-1 h-px bg-gray-400/60" />
+                </div>
+                <div className="rounded-xl bg-white p-4 shadow-sm">
+                  <DotList
+                    items={importantInfoArray}
+                    placeholder="Important information will appear here"
+                  />
+                </div>
+              </div>
+            </div>
+            {/* ===== BOOK NOW BUTTON ===== */}
+            <div className="flex items-center gap-3 mt-6">
+              <div className="flex-1 h-[2px] bg-teal-400" />
               <button
-                onClick={() => downloadVCF(data)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap"
-                title="Save Contact"
+                onClick={() => setIsBookingModalOpen(true)}
+                className="flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white px-8 py-2.5 rounded-full text-sm font-bold tracking-widest transition-colors whitespace-nowrap uppercase shadow-md"
               >
                 <svg
-                  className="w-4 h-4 flex-shrink-0"
+                  className="w-4 h-4"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -347,409 +575,137 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  <path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z" />
-                  <polyline points="9 21 9 13 15 13 15 21" />
-                  <polyline points="9 7 12 7" />
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
                 </svg>
-                Save Contact
+                Book Now
               </button>
-
+              <div className="flex-1 h-[2px] bg-teal-400" />
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* ===== BOOKING MODAL ===== */}
+      {isBookingModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setIsBookingModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-1">
+              <p className="text-base font-bold text-gray-800">
+                How would you like to book?
+              </p>
               <button
-                onClick={onCopyLink}
-                className="h-9 w-9 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50"
-              >
-                🔗
-              </button>
-              <button
-                onClick={() => setIsDownloadModalOpen(true)}
-                className="h-9 w-9 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50"
-              >
-                ⬇️
-              </button>
-              <button
-                onClick={onClose}
-                className="h-9 w-9 flex items-center justify-center rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50"
+                onClick={() => setIsBookingModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 text-lg leading-none"
               >
                 ✕
               </button>
             </div>
-          )}
-
-          {/* ===== LOGO ===== */}
-          <div className="mb-6 text-center">
-            <div className="flex justify-center items-center">
-              <Image src={Logo} alt="access image" width={200} height={200} />
-            </div>
-          </div>
-
-          {/* ===== TWO COLUMN GRID ===== */}
-                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
-
-            {/* ---- LEFT COLUMN ---- */}
-            <div className="flex flex-col gap-5">
-
-              {/* ABOUT */}
-              <SectionBox
-                title={`About ${data.name || "Your Name"}`}
-                titleAlign="left"
+            <p className="text-xs text-gray-500 mb-5">
+              Choose your preferred booking method
+            </p>
+            <div className="flex flex-col gap-3">
+              {/* BOOK VIA LINK */}
+              <a
+                href={data.booking_link || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!data.booking_link) e.preventDefault();
+                }}
+                className={`flex items-center gap-3 p-4 rounded-xl border transition-colors
+            ${data.booking_link
+                    ? "border-gray-200 hover:bg-gray-50"
+                    : "border-gray-200 opacity-50 cursor-not-allowed"
+                  }`}
               >
-                <div className="flex gap-4">
-                  <div className="h-16 w-16 overflow-hidden rounded-full bg-gray-200 ring-2 ring-white shadow flex-shrink-0">
-                    {data?.profile_image && (
-                      <img
-                        src={
-                          mode === "live" && isFile(data.profile_image)
-                            ? URL.createObjectURL(data.profile_image)
-                            : typeof data.profile_image === "string"
-                            ? data.profile_image
-                            : ""
-                        }
-                        className="h-full w-full object-cover"
-                        alt="Profile"
-                      />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-800">
-                      {data.name || "Your Name"}
-                    </p>
-                    <p className="text-sm text-sky-500 font-medium">
-                      {data.professional_title || "Professional Title"}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {data.business_name || "Business Name"}
-                    </p>
-                  </div>
+                <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center flex-shrink-0">
+                  🔗
                 </div>
-                {data.bio && (
-                  <div
-                    className="prose prose-sm mt-4 text-gray-700"
-                    dangerouslySetInnerHTML={{ __html: data.bio }}
-                  />
-                )}
-              </SectionBox>
-
-              {/* SIGNATURE WORK */}
-              <SectionBox title="Signature Work" titleAlign="center">
-                {normalizedImages.length > 0 && thumbnailIndex !== null ? (
-                  <>
-                    <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm">
-                      {normalizedImages[thumbnailIndex]?.file_type ===
-                      "video" ? (
-                        <video
-                          src={galleryPreviews[thumbnailIndex]}
-                          className="h-full w-full object-cover"
-                          controls
-                        />
-                      ) : (
-                        <img
-                          src={galleryPreviews[thumbnailIndex]}
-                          className="h-full w-full object-cover transition hover:scale-105 duration-300"
-                          alt="Featured work"
-                        />
-                      )}
-                    </div>
-                {otherIndexes.length > 0 && (
-  <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-    {otherIndexes.slice(0, 4).map((index) => (
-      <button
-        key={index}
-        onClick={() => setThumbnailIndex(index)}
-        className={`h-14 w-14 overflow-hidden rounded-lg border shadow-sm flex-shrink-0
-          ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}
-        `}
-      >
-        {normalizedImages[index]?.file_type === "video" ? (
-          <video
-            src={galleryPreviews[index]}
-            className="h-full w-full object-cover"
-            muted
-          />
-        ) : (
-          <img
-            src={galleryPreviews[index]}
-            className="h-full w-full object-cover"
-            alt={`Thumbnail ${index + 1}`}
-          />
-        )}
-      </button>
-    ))}
-  </div>
-)}
-                  </>
-                ) : (
-                  <div className="flex aspect-[4/3] items-center justify-center text-xs text-gray-400">
-                    Featured work will appear here
-                  </div>
-                )}
-              </SectionBox>
-            </div>
-
-            {/* ---- RIGHT COLUMN ---- */}
-            <div className="flex flex-col gap-5">
-
-              {/* LOCATION + BUSINESS HOURS — SAME GRADIENT BOX */}
-              <div
-                className="rounded-2xl p-[3px]   "
-                // style={{
-                //   background:
-                //     "linear-gradient(135deg, #a8edea, #c3cfe2, #a8edea)",
-                // }}
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">
+                    Book via Link
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {data.booking_link ? "Visit booking page" : "Not configured"}
+                  </p>
+                </div>
+              </a>
+              {/* CALL / TEXT */}
+              <a
+                href={data.phone ? `tel:${data.phone}` : "#"}
+                onClick={(e) => {
+                  if (!data.phone) e.preventDefault();
+                }}
+                className={`flex items-center gap-3 p-4 rounded-xl border transition-colors
+            ${data.phone
+                    ? "border-gray-200 hover:bg-gray-50"
+                    : "border-gray-200 opacity-50 cursor-not-allowed"
+                  }`}
               >
-                <div
-  className="rounded-2xl p-4 h-full"
-  style={{
-    background: "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)"
-
-  }}
->
-
-                  {/* MAP AREA */}
-                  <div>
-                    {data.locations?.length ? (
-                      <>
-                        {data.locations.length > 1 && (
-                          <select
-                            className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-200"
-                            value={selectedLocationId || ""}
-                            onChange={(e) =>
-                              setSelectedLocationId(e.target.value)
-                            }
-                          >
-                            {data.locations.map((loc: any) => (
-                              <option key={loc.id} value={loc.id}>
-                                {loc.label || `Location ${loc.id}`}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-
-                        {selectedLocation && (
-                          <div className="text-sm mb-3 space-y-1">
-                            {selectedLocation.business_name && (
-                              <p className="font-semibold text-gray-800">
-                                {selectedLocation.business_name}
-                              </p>
-                            )}
-                            <p className="text-gray-600 leading-relaxed">
-                              {selectedLocation.location_type ===
-                              "exact_address"
-                                ? selectedLocation.address?.trim() ||
-                                  "Address not provided"
-                                : [
-                                    selectedLocation.city?.trim(),
-                                    selectedLocation.state?.trim(),
-                                    selectedLocation.area?.trim(),
-                                  ]
-                                    .filter(Boolean)
-                                    .join(", ") || "Location not fully set"}
-                            </p>
-                            {selectedLocation.phone && (
-                              <p className="text-gray-600">
-                                📞 {selectedLocation.phone}
-                              </p>
-                            )}
-                            {selectedLocation.description && (
-                              <p className="text-xs text-gray-500 italic">
-                                {selectedLocation.description}
-                              </p>
-                            )}
-                          </div>
-                        )}
-
-                        {mapSrc ? (
-                          <div className="relative rounded-xl overflow-hidden shadow-sm">
-                            <iframe
-                              title="Business Location Map"
-                              className="w-full h-48 sm:h-52"
-                              style={{ border: 0, display: "block" }}
-                              loading="lazy"
-                              allowFullScreen
-                              referrerPolicy="no-referrer-when-downgrade"
-                              src={mapSrc}
-                            />
-                            <a
-                              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-                                mapQuery
-                              )}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 text-sm whitespace-nowrap"
-                            >
-                              <svg
-                                className="w-4 h-4"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                              >
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                              </svg>
-                              Get Directions
-                            </a>
-                          </div>
-                        ) : (
-                          <p className="text-xs text-gray-400 italic">
-                            Map will appear here once location is set
-                          </p>
-                        )}
-                      </>
-                    ) : (
-                      <p className="text-xs text-gray-400 italic">
-                        Location details will appear here once set
-                      </p>
-                    )}
-                  </div>
-
-                  {/* BUSINESS HOURS — inside same box */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-3 mt-3">
-                      <span className="flex-1 h-px bg-gray-400/60" />
-                      <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
-                        Business Hours
-                      </p>
-                      <span className="flex-1 h-px bg-gray-400/60" />
-                    </div>
-                    <div className="rounded-xl bg-white p-4 shadow-sm">
-                      <ul className="space-y-1.5 text-sm">
-                        {data?.business_hour && data.business_hour.length ? (
-                          data.business_hour.map(
-                            (hour: any, index: number) => {
-                              const open = hour.open_time
-                                ? formatTime(hour.open_time)
-                                : "Closed";
-                              const close = hour.close_time
-                                ? formatTime(hour.close_time)
-                                : "";
-                              const timeText =
-                                open && close && open !== "Closed"
-                                  ? `${open} - ${close}`
-                                  : open;
-                              return (
-                                <li
-                                  key={hour.id ?? index}
-                                  className="flex items-start gap-2"
-                                >
-                                  <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0" />
-                                  <span className="text-gray-700">
-                                    {hour.note ? hour.note : timeText}
-                                  </span>
-                                </li>
-                              );
-                            }
-                          )
-                        ) : (
-                          <li className="text-gray-400 text-xs">
-                            Business hours will appear here
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-                  </div>
-
+                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                  📞
                 </div>
-              </div>
-
-              {/* SPECIALTIES */}
-              <SectionBox title="Specialties" titleAlign="center">
-                <div className="flex justify-between items-start gap-4">
-                  <DotList
-                    items={specialtiesArray}
-                    placeholder="Your specialties will appear here"
-                  />
-                  {/* {data?.qr_code_url && (
-                    <img
-                      src={data.qr_code_url}
-                      alt="QR Code"
-                      className="w-16 h-16 rounded-md border border-gray-200 flex-shrink-0"
-                    />
-                  )} */}
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">
+                    Call / Text
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {data.phone || "Not configured"}
+                  </p>
                 </div>
-              </SectionBox>
-
-            </div>
-          </div>
-
-          {/* ===== IMPORTANT INFO — FULL WIDTH ===== */}
-          <div
-            className="rounded-2xl p-[3px] mt-5 "
-            // style={{
-            //   background:
-            //     "linear-gradient(135deg, #a8edea, #c3cfe2, #a8edea)",
-            // }}
-          >
-            <div
-  className="rounded-2xl p-4"
-  style={{
-    background: "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)"
+              </a>
+              {/* INSTAGRAM DM */}
+              <a
+  href={
+    socialMedia?.instagram
+      ? socialMedia.instagram.startsWith("http")
+        ? socialMedia.instagram.startsWith("https")
+          ? socialMedia.instagram
+          : `https://${socialMedia.instagram}`
+        : `https://ig.me/m/${socialMedia.instagram
+            .replace("https://www.instagram.com/", "")
+            .replace("http://www.instagram.com/", "")
+            .replace("instagram.com/", "")
+            .replace(/^@/, "")}`
+      : "#"
+  }
+  target="_blank"
+  rel="noopener noreferrer"
+  onClick={(e) => {
+    if (!socialMedia?.instagram) e.preventDefault();
   }}
+  className={`flex items-center gap-3 p-4 rounded-xl border transition-colors
+    ${
+      socialMedia?.instagram
+        ? "border-gray-200 hover:bg-gray-50"
+        : "border-gray-200 opacity-50 cursor-not-allowed"
+    }`}
 >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="flex-1 h-px bg-gray-400/60" />
-                <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
-                  Important Info
-                </p>
-                <span className="flex-1 h-px bg-gray-400/60" />
-              </div>
-              <div className="rounded-xl bg-white p-4 shadow-sm">
-                <DotList
-                  items={importantInfoArray}
-                  placeholder="Important information will appear here"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* ===== CTA BUTTON ===== */}
-          {/* <div className="flex items-center gap-3 mt-6">
-            <div className="flex-1 h-[2px] bg-teal-400" />
-            <button className="bg-teal-700 hover:bg-teal-800 text-white px-8 py-2.5 rounded-md text-sm font-bold tracking-widest transition-colors whitespace-nowrap uppercase">
-              DM ON INSTAGRAM
-            </button>
-            <div className="flex-1 h-[2px] bg-teal-400" />
-          </div> */}
-
-          {/* ===== SOCIAL ICONS ===== */}
-          {/* <div className="flex justify-end gap-2 mt-4">
-            <div className="w-9 h-9 rounded-lg border border-gray-300 bg-white flex items-center justify-center text-sm font-bold text-gray-600">
-              G
-            </div>
-            <div className="w-9 h-9 rounded-lg border border-gray-300 bg-white flex items-center justify-center text-base">
-              📷
-            </div>
-            <div className="w-9 h-9 rounded-lg border border-gray-900 bg-gray-900 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="white" className="w-5 h-5">
-                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z" />
-              </svg>
-            </div>
-          </div> */}
-
-<SectionBox title="Specialties" titleAlign="center">
-  <div className="flex justify-between items-start gap-4">
-    <DotList
-      items={specialtiesArray}
-      placeholder="Your specialties will appear here"
-    />
-
-    {/* {qrValue && (
-      <div className="flex flex-col items-center flex-shrink-0">
-        <QRCodeCanvas
-          value={qrValue}
-          size={90}
-          bgColor="#ffffff"
-          fgColor="#000000"
-          level="H"
-          includeMargin={true}
-        />
-        <p className="text-[10px] text-gray-500 mt-1 text-center">
-          Scan me
-        </p>
-      </div>
-    )} */}
+  <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0">
+    📸
   </div>
-</SectionBox>
+
+  <div>
+    <p className="text-sm font-semibold text-gray-800">
+      DM on Instagram
+    </p>
+    <p className="text-xs text-gray-500">
+      {socialMedia?.instagram || "Not configured"}
+    </p>
+  </div>
+</a>
+            </div>
+          </div>
         </div>
-      </div>
-</div>
+      )}
       {/* ===== DOWNLOAD MODAL ===== */}
       <GlamCardDownloadModal
         isOpen={isDownloadModalOpen}
@@ -759,5 +715,4 @@ const GlamCardLivePreview: React.FC<Props> = ({
     </div>
   );
 };
-
 export default GlamCardLivePreview;

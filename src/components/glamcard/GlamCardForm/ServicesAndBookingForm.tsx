@@ -1,60 +1,76 @@
 import React, { useState } from "react";
 import { GlamCardFormData } from "./types";
+
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
 }
+
 const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
 const labelClass = "text-sm font-medium text-gray-700";
 const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm " +
   "text-gray-900 placeholder-gray-400 transition " +
   "focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200";
+
 const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
   if (!data) return null;
+
   const [specialtyInput, setSpecialtyInput] = useState("");
   const [infoInput, setInfoInput] = useState("");
+  const [showInfo, setShowInfo] = useState(false);
+
   const addSpecialty = () => {
     if (!specialtyInput.trim()) return;
     if (data.specialties.length >= 5) return;
+
     setData((prev) => ({
       ...prev,
       specialties: [...prev.specialties, specialtyInput.trim()],
     }));
+
     setSpecialtyInput("");
   };
+
   const removeSpecialty = (index: number) => {
     setData((prev) => ({
       ...prev,
       specialties: prev.specialties.filter((_, i) => i !== index),
     }));
   };
+
   const addInfo = () => {
     if (!infoInput.trim()) return;
+
     setData((prev) => ({
       ...prev,
       important_info: [...prev.important_info, infoInput.trim()],
     }));
+
     setInfoInput("");
   };
+
   const removeInfo = (index: number) => {
     setData((prev) => ({
       ...prev,
       important_info: prev.important_info.filter((_, i) => i !== index),
     }));
   };
+
   const formatInstagram = (value: string) => {
     if (!value.trim()) return "";
     if (value.startsWith("http")) return value.trim();
     const clean = value.replace(/^@/, "").trim();
     return `https://www.instagram.com/${clean}`;
   };
+
   const formatTikTok = (value: string) => {
     if (!value.trim()) return "";
     if (value.startsWith("http")) return value.trim();
     const clean = value.replace(/^@/, "").trim();
     return `https://www.tiktok.com/@${clean}`;
   };
+
   return (
     <section className={sectionClass}>
       <header className="space-y-1">
@@ -63,6 +79,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           Your specialties and how clients can reach you
         </p>
       </header>
+
       {/* Primary Specialty */}
       <div>
         <label className={labelClass}>Primary Specialty *</label>
@@ -73,11 +90,14 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           onChange={(e) =>
             setData((prev) => ({ ...prev, primary_specialty: e.target.value }))
           }
+          required
         />
       </div>
+
       {/* Specialties */}
       <div className="space-y-3">
         <label className={labelClass}>Additional Specialties</label>
+
         <div className="flex gap-2">
           <input
             className={inputClass}
@@ -85,21 +105,25 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             value={specialtyInput}
             onChange={(e) => setSpecialtyInput(e.target.value)}
           />
+
           <button
             type="button"
             onClick={addSpecialty}
             disabled={data.specialties.length >= 5 || !specialtyInput.trim()}
-            className={`rounded-lg px-5 text-sm font-medium transition ${data.specialties.length >= 5 || !specialtyInput.trim()
+            className={`rounded-lg px-5 text-sm font-medium transition ${
+              data.specialties.length >= 5 || !specialtyInput.trim()
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                 : "bg-teal-600 text-white hover:bg-teal-700"
-              }`}
+            }`}
           >
             + Add
           </button>
         </div>
+
         <p className="text-xs text-gray-500">
           Max 5 specialties (showing your expertise)
         </p>
+
         {data.specialties.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {data.specialties.map((item, i) => (
@@ -120,6 +144,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           </div>
         )}
       </div>
+
       {/* Custom Handle */}
       <div>
         <label className={labelClass}>Claim Your Custom Handle</label>
@@ -131,10 +156,8 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             setData((prev) => ({ ...prev, custom_handle: e.target.value }))
           }
         />
-        <p className="mt-1 text-xs text-gray-500">
-          Example: glamqueen_indore → glamlink.net/glamqueen_indore
-        </p>
       </div>
+
       {/* Social Media */}
       <div className="grid gap-4 md:grid-cols-2">
         <div>
@@ -148,12 +171,14 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             }
           />
         </div>
+
         <div>
           <label className={labelClass}>Instagram</label>
           <input
             className={inputClass}
             placeholder="@yourusername or full URL"
             value={data.social_media?.instagram || ""}
+            required={data.preferred_booking_method === "DM_INSTAGRAM"}
             onChange={(e) =>
               setData((prev) => ({
                 ...prev,
@@ -166,6 +191,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           />
         </div>
       </div>
+
       <div>
         <label className={labelClass}>TikTok</label>
         <input
@@ -183,9 +209,47 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
           }
         />
       </div>
-      {/* Preferred Booking Method */}
+
+      {/* Phone */}
       <div>
-        <label className={labelClass}>Preferred Booking Method</label>
+        <label className={labelClass}>Phone Number</label>
+        <input
+          className={inputClass}
+          placeholder="Enter phone number"
+          value={data.phone || ""}
+          required={data.preferred_booking_method === "CALL_TEXT"}
+          onChange={(e) =>
+            setData((prev) => ({
+              ...prev,
+              phone: e.target.value,
+            }))
+          }
+        />
+      </div>
+
+      {/* Preferred Booking Method + Info Popup */}
+      <div>
+        <div className="flex items-center gap-2 relative">
+          <label className={labelClass}>Preferred Booking Method</label>
+
+          <span
+            onMouseEnter={() => setShowInfo(true)}
+            onMouseLeave={() => setShowInfo(false)}
+            className="cursor-pointer text-gray-400 hover:text-gray-600 text-sm"
+          >
+            ⓘ
+          </span>
+
+          {showInfo && (
+            <div className="absolute top-6 left-0 z-10 w-64 rounded-lg bg-black text-white text-xs p-3 shadow-lg">
+              Choose how clients can contact you:
+              <br />• Booking Link → requires link
+              <br />• Call/Text → requires phone number
+              <br />• Instagram DM → requires Instagram
+            </div>
+          )}
+        </div>
+
         <select
           className={inputClass}
           value={data.preferred_booking_method || ""}
@@ -199,21 +263,21 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                   : "",
             }))
           }
+          required
         >
           <option value="">Select booking method...</option>
           <option value="Go_to_Booking_Link">Go to Booking Link</option>
           <option value="CALL_TEXT">Call / Text</option>
           <option value="DM_INSTAGRAM">DM on Instagram</option>
         </select>
-        <p className="mt-1 text-xs text-gray-500">
-          How clients should book appointments with you
-        </p>
+
         {data.preferred_booking_method === "Go_to_Booking_Link" && (
           <div className="mt-4">
             <label className={labelClass}>Booking Link</label>
             <input
               type="url"
               className={inputClass}
+              required
               placeholder="https://booksy.com/yourprofile or calendly.com/..."
               value={data.booking_link || ""}
               onChange={(e) =>
@@ -223,15 +287,14 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                 }))
               }
             />
-            <p className="mt-1 text-xs text-gray-500">
-              Clients will be redirected here to book
-            </p>
           </div>
         )}
       </div>
+
       {/* Important Info */}
       <div className="space-y-3">
         <label className={labelClass}>Important Information</label>
+
         {data.important_info.length > 0 && (
           <div className="space-y-2">
             {data.important_info.map((item, i) => (
@@ -244,7 +307,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                 <button
                   type="button"
                   onClick={() => removeInfo(i)}
-                  className="text-red-600 hover:text-red-800 text-xl "
+                  className="text-red-600 hover:text-red-800 text-xl"
                 >
                   ×
                 </button>
@@ -252,6 +315,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             ))}
           </div>
         )}
+
         <div className="flex gap-2">
           <input
             className={inputClass}
@@ -259,6 +323,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             value={infoInput}
             onChange={(e) => setInfoInput(e.target.value)}
           />
+
           <button
             type="button"
             onClick={addInfo}
@@ -267,11 +332,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             + Add
           </button>
         </div>
-        <p className="text-xs text-gray-500">
-          Key details clients should know before contacting you
-        </p>
       </div>
     </section>
   );
 };
+
 export default ServicesAndBookingForm;

@@ -11,7 +11,7 @@ interface Category {
 interface Props {
   activeCategory: string;
   setActiveCategory: (category: string) => void;
-  vertical?: boolean; // ✅ NEW
+  vertical?: boolean;
 }
 
 const CategoryNav = ({
@@ -44,24 +44,21 @@ const CategoryNav = ({
   }, []);
 
   /* ───────────────────────────────────────────── */
-  /* 🔥 VERTICAL SIDEBAR VERSION */
+  /* ✅ DESKTOP SIDEBAR (UNCHANGED) */
   /* ───────────────────────────────────────────── */
   if (vertical) {
     return (
       <div className="border border-border/40 rounded-xl p-4 bg-background shadow-sm">
-        {/* Title */}
         <div className="mb-4">
           <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Categories
           </h2>
         </div>
 
-        {/* List */}
         <div className="flex flex-col gap-1">
-          {/* All */}
           <button
             onClick={() => setActiveCategory("All")}
-            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200
+            className={`w-full text-left px-3 py-2 rounded-md text-sm transition
               ${
                 activeCategory === "All"
                   ? "bg-primary/10 text-primary font-medium"
@@ -71,13 +68,12 @@ const CategoryNav = ({
             All
           </button>
 
-          {/* Categories */}
           {!loading &&
             categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.title)}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200
+                className={`w-full text-left px-3 py-2 rounded-md text-sm transition
                   ${
                     activeCategory === category.title
                       ? "bg-primary/10 text-primary font-medium"
@@ -93,35 +89,38 @@ const CategoryNav = ({
   }
 
   /* ───────────────────────────────────────────── */
-  /* DEFAULT (HORIZONTAL — KEEP FOR MOBILE/FALLBACK) */
+  /* ✅ MOBILE HORIZONTAL SCROLL (LIKE ALLURE) */
   /* ───────────────────────────────────────────── */
 
   return (
-    <nav className="sticky top-[65px] z-40 bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center gap-6 overflow-x-auto py-4 scrollbar-hide">
+    <nav className="lg:hidden sticky top-[60px] z-50 bg-white border-b border-gray-200">
+      <div className="w-full px-4">
+        <div className="flex items-center gap-3 overflow-x-auto py-3 whitespace-nowrap scrollbar-hide">
+          
+          {/* ALL */}
           <button
             onClick={() => setActiveCategory("All")}
-            className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap
+            className={`px-4 py-2 rounded-full text-sm font-medium flex-shrink-0 transition
               ${
                 activeCategory === "All"
-                  ? "bg-primary/10 text-primary"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-black text-white"
+                  : "bg-gray-100 text-gray-700"
               }`}
           >
             All
           </button>
 
+          {/* DYNAMIC */}
           {!loading &&
             categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.title)}
-                className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap
+                className={`px-4 py-2 rounded-full text-sm font-medium flex-shrink-0 transition
                   ${
                     activeCategory === category.title
-                      ? "bg-primary/10 text-primary"
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "bg-black text-white"
+                      : "bg-gray-100 text-gray-700"
                   }`}
               >
                 {category.title}

@@ -12,7 +12,61 @@ import { useRouter } from "next/navigation";
 /* ───────────────────────────────────────────────────────────── */
 /* Flipbook Panel (UNCHANGED) */
 /* ───────────────────────────────────────────────────────────── */
+const MobileMagazineCarousel = ({
+  onIssueClick,
+}: {
+  onIssueClick: (issue: Issue) => void;
+}) => {
+  const getIssueNumber = (issue: Issue) => {
+    return Number(issue.title.match(/\d+/)?.[0] || 0);
+  };
 
+  const sortedIssues = [...issues2026, ...issues2025].sort(
+    (a, b) => getIssueNumber(b) - getIssueNumber(a)
+  );
+
+  const latestIssues = sortedIssues.slice(0, 5);
+
+  return (
+    <div className="lg:hidden mt-2">
+      <h3 className="text-xs font-bold uppercase mb-3 text-foreground px-1">
+        Latest Issues
+      </h3>
+
+      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+        {latestIssues.map((issue) => {
+          const issueNum = getIssueNumber(issue);
+
+          return (
+            <div
+              key={issue.slug}
+              onClick={() => onIssueClick(issue)}
+              className="min-w-[110px] cursor-pointer"
+            >
+              <div className="w-full h-[140px] rounded-lg overflow-hidden bg-muted/30">
+                {issue.cover ? (
+                  <img
+                    src={issue.cover}
+                    alt={issue.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-xs text-[#24bbcb] font-bold">
+                    #{issueNum}
+                  </div>
+                )}
+              </div>
+
+              <p className="text-[11px] mt-1 text-center font-medium line-clamp-2">
+                Issue {issueNum}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 const FlipbookPanel = ({
   issue,
   onClose,
@@ -39,10 +93,9 @@ const FlipbookPanel = ({
     <>
       <div
         className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-30 transition-opacity duration-300
-          ${
-            isOpen
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none"
+          ${isOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
           }`}
         onClick={onClose}
       />
@@ -127,7 +180,7 @@ const MagazineSidebar = ({
   const getIssueNumber = (issue: Issue) => {
     return Number(issue.title.match(/\d+/)?.[0] || 0);
   };
-const router = useRouter();
+  const router = useRouter();
   // 👉 Merge + sort ALL issues correctly
   const sortedIssues = [...issues2026, ...issues2025].sort(
     (a, b) => getIssueNumber(b) - getIssueNumber(a)
@@ -166,10 +219,9 @@ const router = useRouter();
               className={`
                 group flex items-center gap-3 p-2.5 rounded-lg cursor-pointer
                 border transition-all duration-200
-                ${
-                  isActive
-                    ? "bg-[#24bbcb]/10 border-[#24bbcb]/40"
-                    : "border-transparent hover:bg-[#24bbcb]/5"
+                ${isActive
+                  ? "bg-[#24bbcb]/10 border-[#24bbcb]/40"
+                  : "border-transparent hover:bg-[#24bbcb]/5"
                 }
               `}
             >
@@ -204,16 +256,16 @@ const router = useRouter();
       </div>
 
       {/* FOOTER CTA */}
-     <div className="px-4 py-3 border-t border-border/30 bg-muted/5">
+      <div className="px-4 py-3 border-t border-border/30 bg-muted/5">
 
-  <Button
-    variant="outline"
-    size="sm"
-    onClick={() => router.push("/magazine")}
-    className="w-full rounded-full text-xs border-[#24bbcb]/40 hover:border-[#24bbcb] hover:text-[#24bbcb]"
-  >
-    View All Issues
-  </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => router.push("/magazine")}
+          className="w-full rounded-full text-xs border-[#24bbcb]/40 hover:border-[#24bbcb] hover:text-[#24bbcb]"
+        >
+          View All Issues
+        </Button>
 
       </div>
     </div>
@@ -250,8 +302,24 @@ const JournalClient = () => {
           </aside>
 
           {/* CENTER — flexible, not greedy */}
-          <main className="space-y-12 w-full max-w-[1100px] mx-auto">
-            <HeroSection />
+          {/* CENTER — flexible, not greedy */}
+          <main className="space-y-6 w-full max-w-[1100px] mx-auto">
+
+            {/* ✅ MOBILE CATEGORY NAV (TOP STICKY) */}
+            <div className="lg:hidden">
+              <CategoryNav
+                activeCategory={activeCategory}
+                setActiveCategory={setActiveCategory}
+              />
+            </div>
+              {/* ✅ MOBILE CAROUSEL */}
+              <MobileMagazineCarousel
+                onIssueClick={handleIssueClick}
+              />
+            <div className="hidden lg:block">
+              <HeroSection />
+            </div>
+
             <BlogGrid activeCategory={activeCategory} />
           </main>
 
