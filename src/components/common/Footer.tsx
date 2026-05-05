@@ -16,6 +16,7 @@ const footerLinks = {
   ],
   company: [
     { label: "Privacy Policy", href: "/privacy" },
+    { label: "CSAM Policy", href: "/csam-policy" },
     { label: "Terms of Use", href: "/terms" },
     { label: "Sitemap", href: "/sitemap.xml" },
   ],

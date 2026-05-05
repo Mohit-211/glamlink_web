@@ -41,15 +41,15 @@ const IssueCard = ({ issue }: IssueCardProps) => {
             </span>
           </div>
 
-          <h3 className="font-serif text-lg sm:text-2xl lg:text-2.5xl leading-tight tracking-tight line-clamp-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] group-hover:drop-shadow-[0_3px_12px_rgba(0,0,0,1)] transition-all duration-400">
+          {/* <h3 className="font-serif text-lg sm:text-2xl lg:text-2.5xl leading-tight tracking-tight line-clamp-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] group-hover:drop-shadow-[0_3px_12px_rgba(0,0,0,1)] transition-all duration-400">
             {issue.title}
-          </h3>
+          </h3> */}
         </div>
 
         <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-600 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
       </div>
 
-      <div className="absolute bottom-4 left-4 right-4 translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 md:block hidden">
+      <div className="absolute bottom-4 mt-10 left-4 right-4 translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 md:block hidden">
         <Button
           onClick={handleDigitalEdition}
           className="w-full rounded-full bg-[#24bbcb] hover:bg-[#1ea8b5] text-white shadow-lg shadow-[#24bbcb]/30 hover:shadow-xl hover:shadow-[#24bbcb]/40 transition-all duration-300 font-medium text-sm sm:text-base active:scale-[0.98]"
@@ -59,7 +59,7 @@ const IssueCard = ({ issue }: IssueCardProps) => {
         </Button>
       </div>
 
-      <div className="p-5 pt-3 md:hidden bg-gradient-to-t from-background/90 to-transparent">
+      <div className="p-5 pt-3 md:hidden bg-gradient-to-t from-background/90 to-transparent mt-20">
         <Button
           onClick={handleDigitalEdition}
           className="w-full rounded-full bg-[#24bbcb]/95 hover:bg-[#24bbcb] text-white text-sm"

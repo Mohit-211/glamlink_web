@@ -105,7 +105,7 @@ export default function TermsOfUsePage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Table of Contents</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {sections.map((section) => (
-                <button key={section.id} onClick={() => scrollToSection(section.anchor)} className={`text-left px-4 py-2 rounded-lg transition-colors ${activeSection === section.id ? "bg-glamlink-teal text-white font-medium" : "bg-gray-50 text-gray-700 hover:bg-gray-100"}`}>
+                <button key={section.id} onClick={() => scrollToSection(section.anchor)} className="text-left px-4 py-2 rounded-lg transition-colors" >
                   <span className="text-sm font-medium">{section.id}.</span> {section.title}
                 </button>
               ))}
