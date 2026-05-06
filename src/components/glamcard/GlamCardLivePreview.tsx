@@ -114,7 +114,7 @@ const DotList: React.FC<{ items: any[]; placeholder: string }> = ({
     {items.length ? (
       items.map((item, i) => (
         <li key={i} className="flex items-start gap-2">
-          <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0" />
+          <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-[#23B9CD] flex-shrink-0" />
           <span className="text-gray-700">
             {typeof item === "string"
               ? item
@@ -258,7 +258,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
       <div className="p-4 bg-[#F4F9FF] min-h-screen flex items-center justify-center">
         <div
           className="p-[2px] rounded-2xl"
-          style={{ background: "linear-gradient(135deg, #2dd4bf, #a8edea 50%, #2dd4bf)" }}
+          style={{ background: "linear-gradient(135deg, #23B9CD, #a8edea 50%, #23B9CD)" }}
         >
           <div className="rounded-2xl bg-[#F4F9FF] p-6 shadow-sm">
             {/* ===== TOP ACTION BUTTONS (view mode only) ===== */}
@@ -266,7 +266,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
               <div className="flex justify-end gap-2 mb-3">
                 <button
                   onClick={() => downloadVCF(data)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#23B9CD] hover:bg-[#1ea8b5] text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap"
                   title="Save Contact"
                 >
                   <svg
@@ -564,7 +564,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
               <div className="flex-1 h-[2px] bg-teal-400" />
               <button
                 onClick={() => setIsBookingModalOpen(true)}
-                className="flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white px-8 py-2.5 rounded-full text-sm font-bold tracking-widest transition-colors whitespace-nowrap uppercase shadow-md"
+                className="flex items-center gap-2 bg-[#23B9CD] hover:bg-[#1ea8b5] text-white px-8 py-2.5 rounded-full text-sm font-bold tracking-widest transition-colors whitespace-nowrap uppercase shadow-md"
               >
                 <svg
                   className="w-4 h-4"

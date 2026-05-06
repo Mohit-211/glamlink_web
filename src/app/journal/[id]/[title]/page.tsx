@@ -277,17 +277,18 @@ export default async function Article({
           <div className="border-t border-gray-100 my-14 mx-auto" />
 
           {/* ── RELATED ARTICLES ── */}
-          <section>
-            <div className="text-center mb-8">
-              <p className="text-[10px] tracking-[.15em] uppercase text-gray-400 mb-2">
-                Continue reading
-              </p>
-              <h2 className="font-serif text-3xl text-gray-900">
-                Related articles
-              </h2>
-            </div>
-            <RelatedArticles category_id={article?.category_id} />
-          </section>
+     <section style={{justifyItems:"center"}}>
+  <div className="text-center mb-8 mx-auto max-w-2xl">
+    <p className="text-[10px] tracking-[.15em] uppercase text-gray-400 mb-2">
+      Continue reading
+    </p>
+    <h2 className="font-serif text-3xl text-gray-900">
+      Related articles
+    </h2>
+  </div>
+
+  <RelatedArticles category_id={article?.category_id} />
+</section>
 
         </article>
       </main>
