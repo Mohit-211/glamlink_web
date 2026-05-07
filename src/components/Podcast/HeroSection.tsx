@@ -23,7 +23,6 @@ export default function HeroSection({ onGuestClick }: HeroSectionProps) {
       style={{
         background: "#fff",
         borderBottom: "0.5px solid #d0e8ea",
-        padding: "clamp(2rem, 5vw, 3.5rem) clamp(1rem, 4vw, 1.5rem) clamp(1.5rem, 4vw, 3rem)",
       }}
     >
       <div
@@ -133,7 +132,7 @@ export default function HeroSection({ onGuestClick }: HeroSectionProps) {
               onMouseEnter={() => setSuggestHovered(true)}
               onMouseLeave={() => setSuggestHovered(false)}
             >
-              Suggest a Guest
+              Apply to be a guest
             </button>
             <button
               style={{
@@ -159,56 +158,7 @@ export default function HeroSection({ onGuestClick }: HeroSectionProps) {
             </button>
           </div>
 
-          {/* Stats row */}
-          <div
-            style={{
-              display: "flex",
-              gap: "clamp(1rem, 4vw, 2rem)",
-              paddingTop: "1.75rem",
-              borderTop: "0.5px solid #d8e8e9",
-              flexWrap: "wrap",
-            }}
-          >
-            {[
-              { val: "24+", label: "Episodes" },
-              { val: "Weekly", label: "New Drops" },
-              { val: "3", label: "Platforms" },
-            ].map((stat, i, arr) => (
-              <div
-                key={stat.label}
-                style={{ display: "flex", alignItems: "center", gap: "clamp(1rem, 4vw, 2rem)" }}
-              >
-                <div>
-                  <div
-                    style={{
-                      fontSize: "clamp(16px, 3vw, 20px)",
-                      fontWeight: 700,
-                      color: "#0f1a14",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {stat.val}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "clamp(9px, 1.5vw, 10px)",
-                      letterSpacing: "0.16em",
-                      textTransform: "uppercase",
-                      color: "#8fa898",
-                      marginTop: "4px",
-                    }}
-                  >
-                    {stat.label}
-                  </div>
-                </div>
-                {i < arr.length - 1 && (
-                  <div
-                    style={{ width: "1px", height: "32px", background: "#d8e8e9" }}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
+        
         </div>
       </div>
 

@@ -291,7 +291,7 @@ function ListenOnCard() {
           Listen On
         </p>
         <p style={{ fontSize: "12px", marginBottom: "16px", color: "hsl(210 12% 55%)" }}>Available on all major platforms</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        {/* <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {platforms.map(({ href, label, icon, color, bg }) => (
             <a
               key={label}
@@ -316,7 +316,7 @@ function ListenOnCard() {
               </svg>
             </a>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -439,7 +439,7 @@ export default function PodcastMain() {
       `}</style>
 
       {/* Hero */}
-      <div style={{ marginTop: "50px" }}>
+      <div style={{ marginTop: "120px" }}>
         <HeroSection onGuestClick={() => setGuestModalOpen(true)} />
       </div>
 

@@ -6,7 +6,7 @@ interface ScheduleItem {
   day: string;
   guest: string;
   topic: string;
-  availableOn: string[];
+
 }
 
 const SCHEDULE: ScheduleItem[] = [
@@ -14,71 +14,61 @@ const SCHEDULE: ScheduleItem[] = [
     date: "MAY 4",
     day: "SUNDAY",
     guest: "Dr. Alexis Granite",
-    topic: "Skin Longevity & the Science of Aging Gracefully",
-    availableOn: ["YouTube", "Spotify", "Apple"],
+    topic: "Skin Longevity & the Science of Aging Gracefully"
   },
   {
     date: "MAY 11",
     day: "SUNDAY",
     guest: "Tara Miller",
-    topic: "Building a 7-Figure Esthetics Business From Scratch",
-    availableOn: ["YouTube", "Spotify", "Apple"],
+    topic: "Building a 7-Figure Esthetics Business From Scratch"
   },
   {
     date: "MAY 18",
     day: "SUNDAY",
     guest: "Camille Noir",
-    topic: "Fragrance as Identity: The Art of Scent Branding",
-    availableOn: ["YouTube", "Spotify", "Apple"],
+    topic: "Fragrance as Identity: The Art of Scent Branding"
   },
   {
     date: "MAY 25",
     day: "SUNDAY",
     guest: "TBA",
-    topic: "Wellness Rituals from Around the World",
-    availableOn: ["YouTube", "Spotify", "Apple"],
+    topic: "Wellness Rituals from Around the World"
   },
   {
     date: "JUN 1",
     day: "SUNDAY",
     guest: "Priya Desai",
-    topic: "Ayurvedic Beauty: Ancient Secrets for Modern Skin",
-    availableOn: ["YouTube", "Spotify", "Apple"],
+    topic: "Ayurvedic Beauty: Ancient Secrets for Modern Skin"
   },
   {
     date: "JUN 8",
     day: "SUNDAY",
     guest: "Sofia Reyes",
-    topic: "From Chair to CEO: Opening Your Own Salon Suite",
-    availableOn: ["YouTube", "Spotify", "Apple"],
+    topic: "From Chair to CEO: Opening Your Own Salon Suite"
   },
   {
     date: "JUN 15",
     day: "SUNDAY",
     guest: "Dr. Naomi Kwon",
-    topic: "The Truth About Laser Treatments & Skin of Color",
-    availableOn: ["YouTube", "Spotify", "Apple"],
+    topic: "The Truth About Laser Treatments & Skin of Color"
   },
   {
     date: "JUN 22",
     day: "SUNDAY",
     guest: "Jade Fontaine",
-    topic: "Clean Beauty Myths Debunked by a Cosmetic Chemist",
-    availableOn: ["YouTube", "Spotify", "Apple"],
+    topic: "Clean Beauty Myths Debunked by a Cosmetic Chemist"
   },
   {
     date: "JUN 29",
     day: "SUNDAY",
     guest: "TBA",
-    topic: "Summer Skin Survival: Heat, Humidity & SPF",
-    availableOn: ["YouTube", "Spotify", "Apple"],
+    topic: "Summer Skin Survival: Heat, Humidity & SPF"
   },
   {
     date: "JUL 6",
     day: "SUNDAY",
     guest: "Marcus Bell",
-    topic: "Men's Grooming in the Age of Skincare Culture",
-    availableOn: ["YouTube", "Spotify", "Apple"],
+    topic: "Men's Grooming in the Age of Skincare Culture"
   },
 ];
 
@@ -256,14 +246,7 @@ export default function UpcomingSchedule() {
                     </p>
                   </td>
 
-                  {/* Platforms */}
-                  <td className="py-5 align-top">
-                    <div className="flex flex-wrap gap-y-1">
-                      {item.availableOn.map((p) => (
-                        <PlatformBadge key={p} name={p} />
-                      ))}
-                    </div>
-                  </td>
+                  
                 </tr>
               ))}
             </tbody>

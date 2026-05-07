@@ -122,7 +122,7 @@ export default function UpcomingSchedule2() {
                 </p>
 
                 {/* Platform dots */}
-                <div className="flex items-center gap-1.5">
+                {/* <div className="flex items-center gap-1.5">
                   {item.availableOn.map((p) => (
                     <span
                       key={p}
@@ -136,7 +136,7 @@ export default function UpcomingSchedule2() {
                       {p}
                     </span>
                   ))}
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

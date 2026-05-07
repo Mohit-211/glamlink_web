@@ -31,6 +31,7 @@ export async function generateMetadata({
   const { id, title } = await params;
 
   const response = await getBlogsById(id);
+  console.log(response,"response")
   const article: BlogData = response?.data;
 
   if (!article) {
