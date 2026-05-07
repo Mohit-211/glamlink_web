@@ -23,6 +23,13 @@ export const getAllBlogs = async () => {
   const response = await api.get("journal");
   return response.data;
 };
+//  Get all Podcast
+export const getAllPodcast = async () => {
+  const response = await api.get("podcast-schedule/list");
+  return response.data;
+};
+
+
 // =============================
 // 📌 Get Blog By ID
 // =============================

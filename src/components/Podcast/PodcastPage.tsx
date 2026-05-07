@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import GuestModal from "./GuestModal";
 import NotifySection from "./Notifysection";
-import UpcomingSchedule2 from "./UpcomingSchedule2";
+import UpcomingSchedule from "./UpcomingSchedule";
 import HeroSection from "./HeroSection";
 
 interface Video {
@@ -556,7 +556,7 @@ export default function PodcastMain() {
                 <h3 style={{ fontSize: "17px", fontWeight: 700, color: "white", letterSpacing: "-0.01em" }}>Upcoming Schedule</h3>
               </div>
               <div style={{ background: "white" }}>
-                <UpcomingSchedule2 />
+                <UpcomingSchedule />
               </div>
             </div>
 

@@ -1,285 +1,271 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { getAllPodcast } from "@/api/Api";
 
-// ─── Types ─────────────────────────────────────────────
-export interface ScheduleEpisode {
-  month: string;
-  day: number;
-  dayName: string;
-  guest: string;
-  company: string;
-  platforms: string[];
-  status: "dropping_soon" | "upcoming" | "tba" | "cover" | "live";
-  note?: string;
+
+interface ScheduleItem {
+  id: number;
+  name: string;
+  schedule_date: string;
+  short_description: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
+  is_active?: boolean;
 }
 
-// ─── Data (15+ items) ─────────────────────────────────
-export const SCHEDULE: ScheduleEpisode[] = [
-  {
-    month: "APRIL",
-    day: 27,
-    dayName: "SUNDAY",
-    guest: "Brianna Shaneybrook",
-    company: "Omniluminous",
-    platforms: ["YOUTUBE", "PODCAST", "GLAMLINK.NET"],
-    status: "dropping_soon",
-  },
-  {
-    month: "MAY",
-    day: 4,
-    dayName: "SUNDAY",
-    guest: "Jessica Leigh",
-    company: "The Legacy Collective",
-    platforms: ["YOUTUBE", "PODCAST"],
-    status: "upcoming",
-  },
-  {
-    month: "MAY",
-    day: 11,
-    dayName: "SUNDAY",
-    guest: "Sariah Yackee",
-    company: "Marini Skin Solutions",
-    platforms: ["YOUTUBE", "PODCAST"],
-    status: "upcoming",
-  },
-  {
-    month: "JUNE",
-    day: 22,
-    dayName: "SUNDAY",
-    guest: "Stephani",
-    company: "Nakedskn",
-    platforms: ["YOUTUBE", "PODCAST"],
-    status: "upcoming",
-  },
-  {
-    month: "JUNE",
-    day: 29,
-    dayName: "SUNDAY",
-    guest: "California Guest",
-    company: "To Be Announced",
-    platforms: ["SPECIAL EDITION"],
-    status: "tba",
-    note: "CALIFORNIA SESSIONS — COMING JUNE 29",
-  },
-  {
-    month: "JULY",
-    day: 6,
-    dayName: "SUNDAY",
-    guest: "Michael",
-    company: "Philly Facial Surgery Issue Cover Feature",
-    platforms: ["COVER FEATURE", "PRINT + DIGITAL"],
-    status: "cover",
-  },
+const PAGE_SIZE = 4;
 
-  // EXTRA ITEMS
-  {
-    month: "JULY",
-    day: 13,
-    dayName: "SUNDAY",
-    guest: "Ariana Cole",
-    company: "SkinLab Studio",
-    platforms: ["YOUTUBE", "PODCAST"],
-    status: "upcoming",
-  },
-  {
-    month: "JULY",
-    day: 20,
-    dayName: "SUNDAY",
-    guest: "Daniel Cruz",
-    company: "GlowTech Aesthetics",
-    platforms: ["YOUTUBE"],
-    status: "upcoming",
-  },
-  {
-    month: "JULY",
-    day: 27,
-    dayName: "SUNDAY",
-    guest: "Emily Rhodes",
-    company: "Radiant Skin Co.",
-    platforms: ["PODCAST"],
-    status: "upcoming",
-  },
-  {
-    month: "AUGUST",
-    day: 3,
-    dayName: "SUNDAY",
-    guest: "Chris Walker",
-    company: "Elite Derm Group",
-    platforms: ["YOUTUBE"],
-    status: "upcoming",
-  },
-  {
-    month: "AUGUST",
-    day: 10,
-    dayName: "SUNDAY",
-    guest: "Sophia Bennett",
-    company: "Luxe Aesthetic Clinic",
-    platforms: ["YOUTUBE", "SOCIAL"],
-    status: "upcoming",
-  },
-  {
-    month: "AUGUST",
-    day: 17,
-    dayName: "SUNDAY",
-    guest: "Ryan Mitchell",
-    company: "NextGen Skincare",
-    platforms: ["PODCAST"],
-    status: "upcoming",
-  },
-  {
-    month: "AUGUST",
-    day: 24,
-    dayName: "SUNDAY",
-    guest: "Isabella Moore",
-    company: "Glow House",
-    platforms: ["YOUTUBE"],
-    status: "upcoming",
-  },
-  {
-    month: "SEPTEMBER",
-    day: 7,
-    dayName: "SUNDAY",
-    guest: "Liam Carter",
-    company: "Advanced Aesthetics",
-    platforms: ["SOCIAL"],
-    status: "upcoming",
-  },
-  {
-    month: "SEPTEMBER",
-    day: 14,
-    dayName: "SUNDAY",
-    guest: "Olivia Harper",
-    company: "Skin Revival Clinic",
-    platforms: ["PODCAST"],
-    status: "upcoming",
-  },
-];
+function getInitials(name: string) {
+  if (!name || name === "TBA") return "?";
 
-// ─── Status Config ─────────────────────────────────────
-const STATUS_CONFIG: Record<
-  ScheduleEpisode["status"],
-  { label: string; color: string; border: string }
-> = {
-  dropping_soon: {
-    label: "DROPPING SOON",
-    color: "hsl(184 70% 38%)",
-    border: "hsl(184 70% 38%)",
-  },
-  live: {
-    label: "LIVE",
-    color: "#00ff9d",
-    border: "#00ff9d",
-  },
-  upcoming: {
-    label: "UPCOMING",
-    color: "rgba(255,255,255,0.6)",
-    border: "rgba(255,255,255,0.2)",
-  },
-  tba: {
-    label: "TBA",
-    color: "rgba(255,255,255,0.6)",
-    border: "rgba(255,255,255,0.2)",
-  },
-  cover: {
-    label: "COVER",
-    color: "#f4c27a",
-    border: "#f4c27a",
-  },
-};
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
-// ─── Component ─────────────────────────────────────────
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function AvatarCircle({
+  name,
+  index,
+}: {
+  name: string;
+  index: number;
+}) {
+  const palettes = [
+    { bg: "hsl(184 50% 88%)", text: "hsl(184 70% 28%)" },
+    { bg: "hsl(280 40% 90%)", text: "hsl(280 60% 35%)" },
+    { bg: "hsl(30 50% 90%)", text: "hsl(30 70% 30%)" },
+    { bg: "hsl(340 50% 90%)", text: "hsl(340 60% 35%)" },
+    { bg: "hsl(200 50% 88%)", text: "hsl(200 70% 28%)" },
+  ];
+
+  const p = palettes[index % palettes.length];
+
+  return (
+    <div
+      className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-bold"
+      style={{ background: p.bg, color: p.text }}
+    >
+      {getInitials(name)}
+    </div>
+  );
+}
+
 export default function UpcomingSchedule() {
-  const [visibleCount, setVisibleCount] = useState(10);
+  const [visible, setVisible] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const visibleData = SCHEDULE.slice(0, visibleCount);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const shownItems = schedule.slice(0, visibleCount);
+  const hasMore = visibleCount < schedule.length;
+
+  useEffect(() => {
+    fetchPodcast();
+  }, []);
+
+  const fetchPodcast = async () => {
+    try {
+      setLoading(true);
+
+      const response = await getAllPodcast();
+
+      setSchedule(response?.data || []);
+    } catch (error) {
+      console.error("Podcast fetch error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="py-10 text-center text-sm text-gray-500">
+        Loading schedule...
+      </div>
+    );
+  }
 
   return (
     <section
+      ref={ref}
+      className="relative"
       style={{
-        background:
-          "radial-gradient(circle at top, hsl(184 45% 30%) 0%, hsl(184 50% 18%) 100%)",
-        padding: "60px 0"
+        fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif",
       }}
     >
-      {/* Header */}
-      <div className="max-w-5xl mx-auto px-6 mb-10">
-        <h2 className="text-4xl text-white font-light">
-          Upcoming <em>Episodes</em>
-        </h2>
-      </div>
+      <div
+        className="divide-y"
+        style={{ borderColor: "hsl(204 14% 92%)" }}
+      >
+        {shownItems.map((item, i) => (
+          <div
+            key={item.id}
+            className="px-5 py-4 transition-all duration-200 cursor-default"
+            style={{
+              // opacity: visible ? 1 : 0,
+              transform: visible
+                ? "translateY(0)"
+                : "translateY(10px)",
+              transition: `opacity 0.45s ease ${
+                i * 70
+              }ms, transform 0.45s ease ${
+                i * 70
+              }ms, background 0.15s ease`,
+              background:
+                hoveredIndex === i
+                  ? "hsl(184 40% 97%)"
+                  : "white",
+            }}
+            onMouseEnter={() => setHoveredIndex(i)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
+            <div className="flex items-start gap-3">
+              <AvatarCircle
+                name={item.name}
+                index={i}
+              />
 
-      {/* Cards */}
-      <div className="max-w-5xl mx-auto px-6 space-y-5">
-        {visibleData.map((ep, i) => {
-          const cfg = STATUS_CONFIG[ep.status];
-
-          return (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              whileHover={{ scale: 1.02 }}
-              className="rounded-2xl p-[1px] bg-white/10"
-            >
-              <div className="backdrop-blur-xl bg-white/5 rounded-2xl p-6 flex justify-between flex-col md:flex-row gap-6 border border-white/10">
-
-                {/* LEFT */}
-                <div className="flex gap-5">
-                  <div>
-                    <div className="text-xs text-white/50">{ep.month}</div>
-                    <div className="text-4xl text-white">{ep.day}</div>
-                    <div className="text-xs text-white/40">{ep.dayName}</div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl text-white">{ep.guest}</h3>
-                    <p className="text-xs text-white/50">{ep.company}</p>
-
-                    <div className="flex gap-2 mt-2 flex-wrap">
-                      {ep.platforms.map((p) => (
-                        <span
-                          key={p}
-                          className="text-[10px] px-2 py-1 border border-white/20 rounded-full text-white/60"
-                        >
-                          {p}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* RIGHT */}
-                <div className="flex items-center justify-between md:flex-col md:items-end gap-3">
-                  <span
-                    className="text-xs px-3 py-1 rounded-full"
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2 mb-0.5">
+                  <p
+                    className="text-[13px] font-semibold leading-tight truncate"
                     style={{
-                      color: cfg.color,
-                      border: `1px solid ${cfg.border}`,
+                      color: "hsl(210 30% 10%)",
                     }}
                   >
-                    {cfg.label}
+                    {item.name}
+                  </p>
+
+                  <span
+                    className="text-[9px] tracking-[0.15em] uppercase font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+                    style={{
+                      background: "hsl(184 50% 92%)",
+                      color: "hsl(184 70% 28%)",
+                    }}
+                  >
+                    {formatDate(item.schedule_date)}
                   </span>
                 </div>
+
+                <p
+                  className="text-[12px] leading-snug mb-2"
+                  style={{
+                    color: "hsl(210 15% 42%)",
+                  }}
+                >
+                  {item.short_description}
+                </p>
               </div>
-            </motion.div>
-          );
-        })}
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Load More */}
-      {visibleCount < SCHEDULE.length && (
-        <div className="text-center mt-10">
+      <div
+        className="px-5 py-3 flex items-center justify-between"
+        style={{
+          borderTop: "1px solid hsl(204 14% 92%)",
+          background: "hsl(204 18% 98%)",
+        }}
+      >
+        <p
+          className="text-[10px]"
+          style={{ color: "hsl(210 12% 60%)" }}
+        >
+          {shownItems.length} of {schedule.length} episodes
+        </p>
+
+        {hasMore ? (
           <button
-            onClick={() => setVisibleCount((prev) => prev + 10)}
-            className="px-6 py-2 border border-white/20 text-white rounded-full hover:bg-white/10 transition"
+            type="button"
+            onClick={() =>
+              setVisibleCount((c) =>
+                Math.min(c + PAGE_SIZE, schedule.length)
+              )
+            }
+            className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide transition-all duration-150 hover:opacity-70"
+            style={{ color: "hsl(184 70% 35%)" }}
           >
-            Load More
+            Load{" "}
+            {Math.min(
+              PAGE_SIZE,
+              schedule.length - visibleCount
+            )}{" "}
+            more
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              className="w-3 h-3"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
           </button>
-        </div>
-      )}
+        ) : schedule.length > PAGE_SIZE ? (
+          <button
+            type="button"
+            onClick={() => setVisibleCount(PAGE_SIZE)}
+            className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide transition-all duration-150 hover:opacity-70"
+            style={{ color: "hsl(210 12% 55%)" }}
+          >
+            Show less
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              className="w-3 h-3"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 15l7-7 7 7"
+              />
+            </svg>
+          </button>
+        ) : null}
+      </div>
     </section>
   );
 }
