@@ -400,3 +400,14 @@
   list-style: decimal;
   padding-left: 1.5rem;
 }
+/* REMOVE CKEDITOR POWERED BY */
+
+.ck.ck-powered-by,
+.ck-powered-by,
+.ck.ck-balloon-panel.ck-powered-by-balloon,
+.ck-license-notice,
+.ck-editor__top .ck-powered-by {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}

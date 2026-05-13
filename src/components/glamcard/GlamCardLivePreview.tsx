@@ -127,7 +127,7 @@ const DotList: React.FC<{ items: any[]; placeholder: string }> = ({
     )}
   </ul>
 );
-  
+
 /* ================= COMPONENT ================= */
 const GlamCardLivePreview: React.FC<Props> = ({
   data,
@@ -492,41 +492,44 @@ const GlamCardLivePreview: React.FC<Props> = ({
                       )}
                     </div>
                     {/* BUSINESS HOURS */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-3 mt-3">
-                        <span className="flex-1 h-px bg-gray-400/60" />
-                        <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
-                          Business Hours
-                        </p>
-                        <span className="flex-1 h-px bg-gray-400/60" />
+                    {data.business_hour.length?
+                      <div>
+                        <div className="flex items-center gap-2 mb-3 mt-3">
+                          <span className="flex-1 h-px bg-gray-400/60" />
+                          <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
+                            Business Hours
+                          </p>
+                          <span className="flex-1 h-px bg-gray-400/60" />
+                        </div>
+                        <div className="rounded-xl bg-white p-4 shadow-sm">
+                          <ul className="space-y-1.5 text-sm">
+                            {data?.business_hour && data.business_hour.length ? (
+                              data.business_hour.map((hour: any, index: number) => {
+                                const open = hour.open_time ? formatTime(hour.open_time) : "Closed";
+                                const close = hour.close_time ? formatTime(hour.close_time) : "";
+                                const timeText =
+                                  open && close && open !== "Closed"
+                                    ? `${open} - ${close}`
+                                    : open;
+                                return (
+                                  <li key={hour.id ?? index} className="flex items-start gap-2">
+                                    <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0" />
+                                    <span className="text-gray-700">
+                                      {hour.note ? hour.note : timeText}
+                                    </span>
+                                  </li>
+                                );
+                              })
+                            ) : (
+                              <li className="text-gray-400 text-xs">
+                                Business hours will appear here
+                              </li>
+                            )}
+                          </ul>
+                        </div>
                       </div>
-                      <div className="rounded-xl bg-white p-4 shadow-sm">
-                        <ul className="space-y-1.5 text-sm">
-                          {data?.business_hour && data.business_hour.length ? (
-                            data.business_hour.map((hour: any, index: number) => {
-                              const open = hour.open_time ? formatTime(hour.open_time) : "Closed";
-                              const close = hour.close_time ? formatTime(hour.close_time) : "";
-                              const timeText =
-                                open && close && open !== "Closed"
-                                  ? `${open} - ${close}`
-                                  : open;
-                              return (
-                                <li key={hour.id ?? index} className="flex items-start gap-2">
-                                  <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0" />
-                                  <span className="text-gray-700">
-                                    {hour.note ? hour.note : timeText}
-                                  </span>
-                                </li>
-                              );
-                            })
-                          ) : (
-                            <li className="text-gray-400 text-xs">
-                              Business hours will appear here
-                            </li>
-                          )}
-                        </ul>
-                      </div>
-                    </div>
+                      : null
+                    }
                   </div>
                 </div>
                 {/* SPECIALTIES */}
@@ -664,44 +667,43 @@ const GlamCardLivePreview: React.FC<Props> = ({
               </a>
               {/* INSTAGRAM DM */}
               <a
-  href={
-    socialMedia?.instagram
-      ? socialMedia.instagram.startsWith("http")
-        ? socialMedia.instagram.startsWith("https")
-          ? socialMedia.instagram
-          : `https://${socialMedia.instagram}`
-        : `https://ig.me/m/${socialMedia.instagram
-            .replace("https://www.instagram.com/", "")
-            .replace("http://www.instagram.com/", "")
-            .replace("instagram.com/", "")
-            .replace(/^@/, "")}`
-      : "#"
-  }
-  target="_blank"
-  rel="noopener noreferrer"
-  onClick={(e) => {
-    if (!socialMedia?.instagram) e.preventDefault();
-  }}
-  className={`flex items-center gap-3 p-4 rounded-xl border transition-colors
-    ${
-      socialMedia?.instagram
-        ? "border-gray-200 hover:bg-gray-50"
-        : "border-gray-200 opacity-50 cursor-not-allowed"
-    }`}
->
-  <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0">
-    📸
-  </div>
+                href={
+                  socialMedia?.instagram
+                    ? socialMedia.instagram.startsWith("http")
+                      ? socialMedia.instagram.startsWith("https")
+                        ? socialMedia.instagram
+                        : `https://${socialMedia.instagram}`
+                      : `https://ig.me/m/${socialMedia.instagram
+                        .replace("https://www.instagram.com/", "")
+                        .replace("http://www.instagram.com/", "")
+                        .replace("instagram.com/", "")
+                        .replace(/^@/, "")}`
+                    : "#"
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!socialMedia?.instagram) e.preventDefault();
+                }}
+                className={`flex items-center gap-3 p-4 rounded-xl border transition-colors
+    ${socialMedia?.instagram
+                    ? "border-gray-200 hover:bg-gray-50"
+                    : "border-gray-200 opacity-50 cursor-not-allowed"
+                  }`}
+              >
+                <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0">
+                  📸
+                </div>
 
-  <div>
-    <p className="text-sm font-semibold text-gray-800">
-      DM on Instagram
-    </p>
-    <p className="text-xs text-gray-500">
-      {socialMedia?.instagram || "Not configured"}
-    </p>
-  </div>
-</a>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">
+                    DM on Instagram
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {socialMedia?.instagram || "Not configured"}
+                  </p>
+                </div>
+              </a>
             </div>
           </div>
         </div>

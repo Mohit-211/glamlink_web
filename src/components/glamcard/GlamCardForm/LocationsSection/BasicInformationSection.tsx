@@ -10,17 +10,19 @@ interface SectionProps {
 
 const sectionClass =
   "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
+
 const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
+
 const labelClass = "text-sm font-medium text-gray-700";
 
-/* ================= WORD LIMIT HELPERS ================= */
+/* ================= CHARACTER LIMIT HELPERS ================= */
 
-const WORD_LIMIT = 150;
+const CHARACTER_LIMIT = 80;
 
-const getWordCount = (html: string) => {
-  const text = html.replace(/<[^>]*>/g, " ").trim();
-  return text ? text.split(/\s+/).length : 0;
+const getCharacterCount = (html: string) => {
+  const text = html.replace(/<[^>]*>/g, "").trim();
+  return text.length;
 };
 
 /* ================= COMPONENT ================= */
@@ -90,19 +92,22 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             data={data.bio}
             onChange={(_, editor) => {
               const html = editor.getData();
-              const wordCount = getWordCount(html);
 
-              if (wordCount <= WORD_LIMIT) {
+              const plainText = html
+                .replace(/<[^>]*>/g, "")
+                .trim();
+
+              if (plainText.length <= CHARACTER_LIMIT) {
                 setData((p) => ({ ...p, bio: html }));
               } else {
-                editor.setData(data.bio); // block extra words
+                editor.setData(data.bio); // prevent extra characters
               }
             }}
           />
 
-          {/* WORD COUNTER */}
+          {/* CHARACTER COUNTER */}
           <p className="mt-1 text-right text-xs text-gray-500">
-            {getWordCount(data.bio)} / {WORD_LIMIT} words
+            {getCharacterCount(data.bio)} / {CHARACTER_LIMIT} characters
           </p>
         </div>
       </div>

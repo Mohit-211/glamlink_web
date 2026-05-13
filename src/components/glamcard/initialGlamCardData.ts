@@ -40,8 +40,9 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     booking_phone: "123-456-7890", // ✅ FIXED
 
     business_name: "Luxe Beauty Studio",
-    bio: "Award-winning stylist with 8+ years of experience specializing in balayage, lived-in color, and transformative hair makeovers.",
-
+    // bio: "Award-winning stylist with 8+ years of experience specializing in balayage, lived-in color, and transformative hair makeovers.",
+    // bio: "Award-winning stylist specializing in balayage & hair makeovers.",
+    bio: "<p>Founder of Glamlink</p><p>The Glamlink Edit</p><p>The Beauty Vault</p>",
     /* SPECIALTIES */
     primary_specialty: "Hair Styling & Color",
     specialties: ["Balayage", "Color Correction", "Bridal Styling", "Extensions"],
