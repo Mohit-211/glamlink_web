@@ -252,6 +252,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
     }
     return data.social_media;
   }, [data.social_media]);
+  // console.log(data.business_hour.length,"===>>")
   return (
     <div className={`${mode !== "download" ? "h-90dvh" : ""} flex flex-col`}>
       {/* ===== OUTER CARD ===== */}
@@ -492,7 +493,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                       )}
                     </div>
                     {/* BUSINESS HOURS */}
-                    {data.business_hour.length?
+                    {data.business_hour.length === 1 ?
                       <div>
                         <div className="flex items-center gap-2 mb-3 mt-3">
                           <span className="flex-1 h-px bg-gray-400/60" />
