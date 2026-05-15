@@ -4,7 +4,7 @@ import { FormField, Input, TextArea, Select } from './Formfield'
 import { AccessCardToggle } from './Accesscardtoggle'
 import { SuccessModal } from './Successmodal'
 import { SectionCard } from './Sectioncard'
-import { getallCategories } from '@/api/Api'
+import { getAllCategories } from '@/api/Api'
 
 // ── Types ─────────────────────────────────────────────────
 
@@ -387,7 +387,7 @@ export default function DirectoryFormApply() {
 useEffect(() => {
   const fetchCategories = async () => {
     try {
-      const response = await getallCategories();
+      const response = await getAllCategories();
 
       console.log(response, "===>>");
 
