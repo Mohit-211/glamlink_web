@@ -67,6 +67,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({
 
     const fetchCities = async () => {
       try {
+            if (!location.state) return;
         const res = await getCitiesByState(location.state);
         console.log(res,"res")
         setCities(res?.data?.all_city );
@@ -75,6 +76,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({
       }
     };
 
+    
     fetchCities();
   }, [location.state]);
 console.log(cities,"===>")

@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import BlogCard from './BlogCard';
 import Link from 'next/link';
-import { getBlogsByCategpryId } from '@/api/Api';
+import { getBlogsByCategoryId } from '@/api/Api';
 import slugify from 'slugify';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -51,7 +51,7 @@ const RelatedArticles: React.FC<Props> = ({ category_id }) => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        const data = await getBlogsByCategpryId(category_id);
+        const data = await getBlogsByCategoryId(category_id);
         setBlogs(data?.data?.rows ?? []);
         setPage(1); // reset on category change
       } catch (error) {
