@@ -158,57 +158,201 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
       </div>
 
       {/* Social Media */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <label className={labelClass}>Website</label>
-          <input
-            className={inputClass}
-            placeholder="https://yourwebsite.com"
-            value={data.website || ""}
-            onChange={(e) =>
-              setData((prev) => ({ ...prev, website: e.target.value }))
-            }
-          />
-        </div>
+     {/* Social Media */}
+<div className="space-y-4">
+  <div className="flex items-center justify-between">
+    <div>
+      <h3 className="text-sm font-semibold text-gray-800">
+        Socials & Website
+      </h3>
+      <p className="text-xs text-gray-500 mt-1">
+        Add your social profiles, website, press features, or articles
+      </p>
+    </div>
+  </div>
 
-        <div>
-          <label className={labelClass}>Instagram</label>
-          <input
-            className={inputClass}
-            placeholder="@yourusername or full URL"
-            value={data.social_media?.instagram || ""}
-            // required={data.preferred_booking_method === "DM_INSTAGRAM"}
-            required={data.preferred_booking_method === BOOKING_METHODS.INSTAGRAM}
-            onChange={(e) =>
-              setData((prev) => ({
-                ...prev,
-                social_media: {
-                  ...prev.social_media,
-                  instagram: formatInstagram(e.target.value),
-                },
-              }))
-            }
-          />
-        </div>
-      </div>
+  <div className="grid gap-4 md:grid-cols-2">
+    {/* Website */}
+    <div>
+      <label className={labelClass}>Website</label>
+      <input
+        type="url"
+        className={inputClass}
+        placeholder="https://yourwebsite.com"
+        value={data.website || ""}
+        onChange={(e) =>
+          setData((prev) => ({
+            ...prev,
+            website: e.target.value,
+          }))
+        }
+      />
+    </div>
 
-      <div>
-        <label className={labelClass}>TikTok</label>
-        <input
-          className={inputClass}
-          placeholder="@yourusername or full URL"
-          value={data.social_media?.tiktok || ""}
-          onChange={(e) =>
-            setData((prev) => ({
-              ...prev,
-              social_media: {
-                ...prev.social_media,
-                tiktok: formatTikTok(e.target.value),
-              },
-            }))
-          }
-        />
-      </div>
+    {/* Instagram */}
+    <div>
+      <label className={labelClass}>Instagram</label>
+      <input
+        className={inputClass}
+        placeholder="@yourusername or full URL"
+        value={data.social_media?.instagram || ""}
+        required={
+          data.preferred_booking_method === BOOKING_METHODS.INSTAGRAM
+        }
+        onChange={(e) =>
+          setData((prev) => ({
+            ...prev,
+            social_media: {
+              ...prev.social_media,
+              instagram: formatInstagram(e.target.value),
+            },
+          }))
+        }
+      />
+    </div>
+
+    {/* TikTok */}
+    <div>
+      <label className={labelClass}>TikTok</label>
+      <input
+        className={inputClass}
+        placeholder="@yourusername or full URL"
+        value={data.social_media?.tiktok || ""}
+        onChange={(e) =>
+          setData((prev) => ({
+            ...prev,
+            social_media: {
+              ...prev.social_media,
+              tiktok: formatTikTok(e.target.value),
+            },
+          }))
+        }
+      />
+    </div>
+
+    {/* LinkedIn */}
+    <div>
+      <label className={labelClass}>LinkedIn</label>
+      <input
+        type="url"
+        className={inputClass}
+        placeholder="https://linkedin.com/in/yourprofile"
+        value={data.social_media?.linkedin || ""}
+        onChange={(e) =>
+          setData((prev) => ({
+            ...prev,
+            social_media: {
+              ...prev.social_media,
+              linkedin: e.target.value,
+            },
+          }))
+        }
+      />
+    </div>
+
+    {/* YouTube */}
+    <div>
+      <label className={labelClass}>YouTube</label>
+      <input
+        type="url"
+        className={inputClass}
+        placeholder="https://youtube.com/@yourchannel"
+        value={data.social_media?.youtube || ""}
+        onChange={(e) =>
+          setData((prev) => ({
+            ...prev,
+            social_media: {
+              ...prev.social_media,
+              youtube: e.target.value,
+            },
+          }))
+        }
+      />
+    </div>
+
+    {/* Facebook */}
+    <div>
+      <label className={labelClass}>Facebook</label>
+      <input
+        type="url"
+        className={inputClass}
+        placeholder="https://facebook.com/yourpage"
+        value={data.social_media?.facebook || ""}
+        onChange={(e) =>
+          setData((prev) => ({
+            ...prev,
+            social_media: {
+              ...prev.social_media,
+              facebook: e.target.value,
+            },
+          }))
+        }
+      />
+    </div>
+  </div>
+
+  {/* Other Websites / Press Links */}
+  <div className="space-y-3 rounded-xl border border-dashed border-gray-300 p-4 bg-gray-50">
+    <div>
+      <label className={labelClass}>Press / Articles / Other Links</label>
+
+      <p className="mt-1 text-xs text-gray-500">
+        Add magazine features, interviews, blog articles, portfolios,
+        press coverage, or any important external links.
+      </p>
+    </div>
+
+    <div className="grid gap-3">
+      <input
+        type="url"
+        className={inputClass}
+        placeholder="https://vogue.com/article/your-feature"
+        value={data.other_links?.[0] || ""}
+        onChange={(e) => {
+          const updated = [...(data.other_links || [])];
+          updated[0] = e.target.value;
+
+          setData((prev) => ({
+            ...prev,
+            other_links: updated,
+          }));
+        }}
+      />
+
+      <input
+        type="url"
+        className={inputClass}
+        placeholder="https://yourpressarticle.com"
+        value={data.other_links?.[1] || ""}
+        onChange={(e) => {
+          const updated = [...(data.other_links || [])];
+          updated[1] = e.target.value;
+
+          setData((prev) => ({
+            ...prev,
+            other_links: updated,
+          }));
+        }}
+      />
+
+      <input
+        type="url"
+        className={inputClass}
+        placeholder="https://behance.net/yourportfolio"
+        value={data.other_links?.[2] || ""}
+        onChange={(e) => {
+          const updated = [...(data.other_links || [])];
+          updated[2] = e.target.value;
+
+          setData((prev) => ({
+            ...prev,
+            other_links: updated,
+          }));
+        }}
+      />
+    </div>
+  </div>
+</div>
 
       {/* Phone */}
       <div>

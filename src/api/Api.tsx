@@ -4,142 +4,180 @@ const api = axios.create({
   baseURL: "https://node.glamlink.net:5000/api/v1/",
 });
 
-// =============================
-// 📌 Get Categories
-// =============================
+/* ============================= */
+/* 📌 Categories */
+/* ============================= */
+
 export const getCategories = async () => {
-  const response = await api.get("journalCategory");
-  return response.data;
+  const { data } = await api.get("journalCategory");
+  return data;
 };
 
-export const getallCategories = async () => {
-  const response = await api.get("businessCard/getAllCategories");
-  return response.data;
+export const getAllCategories = async () => {
+  const { data } = await api.get("businessCard/getAllCategories");
+  return data;
 };
-// =============================
-// 📌 Get All Blogs
-// =============================
+
+/* ============================= */
+/* 📌 Blogs */
+/* ============================= */
+
 export const getAllBlogs = async () => {
-  const response = await api.get("journal");
-  return response.data;
+  const { data } = await api.get("journal");
+  return data;
 };
-//  Get all Podcast
+
+export const getBlogsById = async (id: string | number) => {
+  const { data } = await api.get(
+    `journal/findJournalById/${id}`
+  );
+  return data;
+};
+
+export const getBlogsByCategoryId = async (
+  category_id: string | number
+) => {
+  const { data } = await api.get(
+    `journal/${category_id}`
+  );
+  return data;
+};
+
+/* ============================= */
+/* 📌 Podcast */
+/* ============================= */
+
 export const getAllPodcast = async () => {
-  const response = await api.get("podcast-schedule/list");
-  return response.data;
+  const { data } = await api.get(
+    "podcast-schedule/list"
+  );
+  return data;
 };
 
+/* ============================= */
+/* 📌 Business Card */
+/* ============================= */
 
-// =============================
-// 📌 Get Blog By ID
-// =============================
-export const getBlogsById = async (id: any) => {
-  const response = await api.get(`journal/findJournalById/${id}`);
-  return response.data;
-};
-// =============================
-// 📌 Get Blog By Category ID
-// =============================
-export const getBlogsByCategpryId = async (category_id: any) => {
-  const response = await api.get(`journal/${category_id}`);
-  return response.data;
-};
-
-// =============================
-// 📌 Get Business Card By Slug
-// =============================
-export const getBusinessCardBySlug = async (slug: string) => {
-  console.log(slug,"==>")
+export const getBusinessCardBySlug = async (
+  slug: string
+) => {
   try {
-    const response = await api.get(`businessCard/getBusinessCard/${slug}`);
-    return response.data;
+    const { data } = await api.get(
+      `businessCard/getBusinessCard/${slug}`
+    );
+    return data;
   } catch (error) {
+    console.error("Business Card API Error:", error);
     throw error;
   }
 };
-// =============================
-// 📌 🔥 Search Business Card
-// =============================
+
+/* ============================= */
+/* 📌 Search Business Card */
+/* ============================= */
+
 export const searchBusinessCard = async (params: {
   specialty?: string;
   location?: string;
   name?: string;
 }) => {
-  const response = await api.get("businessCard/search", {
-    params: params,
-  });
-  return response.data;
+  const { data } = await api.get(
+    "businessCard/search",
+    { params }
+  );
+  return data;
 };
 
-// =============================
-// 📌 Get Business Profiles
-// =============================
+/* ============================= */
+/* 📌 Profiles */
+/* ============================= */
+
 export const getBusinessProfile = async () => {
-  const response = await api.get("businessCard/getAllProfiles");
-  return response.data;
+  const { data } = await api.get(
+    "businessCard/getAllProfiles"
+  );
+  return data;
 };
 
-// =============================
-// 📌 Get Nearby Beauticians
-// =============================
+/* ============================= */
+/* 📌 Nearby Beauticians */
+/* ============================= */
+
 export const GetBeauticianListApi = async () => {
-  const res = await api.get("user/nearby/map/beautician/list");
-  return res.data;
+  const { data } = await api.get(
+    "user/nearby/map/beautician/list"
+  );
+  return data;
 };
 
-// =============================
-// 📌 Get All Directories (Categories)
-// =============================
+/* ============================= */
+/* 📌 Directories */
+/* ============================= */
+
 export const GetAllCategoryApi = async () => {
-  const res = await api.get("businessCard/getAllDirectories");
-  return res.data;
+  const { data } = await api.get(
+    "businessCard/getAllDirectories"
+  );
+  return data;
 };
 
-// =============================
-// 📌 Get Profiles By Directory
-// =============================
-export const GetProfilesByDirectory = async (category_id: any) => {
-  const res = await api.get(
+export const GetProfilesByDirectory = async (
+  category_id: string | number
+) => {
+  const { data } = await api.get(
     `businessCard/getProfilesByDirectory/${category_id}`
   );
-  return res.data;
+  return data;
 };
 
-// =============================
-// 📌 Get Beautician Details (Google Place)
-// =============================
-export const GetBeauticianListDetailsApi = async (place_id: string) => {
+/* ============================= */
+/* 📌 Beautician Details */
+/* ============================= */
+
+export const GetBeauticianListDetailsApi = async (
+  place_id: string
+) => {
   try {
-    const res = await api.get(
+    const { data } = await api.get(
       `user/google-locations/details/${place_id}`
     );
-    return res.data;
+    return data;
   } catch (error) {
-    console.error("Beautician Details API Error:", error);
+    console.error(
+      "Beautician Details API Error:",
+      error
+    );
     throw error;
   }
 };
 
-// =============================
-// 🆕 📌 Get All States
-// =============================
+/* ============================= */
+/* 📌 States */
+/* ============================= */
+
 export const getAllStates = async () => {
   try {
-    const res = await api.get("state");
-    return res.data;
+    const { data } = await api.get("state");
+    return data;
   } catch (error) {
     console.error("Get States API Error:", error);
     throw error;
   }
 };
 
-// =============================
-// 🆕 📌 Get Cities By State ID
-// =============================
-export const getCitiesByState = async (state_id: any) => {
+/* ============================= */
+/* 📌 Cities */
+/* ============================= */
+
+export const getCitiesByState = async (state_id: string | number) => {
   try {
-    const res = await api.get(`state/${state_id}`);
-    return res.data;
+    const { data } = await api.get("city", {
+      params: {
+        state_id,
+      },
+    });
+
+    return data;
   } catch (error) {
     console.error("Get Cities API Error:", error);
     throw error;

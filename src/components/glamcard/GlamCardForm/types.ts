@@ -40,6 +40,7 @@ export interface GalleryMetaItem {
 /* ================= MAIN FORM ================= */
 
 export interface GlamCardFormData {
+  other_links: any;
   /* BASIC INFO */
   name: string;
   business_name: string;
@@ -73,6 +74,7 @@ export interface GlamCardFormData {
   website?: string;
 
   social_media: {
+    linkedin: string;
     instagram?: string;
     tiktok?: string;
     facebook?: string;

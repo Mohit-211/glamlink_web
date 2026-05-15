@@ -2,6 +2,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import { GlamCardFormData } from "./GlamCardForm/types";
 import Logo from "../../../public/assets/ACCESS-3.png";
 import Image from "next/image";
+import {
+  Instagram,
+  Globe,
+  Linkedin,
+  Youtube,
+  Facebook,
+  Music2,
+  ExternalLink,
+} from "lucide-react";
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 /* ================= VCF GENERATOR ================= */
 function generateVCF(data: GlamCardFormData): string {
@@ -543,27 +552,171 @@ const GlamCardLivePreview: React.FC<Props> = ({
               </div>
             </div>
             {/* ===== IMPORTANT INFO — FULL WIDTH ===== */}
-            <div className="rounded-2xl p-[3px] mt-5">
-              <div
-                className="rounded-2xl p-4"
-                style={{ background: "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)" }}
-              >
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="flex-1 h-px bg-gray-400/60" />
-                  <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
-                    Important Info
-                  </p>
-                  <span className="flex-1 h-px bg-gray-400/60" />
-                </div>
-                <div className="rounded-xl bg-white p-4 shadow-sm">
-                  <DotList
-                    items={importantInfoArray}
-                    placeholder="Important information will appear here"
-                  />
-                </div>
-              </div>
+<div className="rounded-2xl p-[3px] mt-5">
+  <div
+    className="rounded-2xl p-4"
+    style={{
+      background:
+        "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
+    }}
+  >
+    <div className="flex items-center gap-2 mb-3">
+      <span className="flex-1 h-px bg-gray-400/60" />
+
+      <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
+        Important Info
+      </p>
+
+      <span className="flex-1 h-px bg-gray-400/60" />
+    </div>
+
+    <div className="rounded-xl bg-white p-4 shadow-sm">
+      <DotList
+        items={importantInfoArray}
+        placeholder="Important information will appear here"
+      />
+    </div>
+  </div>
+</div>
+
+{/* ===== SOCIAL LINKS ===== */}
+{(
+  socialMedia?.instagram ||
+  socialMedia?.tiktok ||
+  socialMedia?.linkedin ||
+  socialMedia?.youtube ||
+  socialMedia?.facebook ||
+  data?.website ||
+  data?.other_links?.length
+) && (
+  <div className="rounded-2xl p-[3px] mt-5">
+    <div
+      className="rounded-2xl p-4"
+      style={{
+        background:
+          "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
+      }}
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <span className="flex-1 h-px bg-gray-400/60" />
+
+        <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
+          Connect
+        </p>
+
+        <span className="flex-1 h-px bg-gray-400/60" />
+      </div>
+
+      <div className="rounded-xl bg-white p-4 shadow-sm">
+        {/* SOCIAL ICONS */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* WEBSITE */}
+          {data?.website && (
+            <a
+              href={data.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-teal-400 hover:bg-teal-50"
+            >
+              <Globe className="h-5 w-5 text-gray-700 group-hover:text-teal-600" />
+            </a>
+          )}
+
+          {/* INSTAGRAM */}
+          {socialMedia?.instagram && (
+            <a
+              href={socialMedia.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-pink-400 hover:bg-pink-50"
+            >
+              <Instagram className="h-5 w-5 text-gray-700 group-hover:text-pink-600" />
+            </a>
+          )}
+
+          {/* TIKTOK */}
+          {socialMedia?.tiktok && (
+            <a
+              href={socialMedia.tiktok}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-black hover:bg-gray-100"
+            >
+              <Music2 className="h-5 w-5 text-gray-700 group-hover:text-black" />
+            </a>
+          )}
+
+          {/* LINKEDIN */}
+          {socialMedia?.linkedin && (
+            <a
+              href={socialMedia.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-400 hover:bg-blue-50"
+            >
+              <Linkedin className="h-5 w-5 text-gray-700 group-hover:text-blue-600" />
+            </a>
+          )}
+
+          {/* YOUTUBE */}
+          {socialMedia?.youtube && (
+            <a
+              href={socialMedia.youtube}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-red-400 hover:bg-red-50"
+            >
+              <Youtube className="h-5 w-5 text-gray-700 group-hover:text-red-600" />
+            </a>
+          )}
+
+          {/* FACEBOOK */}
+          {socialMedia?.facebook && (
+            <a
+              href={socialMedia.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-400 hover:bg-blue-50"
+            >
+              <Facebook className="h-5 w-5 text-gray-700 group-hover:text-blue-600" />
+            </a>
+          )}
+        </div>
+
+        {/* OTHER LINKS */}
+        {data?.other_links?.filter(Boolean)?.length > 0 && (
+          <div className="mt-5 border-t border-gray-100 pt-4">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Press & Features
+            </p>
+
+            <div className="space-y-2">
+              {data.other_links
+                .filter(Boolean)
+                .map((link: string, index: number) => (
+                  <a
+                    key={index}
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 transition hover:border-teal-300 hover:bg-teal-50"
+                  >
+                    <ExternalLink className="h-4 w-4 text-teal-600 flex-shrink-0" />
+
+                    <span className="truncate">
+                      {link.replace(/^https?:\/\//, "")}
+                    </span>
+                  </a>
+                ))}
             </div>
-            {/* ===== BOOK NOW BUTTON ===== */}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
+{/* ===== BOOK NOW BUTTON ===== */}
             <div className="flex items-center gap-3 mt-6">
               <div className="flex-1 h-[2px] bg-teal-400" />
               <button
