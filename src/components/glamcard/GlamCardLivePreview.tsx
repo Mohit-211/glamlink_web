@@ -326,8 +326,8 @@ const GlamCardLivePreview: React.FC<Props> = ({
               <div className="flex flex-col gap-5">
                 {/* ABOUT */}
                 <SectionBox title={`About ${data.name || "Your Name"}`} titleAlign="left">
-                  <div className="flex gap-4">
-                    <div className="h-16 w-16 overflow-hidden rounded-full bg-gray-200 ring-2 ring-white shadow flex-shrink-0">
+                  <div className="flex gap-4" style={{alignItems:"center"}}>
+                    <div className="h-21 w-21 overflow-hidden rounded-full bg-gray-200 ring-2 ring-white shadow flex-shrink-0 align-items-center justify-center">
                       {data?.profile_image && (
                         <img
                           src={
