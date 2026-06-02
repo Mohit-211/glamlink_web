@@ -15,7 +15,6 @@ interface BlogPost {
 }
 const HeroSection = () => {
   const [featured, setFeatured] = useState<BlogPost | null>(null);
-  console.log(featured, "featured");
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
@@ -41,7 +40,6 @@ const HeroSection = () => {
     fetchFeatured();
   }, []);
   if (!featured) return null;
-  console.log(featured)
   return (
     <section className="relative bg-[#fafafa] rounded-2xl px-6 md:px-10 py-10 md:py-12">
       <Link

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Explore beauty industry insights, trends, tips, and expert articles.",
 };
 
-export default function JournalPage() {
+export default function JournalEducationPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Script
@@ -27,7 +27,7 @@ export default function JournalPage() {
 
       <main className="flex-1">
         {/* 👇 Everything handled inside client now */}
-        <JournalClient path="journal" />
+        <JournalClient  path="journal/education"/>
         <ConditionalGetFeatured />
       </main>
     </div>

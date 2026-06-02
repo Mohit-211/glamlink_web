@@ -1,6 +1,7 @@
 "use client";
 
 import { getCategories } from "@/api/Api";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Category {
@@ -12,13 +13,17 @@ interface Props {
   activeCategory: string;
   setActiveCategory: (category: string) => void;
   vertical?: boolean;
+  path?: string;
 }
 
 const CategoryNav = ({
   activeCategory,
   setActiveCategory,
   vertical = false,
+  path,
 }: Props) => {
+  console.log(path,'pathpath')
+  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -43,8 +48,20 @@ const CategoryNav = ({
     fetchCategories();
   }, []);
 
+  const handleCategoryClick = (title: string) => {
+    console.log(path,"path===")
+    console.log("Clicked category:", title);
+    if (title.toLowerCase() === "education") {
+      router.push("/journal/education");
+    } else if (path === "journal/education") {
+      router.push("/journal");
+    } else {
+      setActiveCategory(title);
+    }
+  };
+
   /* ───────────────────────────────────────────── */
-  /* ✅ DESKTOP SIDEBAR (UNCHANGED) */
+  /* DESKTOP SIDEBAR                               */
   /* ───────────────────────────────────────────── */
   if (vertical) {
     return (
@@ -72,7 +89,7 @@ const CategoryNav = ({
             categories.map((category) => (
               <button
                 key={category.id}
-                onClick={() => setActiveCategory(category.title)}
+                onClick={() => handleCategoryClick(category.title)}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm transition
                   ${
                     activeCategory === category.title
@@ -89,14 +106,14 @@ const CategoryNav = ({
   }
 
   /* ───────────────────────────────────────────── */
-  /* ✅ MOBILE HORIZONTAL SCROLL (LIKE ALLURE) */
+  /* MOBILE HORIZONTAL SCROLL                      */
   /* ───────────────────────────────────────────── */
-
+console.log(path,"path")
   return (
     <nav className="lg:hidden sticky top-[60px] z-50 bg-white border-b border-gray-200">
       <div className="w-full px-4 mt-5">
         <div className="flex items-center gap-3 overflow-x-auto py-3 whitespace-nowrap scrollbar-hide">
-          
+
           {/* ALL */}
           <button
             onClick={() => setActiveCategory("All")}
