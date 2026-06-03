@@ -28,6 +28,7 @@ export default function JournalEducationPage() {
       <main className="flex-1">
         {/* 👇 Everything handled inside client now */}
         <JournalClient  path="journal/education"/>
+        
         <ConditionalGetFeatured />
       </main>
     </div>
