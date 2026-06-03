@@ -322,7 +322,7 @@ const JournalClient = ({ path }: { path: string }) => {
   const handleIssueClick = (issue: Issue) => {
     setSelectedIssue((prev) => (prev?.slug === issue.slug ? null : issue));
   };
-  console.log(path,"path in client===")
+  console.log(path, "path in client===")
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-[1700px] mx-auto px-4 sm:px-6 xl:px-14 py-8 lg:py-14">
