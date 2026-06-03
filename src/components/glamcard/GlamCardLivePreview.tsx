@@ -590,39 +590,31 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     <div className="flex items-center gap-2 mb-3">
                       <span className="flex-1 h-px bg-gray-400/60" />
                       <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
-                        Connect
+                        Press & Features
                       </p>
                       <span className="flex-1 h-px bg-gray-400/60" />
                     </div>
-
-
                     {/* OTHER LINKS */}
                     {data?.other_links?.filter(Boolean)?.length > 0 && (
-                      <div className="mt-5 border-gray-100 pt-4">
-                        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                          Press & Features
-                        </p>
-                        <div className="space-y-2">
-                          {data.other_links
-                            .filter(Boolean)
-                            .map((link: string, index: number) => (
-                              <a
-                                key={index}
-                                href={link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 transition hover:border-teal-300 hover:bg-teal-50"
-                              >
-                                <ExternalLink className="h-4 w-4 text-teal-600 flex-shrink-0" />
-                                <span className="truncate">
-                                  {link.replace(/^https?:\/\//, "")}
-                                </span>
-                              </a>
-                            ))}
-                        </div>
+                      <div className="space-y-2">
+                        {data.other_links
+                          .filter(Boolean)
+                          .map((link: string, index: number) => (
+                            <a
+                              key={index}
+                              href={link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 transition hover:border-teal-300 hover:bg-teal-50"
+                            >
+                              <ExternalLink className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                              <span className="truncate">
+                                {link.replace(/^https?:\/\//, "")}
+                              </span>
+                            </a>
+                          ))}
                       </div>
                     )}
-
                   </div>
                 </div>
               )}
@@ -657,31 +649,26 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   <Globe className="w-4 h-4 text-gray-500 hover:text-teal-600 transition" />
                 </a>
               )}
-
               {socialMedia?.instagram && (
                 <a href={socialMedia.instagram} target="_blank" rel="noopener noreferrer">
                   <Instagram className="w-4 h-4 text-gray-500 hover:text-pink-600 transition" />
                 </a>
               )}
-
               {socialMedia?.facebook && (
                 <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer">
                   <Facebook className="w-4 h-4 text-gray-500 hover:text-blue-600 transition" />
                 </a>
               )}
-
               {socialMedia?.linkedin && (
                 <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer">
                   <Linkedin className="w-4 h-4 text-gray-500 hover:text-blue-700 transition" />
                 </a>
               )}
-
               {socialMedia?.youtube && (
                 <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer">
                   <Youtube className="w-4 h-4 text-gray-500 hover:text-red-600 transition" />
                 </a>
               )}
-
               {socialMedia?.tiktok && (
                 <a href={socialMedia.tiktok} target="_blank" rel="noopener noreferrer">
                   <Music2 className="w-4 h-4 text-gray-500 hover:text-black transition" />
