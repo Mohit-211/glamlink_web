@@ -44,7 +44,7 @@ const ProfessionalsMap: React.FC<ProfessionalsMapProps> = ({
 
   // Flatten all locations
   const allLocations = useMemo(() => {
-    return professionals.flatMap((pro) =>
+    return professionals?.flatMap((pro) =>
       (pro.locations || [])
         .filter((loc) => {
           const lat = Number(loc?.latitude);

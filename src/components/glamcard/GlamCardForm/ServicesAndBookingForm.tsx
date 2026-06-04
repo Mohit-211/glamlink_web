@@ -70,7 +70,33 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
     const clean = value.replace(/^@/, "").trim();
     return `https://www.tiktok.com/@${clean}`;
   };
+/* ================= PRESS / ARTICLES / OTHER LINKS ================= */
 
+const addOtherLink = () => {
+  setData((prev) => ({
+    ...prev,
+    other_links: [...(prev.other_links || []), ""],
+  }));
+};
+
+const removeOtherLink = (index: number) => {
+  setData((prev) => ({
+    ...prev,
+    other_links: prev.other_links.filter((_: any, i: number) => i !== index),
+  }));
+};
+
+const updateOtherLink = (index: number, value: string) => {
+  setData((prev) => {
+    const updated = [...(prev.other_links || [])];
+    updated[index] = value;
+
+    return {
+      ...prev,
+      other_links: updated,
+    };
+  });
+};
   return (
     <section className={sectionClass}>
       <header className="space-y-1">
@@ -291,71 +317,66 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
     </div>
   </div>
 
-  {/* Other Websites / Press Links */}
-  <div className="space-y-3 rounded-xl border border-dashed border-gray-300 p-4 bg-gray-50">
+<div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5">
+  <div className="flex items-center justify-between">
     <div>
-      <label className={labelClass}>Press / Articles / Other Links</label>
+      <label className="text-sm font-semibold text-gray-800">
+        Press / Articles / Other Links
+      </label>
 
       <p className="mt-1 text-xs text-gray-500">
-        Add magazine features, interviews, blog articles, portfolios,
-        press coverage, or any important external links.
+        Add magazine features, interviews, blog articles,
+        portfolios, press coverage, Behance projects,
+        or any important external links.
       </p>
     </div>
 
-    <div className="grid gap-3">
-      <input
-        type="url"
-        className={inputClass}
-        placeholder="https://vogue.com/article/your-feature"
-        value={data.other_links?.[0] || ""}
-        onChange={(e) => {
-          const updated = [...(data.other_links || [])];
-          updated[0] = e.target.value;
-
-          setData((prev) => ({
-            ...prev,
-            other_links: updated,
-          }));
-        }}
-      />
-
-      <input
-        type="url"
-        className={inputClass}
-        placeholder="https://yourpressarticle.com"
-        value={data.other_links?.[1] || ""}
-        onChange={(e) => {
-          const updated = [...(data.other_links || [])];
-          updated[1] = e.target.value;
-
-          setData((prev) => ({
-            ...prev,
-            other_links: updated,
-          }));
-        }}
-      />
-
-      <input
-        type="url"
-        className={inputClass}
-        placeholder="https://behance.net/yourportfolio"
-        value={data.other_links?.[2] || ""}
-        onChange={(e) => {
-          const updated = [...(data.other_links || [])];
-          updated[2] = e.target.value;
-
-          setData((prev) => ({
-            ...prev,
-            other_links: updated,
-          }));
-        }}
-      />
-    </div>
+    <button
+  type="button"
+  onClick={addOtherLink}
+  className="flex-none rounded-lg bg-[#23AEB8] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3]"
+>
+  + Add Link
+</button>
   </div>
+
+  <div className="space-y-3">
+    {(data.other_links || []).map((link: string, index: number) => (
+      <div
+        key={index}
+        className="flex flex-col gap-2 sm:flex-row sm:items-center"
+      >
+        <input
+          type="url"
+          className={`${inputClass} flex-1`}
+          placeholder={`Link ${index + 1} (https://example.com)`}
+          value={link}
+          onChange={(e) =>
+            updateOtherLink(index, e.target.value)
+          }
+        />
+
+        <button
+          type="button"
+          onClick={() => removeOtherLink(index)}
+          className="rounded-lg bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+        >
+          Delete
+        </button>
+      </div>
+    ))}
+
+    {(data.other_links?.length ?? 0) === 0 && (
+      <div className="rounded-lg border border-gray-200 bg-white p-4 text-center text-sm text-gray-500">
+        No links added yet. Click "Add Link" to get started.
+      </div>
+    )}
+  </div>
+</div>
 </div>
 
       {/* Phone */}
-      <div>
+      {/* <div>
         <label className={labelClass}>Phone Number</label>
         <input
           className={inputClass}
@@ -369,7 +390,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             }))
           }
         />
-      </div>
+      </div> */}
 
       {/* Preferred Booking Method + Info Popup */}
       <div>

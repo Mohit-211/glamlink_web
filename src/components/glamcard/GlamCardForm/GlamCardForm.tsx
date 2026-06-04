@@ -42,6 +42,7 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
       const jsonFields = [
         "business_hour",
         "social_media",
+        "other_links",
         "important_info",
         "excites_about_glamlink",
         "biggest_pain_points",

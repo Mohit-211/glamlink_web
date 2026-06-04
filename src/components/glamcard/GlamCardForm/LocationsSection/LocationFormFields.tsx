@@ -69,8 +69,8 @@ const LocationFormFields: React.FC<FieldsProps> = ({
       try {
             if (!location.state) return;
         const res = await getCitiesByState(location.state);
-        console.log(res,"res")
-        setCities(res?.data?.all_city );
+        console.log(res?.data,"res======>>>")
+        setCities(res?.data );
       } catch (err) {
         console.error("City fetch error", err);
       }
@@ -140,6 +140,8 @@ console.log(cities,"===>")
     !!location.state;
 
   const handleConfirmExact = () => {
+    console.log(canConfirmExact,"canConfirmExact")
+    console.log("Confirming exact address with data:", location);
     if (!canConfirmExact) return;
 
     if (!location.latitude || !location.longitude) {

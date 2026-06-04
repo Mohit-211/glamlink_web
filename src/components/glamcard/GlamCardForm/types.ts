@@ -10,20 +10,16 @@ export interface Location {
   id: string;
   label: string;
   location_type: "exact_address" | "city_only";
-
   address: string;
   area: string;
   city: string;
   state: string;
-
   latitude?: number;
   longitude?: number;
   isSet?: boolean;
-
   business_name: string;
   phone: string;
   description: string;
-
   isPrimary: boolean;
   isOpen: boolean;
 }

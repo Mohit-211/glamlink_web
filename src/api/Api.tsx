@@ -171,7 +171,7 @@ export const getAllStates = async () => {
 
 export const getCitiesByState = async (state_id: string | number) => {
   try {
-    const { data } = await api.get("city", {
+    const { data } = await api.get("state", {
       params: {
         state_id,
       },
