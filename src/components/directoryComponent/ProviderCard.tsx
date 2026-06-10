@@ -111,7 +111,7 @@ export default function ProviderCard({ data, pagetype }: Props) {
           rel="noopener noreferrer"
           className="mt-6"
         >
-          <button className="btn-primary w-full text-sm">Book Now</button>
+          <button className="btn-primary w-full text-sm">CONNECT</button>
         </a>
       )}
     </div>

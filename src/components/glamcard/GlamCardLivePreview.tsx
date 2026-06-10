@@ -493,7 +493,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                       )}
                     </div>
                     {/* BUSINESS HOURS */}
-                    {data.business_hour.length === 1 ?
+                    {data.business_hour.length !== 0 ?
                       <div>
                         <div className="flex items-center gap-2 mb-3 mt-3">
                           <span className="flex-1 h-px bg-gray-400/60" />
@@ -629,7 +629,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   <line x1="8" y1="2" x2="8" y2="6" />
                   <line x1="3" y1="10" x2="21" y2="10" />
                 </svg>
-                Book Now
+            CONNECT
               </button>
               <div className="flex-1 h-[2px] bg-teal-400" />
             </div>
@@ -680,7 +680,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
           >
             <div className="flex justify-between items-center mb-1">
               <p className="text-base font-bold text-gray-800">
-                How would you like to book?
+                How would you like to connect??
               </p>
               <button
                 onClick={() => setIsBookingModalOpen(false)}
