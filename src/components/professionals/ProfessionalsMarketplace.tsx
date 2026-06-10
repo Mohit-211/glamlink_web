@@ -120,7 +120,7 @@ const ProfessionalCard = ({
           className="mt-auto w-full bg-[#23B9CD] hover:bg-[#1ea8b5] text-white rounded-full py-5 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 gap-2"
         >
           <CalendarDays className="w-4 h-4" />
-          Book Now
+         CONNECT
         </Button>
       </div>
     </div>

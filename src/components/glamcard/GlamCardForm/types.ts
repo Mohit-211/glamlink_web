@@ -31,6 +31,7 @@ export interface GalleryMetaItem {
   caption: string;
   is_thumbnail: boolean;
   sort_order: number;
+   thumbnail_file?: File;
 }
 
 /* ================= MAIN FORM ================= */

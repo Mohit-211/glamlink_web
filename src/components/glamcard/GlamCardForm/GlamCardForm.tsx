@@ -5,26 +5,32 @@ import BasicInfoForm from "./BasicInfoForm";
 import MediaAndProfileForm from "../MediaAndProfileForm";
 import GlamlinkIntegrationForm from "./GlamlinkIntegrationForm";
 import ServicesAndBookingForm from "./ServicesAndBookingForm";
+
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
 }
+
 const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
   const handleSubmit = async () => {
     console.log("FINAL DATA 👉", data);
     try {
       setLoading(true);
       const formData = new FormData();
+
       /* ================= PROFILE IMAGE ================= */
       if (data.profile_image) {
         formData.append("profile_image", data.profile_image);
       }
+
       /* ================= GALLERY IMAGES ================= */
-      data.images?.forEach(file => {
+      data.images?.forEach((file) => {
         formData.append("images", file);
       });
+
       /* ================= GALLERY META ================= */
       if (data.gallery_meta?.length) {
         formData.append(
@@ -38,6 +44,32 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
           )
         );
       }
+
+      /* ================= VIDEOS + VIDEO THUMBNAILS ================= */
+      // FIX: Collect video items with their meta for validation and upload
+      const videoItems = data.images
+        ?.map((file, index) => ({
+          file,
+          meta: data.gallery_meta?.[index],
+          index,
+        }))
+        .filter(({ file }) => file instanceof File && file.type.startsWith("video/"));
+
+      // Validate: every video must have a thumbnail_file
+      for (const { meta, index } of videoItems ?? []) {
+        if (!meta?.thumbnail_file) {
+          alert(`Please upload a thumbnail for video #${index + 1}.`);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Append videos and their thumbnails
+      videoItems?.forEach(({ file, meta }) => {
+        formData.append("videos", file);
+        formData.append("video_thumbnails", meta!.thumbnail_file!);
+      });
+
       /* ================= STRINGIFY OBJECTS / ARRAYS ================= */
       const jsonFields = [
         "business_hour",
@@ -47,14 +79,16 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
         "excites_about_glamlink",
         "biggest_pain_points",
         "specialties",
-        "locations"
+        "locations",
       ] as const;
-      jsonFields.forEach(field => {
+
+      jsonFields.forEach((field) => {
         const value = data[field];
         if (value !== undefined) {
           formData.append(field, JSON.stringify(value));
         }
       });
+
       /* ================= PRIMITIVE FIELDS ================= */
       const primitiveFields = [
         "name",
@@ -72,22 +106,26 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
         "website",
         "promotion_details",
       ] as const;
-      primitiveFields.forEach(field => {
+
+      primitiveFields.forEach((field) => {
         const value = data[field];
         if (value !== undefined && value !== null) {
           formData.append(field, String(value));
         }
       });
+
       const res = await fetch(
         "https://node.glamlink.net:5000/api/v1/businessCard",
         {
           method: "POST",
-          body: formData, // ✅ DO NOT set Content-Type
+          body: formData,
         }
       );
+
       if (!res.ok) {
         throw new Error("Failed to create GlamCard");
       }
+
       await res.json();
       setShowSuccess(true);
     } catch (error) {
@@ -97,36 +135,36 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
       setLoading(false);
     }
   };
+
   return (
     <>
-     <div className="h-[90dvh] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-  <div className="space-y-10 pb-6">
-    <BasicInfoForm data={data} setData={setData} />
-    <MediaAndProfileForm data={data} setData={setData} />
-    <ServicesAndBookingForm data={data} setData={setData} />
-    <GlamlinkIntegrationForm data={data} setData={setData} />
-    <div
-      className="mt-10 rounded-full text-sm font-semibold text-white shadow-lg"
-      style={{
-        background: "linear-gradient(135deg, #23aeb8 0%, #53bec6 50%, #5cc2d6 100%)",
-      }}
-    >
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        className="w-full py-3 rounded-lg font-medium disabled:opacity-50"
-      >
-        {loading ? "Creating..." : "Create Business Card"}
-      </button>
-    </div>
-  </div>
-</div>
+      <div className="h-[90dvh] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <div className="space-y-10 pb-6">
+          <BasicInfoForm data={data} setData={setData} />
+          <MediaAndProfileForm data={data} setData={setData} />
+          <ServicesAndBookingForm data={data} setData={setData} />
+          <GlamlinkIntegrationForm data={data} setData={setData} />
+          <div
+            className="mt-10 rounded-full text-sm font-semibold text-white shadow-lg"
+            style={{
+              background:
+                "linear-gradient(135deg, #23aeb8 0%, #53bec6 50%, #5cc2d6 100%)",
+            }}
+          >
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="w-full py-3 rounded-lg font-medium disabled:opacity-50"
+            >
+              {loading ? "Creating..." : "Create Business Card"}
+            </button>
+          </div>
+        </div>
+      </div>
 
-<SuccessModal
-  open={showSuccess}
-  onClose={() => setShowSuccess(false)}
-/>
+      <SuccessModal open={showSuccess} onClose={() => setShowSuccess(false)} />
     </>
   );
 };
+
 export default GlamCardForm;

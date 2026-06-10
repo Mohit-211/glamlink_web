@@ -8,7 +8,6 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { GlamCardFormData } from "../types";
 
 /* ================= SSR SAFE CKEDITOR ================= */
-// (prevents Next.js hydration issues)
 const CKEditorComponent = dynamic(
   () => Promise.resolve(CKEditor),
   { ssr: false }
@@ -17,8 +16,16 @@ const CKEditorComponent = dynamic(
 /* ================= TYPES ================= */
 
 interface SectionProps {
-  data: GlamCardFormData;
-  setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
+  data: GlamCardFormData & {
+    preferred_booking_phone?: boolean;
+  };
+  setData: React.Dispatch<
+    React.SetStateAction<
+      GlamCardFormData & {
+        preferred_booking_phone?: boolean;
+      }
+    >
+  >;
 }
 
 /* ================= STYLES ================= */
@@ -47,7 +54,6 @@ const BasicInformationSection: React.FC<SectionProps> = ({
       <h2 className="text-lg font-semibold">Basic Information</h2>
 
       <div className="grid gap-5 md:grid-cols-2">
-
         {/* NAME */}
         <div>
           <label className={labelClass}>Full Name *</label>
@@ -55,7 +61,10 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             className={inputClass}
             value={data.name || ""}
             onChange={(e) =>
-              setData((p) => ({ ...p, name: e.target.value }))
+              setData((p) => ({
+                ...p,
+                name: e.target.value,
+              }))
             }
           />
         </div>
@@ -83,19 +92,45 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             className={inputClass}
             value={data.email || ""}
             onChange={(e) =>
-              setData((p) => ({ ...p, email: e.target.value }))
+              setData((p) => ({
+                ...p,
+                email: e.target.value,
+              }))
             }
           />
         </div>
 
         {/* PHONE */}
         <div>
-          <label className={labelClass}>Phone *</label>
+          <div className="mb-2 flex items-center justify-between">
+            <label className={labelClass}>Phone *</label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={data.preferred_booking_phone || false}
+                onChange={(e) =>
+                  setData((p) => ({
+                    ...p,
+                    preferred_booking_phone: e.target.checked,
+                  }))
+                }
+                className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+              />
+              <span className="text-xs font-medium text-gray-600">
+                Preferred Booking Method
+              </span>
+            </label>
+          </div>
+
           <input
             className={inputClass}
             value={data.phone || ""}
             onChange={(e) =>
-              setData((p) => ({ ...p, phone: e.target.value }))
+              setData((p) => ({
+                ...p,
+                phone: e.target.value,
+              }))
             }
           />
         </div>
@@ -104,25 +139,27 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         <div className="md:col-span-2">
           <label className={labelClass}>Professional Bio</label>
 
-          <CKEditor
+          <CKEditorComponent
             editor={ClassicEditor as any}
             data={data.bio || ""}
-           config={{
-  licenseKey: "GPL",
-  placeholder: "Write your bio...",
-}}
+            config={{
+              licenseKey: "GPL",
+              placeholder: "Write your bio...",
+            }}
             onChange={(_, editor) => {
               const html = editor.getData();
               const text = html.replace(/<[^>]*>/g, "").trim();
 
               if (text.length <= CHARACTER_LIMIT) {
-                setData((p) => ({ ...p, bio: html }));
+                setData((p) => ({
+                  ...p,
+                  bio: html,
+                }));
               }
             }}
           />
 
-          {/* COUNTER */}
-          <p className="mt-1 text-right text-xs text-gray-500">
+          <p className="mt-2 text-right text-xs text-gray-500">
             {getCharacterCount(data.bio || "")} / {CHARACTER_LIMIT}
           </p>
         </div>
