@@ -352,6 +352,24 @@ const [isQrModalOpen, setIsQrModalOpen] = useState(false);
     return Array.isArray(data.other_links) ? data.other_links : [];
   }, [data.other_links]);
 console.log(data,"data")
+const [copied, setCopied] = useState(false);
+
+const handleCopyLink = async () => {
+  const link =
+    data?.business_card_link ||
+    `https://glamlink.net/business-card/${data?.custom_handle}`;
+
+  try {
+    await navigator.clipboard.writeText(link);
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  } catch (error) {
+    console.error("Failed to copy link:", error);
+  }
+};
   /* ================= RENDER ================= */
   return (
     <div className={`${mode !== "download" ? "h-90dvh" : ""} flex flex-col`}>
@@ -909,22 +927,48 @@ console.log(data,"data")
       </div>
 
       {data?.business_card_qr ? (
-        <>
-          <div className="flex justify-center">
-            <img
-              src={data.business_card_qr}
-              alt="Business Card QR"
-              className="w-72 h-72 object-contain rounded-lg border"
-            />
-          </div>
+  <>
+    <div className="flex justify-center mb-4">
+      <img
+        src={data.business_card_qr}
+        alt="Business Card QR"
+        className="w-72 h-72 object-contain rounded-lg border"
+      />
+    </div>
 
-         
-        </>
-      ) : (
-        <div className="text-center py-10 text-gray-500">
-          QR Code not available
-        </div>
-      )}
+    {/* Business Card Link */}
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Business Card Link
+      </label>
+
+      <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-50 p-2">
+        <a
+          href={data.business_card_link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 truncate text-sm text-teal-700 hover:underline"
+        >
+          {data.business_card_link}
+        </a>
+
+        <button
+          onClick={handleCopyLink}
+          className="px-3 py-1.5 text-xs cursor-pointer font-medium rounded-md bg-[#23B9CD] text-white hover:bg-[#1ea8b5] transition-colors"
+        >
+          {copied ? "Copied!" : "Copy"}
+        </button>
+      </div>
+    </div>
+
+   
+   
+  </>
+) : (
+  <div className="text-center py-10 text-gray-500">
+    QR Code not available
+  </div>
+)}
     </div>
   </div>
 )}
