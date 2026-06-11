@@ -11,6 +11,7 @@ import {
   Music2,
   ExternalLink,
   Download,
+  QrCode,
 } from "lucide-react";
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 
@@ -157,7 +158,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(0);
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
-
+const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const specialtiesArray = parseArray(data.specialties);
   const importantInfoArray = parseArray(data.important_info);
 
@@ -350,7 +351,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
     }
     return Array.isArray(data.other_links) ? data.other_links : [];
   }, [data.other_links]);
-
+console.log(data,"data")
   /* ================= RENDER ================= */
   return (
     <div className={`${mode !== "download" ? "h-90dvh" : ""} flex flex-col`}>
@@ -363,34 +364,44 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
             {/* ===== TOP ACTION BUTTONS ===== */}
             {mode === "view" && (
-              <div className="flex justify-end gap-2 mb-3">
-                <button
-                  onClick={() => downloadVCF(data)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#23B9CD] hover:bg-[#1ea8b5] text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap"
-                  title="Save Contact"
-                >
-                  <svg
-                    className="w-4 h-4 flex-shrink-0"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z" />
-                    <polyline points="9 21 9 13 15 13 15 21" />
-                    <polyline points="9 7 12 7" />
-                  </svg>
-                  Save Contact
-                </button>
-                <button
-                  onClick={() => setIsDownloadModalOpen(true)}
-                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23AEB8] text-white shadow-lg hover:bg-[#1f9aa3] transition-all duration-200"
-                >
-                  <Download size={18} strokeWidth={2.5} />
-                </button>
-              </div>
+   <div className="flex justify-end gap-2 mb-3">
+  <button
+    onClick={() => downloadVCF(data)}
+    className="flex items-center cursor-pointer gap-1.5 px-4 py-2 rounded-full bg-[#23B9CD] hover:bg-[#1ea8b5] text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap"
+    title="Save Contact"
+  >
+    <svg
+      className="w-4 h-4 flex-shrink-0"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z" />
+      <polyline points="9 21 9 13 15 13 15 21" />
+      <polyline points="9 7 12 7" />
+    </svg>
+    Save Contact
+  </button>
+
+  <button
+    onClick={() => setIsQrModalOpen(true)}
+    className="h-10 w-10 flex items-center cursor-pointer justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200"
+    title="View QR Code"
+  >
+    <QrCode size={18} strokeWidth={2.5} />
+  </button>
+
+  <button
+    onClick={() => setIsDownloadModalOpen(true)}
+    className="h-10 w-10 flex items-center cursor-pointer justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200"
+    title="Download"
+  >
+    <Download size={18} strokeWidth={2.5} />
+  </button>
+</div>
             )}
 
             {/* ===== LOGO ===== */}
@@ -874,6 +885,49 @@ const GlamCardLivePreview: React.FC<Props> = ({
         onClose={() => setIsDownloadModalOpen(false)}
         datadownload={data}
       />
+      {/* ===== QR CODE MODAL ===== */}
+{isQrModalOpen && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+    onClick={() => setIsQrModalOpen(false)}
+  >
+    <div
+      className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold text-gray-800">
+          Business Card QR Code
+        </h3>
+
+        <button
+          onClick={() => setIsQrModalOpen(false)}
+          className="text-gray-500 hover:text-gray-700 text-xl"
+        >
+          ✕
+        </button>
+      </div>
+
+      {data?.business_card_qr ? (
+        <>
+          <div className="flex justify-center">
+            <img
+              src={data.business_card_qr}
+              alt="Business Card QR"
+              className="w-72 h-72 object-contain rounded-lg border"
+            />
+          </div>
+
+         
+        </>
+      ) : (
+        <div className="text-center py-10 text-gray-500">
+          QR Code not available
+        </div>
+      )}
+    </div>
+  </div>
+)}
     </div>
   );
 };

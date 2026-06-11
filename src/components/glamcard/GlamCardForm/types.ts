@@ -37,6 +37,7 @@ export interface GalleryMetaItem {
 /* ================= MAIN FORM ================= */
 
 export interface GlamCardFormData {
+  [x: string]: any;
   other_links: any;
   /* BASIC INFO */
   name: string;

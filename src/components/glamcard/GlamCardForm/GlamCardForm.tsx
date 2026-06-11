@@ -14,129 +14,233 @@ interface Props {
 const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+const DEMO_VALUES = {
+  name: "Sophia Martinez",
+  professional_title: "Master Hair Stylist & Colorist",
+  email: "sophia@luxebeauty.com",
+  phone: "123-456-7890",
+  booking_phone: "123-456-7890",
+  business_name: "Luxe Beauty Studio",
+  primary_specialty: "Hair Styling & Color",
+  custom_handle: "luxebeauty",
+  website: "https://luxebeauty.com",
+};
 
-  const handleSubmit = async () => {
-    console.log("FINAL DATA 👉", data);
-    try {
-      setLoading(true);
-      const formData = new FormData();
+ const handleSubmit = async () => {
+  console.log("FINAL DATA 👉", data);
 
-      /* ================= PROFILE IMAGE ================= */
-      if (data.profile_image) {
-        formData.append("profile_image", data.profile_image);
-      }
+  /* ================= REQUIRED VALIDATION ================= */
 
-      /* ================= GALLERY IMAGES (images only, skip videos) ================= */
-      data.images?.forEach((file) => {
-        if (file instanceof File && file.type.startsWith("video/")) return;
-        formData.append("images", file);
-      });
+  if (!data.name?.trim() || data.name === DEMO_VALUES.name) {
+    alert("Please enter your Name");
+    return;
+  }
 
-      /* ================= GALLERY META ================= */
-      if (data.gallery_meta?.length) {
-        formData.append(
-          "gallery_meta",
-          JSON.stringify(
-            data.gallery_meta.map(({ caption, is_thumbnail, sort_order }) => ({
-              caption,
-              is_thumbnail,
-              sort_order,
-            }))
-          )
-        );
-      }
+  if (
+    !data.professional_title?.trim() ||
+    data.professional_title === DEMO_VALUES.professional_title
+  ) {
+    alert("Please enter your Professional Title");
+    return;
+  }
 
-      /* ================= VIDEOS + VIDEO THUMBNAILS ================= */
-      const videoItems = data.images
-        ?.map((file, index) => ({
-          file,
-          meta: data.gallery_meta?.[index],
-          index,
-        }))
-        .filter(({ file }) => file instanceof File && file.type.startsWith("video/"));
+  if (!data.email?.trim() || data.email === DEMO_VALUES.email) {
+    alert("Please enter your Email");
+    return;
+  }
 
-      for (const { meta, index } of videoItems ?? []) {
-        if (!meta?.thumbnail_file) {
-          alert(`Please upload a thumbnail for video #${index + 1}.`);
-          setLoading(false);
-          return;
-        }
-      }
+  if (!data.phone?.trim() || data.phone === DEMO_VALUES.phone) {
+    alert("Please enter your Phone Number");
+    return;
+  }
 
-      videoItems?.forEach(({ file, meta }) => {
-        formData.append("videos", file);
-        formData.append("video_thumbnails", meta!.thumbnail_file!);
-      });
+  if (
+    !data.business_name?.trim() ||
+    data.business_name === DEMO_VALUES.business_name
+  ) {
+    alert("Please enter your Business Name");
+    return;
+  }
 
-      /* ================= SOCIAL MEDIA (strip non-serializable, include instagram_handles) ================= */
-      if (data.social_media) {
-        const { ...socialRest } = data.social_media;
-        formData.append("social_media", JSON.stringify(socialRest));
-      }
+  if (!data.bio?.trim()) {
+    alert("Please enter your Bio");
+    return;
+  }
 
-      /* ================= STRINGIFY OBJECTS / ARRAYS ================= */
-      const jsonFields = [
-        "business_hour",
-        "other_links",
-        "important_info",
-        "excites_about_glamlink",
-        "biggest_pain_points",
-        "specialties",
-        "locations",
-      ] as const;
+  if (
+    !data.primary_specialty?.trim() ||
+    data.primary_specialty === DEMO_VALUES.primary_specialty
+  ) {
+    alert("Please select your Primary Specialty");
+    return;
+  }
 
-      jsonFields.forEach((field) => {
-        const value = data[field];
-        if (value !== undefined) {
-          formData.append(field, JSON.stringify(value));
-        }
-      });
+  if (
+    !data.custom_handle?.trim() ||
+    data.custom_handle === DEMO_VALUES.custom_handle
+  ) {
+    alert("Please enter your Custom Handle");
+    return;
+  }
 
-      /* ================= PRIMITIVE FIELDS ================= */
-      const primitiveFields = [
-        "name",
-        "email",
-        "phone",
-        "business_name",
-        "professional_title",
-        "bio",
-        "preferred_booking_method",
-        "booking_link",
-        "offer_promotion",
-        "elite_setup",
-        "primary_specialty",
-        "custom_handle",
-        "website",
-        "promotion_details",
-      ] as const;
+  if (
+    !data.website?.trim() ||
+    data.website === DEMO_VALUES.website
+  ) {
+    alert("Please enter your Website");
+    return;
+  }
 
-      primitiveFields.forEach((field) => {
-        const value = data[field];
-        if (value !== undefined && value !== null) {
-          formData.append(field, String(value));
-        }
-      });
+  if (!data.preferred_booking_method) {
+    alert("Please select Preferred Booking Method");
+    return;
+  }
 
-      const res = await fetch(
-        "https://node.glamlink.net:5000/api/v1/businessCard",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+  if (!data.profile_image) {
+    alert("Please upload Profile Image");
+    return;
+  }
 
-      if (!res.ok) {
-        throw new Error("Failed to create GlamCard");
-      }
+  if (!data.images?.length) {
+    alert("Please upload Gallery Images");
+    return;
+  }
 
-      await res.json();
-      setShowSuccess(true);
-    } catch (error) {
-      console.error("ERROR 👉", error);
-      alert("Failed to create Business Card");
-    } finally {
-      setLoading(false);
-    }
+  if (!data.specialties?.length) {
+    alert("Please add at least one Specialty");
+    return;
+  }
+
+  if (!data.locations?.length) {
+    alert("Please add a Location");
+    return;
+  }
+
+  if (!data.business_hour?.length) {
+    alert("Please add Business Hours");
+    return;
+  }
+
+  // try {
+  //     setLoading(true);
+  //     const formData = new FormData();
+
+  //     /* ================= PROFILE IMAGE ================= */
+  //     if (data.profile_image) {
+  //       formData.append("profile_image", data.profile_image);
+  //     }
+
+  //     /* ================= GALLERY IMAGES (images only, skip videos) ================= */
+  //     data.images?.forEach((file) => {
+  //       if (file instanceof File && file.type.startsWith("video/")) return;
+  //       formData.append("images", file);
+  //     });
+
+  //     /* ================= GALLERY META ================= */
+  //     if (data.gallery_meta?.length) {
+  //       formData.append(
+  //         "gallery_meta",
+  //         JSON.stringify(
+  //           data.gallery_meta.map(({ caption, is_thumbnail, sort_order }) => ({
+  //             caption,
+  //             is_thumbnail,
+  //             sort_order,
+  //           }))
+  //         )
+  //       );
+  //     }
+
+  //     /* ================= VIDEOS + VIDEO THUMBNAILS ================= */
+  //     const videoItems = data.images
+  //       ?.map((file, index) => ({
+  //         file,
+  //         meta: data.gallery_meta?.[index],
+  //         index,
+  //       }))
+  //       .filter(({ file }) => file instanceof File && file.type.startsWith("video/"));
+
+  //     for (const { meta, index } of videoItems ?? []) {
+  //       if (!meta?.thumbnail_file) {
+  //         alert(`Please upload a thumbnail for video #${index + 1}.`);
+  //         setLoading(false);
+  //         return;
+  //       }
+  //     }
+
+  //     videoItems?.forEach(({ file, meta }) => {
+  //       formData.append("videos", file);
+  //       formData.append("video_thumbnails", meta!.thumbnail_file!);
+  //     });
+
+  //     /* ================= SOCIAL MEDIA (strip non-serializable, include instagram_handles) ================= */
+  //     if (data.social_media) {
+  //       const { ...socialRest } = data.social_media;
+  //       formData.append("social_media", JSON.stringify(socialRest));
+  //     }
+
+  //     /* ================= STRINGIFY OBJECTS / ARRAYS ================= */
+  //     const jsonFields = [
+  //       "business_hour",
+  //       "other_links",
+  //       "important_info",
+  //       "excites_about_glamlink",
+  //       "biggest_pain_points",
+  //       "specialties",
+  //       "locations",
+  //     ] as const;
+
+  //     jsonFields.forEach((field) => {
+  //       const value = data[field];
+  //       if (value !== undefined) {
+  //         formData.append(field, JSON.stringify(value));
+  //       }
+  //     });
+
+  //     /* ================= PRIMITIVE FIELDS ================= */
+  //     const primitiveFields = [
+  //       "name",
+  //       "email",
+  //       "phone",
+  //       "business_name",
+  //       "professional_title",
+  //       "bio",
+  //       "preferred_booking_method",
+  //       "booking_link",
+  //       "offer_promotion",
+  //       "elite_setup",
+  //       "primary_specialty",
+  //       "custom_handle",
+  //       "website",
+  //       "promotion_details",
+  //     ] as const;
+
+  //     primitiveFields.forEach((field) => {
+  //       const value = data[field];
+  //       if (value !== undefined && value !== null) {
+  //         formData.append(field, String(value));
+  //       }
+  //     });
+
+  //     const res = await fetch(
+  //       "https://node.glamlink.net:5000/api/v1/businessCard",
+  //       {
+  //         method: "POST",
+  //         body: formData,
+  //       }
+  //     );
+
+  //     if (!res.ok) {
+  //       throw new Error("Failed to create GlamCard");
+  //     }
+
+  //     await res.json();
+  //     setShowSuccess(true);
+  //   } catch (error) {
+  //     console.error("ERROR 👉", error);
+  //     alert("Failed to create Business Card");
+  //   } finally {
+  //     setLoading(false);
+  //   }
   };
 
   return (

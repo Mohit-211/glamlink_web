@@ -153,7 +153,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
 
-      <body className="min-h-screen bg-background">
+     <body className="min-h-screen bg-background" suppressHydrationWarning>
         {/* Google Tag Manager (noscript fallback) */}
         <noscript>
           <iframe
