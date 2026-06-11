@@ -121,6 +121,17 @@ const parseArray = (value: string | string[] | undefined): string[] => {
 
 const isFile = (v: any): v is File => v instanceof File;
 
+/* ================= VIDEO DETECTION ================= */
+const VIDEO_EXT = /\.(mp4|mov|webm|avi|mkv)$/i;
+
+const resolveIsVideo = (item: any): boolean => {
+  return (
+    item?.file_type === "video" ||
+    VIDEO_EXT.test(item?.file_uri || "") ||
+    VIDEO_EXT.test(item?.file_name || "")
+  );
+};
+
 /* ================= TEAL DOT BULLET LIST ================= */
 const DotList: React.FC<{ items: any[]; placeholder: string }> = ({
   items,
@@ -141,6 +152,25 @@ const DotList: React.FC<{ items: any[]; placeholder: string }> = ({
     )}
   </ul>
 );
+
+/* ================= VIDEO STRIP THUMBNAIL ================= */
+const VideoStripThumb = ({ src }: { src: string }) => {
+  console.log("Video thumb:", src);
+
+  return src ? (
+    <img
+      src={src}
+      alt="Video thumbnail"
+      className="h-full w-full object-cover"
+      onLoad={() => console.log("Loaded:", src)}
+      onError={() => console.log("Failed:", src)}
+    />
+  ) : (
+    <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+      No Thumb
+    </div>
+  );
+};
 
 /* ================= COMPONENT ================= */
 const GlamCardLivePreview: React.FC<Props> = ({
@@ -180,79 +210,73 @@ const GlamCardLivePreview: React.FC<Props> = ({
   const normalizedImages = useMemo(() => {
     const rawImages = data?.images || [];
     return rawImages.map((item: any, index: number) => {
-      if (typeof item === "string")
-        return { url: item, file_type: "image", thumbnail_uri: "", sort_order: index };
-      const fileType =
-        item.file_type ||
-        (item instanceof File && item.type.startsWith("video/") ? "video" : "image");
-      const resolvedFileType =
-        fileType === "image" &&
-          (item.file_uri || item.url || "").match(/\.(mp4|mov|webm|avi|mkv)$/i)
-          ? "video"
-          : fileType;
+      const meta = data?.gallery_meta?.[index];
+      const isVideo = resolveIsVideo(item);
+
+      // Resolve thumbnail URI — priority:
+      // 1. live mode: blob URL from gallery_meta thumbnail_file (File object)
+      // 2. thumbnail_uri from server (properly uploaded video thumb)
+      // 3. video_thumbnails alternate key from server
+      // 4. empty string → VideoStripThumb shows play icon fallback
+    let thumbnailUri = "";
+
+if (mode === "live" && meta?.thumbnail_file instanceof File) {
+  thumbnailUri = URL.createObjectURL(meta.thumbnail_file);
+} else if (typeof item === "object") {
+  thumbnailUri =
+    item.thumbnail_uri ||
+    item.video_thumbnail ||
+    item.video_thumbnails ||
+    "";
+}
+
+      if (typeof item === "string") {
+        return {
+          url: item,
+          sort_order: index,
+          thumbnail_uri: thumbnailUri,
+          file_type: VIDEO_EXT.test(item) ? "video" : "image",
+        };
+      }
+
       return {
         ...item,
+        // Always use file_uri as the playable src (covers both images[] and videos[])
         url: item.file_uri || item.url || "",
-        thumbnail_uri: item.thumbnail_uri || "",
-        file_type: resolvedFileType,
+        thumbnail_uri: thumbnailUri,
+        // Override file_type with our corrected detection
+        file_type: isVideo ? "video" : "image",
         sort_order: item.sort_order ?? index,
       };
     });
-  }, [data?.images]);
-
-  /* ================= DEDUPLICATE ================= */
-  const deduplicatedImages = useMemo(() => {
-    const properVideoUrls = new Set(
-      normalizedImages
-        .filter((img) => img.file_type === "video" && img.thumbnail_uri)
-        .map((img) => img.url)
-    );
-    return normalizedImages.filter(
-      (img) =>
-        !(img.file_type === "video" && !img.thumbnail_uri && properVideoUrls.has(img.url))
-    );
-  }, [normalizedImages]);
+  }, [data?.images, data?.gallery_meta, mode]);
 
   const galleryMeta = data?.gallery_meta || [];
 
-  /* ================= GALLERY PREVIEWS ================= */
   const galleryPreviews = useMemo(
     () =>
       mode === "live"
-        ? normalizedImages.map((item, idx) => {
-          const raw = data?.images?.[idx];
-          return isFile(raw) ? URL.createObjectURL(raw) : item.url;
-        })
+        ? normalizedImages.map((item, idx) =>
+            isFile(data?.images?.[idx])
+              ? URL.createObjectURL(data.images[idx])
+              : item.url
+          )
         : normalizedImages.map((item) => item.url),
     [mode, normalizedImages, data?.images]
   );
-
-  /* ================= THUMBNAIL PREVIEWS ================= */
-  const thumbnailPreviews = useMemo(
-    () =>
-      normalizedImages.map((item, idx) => {
-        const meta = galleryMeta[idx];
-        if (item.file_type === "video") {
-          if (meta?.thumbnail_file instanceof File)
-            return URL.createObjectURL(meta.thumbnail_file);
-          if (item.thumbnail_uri) return item.thumbnail_uri;
-        }
-        return item.thumbnail_uri || galleryPreviews[idx];
-      }),
-    [normalizedImages, galleryMeta, galleryPreviews]
-  );
-
+console.log(normalizedImages[4],"normalizedImages")
+  // Cleanup all blob URLs
   useEffect(() => {
     if (mode !== "live") return;
     return () => {
       galleryPreviews.forEach((url) => {
         if (url?.startsWith("blob:")) URL.revokeObjectURL(url);
       });
-      thumbnailPreviews.forEach((url) => {
-        if (url?.startsWith("blob:")) URL.revokeObjectURL(url);
+      normalizedImages.forEach((item) => {
+        if (item.thumbnail_uri?.startsWith("blob:")) URL.revokeObjectURL(item.thumbnail_uri);
       });
     };
-  }, [galleryPreviews, thumbnailPreviews, mode]);
+  }, [galleryPreviews, normalizedImages, mode]);
 
   /* ================= THUMBNAIL INDEX ================= */
   useEffect(() => {
@@ -261,7 +285,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
       return;
     }
     if (thumbnailIndex === null) {
-      const metaIndex = galleryMeta.findIndex((g) => g.is_thumbnail);
+      const metaIndex = galleryMeta.findIndex((g: any) => g.is_thumbnail);
       setThumbnailIndex(metaIndex !== -1 ? metaIndex : 0);
     }
   }, [normalizedImages, galleryMeta, thumbnailIndex]);
@@ -324,33 +348,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
     return data.social_media;
   }, [data.social_media]);
 
-  /* ================= ALL INSTAGRAM HANDLES ================= */
-  const allInstagramHandles = useMemo(() => {
-    const handles: { key: string; url: string }[] = [];
-    if (socialMedia?.instagram) {
-      handles.push({ key: "instagram", url: socialMedia.instagram });
-    }
-    let i = 1;
-    while (socialMedia?.[`instagram${i}`]) {
-      handles.push({ key: `instagram${i}`, url: socialMedia[`instagram${i}`] });
-      i++;
-    }
-    return handles;
-  }, [socialMedia]);
-
-  /* ================= OTHER LINKS ================= */
-  const otherLinks = useMemo(() => {
-    if (!data?.other_links) return [];
-    if (typeof data.other_links === "string") {
-      try {
-        return JSON.parse(data.other_links);
-      } catch {
-        return [];
-      }
-    }
-    return Array.isArray(data.other_links) ? data.other_links : [];
-  }, [data.other_links]);
-
   /* ================= RENDER ================= */
   return (
     <div className={`${mode !== "download" ? "h-90dvh" : ""} flex flex-col`}>
@@ -361,7 +358,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
         >
           <div className="rounded-2xl bg-[#F4F9FF] p-6 shadow-sm">
 
-            {/* ===== TOP ACTION BUTTONS ===== */}
+            {/* ===== TOP ACTION BUTTONS (view mode only) ===== */}
             {mode === "view" && (
               <div className="flex justify-end gap-2 mb-3">
                 <button
@@ -402,8 +399,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
             {/* ===== TWO COLUMN GRID ===== */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
               {/* ---- LEFT COLUMN ---- */}
               <div className="flex flex-col gap-5">
+
                 {/* ABOUT */}
                 <SectionBox title={`About ${data.name || "Your Name"}`} titleAlign="left">
                   <div className="flex flex-col items-center text-center">
@@ -414,8 +413,8 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             mode === "live" && isFile(data.profile_image)
                               ? URL.createObjectURL(data.profile_image)
                               : typeof data.profile_image === "string"
-                                ? data.profile_image
-                                : ""
+                              ? data.profile_image
+                              : ""
                           }
                           className="h-full w-full object-cover"
                           alt="Profile"
@@ -424,7 +423,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     </div>
                     <div className="mt-3">
                       <p className="font-bold text-gray-800">{data.name || "Your Name"}</p>
-                      <p className="text-sm text-[#24bbcb] font-medium">
+                      <p className="text-sm text-sky-500 font-medium">
                         {data.professional_title || "Professional Title"}
                       </p>
                       <p className="text-xs text-gray-500">
@@ -444,41 +443,51 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <SectionBox title="Signature Work" titleAlign="center">
                   {normalizedImages.length > 0 && thumbnailIndex !== null ? (
                     <>
+                      {/* ── Featured slot ── */}
                       <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm">
                         {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
                           <video
+                            key={galleryPreviews[thumbnailIndex]}
                             src={galleryPreviews[thumbnailIndex]}
-                            poster={thumbnailPreviews[thumbnailIndex]}
+                            poster={normalizedImages[thumbnailIndex]?.thumbnail_uri || undefined}
                             className="h-full w-full object-cover"
                             controls
                           />
                         ) : (
-                          <img
-                            src={
-                              normalizedImages[thumbnailIndex]?.thumbnail_uri ||
-                              galleryPreviews[thumbnailIndex]
-                            }
-                            className="h-full w-full object-cover transition hover:scale-105 duration-300"
-                            alt="Featured work"
-                          />
+                       <img
+  src={normalizedImages[thumbnailIndex]?.thumbnail_uri}
+  className="h-full w-full object-cover"
+  alt="Featured work"
+/>
                         )}
                       </div>
-                      {otherIndexes.length > 0 && (
-                        <div className="mt-3 flex gap-2 overflow-x-auto p-3">
+
+                      {/* ── Strip ── */}
+                      {otherIndexes.length > 1 && (
+                        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
                           {otherIndexes.slice(0, 4).map((index) => (
                             <button
                               key={index}
                               onClick={() => setThumbnailIndex(index)}
-                              className={`relative h-14 w-14 overflow-hidden rounded-lg border shadow-sm flex-shrink-0 ${thumbnailIndex === index
+                              className={`h-14 w-14 overflow-hidden rounded-lg border shadow-sm flex-shrink-0
+                                ${thumbnailIndex === index
                                   ? "ring-2 ring-teal-500"
                                   : "hover:ring-2 hover:ring-teal-400"
                                 }`}
                             >
-                              <img
-                                src={thumbnailPreviews[index]}
-                                className="h-full w-full object-cover"
-                                alt={`Thumbnail ${index + 1}`}
-                              />
+                              {normalizedImages[index]?.file_type === "video" ? (
+                                // Always show thumbnail image for videos — never a <video> tag in the strip
+                                <VideoStripThumb
+                                  src={normalizedImages[index]?.thumbnail_uri || ""}
+                                />
+                                
+                              ) : (
+                                <img
+                                  src={galleryPreviews[index]}
+                                  className="h-full w-full object-cover"
+                                  alt="Thumbnail"
+                                />
+                              )}
                             </button>
                           ))}
                         </div>
@@ -494,6 +503,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
               {/* ---- RIGHT COLUMN ---- */}
               <div className="flex flex-col gap-5">
+
                 {/* LOCATION + BUSINESS HOURS */}
                 <div className="rounded-2xl p-[3px]">
                   <div
@@ -527,12 +537,12 @@ const GlamCardLivePreview: React.FC<Props> = ({
                                 {selectedLocation.location_type === "exact_address"
                                   ? selectedLocation.address?.trim() || "Address not provided"
                                   : [
-                                    selectedLocation.city?.trim(),
-                                    selectedLocation.state?.trim(),
-                                    selectedLocation.area?.trim(),
-                                  ]
-                                    .filter(Boolean)
-                                    .join(", ") || "Location not fully set"}
+                                      selectedLocation.city?.trim(),
+                                      selectedLocation.state?.trim(),
+                                      selectedLocation.area?.trim(),
+                                    ]
+                                      .filter(Boolean)
+                                      .join(", ") || "Location not fully set"}
                               </p>
                               {selectedLocation.phone && (
                                 <p className="text-gray-600">📞 {selectedLocation.phone}</p>
@@ -611,25 +621,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           </ul>
                         </div>
                       </div>
-                    ) : <div>
-                      <div className="flex items-center gap-2 mb-3 mt-3">
-                        <span className="flex-1 h-px bg-gray-400/60" />
-                        <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
-                          Business Hours
-                        </p>
-                        <span className="flex-1 h-px bg-gray-400/60" />
-                      </div>
-                      <div className="rounded-xl bg-white p-4 shadow-sm">
-                        <ul className="space-y-1.5 text-sm">
-                          <li className="flex items-start gap-2">
-                            <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0" />
-                            <span className="text-gray-700">
-                              Appointment on request
-                            </span>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>}
+                    ) : null}
                   </div>
                 </div>
 
@@ -666,7 +658,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
             </div>
 
             {/* ===== PRESS & FEATURES ===== */}
-            {otherLinks.filter((l: any) => l?.url).length > 0 && (
+            {data?.other_links?.filter(Boolean)?.length > 0 && (
               <div className="rounded-2xl p-[3px] mt-5">
                 <div
                   className="rounded-2xl p-4"
@@ -679,21 +671,19 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     </p>
                     <span className="flex-1 h-px bg-gray-400/60" />
                   </div>
-                  <div className="rounded-xl bg-white p-4 shadow-sm space-y-2">
-                    {otherLinks
-                      .filter((link: any) => link?.url)
-                      .map((link: { title: string; url: string }, index: number) => (
+                  <div className="space-y-2">
+                    {data.other_links
+                      .filter(Boolean)
+                      .map((link: string, index: number) => (
                         <a
                           key={index}
-                          href={link.url}
+                          href={link}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 transition hover:border-teal-300 hover:bg-teal-50"
                         >
                           <ExternalLink className="h-4 w-4 text-teal-600 flex-shrink-0" />
-                          <span className="truncate font-medium">
-                            {link.title}
-                          </span>
+                          <span className="truncate">{link?.replace(/^https?:\/\//, "")}</span>
                         </a>
                       ))}
                   </div>
@@ -728,35 +718,34 @@ const GlamCardLivePreview: React.FC<Props> = ({
             </div>
 
             {/* ===== SOCIAL ICONS ===== */}
-            <div className="flex justify-end flex-wrap gap-3 mt-3">
+            <div className="flex justify-end gap-3">
               {data?.website && (
-                <a href={data.website} target="_blank" rel="noopener noreferrer" title={data.website}>
+                <a href={data.website} target="_blank" rel="noopener noreferrer">
                   <Globe className="w-4 h-4 text-gray-500 hover:text-teal-600 transition" />
                 </a>
               )}
-              {/* All Instagram handles */}
-              {allInstagramHandles.map(({ key, url }) => (
-                <a key={key} href={url} target="_blank" rel="noopener noreferrer" title={url}>
+              {socialMedia?.instagram && (
+                <a href={socialMedia.instagram} target="_blank" rel="noopener noreferrer">
                   <Instagram className="w-4 h-4 text-gray-500 hover:text-pink-600 transition" />
                 </a>
-              ))}
+              )}
               {socialMedia?.facebook && (
-                <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" title={socialMedia.facebook}>
+                <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer">
                   <Facebook className="w-4 h-4 text-gray-500 hover:text-blue-600 transition" />
                 </a>
               )}
               {socialMedia?.linkedin && (
-                <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer" title={socialMedia.linkedin}>
+                <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer">
                   <Linkedin className="w-4 h-4 text-gray-500 hover:text-blue-700 transition" />
                 </a>
               )}
               {socialMedia?.youtube && (
-                <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer" title={socialMedia.youtube}>
+                <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer">
                   <Youtube className="w-4 h-4 text-gray-500 hover:text-red-600 transition" />
                 </a>
               )}
               {socialMedia?.tiktok && (
-                <a href={socialMedia.tiktok} target="_blank" rel="noopener noreferrer" title={socialMedia.tiktok}>
+                <a href={socialMedia.tiktok} target="_blank" rel="noopener noreferrer">
                   <Music2 className="w-4 h-4 text-gray-500 hover:text-black transition" />
                 </a>
               )}
@@ -776,9 +765,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-1">
-              <p className="text-base font-bold text-gray-800">
-                How would you like to connect?
-              </p>
+              <p className="text-base font-bold text-gray-800">How would you like to connect?</p>
               <button
                 onClick={() => setIsBookingModalOpen(false)}
                 className="text-gray-400 hover:text-gray-600 text-lg leading-none"
@@ -786,25 +773,20 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 ✕
               </button>
             </div>
-            <p className="text-xs text-gray-500 mb-5">
-              Choose your preferred booking method
-            </p>
+            <p className="text-xs text-gray-500 mb-5">Choose your preferred booking method</p>
             <div className="flex flex-col gap-3">
-
-              {/* BOOK VIA LINK */}
               <a
                 href={data.booking_link || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => { if (!data.booking_link) e.preventDefault(); }}
-                className={`flex items-center gap-3 p-4 rounded-xl border transition-colors ${data.booking_link
+                className={`flex items-center gap-3 p-4 rounded-xl border transition-colors ${
+                  data.booking_link
                     ? "border-gray-200 hover:bg-gray-50"
                     : "border-gray-200 opacity-50 cursor-not-allowed"
-                  }`}
+                }`}
               >
-                <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center flex-shrink-0">
-                  🔗
-                </div>
+                <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center flex-shrink-0">🔗</div>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Book via Link</p>
                   <p className="text-xs text-gray-500">
@@ -813,56 +795,53 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </div>
               </a>
 
-              {/* CALL / TEXT */}
               <a
                 href={data.phone ? `tel:${data.phone}` : "#"}
                 onClick={(e) => { if (!data.phone) e.preventDefault(); }}
-                className={`flex items-center gap-3 p-4 rounded-xl border transition-colors ${data.phone
+                className={`flex items-center gap-3 p-4 rounded-xl border transition-colors ${
+                  data.phone
                     ? "border-gray-200 hover:bg-gray-50"
                     : "border-gray-200 opacity-50 cursor-not-allowed"
-                  }`}
+                }`}
               >
-                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-                  📞
-                </div>
+                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">📞</div>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Call / Text</p>
                   <p className="text-xs text-gray-500">{data.phone || "Not configured"}</p>
                 </div>
               </a>
 
-              {/* INSTAGRAM DM — one row per handle */}
-              {allInstagramHandles.length > 0 ? (
-                allInstagramHandles.map(({ key, url }, idx) => (
-                  <a
-                    key={key}
-                    href={url.startsWith("http") ? url : `https://ig.me/m/${url.replace(/^@/, "")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0">
-                      📸
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-800">
-                        DM on Instagram{allInstagramHandles.length > 1 ? ` ${idx + 1}` : ""}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">{url}</p>
-                    </div>
-                  </a>
-                ))
-              ) : (
-                <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 opacity-50 cursor-not-allowed">
-                  <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0">
-                    📸
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">DM on Instagram</p>
-                    <p className="text-xs text-gray-500">Not configured</p>
-                  </div>
+              <a
+                href={
+                  socialMedia?.instagram
+                    ? socialMedia.instagram.startsWith("http")
+                      ? socialMedia.instagram.startsWith("https")
+                        ? socialMedia.instagram
+                        : `https://${socialMedia.instagram}`
+                      : `https://ig.me/m/${socialMedia.instagram
+                          .replace("https://www.instagram.com/", "")
+                          .replace("http://www.instagram.com/", "")
+                          .replace("instagram.com/", "")
+                          .replace(/^@/, "")}`
+                    : "#"
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => { if (!socialMedia?.instagram) e.preventDefault(); }}
+                className={`flex items-center gap-3 p-4 rounded-xl border transition-colors ${
+                  socialMedia?.instagram
+                    ? "border-gray-200 hover:bg-gray-50"
+                    : "border-gray-200 opacity-50 cursor-not-allowed"
+                }`}
+              >
+                <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0">📸</div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">DM on Instagram</p>
+                  <p className="text-xs text-gray-500">
+                    {socialMedia?.instagram || "Not configured"}
+                  </p>
                 </div>
-              )}
+              </a>
             </div>
           </div>
         </div>

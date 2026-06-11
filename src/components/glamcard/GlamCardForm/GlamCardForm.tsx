@@ -26,8 +26,9 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
         formData.append("profile_image", data.profile_image);
       }
 
-      /* ================= GALLERY IMAGES ================= */
+      /* ================= GALLERY IMAGES (images only, skip videos) ================= */
       data.images?.forEach((file) => {
+        if (file instanceof File && file.type.startsWith("video/")) return;
         formData.append("images", file);
       });
 
@@ -46,7 +47,6 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
       }
 
       /* ================= VIDEOS + VIDEO THUMBNAILS ================= */
-      // FIX: Collect video items with their meta for validation and upload
       const videoItems = data.images
         ?.map((file, index) => ({
           file,
@@ -55,7 +55,6 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
         }))
         .filter(({ file }) => file instanceof File && file.type.startsWith("video/"));
 
-      // Validate: every video must have a thumbnail_file
       for (const { meta, index } of videoItems ?? []) {
         if (!meta?.thumbnail_file) {
           alert(`Please upload a thumbnail for video #${index + 1}.`);
@@ -64,16 +63,20 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
         }
       }
 
-      // Append videos and their thumbnails
       videoItems?.forEach(({ file, meta }) => {
         formData.append("videos", file);
         formData.append("video_thumbnails", meta!.thumbnail_file!);
       });
 
+      /* ================= SOCIAL MEDIA (strip non-serializable, include instagram_handles) ================= */
+      if (data.social_media) {
+        const { ...socialRest } = data.social_media;
+        formData.append("social_media", JSON.stringify(socialRest));
+      }
+
       /* ================= STRINGIFY OBJECTS / ARRAYS ================= */
       const jsonFields = [
         "business_hour",
-        "social_media",
         "other_links",
         "important_info",
         "excites_about_glamlink",

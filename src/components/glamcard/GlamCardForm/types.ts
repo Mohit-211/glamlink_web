@@ -70,13 +70,15 @@ export interface GlamCardFormData {
   /* LINKS */
   website?: string;
 
-  social_media: {
-    linkedin: string;
-    instagram?: string;
-    tiktok?: string;
-    facebook?: string;
-    youtube?: string;
-  };
+ social_media?: {
+  instagram?: string;
+  instagram1?: string;
+  instagram2?: string;
+  tiktok?: string;
+  linkedin?: string;
+  youtube?: string;
+  facebook?: string;
+};
 
 preferred_booking_method: BookingMethod;
   booking_link?: string;
@@ -97,7 +99,7 @@ preferred_booking_method: BookingMethod;
 export type PriceRange = "$" | "$$" | "$$$" | "$$$$" | "";
 
 export const BOOKING_METHODS = {
-  LINK: "Go_to_Booking_Link",
+  LINK: "GO_tO_BOOKING_LINK",
   CALL: "CALL_TEXT",
   INSTAGRAM: "DM_INSTAGRAM",
 } as const;

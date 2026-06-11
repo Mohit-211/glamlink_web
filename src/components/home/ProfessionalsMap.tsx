@@ -36,6 +36,8 @@ const ProfessionalsMap: React.FC<ProfessionalsMapProps> = ({
   professionals = [],
   onSelectProfessional,
 }) => {
+const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
   });
@@ -81,38 +83,49 @@ const ProfessionalsMap: React.FC<ProfessionalsMapProps> = ({
   if (!isLoaded) return <p className="text-center">Loading map...</p>;
   if (!center) return <p className="text-center">No locations available</p>;
 
+
   return (
     <div className="w-full h-full flex">
       <div className="w-full h-full">
+
         <GoogleMap
           mapContainerStyle={{ width: "100%", height: "100%" }}
           center={center}
           zoom={11}
+          onClick={() => setActiveIndex(null)} // close on map click
         >
           {allLocations.map((loc, index) => (
             <Marker
               key={index}
               position={{ lat: loc.lat, lng: loc.lng }}
-              onMouseOver={() => setHoveredIndex(index)}
-              onMouseOut={() => setHoveredIndex(null)}
-              onClick={() => onSelectProfessional?.(loc.professional)}
-            >
-              {hoveredIndex === index && (
-                <InfoWindow
-                  position={{ lat: loc.lat, lng: loc.lng }}
-                  onCloseClick={() => setHoveredIndex(null)}
-                >
-                  <div style={{ minWidth: "220px" }}>
-                    <div style={{ fontWeight: 600 }}>{loc.name}</div>
-                    <div style={{ fontSize: "13px", marginTop: "4px" }}>
-                      {loc.address}
-                    </div>
-                  </div>
-                </InfoWindow>
-              )}
-            </Marker>
+              onClick={() => {
+                setActiveIndex(index === activeIndex ? null : index);
+                onSelectProfessional?.(loc.professional);
+              }}
+            />
           ))}
+
+          {/* Single InfoWindow outside markers — no remount on hover */}
+          {activeIndex !== null && (
+            <InfoWindow
+              position={{
+                lat: allLocations[activeIndex].lat,
+                lng: allLocations[activeIndex].lng,
+              }}
+              onCloseClick={() => setActiveIndex(null)}
+            >
+              <div style={{ minWidth: "220px" }}>
+                <div style={{ fontWeight: 600 }}>
+                  {allLocations[activeIndex].name}
+                </div>
+                <div style={{ fontSize: "13px", marginTop: "4px" }}>
+                  {allLocations[activeIndex].address}
+                </div>
+              </div>
+            </InfoWindow>
+          )}
         </GoogleMap>
+
       </div>
     </div>
   );
