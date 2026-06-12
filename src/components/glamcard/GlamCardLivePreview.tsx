@@ -21,39 +21,19 @@ import {
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 
 /* ================= VCF GENERATOR ================= */
-function generateVCF(data: GlamCardFormData): string {
-  const escape = (s?: string) =>
-    (s || "").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\n/g, "\\n");
-  const lines: string[] = [
-    "BEGIN:VCARD",
-    "VERSION:3.0",
-    `FN:${escape(data.name)}`,
-    `ORG:${escape(data.business_name)}`,
-    `TITLE:${escape(data.professional_title)}`,
-  ];
-  const primary =
-    data.locations?.find((l: any) => l.is_primary) || data.locations?.[0];
-  if (primary?.phone) lines.push(`TEL;TYPE=WORK,VOICE:${primary.phone}`);
-  if (primary?.address) {
-    lines.push(
-      `ADR;TYPE=WORK:;;${escape(primary.address)};${escape(primary.city)};${escape(primary.state)};;;`
-    );
-  } else if (primary?.city || primary?.state || primary?.area) {
-    const locality = [primary.city, primary.area].filter(Boolean).join(", ");
-    lines.push(`ADR;TYPE=WORK:;;${locality};${escape(primary.state)};;;`);
-  }
-  if (data.bio) {
-    const plainBio = data.bio.replace(/<[^>]+>/g, "").trim();
-    lines.push(`NOTE:${escape(plainBio)}`);
-  }
-  if (typeof data.profile_image === "string" && data.profile_image) {
-    lines.push(`PHOTO;VALUE=URI:${data.profile_image}`);
-  }
-  lines.push("END:VCARD");
-  return lines.join("\r\n");
+export function generateVCF(data: GlamCardFormData) {
+  return `BEGIN:VCARD
+VERSION:3.0
+FN:${data.name || ""}
+ORG:${data.business_name || ""}
+TITLE:${data.professional_title || ""}
+TEL;TYPE=CELL:${data.phone || ""}
+EMAIL:${data.email || ""}
+URL:${data.website || ""}
+END:VCARD`;
 }
-
 function downloadVCF(data: GlamCardFormData) {
+  console.log(data,"data")
   const vcf = generateVCF(data);
   const blob = new Blob([vcf], { type: "text/vcard;charset=utf-8" });
   const url = URL.createObjectURL(blob);
