@@ -171,6 +171,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   const [copied, setCopied] = useState(false);
 
   const specialtiesArray = parseArray(data.specialties);
+  console.log(specialtiesArray, "specialtiesArray")
   const importantInfoArray = parseArray(data.important_info);
 
   /* ================= PROFILE IMAGE ================= */
@@ -389,7 +390,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
     socialMedia?.tiktok;
 
   /* ================= RENDER ================= */
-  console.log(selectedLocation,"selectedLocation")
+  console.log(selectedLocation, "selectedLocation")
   return (
     <div className={`${mode !== "download" ? "min-h-screen" : ""} flex flex-col bg-[#F0F7FF]`}>
 
@@ -624,7 +625,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                                 ? selectedLocation.address?.trim() || "Address not provided"
                                 : [selectedLocation.city?.trim(), selectedLocation.state?.trim(), selectedLocation.area?.trim()].filter(Boolean).join(", ") || "Location not fully set"}
                             </p>
-                            {selectedLocation?.phone|| data.phone && <p className="text-gray-600">📞 {selectedLocation.phone|| data.phone}</p>}
+                            {selectedLocation?.phone || data.phone && <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>}
                             {selectedLocation.description && <p className="text-xs text-gray-500 italic">{selectedLocation.description}</p>}
                           </div>
                         )}
@@ -774,11 +775,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           ? selectedLocation.address?.trim() || "Address not provided"
                           : [selectedLocation.city?.trim(), selectedLocation.state?.trim(), selectedLocation.area?.trim()].filter(Boolean).join(", ")}
                       </p>
-                      {selectedLocation.phone && (
-                        <a href={`tel:${selectedLocation.phone}`} className="flex items-center gap-1.5 text-sm text-[#23B9CD] font-medium">
-                          <Phone size={12} /> {selectedLocation.phone}
-                        </a>
-                      )}
+                     {(selectedLocation?.phone || data.phone) && (
+  <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>
+)}
                     </div>
                   )}
                   {mapSrc ? (
@@ -826,18 +825,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 )}
               </SectionBox>
 
-              {/* SPECIALTIES mobile */}
+              {/* SPECIALTIES mobile  */}
               {specialtiesArray.length > 0 && (
                 <SectionBox title="Specialties" titleAlign="center">
-                  {/* pill chips on mobile */}
-                  <div className="flex flex-wrap gap-2">
-                    {specialtiesArray.map((spec, i) => (
-                      <span key={i} className="inline-flex items-center gap-1.5 bg-[#23B9CD]/10 text-[#0e8fa0] text-xs font-medium px-3 py-1.5 rounded-full border border-[#23B9CD]/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#23B9CD] flex-shrink-0" />
-                        {typeof spec === "string" }
-                      </span>
-                    ))}
-                  </div>
+                  <DotList items={specialtiesArray} placeholder="Your specialties will appear here" />
                 </SectionBox>
               )}
             </div>
@@ -975,17 +966,17 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
               {/* CALL / TEXT */}
               {preferredBookingMethods.includes("CALL_TEXT") && (
-              <a
-                href={data.phone ? `tel:${data.phone}` : "#"}
-                onClick={(e) => { if (!data.phone) e.preventDefault(); }}
-                className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.phone ? "border-gray-200 hover:bg-gray-50" : "border-gray-200 opacity-50 cursor-not-allowed"}`}
-              >
-                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0 text-lg">📞</div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">Call / Text</p>
-                  <p className="text-xs text-gray-500">{data.phone || "Not configured"}</p>
-                </div>
-              </a>
+                <a
+                  href={data.phone ? `tel:${data.phone}` : "#"}
+                  onClick={(e) => { if (!data.phone) e.preventDefault(); }}
+                  className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.phone ? "border-gray-200 hover:bg-gray-50" : "border-gray-200 opacity-50 cursor-not-allowed"}`}
+                >
+                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0 text-lg">📞</div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800">Call / Text</p>
+                    <p className="text-xs text-gray-500">{data.phone || "Not configured"}</p>
+                  </div>
+                </a>
               )}
 
               {/* INSTAGRAM */}
