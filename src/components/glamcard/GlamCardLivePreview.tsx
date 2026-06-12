@@ -607,7 +607,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
                                 ? selectedLocation.address?.trim() || "Address not provided"
                                 : [selectedLocation.city?.trim(), selectedLocation.state?.trim(), selectedLocation.area?.trim()].filter(Boolean).join(", ") || "Location not fully set"}
                             </p>
-                            {selectedLocation?.phone || data.phone && <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>}
+                            {(selectedLocation?.phone || data.phone) && data.is_phone_visible && (
+  <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>
+)}
                             {selectedLocation.description && <p className="text-xs text-gray-500 italic">{selectedLocation.description}</p>}
                           </div>
                         )}
@@ -757,9 +759,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           ? selectedLocation.address?.trim() || "Address not provided"
                           : [selectedLocation.city?.trim(), selectedLocation.state?.trim(), selectedLocation.area?.trim()].filter(Boolean).join(", ")}
                       </p>
-                      {(selectedLocation?.phone || data.phone) && (
-                        <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>
-                      )}
+                     {(selectedLocation?.phone || data.phone) && data.is_phone_visible && (
+  <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>
+)}
                     </div>
                   )}
                   {mapSrc ? (

@@ -83,8 +83,7 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
 
     other_links: [],
     preferred_booking_methods: [
-      BOOKING_METHODS.INSTAGRAM,
-      BOOKING_METHODS.CALL,
+     
     ],
     booking_link: "",
     important_info: [

@@ -17,12 +17,14 @@ const CKEditorComponent = dynamic(
 
 interface SectionProps {
   data: GlamCardFormData & {
-    preferred_booking_phone?: boolean;
+    // preferred_booking_phone?: boolean;
+    is_phone_visible?: boolean;
   };
   setData: React.Dispatch<
     React.SetStateAction<
       GlamCardFormData & {
-        preferred_booking_phone?: boolean;
+        // preferred_booking_phone?: boolean;
+        is_phone_visible?: boolean;
       }
     >
   >;
@@ -101,39 +103,40 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         </div>
 
         {/* PHONE */}
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className={labelClass}>Phone *</label>
+     {/* PHONE */}
+<div>
+  <div className="mb-2 flex items-center justify-between">
+    <label className={labelClass}>Phone *</label>
 
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={data.preferred_booking_phone || false}
-                onChange={(e) =>
-                  setData((p) => ({
-                    ...p,
-                    preferred_booking_phone: e.target.checked,
-                  }))
-                }
-                className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-              />
-              <span className="text-xs font-medium text-gray-600">
-                Preferred Booking Method
-              </span>
-            </label>
-          </div>
+    <label className="flex items-center gap-2 cursor-pointer">
+      <input
+  type="checkbox"
+  checked={data.is_phone_visible ?? true}
+  onChange={(e) =>
+    setData((p) => ({
+      ...p,
+      is_phone_visible: e.target.checked,
+    }))
+  }
+  className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+/>
+      <span className="text-xs font-medium text-gray-600">
+        Show phone number on card
+      </span>
+    </label>
+  </div>
 
-          <input
-            className={inputClass}
-            value={data.phone || ""}
-            onChange={(e) =>
-              setData((p) => ({
-                ...p,
-                phone: e.target.value,
-              }))
-            }
-          />
-        </div>
+  <input
+    className={inputClass}
+    value={data.phone || ""}
+    onChange={(e) =>
+      setData((p) => ({
+        ...p,
+        phone: e.target.value,
+      }))
+    }
+  />
+</div>
 
         {/* BIO */}
         <div className="md:col-span-2">
