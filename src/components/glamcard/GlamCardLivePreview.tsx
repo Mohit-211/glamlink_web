@@ -400,12 +400,12 @@ const GlamCardLivePreview: React.FC<Props> = ({
             >
               <QrCode size={15} strokeWidth={2.5} />
             </button>
-            <button
+            {/* <button
               onClick={() => setIsDownloadModalOpen(true)}
               className="h-8 w-8 flex items-center justify-center rounded-full bg-[#23B9CD]/10 text-[#23B9CD] transition active:scale-95"
             >
               <Download size={15} strokeWidth={2.5} />
-            </button>
+            </button> */}
           </div>
         </div>
       )}
@@ -439,9 +439,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <button onClick={() => setIsQrModalOpen(true)} className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200">
                   <QrCode size={18} strokeWidth={2.5} />
                 </button>
-                <button onClick={() => setIsDownloadModalOpen(true)} className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200">
+                {/* <button onClick={() => setIsDownloadModalOpen(true)} className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200">
                   <Download size={18} strokeWidth={2.5} />
-                </button>
+                </button> */}
               </div>
             )}
 
