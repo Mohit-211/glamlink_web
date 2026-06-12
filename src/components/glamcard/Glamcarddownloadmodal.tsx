@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useRef, useState } from "react";
 import { Download, X, Loader2 } from "lucide-react";
 import { toPng, toJpeg } from "html-to-image";
@@ -11,6 +10,17 @@ interface GlamCardDownloadModalProps {
   datadownload: any;
 }
 
+// ─── Device detection ────────────────────────────────────────────────────────
+const isIOS = () =>
+  typeof navigator !== "undefined" &&
+  (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+
+const isAndroid = () =>
+  typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent);
+
+const isMobile = () => isIOS() || isAndroid();
+
 const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
   isOpen,
   onClose,
@@ -20,14 +30,20 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
   const [isDownloading, setIsDownloading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [format, setFormat] = useState<"png" | "jpg">("png");
+  const [mobileHint, setMobileHint] = useState(false);
 
-  // ─── Lock body scroll when modal is open ────────────────────────────────────
+  // ─── Lock body scroll when modal is open ──────────────────────────────────
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
-  // ─── Force-load all lazy / Next.js images when modal opens ──────────────────
+  // ─── Reset hint when modal closes ─────────────────────────────────────────
+  useEffect(() => {
+    if (!isOpen) setMobileHint(false);
+  }, [isOpen]);
+
+  // ─── Force-load all lazy / Next.js images when modal opens ────────────────
   useEffect(() => {
     if (!isOpen) return;
     const timer = setTimeout(() => {
@@ -49,11 +65,10 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
     return () => clearTimeout(timer);
   }, [isOpen]);
 
-  // ════════════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════════
   //  HELPERS
-  // ════════════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════════
 
-  /** Wait for every <img> inside element to finish loading. */
   const waitForImages = (element: HTMLElement) =>
     Promise.all(
       Array.from(element.querySelectorAll<HTMLImageElement>("img")).map(
@@ -61,20 +76,13 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
           new Promise<void>((resolve) => {
             if (img.complete && img.naturalWidth > 0) return resolve();
             img.onload = () => resolve();
-            img.onerror = () => resolve(); // don't stall on broken images
+            img.onerror = () => resolve();
           })
       )
     );
 
-  /**
-   * Convert any URL to a base64 data-URL.
-   * 1. Canvas + crossOrigin (fastest, same-origin / CORS-enabled)
-   * 2. fetch + blob → FileReader (handles more CORS scenarios)
-   * 3. Original URL (last resort — html-to-image will try again)
-   */
   const toDataUrl = (src: string): Promise<string> =>
     new Promise((resolve) => {
-      // Attempt 1 — canvas
       const tryCanvas = () => {
         const img = new Image();
         img.crossOrigin = "anonymous";
@@ -84,21 +92,21 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             c.width = img.naturalWidth || 300;
             c.height = img.naturalHeight || 300;
             c.getContext("2d")?.drawImage(img, 0, 0);
-            const url = c.toDataURL("image/png"); // throws on tainted canvas
+            const url = c.toDataURL("image/png");
             if (url && url !== "data:,") return resolve(url);
             tryFetch();
           } catch {
-            tryFetch(); // SecurityError from tainted canvas
+            tryFetch();
           }
         };
         img.onerror = () => tryFetch();
-        // cache-bust so the browser actually attaches CORS headers
         img.src = src + (src.includes("?") ? "&" : "?") + "_t=" + Date.now();
       };
 
-      // Attempt 2 — fetch blob
       const tryFetch = () => {
-        fetch(src, { mode: "cors", cache: "no-store" })
+        // Use "default" cache on iOS to avoid ITP blocking "no-store" requests
+        const cacheMode: RequestCache = isIOS() ? "default" : "no-store";
+        fetch(src, { mode: "cors", cache: cacheMode })
           .then((r) => { if (!r.ok) throw new Error(); return r.blob(); })
           .then((blob) => {
             const reader = new FileReader();
@@ -106,16 +114,12 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             reader.onerror = () => resolve(src);
             reader.readAsDataURL(blob);
           })
-          .catch(() => resolve(src)); // give up — pass original src
+          .catch(() => resolve(src));
       };
 
       tryCanvas();
     });
 
-  /**
-   * Replace every <img> src with an inline base64 data-URL.
-   * Returns a cleanup function that restores the originals.
-   */
   const inlineImages = async (element: HTMLElement): Promise<() => void> => {
     const restores: { img: HTMLImageElement; src: string }[] = [];
     await Promise.all(
@@ -130,17 +134,12 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
     return () => restores.forEach(({ img, src }) => { img.src = src; });
   };
 
-  /** Draw a canvas-based map placeholder (used when Google Maps iframe can't be captured). */
   const drawMapCanvas = (w: number, h: number, lat: number | null, lng: number | null): string => {
     const c = document.createElement("canvas");
     c.width = w; c.height = h;
     const ctx = c.getContext("2d")!;
-
-    // Background
     ctx.fillStyle = "#f2efe9";
     ctx.fillRect(0, 0, w, h);
-
-    // Fake roads
     ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 6;
     [[0, h * 0.45, w, h * 0.45], [0, h * 0.65, w, h * 0.65],
      [w * 0.3, 0, w * 0.3, h], [w * 0.7, 0, w * 0.7, h]].forEach(([x1, y1, x2, y2]) => {
@@ -151,9 +150,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
      [w * 0.55, 0, w * 0.55, h]].forEach(([x1, y1, x2, y2]) => {
       ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
     });
-
     if (lat !== null && lng !== null) {
-      // Red pin
       const cx = w / 2, cy = h / 2;
       ctx.fillStyle = "#e53e3e";
       ctx.beginPath(); ctx.arc(cx, cy - 16, 12, 0, Math.PI * 2); ctx.fill();
@@ -163,17 +160,14 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
       ctx.fillStyle = "#9ca3af"; ctx.font = "13px sans-serif"; ctx.textAlign = "center";
       ctx.fillText("Map View", w / 2, h / 2 + 5);
     }
-
-    // Border
     ctx.strokeStyle = "#d1d5db"; ctx.lineWidth = 1; ctx.strokeRect(0, 0, w, h);
     return c.toDataURL("image/png");
   };
 
-  /** Sanitize oklch / lab / lch colors that html-to-image's canvas can't render. */
   const sanitizeColors = (element: HTMLElement) => {
     const re = /\b(lab|lch|oklch|oklab|color|display-p3|hwb)\s*\(/gi;
-    const props = ["color","backgroundColor","borderColor","borderTopColor","borderBottomColor",
-      "borderLeftColor","borderRightColor","outlineColor","boxShadow","textShadow","fill","stroke"] as const;
+    const props = ["color", "backgroundColor", "borderColor", "borderTopColor", "borderBottomColor",
+      "borderLeftColor", "borderRightColor", "outlineColor", "boxShadow", "textShadow", "fill", "stroke"] as const;
     element.querySelectorAll<HTMLElement>("*").forEach((el) => {
       const s = window.getComputedStyle(el);
       props.forEach((p) => {
@@ -186,13 +180,70 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
     });
   };
 
-  // ════════════════════════════════════════════════════════════════════════════
+  /**
+   * Trigger download:
+   * - Desktop: standard <a download> click
+   * - Android: convert to Blob + object URL (works in Chrome Android)
+   * - iOS: open in new tab — user long-presses to save (only reliable method)
+   */
+  const triggerDownload = async (dataUrl: string, fileName: string) => {
+    if (isIOS()) {
+      // iOS Safari ignores <a download> entirely.
+      // Best UX: open image in new tab with save instructions.
+      const newTab = window.open("", "_blank");
+      if (newTab) {
+        newTab.document.write(
+          `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">` +
+          `<title>${fileName}</title></head>` +
+          `<body style="margin:0;padding:0;background:#111;display:flex;flex-direction:column;align-items:center;min-height:100vh">` +
+          `<p style="color:#fff;font-family:-apple-system,sans-serif;font-size:15px;text-align:center;padding:16px 24px;margin:0">` +
+          `👆 Tap &amp; hold the image below, then tap <strong>"Save to Photos"</strong></p>` +
+          `<img src="${dataUrl}" style="width:100%;max-width:600px;display:block" />` +
+          `</body></html>`
+        );
+        newTab.document.close();
+      }
+      setMobileHint(true);
+      return;
+    }
+
+    if (isAndroid()) {
+      // Android Chrome supports <a download> with blob: URLs reliably.
+      // Converting from data URL → Blob → object URL avoids some Chrome Android quirks.
+      try {
+        const res = await fetch(dataUrl);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+      } catch {
+        // Fallback to direct data URL if blob conversion fails
+        const a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = fileName;
+        a.click();
+      }
+      return;
+    }
+
+    // Desktop
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = fileName;
+    a.click();
+  };
+
+  // ══════════════════════════════════════════════════════════════════════════
   //  DOWNLOAD
-  // ════════════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════════
   const handleDownload = async () => {
     if (!previewRef.current) return;
 
-    // Track everything we mutate so we can restore on cleanup
     const videoRestores: { video: HTMLVideoElement; placeholder: HTMLElement }[] = [];
     const iframeRestores: { iframe: HTMLIFrameElement; placeholder: HTMLElement }[] = [];
     const bgRestores: { el: HTMLElement; orig: string }[] = [];
@@ -202,11 +253,11 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
     try {
       setIsDownloading(true);
       setErrorMsg(null);
+      setMobileHint(false);
 
       const el = previewRef.current;
 
-      // ── STEP 1: Strip srcset FIRST ──────────────────────────────────────────
-      // Must happen before inlining so html-to-image never re-fetches via srcset.
+      // ── STEP 1: Strip srcset FIRST ────────────────────────────────────────
       el.querySelectorAll<HTMLImageElement>("img").forEach((img) => {
         const ss = img.getAttribute("srcset");
         if (ss) {
@@ -216,12 +267,12 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         }
       });
 
-      // ── STEP 2: Inline all images as base64 (ALL screen sizes) ─────────────
+      // ── STEP 2: Inline all images as base64 ──────────────────────────────
       await waitForImages(el);
       restoreImages = await inlineImages(el);
       await waitForImages(el);
 
-      // ── STEP 3: Inline background-image CSS URLs ────────────────────────────
+      // ── STEP 3: Inline background-image CSS URLs ──────────────────────────
       const b64Cache = new Map<string, string>();
       const cachedDataUrl = async (url: string) => {
         if (b64Cache.has(url)) return b64Cache.get(url)!;
@@ -241,68 +292,55 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         })
       );
 
-      // ── STEP 4: Re-inline any remaining non-base64 srcs ────────────────────
-     // ── STEP 4: Re-inline any remaining non-base64 srcs ────────────────────
-await Promise.all(
-  Array.from(el.querySelectorAll<HTMLImageElement>("img")).map(async (img) => {
-    const src = img.getAttribute("src") || "";
-    if (src && !src.startsWith("data:")) {
-      img.src = await cachedDataUrl(src);
-    }
-  })
-);
+      // ── STEP 4: Re-inline any remaining non-base64 srcs ──────────────────
+      await Promise.all(
+        Array.from(el.querySelectorAll<HTMLImageElement>("img")).map(async (img) => {
+          const src = img.getAttribute("src") || "";
+          if (src && !src.startsWith("data:")) {
+            img.src = await cachedDataUrl(src);
+          }
+        })
+      );
 
-      // ── STEP 5: Replace <iframe> (Google Maps etc.) with canvas placeholder ─
-      // We intentionally do NOT try toPng on the iframe parent — Google Maps is
-      // always cross-origin, and that call will always throw a SecurityError.
-      // A clean canvas placeholder is reliable and looks good in the download.
+      // ── STEP 5: Replace <iframe> with canvas map placeholder ──────────────
       el.querySelectorAll<HTMLIFrameElement>("iframe").forEach((iframe) => {
         const w = iframe.offsetWidth || 300;
         const h = iframe.offsetHeight || 200;
         const radius = getComputedStyle(iframe).borderRadius || "8px";
         const src = iframe.getAttribute("src") || "";
-
         const pbMatch = src.match(/!3d(-?[\d.]+)!4d(-?[\d.]+)/);
         const qMatch = src.match(/[?&]q=(-?[\d.]+),(-?[\d.]+)/);
         const lat = pbMatch ? parseFloat(pbMatch[1]) : qMatch ? parseFloat(qMatch[1]) : null;
         const lng = pbMatch ? parseFloat(pbMatch[2]) : qMatch ? parseFloat(qMatch[2]) : null;
-
         const mapDataUrl = drawMapCanvas(w, h, lat, lng);
         const img = document.createElement("img");
         img.src = mapDataUrl;
         img.style.cssText = `width:${w}px;height:${h}px;object-fit:cover;border-radius:${radius};display:block;`;
-
         iframeRestores.push({ iframe, placeholder: img });
         iframe.parentNode!.replaceChild(img, iframe);
       });
 
-      // ── STEP 6: Replace <video> with thumbnail / poster / placeholder ───────
+      // ── STEP 6: Replace <video> with poster / thumbnail / placeholder ─────
       await Promise.all(
         Array.from(el.querySelectorAll<HTMLVideoElement>("video")).map(async (video) => {
           const w = video.offsetWidth || 320;
           const h = video.offsetHeight || 180;
           const radius = getComputedStyle(video).borderRadius || "0px";
-
           const placeholder = document.createElement("img");
           placeholder.style.cssText = `width:${w}px;height:${h}px;object-fit:cover;border-radius:${radius};display:block;`;
-
           const poster = video.getAttribute("poster");
-
           if (poster) {
-            // Use poster image
             placeholder.src = await cachedDataUrl(poster);
           } else {
-            // Look for a sibling thumbnail <img> the carousel renders
             const parent = video.parentElement;
-            const nearbyImg = parent?.querySelector<HTMLImageElement>("img") ??
+            const nearbyImg =
+              parent?.querySelector<HTMLImageElement>("img") ??
               (video.previousElementSibling instanceof HTMLImageElement ? video.previousElementSibling : null) ??
               (video.nextElementSibling instanceof HTMLImageElement ? video.nextElementSibling : null);
-
             if (nearbyImg && nearbyImg.naturalWidth > 0) {
               const nearbySrc = nearbyImg.getAttribute("src") || "";
               placeholder.src = nearbySrc.startsWith("data:") ? nearbySrc : await cachedDataUrl(nearbySrc);
             } else {
-              // Canvas play-button placeholder
               const c = document.createElement("canvas");
               c.width = w; c.height = h;
               const ctx = c.getContext("2d")!;
@@ -313,41 +351,41 @@ await Promise.all(
               placeholder.src = c.toDataURL("image/png");
             }
           }
-
           videoRestores.push({ video, placeholder });
           video.parentNode!.replaceChild(placeholder, video);
         })
       );
 
-      // ── STEP 7: Sanitize unsupported CSS color functions ────────────────────
+      // ── STEP 7: Sanitize unsupported CSS color functions ──────────────────
       sanitizeColors(el);
 
-      // ── STEP 8: Final paint settle ──────────────────────────────────────────
+      // ── STEP 8: Final paint settle ────────────────────────────────────────
       await new Promise((r) => setTimeout(r, 200));
       await waitForImages(el);
 
-      // ── STEP 9: Capture ─────────────────────────────────────────────────────
+      // ── STEP 9: Capture ───────────────────────────────────────────────────
+      // pixelRatio: 1 on iOS to stay under the ~16MB canvas size limit.
+      // pixelRatio: 2 everywhere else for crisp output.
       const options = {
-        cacheBust: true,   // ensure fresh CORS headers on any remaining fetches
-        pixelRatio: 2,
-        skipFonts: true,   // prevents cross-origin stylesheet SecurityErrors
+        cacheBust: true,
+        pixelRatio: isIOS() ? 1 : 2,
+        skipFonts: true,
       };
 
       const fileName = `glam-card-${Date.now()}`;
 
       if (format === "png") {
         const dataUrl = await toPng(el, options);
-        triggerDownload(dataUrl, `${fileName}.png`);
+        await triggerDownload(dataUrl, `${fileName}.png`);
       } else {
         const dataUrl = await toJpeg(el, { ...options, quality: 0.95 });
-        triggerDownload(dataUrl, `${fileName}.jpg`);
+        await triggerDownload(dataUrl, `${fileName}.jpg`);
       }
 
     } catch (err) {
       console.error("[GlamCard download]", err);
       setErrorMsg("Something went wrong while generating the image. Please try again.");
     } finally {
-      // ── Restore everything ──────────────────────────────────────────────────
       videoRestores.forEach(({ video, placeholder }) => {
         placeholder.parentNode?.replaceChild(video, placeholder);
       });
@@ -361,16 +399,9 @@ await Promise.all(
     }
   };
 
-  const triggerDownload = (dataUrl: string, fileName: string) => {
-    const a = document.createElement("a");
-    a.href = dataUrl;
-    a.download = fileName;
-    a.click();
-  };
-
-  // ════════════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════════
   //  RENDER
-  // ════════════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════════
   if (!isOpen) return null;
 
   return (
@@ -405,6 +436,14 @@ await Promise.all(
             />
           </div>
         </div>
+
+        {/* iOS save hint */}
+        {mobileHint && isIOS() && (
+          <div className="px-4 py-3 bg-blue-50 text-blue-700 text-xs sm:text-sm text-center flex-shrink-0 leading-relaxed">
+            📸 Image opened in a new tab —<br />
+            <strong>tap &amp; hold it, then tap "Save to Photos"</strong>
+          </div>
+        )}
 
         {/* Error banner */}
         {errorMsg && (
@@ -444,7 +483,7 @@ await Promise.all(
               {isDownloading ? (
                 <><Loader2 size={16} className="animate-spin" /> Downloading…</>
               ) : (
-                <><Download size={16} /> Download</>
+                <><Download size={16} /> {isIOS() ? "Save Image" : "Download"}</>
               )}
             </button>
           </div>
