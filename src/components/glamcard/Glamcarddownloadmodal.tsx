@@ -100,7 +100,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         }
       }));
       setIframeScreenshots(screenshots);
-    }, 1500); // wait 1.5s for Google Maps iframe to fully load its tiles
+    }, 300); // wait 1.5s for Google Maps iframe to fully load its tiles
     return () => clearTimeout(timer);
   }, [isOpen]);
 
@@ -244,9 +244,11 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
       // Step 1: Wait for all images to load naturally
       await waitForImagesToLoad(element);
 
-      // Step 2: Inline all <img> src as base64
-      restoreImages = await inlineAllImages(element);
-      await waitForImagesToLoad(element);
+ // Step 2: Inline images only on desktop
+if (window.innerWidth >= 768) {
+  restoreImages = await inlineAllImages(element);
+  await waitForImagesToLoad(element);
+}
 
       // Step 3: Sanitize unsupported CSS color functions
       sanitizeUnsupportedColors(element);
@@ -493,14 +495,16 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
 
       const fileName = `glam-card-${Date.now()}`;
       const options = {
-        cacheBust: false,
-        pixelRatio: 3,
-        skipFonts: true,
-        fetchRequestInit: { mode: "cors" as RequestMode, cache: "no-cache" as RequestCache },
-      };
+  cacheBust: false,
+  pixelRatio: window.innerWidth < 768 ? 1 : 2,
+  skipFonts: true,
+};
 
       if (format === "png") {
-        const dataUrl = await toPng(element, options);
+        const dataUrl = await toPng(element, {
+    ...options,
+    pixelRatio: window.innerWidth < 768 ? 1 : 2,
+  });
         const link = document.createElement("a");
         link.download = `${fileName}.png`;
         link.href = dataUrl;

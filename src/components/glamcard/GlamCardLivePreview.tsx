@@ -36,7 +36,7 @@ export function generateVCF(data: GlamCardFormData) {
   ].join("\r\n");
 }
 function downloadVCF(data: GlamCardFormData) {
-  console.log(data,"data")
+  console.log(data, "data")
   const vcf = generateVCF(data);
   const blob = new Blob([vcf], { type: "text/vcard;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -460,24 +460,24 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <div className="relative flex items-center gap-4 p-4">
                   {/* avatar */}
                   <div className="w-28 h-28 rounded-full overflow-hidden bg-white/20 border-2 border-white shadow-lg flex-shrink-0">
-  {data?.profile_image ? (
-    <img
-      src={
-        mode === "live" && isFile(data.profile_image)
-          ? URL.createObjectURL(data.profile_image)
-          : typeof data.profile_image === "string"
-            ? data.profile_image
-            : ""
-      }
-      className="w-full h-full object-cover"
-      alt="Profile"
-    />
-  ) : (
-    <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">
-      {(data.name || "?")[0]}
-    </div>
-  )}
-</div>
+                    {data?.profile_image ? (
+                      <img
+                        src={
+                          mode === "live" && isFile(data.profile_image)
+                            ? URL.createObjectURL(data.profile_image)
+                            : typeof data.profile_image === "string"
+                              ? data.profile_image
+                              : ""
+                        }
+                        className="w-full h-full object-cover"
+                        alt="Profile"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">
+                        {(data.name || "?")[0]}
+                      </div>
+                    )}
+                  </div>
                   {/* info */}
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-white text-lg leading-tight truncate">
@@ -491,7 +491,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     </p>
 
                     {/* quick social row */}
-                    {hasSocials && (
+                    {/* {hasSocials && (
                       <div className="flex items-center gap-2 mt-2">
                         {data?.website && (
                           <a href={data.website} target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
@@ -519,7 +519,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           </a>
                         )}
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
               </div>
@@ -757,9 +757,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           ? selectedLocation.address?.trim() || "Address not provided"
                           : [selectedLocation.city?.trim(), selectedLocation.state?.trim(), selectedLocation.area?.trim()].filter(Boolean).join(", ")}
                       </p>
-                     {(selectedLocation?.phone || data.phone) && (
-  <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>
-)}
+                      {(selectedLocation?.phone || data.phone) && (
+                        <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>
+                      )}
                     </div>
                   )}
                   {mapSrc ? (
@@ -871,38 +871,76 @@ const GlamCardLivePreview: React.FC<Props> = ({
             </div>
 
             {/* ===== SOCIAL ICONS (desktop only — mobile shown in hero) ===== */}
-            <div className="hidden lg:flex justify-end flex-wrap gap-3 mt-3">
-              {data?.website && (
-                <a href={data.website} target="_blank" rel="noopener noreferrer" title={data.website}>
-                  <Globe className="w-4 h-4 text-gray-500 hover:text-teal-600 transition" />
-                </a>
-              )}
-              {allInstagramHandles.map(({ key, url }) => (
-                <a key={key} href={url} target="_blank" rel="noopener noreferrer" title={url}>
-                  <Instagram className="w-4 h-4 text-gray-500 hover:text-pink-600 transition" />
-                </a>
-              ))}
-              {socialMedia?.facebook && (
-                <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer">
-                  <Facebook className="w-4 h-4 text-gray-500 hover:text-blue-600 transition" />
-                </a>
-              )}
-              {socialMedia?.linkedin && (
-                <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer">
-                  <Linkedin className="w-4 h-4 text-gray-500 hover:text-blue-700 transition" />
-                </a>
-              )}
-              {socialMedia?.youtube && (
-                <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer">
-                  <Youtube className="w-4 h-4 text-gray-500 hover:text-red-600 transition" />
-                </a>
-              )}
-              {socialMedia?.tiktok && (
-                <a href={socialMedia.tiktok} target="_blank" rel="noopener noreferrer">
-                  <Music2 className="w-4 h-4 text-gray-500 hover:text-black transition" />
-                </a>
-              )}
-            </div>
+         <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
+  {data?.website && (
+    <a
+      href={data.website}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={data.website}
+      className="p-2 rounded-full hover:bg-gray-100 transition"
+    >
+      <Globe className="w-5 h-5 text-gray-500 hover:text-teal-600 transition" />
+    </a>
+  )}
+
+  {allInstagramHandles.map(({ key, url }) => (
+    <a
+      key={key}
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={url}
+      className="p-2 rounded-full hover:bg-gray-100 transition"
+    >
+      <Instagram className="w-5 h-5 text-gray-500 hover:text-pink-600 transition" />
+    </a>
+  ))}
+
+  {socialMedia?.facebook && (
+    <a
+      href={socialMedia.facebook}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="p-2 rounded-full hover:bg-gray-100 transition"
+    >
+      <Facebook className="w-5 h-5 text-gray-500 hover:text-blue-600 transition" />
+    </a>
+  )}
+
+  {socialMedia?.linkedin && (
+    <a
+      href={socialMedia.linkedin}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="p-2 rounded-full hover:bg-gray-100 transition"
+    >
+      <Linkedin className="w-5 h-5 text-gray-500 hover:text-blue-700 transition" />
+    </a>
+  )}
+
+  {socialMedia?.youtube && (
+    <a
+      href={socialMedia.youtube}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="p-2 rounded-full hover:bg-gray-100 transition"
+    >
+      <Youtube className="w-5 h-5 text-gray-500 hover:text-red-600 transition" />
+    </a>
+  )}
+
+  {socialMedia?.tiktok && (
+    <a
+      href={socialMedia.tiktok}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="p-2 rounded-full hover:bg-gray-100 transition"
+    >
+      <Music2 className="w-5 h-5 text-gray-500 hover:text-black transition" />
+    </a>
+  )}
+</div>
 
 
           </div>
