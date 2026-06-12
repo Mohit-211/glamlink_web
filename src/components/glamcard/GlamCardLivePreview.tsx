@@ -22,15 +22,18 @@ import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 
 /* ================= VCF GENERATOR ================= */
 export function generateVCF(data: GlamCardFormData) {
-  return `BEGIN:VCARD
-VERSION:3.0
-FN:${data.name || ""}
-ORG:${data.business_name || ""}
-TITLE:${data.professional_title || ""}
-TEL;TYPE=CELL:${data.phone || ""}
-EMAIL:${data.email || ""}
-URL:${data.website || ""}
-END:VCARD`;
+  return [
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    `N:${data.name || ""};;;;`,
+    `FN:${data.name || ""}`,
+    `ORG:${data.business_name || ""}`,
+    `TITLE:${data.professional_title || ""}`,
+    `TEL;TYPE=CELL:${data.phone || ""}`,
+    `EMAIL:${data.email || ""}`,
+    `URL:${data.website || ""}`,
+    "END:VCARD",
+  ].join("\r\n");
 }
 function downloadVCF(data: GlamCardFormData) {
   console.log(data,"data")
@@ -456,26 +459,25 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
                 <div className="relative flex items-center gap-4 p-4">
                   {/* avatar */}
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden bg-white/20 ring-2 ring-white/60 flex-shrink-0 shadow-lg">
-                    {data?.profile_image ? (
-                      <img
-                        src={
-                          mode === "live" && isFile(data.profile_image)
-                            ? URL.createObjectURL(data.profile_image)
-                            : typeof data.profile_image === "string"
-                              ? data.profile_image
-                              : ""
-                        }
-                        className="h-full w-full object-cover"
-                        alt="Profile"
-                      />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center text-white/60 text-2xl font-bold">
-                        {(data.name || "?")[0]}
-                      </div>
-                    )}
-                  </div>
-
+                  <div className="w-28 h-28 rounded-full overflow-hidden bg-white/20 border-2 border-white shadow-lg flex-shrink-0">
+  {data?.profile_image ? (
+    <img
+      src={
+        mode === "live" && isFile(data.profile_image)
+          ? URL.createObjectURL(data.profile_image)
+          : typeof data.profile_image === "string"
+            ? data.profile_image
+            : ""
+      }
+      className="w-full h-full object-cover"
+      alt="Profile"
+    />
+  ) : (
+    <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">
+      {(data.name || "?")[0]}
+    </div>
+  )}
+</div>
                   {/* info */}
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-white text-lg leading-tight truncate">
