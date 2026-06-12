@@ -479,7 +479,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     )}
                   </div>
                   {/* info */}
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 text-white">
                     <p className="font-bold text-white text-lg leading-tight truncate">
                       {data.name || "Your Name"}
                     </p>
