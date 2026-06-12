@@ -441,64 +441,72 @@ const removeInstagramHandle = (idx: number) => {
         </div>
       </div>
 
-      {/* Preferred Booking Method */}
-      <div>
-        <div className="flex items-center gap-2 relative">
-          <label className={labelClass}>Preferred Booking Method</label>
-          <span
-            onMouseEnter={() => setShowInfo(true)}
-            onMouseLeave={() => setShowInfo(false)}
-            className="cursor-pointer text-gray-400 hover:text-gray-600 text-sm"
-          >
-            ⓘ
-          </span>
-          {showInfo && (
-            <div className="absolute top-6 left-0 z-10 w-64 rounded-lg bg-black text-white text-xs p-3 shadow-lg">
-              Choose how clients can contact you:
-              <br />• Booking Link → requires link
-              <br />• Call/Text → requires phone number
-              <br />• Instagram DM → requires Instagram
-            </div>
-          )}
-        </div>
-        <select
-          className={inputClass}
-          value={data.preferred_booking_method}
+    <div>
+  <div className="flex items-center gap-2 relative">
+    <label className={labelClass}>Preferred Booking Methods</label>
+  </div>
+
+<div
+  className="mt-3"
+  style={{ display: "flex", gap: "8px" }}
+>
+    {[
+      BOOKING_METHODS.LINK,
+      BOOKING_METHODS.CALL,
+      BOOKING_METHODS.INSTAGRAM,
+    ].map((method) => (
+      <label
+        key={method}
+        className="flex items-center gap-2 cursor-pointer m-0" 
+      >
+        <input
+          type="checkbox"
+          checked={data.preferred_booking_methods?.includes(method)}
           onChange={(e) => {
-            const value = e.target.value as BookingMethod;
             setData((prev) => ({
               ...prev,
-              preferred_booking_method: value,
-              booking_link: value === BOOKING_METHODS.LINK ? prev.booking_link : "",
+              preferred_booking_methods: e.target.checked
+                ? [...(prev.preferred_booking_methods || []), method]
+                : (prev.preferred_booking_methods || []).filter(
+                    (m) => m !== method
+                  ),
             }));
           }}
-          required
-        >
-          <option value="">Select booking method...</option>
-          <option value={BOOKING_METHODS.LINK}>Go to Booking Link</option>
-          <option value={BOOKING_METHODS.CALL}>Call / Text</option>
-          <option value={BOOKING_METHODS.INSTAGRAM}>DM on Instagram</option>
-        </select>
-        {data.preferred_booking_method === "GO_tO_BOOKING_LINK" && (
-          <div className="mt-4">
-            <label className={labelClass}>Booking Link</label>
-            <input
-              type="url"
-              className={inputClass}
-              required
-              placeholder="https://booksy.com/yourprofile or calendly.com/..."
-              value={data.booking_link || ""}
-              onChange={(e) =>
-                setData((prev) => ({ ...prev, booking_link: e.target.value }))
-              }
-            />
-          </div>
-        )}
-      </div>
+        />
+
+        <span>
+          {method === BOOKING_METHODS.LINK && "Go to Booking Link"}
+          {method === BOOKING_METHODS.CALL && "Call / Text"}
+          {method === BOOKING_METHODS.INSTAGRAM && "DM on Instagram"}
+        </span>
+      </label>
+    ))}
+  </div>
+
+  {data.preferred_booking_methods?.includes(BOOKING_METHODS.LINK) && (
+    <div className="mt-4">
+      <label className={labelClass} m-0>Booking Link</label>
+      <input
+        type="url"
+        className={inputClass}
+        placeholder="https://booksy.com/yourprofile"
+        value={data.booking_link || ""}
+        onChange={(e) =>
+          setData((prev) => ({
+            ...prev,
+            booking_link: e.target.value,
+          }))
+        }
+      />
+    </div>
+  )}
+</div>
 
       {/* Important Info */}
       <div className="space-y-3">
-        <label className={labelClass}>Important Information</label>
+        <label className={labelClass} m-0>
+          Important Information
+        </label>
         {data.important_info.length > 0 && (
           <div className="space-y-2">
             {data.important_info.map((item, i) => (
@@ -529,7 +537,7 @@ const removeInstagramHandle = (idx: number) => {
           <button
             type="button"
             onClick={addInfo}
-            className="rounded-lg bg-gray-200 px-5 text-sm font-medium hover:bg-gray-300"
+            className="rounded-lg bg-gray-200 p-1 text-sm font-medium hover:bg-gray-300"
           >
             + Add
           </button>

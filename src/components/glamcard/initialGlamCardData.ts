@@ -80,11 +80,12 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
       facebook:
         "",
     },
-  
-other_links: [],
-    /* ================= BOOKING ================= */
-    preferred_booking_method:
+
+    other_links: [],
+    preferred_booking_methods: [
       BOOKING_METHODS.INSTAGRAM,
+      BOOKING_METHODS.CALL,
+    ],
     booking_link: "",
     important_info: [
       "Deposit required to secure booking",
