@@ -186,6 +186,7 @@ const GlamCardForm: React.FC<Props> = ({ data, setData }) => {
       const res = await fetch("https://node.glamlink.net:5000/api/v1/businessCard", {
         method: "POST",
         body: formData,
+        
       });
       // const token = localStorage.getItem(
       //   "GlamlinkaccessToken"
