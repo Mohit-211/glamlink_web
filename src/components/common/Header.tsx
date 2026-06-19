@@ -1,32 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Download } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import logo from "../../../public/header_logo.png";
 
 const navLinks = [
   { label: "Home", href: "/", id: "home" },
-  // { label: "For Clients", href: "/for-clients", id: "clients" },
-  // { label: "For Professionals", href: "/for-professionals", id: "pros" },
   { label: "Magazine", href: "/magazine", id: "magazine" },
   { label: "Podcast", href: "/podcast", id: "podcast" },
   { label: "Journal", href: "/journal", id: "journal" },
-
-  // { label: "Directory", href: "/directory", id: "directory" },
-  // { label: "Media kit", href: "/media-kit", id: "media-kit" },
-
 ];
 
-export default function Header({activeRoute}:any) {
+export default function Header({ activeRoute }: any) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const pathname = usePathname();
 
-  const isActive = (href: string) => pathname === href;
+  useEffect(() => {
+    const token = localStorage.getItem("GlamlinkaccessToken");
+    setIsLoggedIn(!!token);
+  }, []);
 
+  const isActive = (href: string) => pathname === href;
+const hideAuthButton =
+  pathname.startsWith("/dashboard");
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-border">
       <div className="container-glamlink">
@@ -49,8 +51,7 @@ export default function Header({activeRoute}:any) {
               <Link
                 key={link.id}
                 href={link.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive(link.href)
                     ? "text-primary bg-primary/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -61,24 +62,34 @@ export default function Header({activeRoute}:any) {
             ))}
           </nav>
 
-          {/* DESKTOP CTA */}
+          {/* DESKTOP BUTTON */}
+          { !hideAuthButton&&
           <div className="hidden lg:block">
-            <Button asChild className="btn-primary rounded-full px-6 text-sm">
-              <a
-                href="https://linktr.ee/glamlink_app"
-                target="_blank"
-                rel="noopener noreferrer"
+            <Button
+              asChild
+              className="btn-primary rounded-full px-6 text-sm"
+            >
+              <Link
+                href={
+                  isLoggedIn
+                    ? "/dashboard"
+                    : "/login"
+                }
               >
-                <Download className="w-4 h-4 mr-2" />
-                Download App
-              </a>
+                {isLoggedIn
+                  ? "Dashboard"
+                  : "Login"}
+              </Link>
             </Button>
           </div>
+          }
 
           {/* MOBILE MENU BUTTON */}
           <button
             className="lg:hidden p-2 rounded-lg hover:bg-muted"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() =>
+              setMobileMenuOpen(!mobileMenuOpen)
+            }
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? (
@@ -98,9 +109,10 @@ export default function Header({activeRoute}:any) {
               <Link
                 key={link.id}
                 href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-4 py-3 rounded-lg text-base font-medium
-                ${
+                onClick={() =>
+                  setMobileMenuOpen(false)
+                }
+                className={`px-4 py-3 rounded-lg text-base font-medium ${
                   isActive(link.href)
                     ? "bg-primary/10 text-primary"
                     : "text-foreground hover:bg-muted"
@@ -110,19 +122,26 @@ export default function Header({activeRoute}:any) {
               </Link>
             ))}
 
-            {/* MOBILE CTA */}
-
-            <a
-              href="https://linktr.ee/glamlink_app"
-              target="_blank"
-              rel="noopener noreferrer"
+            {/* MOBILE BUTTON */}
+                { !hideAuthButton&&
+            <Link
+              href={
+                isLoggedIn
+                  ? "/dashboard"
+                  : "/login"
+              }
+              onClick={() =>
+                setMobileMenuOpen(false)
+              }
               className="mt-4"
             >
               <Button className="btn-primary w-full rounded-full py-6">
-                <Download className="w-5 h-5 mr-2" />
-                Download App
+                {isLoggedIn
+                  ? "Dashboard"
+                  : "Login"}
               </Button>
-            </a>
+            </Link>
+}
           </div>
         </div>
       )}

@@ -18,6 +18,22 @@ export const getAllCategories = async () => {
   return data;
 };
 
+export const getMyBusinessCard = async () => {
+  const token = localStorage.getItem(
+    "GlamlinkaccessToken"
+  );
+
+  const { data } = await api.get(
+    "businessCard/getMyBusinessCard",
+    {
+      headers: {
+        "x-access-token": token,
+      },
+    }
+  );
+
+  return data;
+};
 /* ============================= */
 /* 📌 Blogs */
 /* ============================= */
@@ -182,4 +198,80 @@ export const getCitiesByState = async (state_id: string | number) => {
     console.error("Get Cities API Error:", error);
     throw error;
   }
+};
+
+/* ============================= */
+/* 📌 Auth - Register */
+/* ============================= */
+export const registerUser = async (payload: {
+  name: string;
+  email: string;
+  mobile: string;
+  password: string;
+  confirm_password: string;
+}) => {
+  const { data } = await api.post(
+    "user/auth/register",
+    payload,
+    {
+      headers: {
+        role_id: 7,
+      },
+    }
+  );
+
+  return data;
+};
+
+export const loginUser = async (payload: {
+  email: string;
+  password: string;
+}) => {
+  const { data } = await api.post(
+    "user/auth/login",
+    payload,
+    {
+      headers: {
+        role_id: "7",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      },
+    }
+  );
+
+  return data;
+};
+
+export const sendOtp = async (payload: {
+  email: string;
+  type: string;
+}) => {
+  const { data } = await api.post(
+    "user/auth/otp",
+    payload,
+    {
+      headers: {
+        role_id: "7",
+      },
+    }
+  );
+
+  return data;
+};
+
+export const verifyOtp = async (payload: {
+  email: string;
+  otp: string;
+  type: string;
+}) => {
+  const { data } = await api.post(
+    "user/auth/verify-otp",
+    payload,
+    {
+      headers: {
+        role_id: "7",
+      },
+    }
+  );
+
+  return data;
 };
