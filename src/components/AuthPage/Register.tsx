@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Eye, EyeOff, Sparkles } from "lucide-react";
 import { registerUser, sendOtp } from "@/api/Api";
 import { useRouter } from "next/navigation";
-import { message } from "antd";
+// import { message } from "antd";
 export default function Register() {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
@@ -88,7 +88,7 @@ export default function Register() {
                 )}&type=email_varification`
             );
             return;
-            message.success(response?.message || "Registration failed");
+            // message.success(response?.message || "Registration failed");
         } catch (error: any) {
             const errorMessage =
                 error?.response?.data?.message || "Something went wrong";
@@ -96,7 +96,7 @@ export default function Register() {
                 errorMessage.toLowerCase().includes("verify your otp") ||
                 errorMessage.toLowerCase().includes("not verified")
             ) {
-                message.warning(errorMessage);
+                // message.warning(errorMessage);
                 router.push(
                     `/verify-otp?email=${encodeURIComponent(
                         form.email
@@ -104,7 +104,7 @@ export default function Register() {
                 );
                 return;
             }
-            message.error(errorMessage);
+            // message.error(errorMessage);
         } finally {
             setLoading(false);
         }

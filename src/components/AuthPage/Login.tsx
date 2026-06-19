@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Sparkles } from "lucide-react";
 import { loginUser, sendOtp } from "@/api/Api";
-import { message } from "antd";
+// import { message } from "antd";
 export default function Login() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -58,19 +58,19 @@ export default function Login() {
           );
         }
      
-        message.success(
-          response?.message || "Login successful"
-        );
+        // message.success(
+        //   response?.message || "Login successful"
+        // );
         router.push("/dashboard");
         return;
       }
-      message.error(response?.message || "Login failed");
+      // message.error(response?.message || "Login failed");
     } catch (error: any) {
       console.error(error);
       if (
         error?.response?.data?.message.toLowerCase().includes("not verified")
       ) {
-        message.warning(error?.response?.data?.message);
+        // message.warning(error?.response?.data?.message);
         router.push(
           `/verify-otp?email=${encodeURIComponent(
             form.email

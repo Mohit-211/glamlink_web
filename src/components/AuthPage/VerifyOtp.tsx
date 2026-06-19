@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, Mail, CheckCircle2, RotateCcw } from "lucide-react";
-import { message } from "antd";
+// import { message } from "antd";
 import { sendOtp, verifyOtp } from "@/api/Api";
 const OTP_LENGTH = 4;
 const RESEND_COOLDOWN = 30; // seconds
@@ -120,16 +120,16 @@ export default function VerifyOtp() {
                 type,
             });
             setResendSuccess(true);
-            message.success("OTP sent successfully");
+            // message.success("OTP sent successfully");
             setTimeout(() => {
                 setResendSuccess(false);
             }, 3000);
         } catch (error: any) {
             console.error(error);
-            message.error(
-                error?.response?.data?.message ||
-                "Failed to resend OTP"
-            );
+            // message.error(
+            //     error?.response?.data?.message ||
+            //     "Failed to resend OTP"
+            // );
             setCanResend(true);
         }
     }, [canResend, email, type]);

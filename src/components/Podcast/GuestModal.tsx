@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { message } from "antd";
+// import { message } from "antd";
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -53,14 +53,14 @@ export default function GuestModal({ open, onClose }: Props) {
 
     if (res.ok) {
       clearForm();
-      message.success(data?.message);
+      // message.success(data?.message);
       onClose();
     } else {
-      message.error(data?.message);
+      // message.error(data?.message);
     }
   } catch (err) {
     console.error(err);
-    message.error("Server error. Please try again.");
+    // message.error("Server error. Please try again.");
   }
 
   setLoading(false);
