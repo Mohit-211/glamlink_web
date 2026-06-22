@@ -1,10 +1,13 @@
+
 import VerifyOtp from '@/components/AuthPage/VerifyOtp'
-import React from 'react'
+import React, { Suspense } from 'react'
+export const dynamic = "force-dynamic";
 const VerifyOtppage = () => {
     return (
-        <div>
+        <Suspense fallback={<div>Loading...</div>}>
             <VerifyOtp />
-        </div>
+        </Suspense>
     )
 }
 export default VerifyOtppage
+
