@@ -3,9 +3,10 @@ import React from "react";
 interface Props {
   open: boolean;
   onClose: () => void;
+  onPayNow?: () => void;
 }
 
-const SuccessModal: React.FC<Props> = ({ open, onClose }) => {
+const SuccessModal: React.FC<Props> = ({ open, onClose, onPayNow }) => {
   if (!open) return null;
 
   return (
@@ -21,17 +22,27 @@ const SuccessModal: React.FC<Props> = ({ open, onClose }) => {
           <strong>Please check your email.</strong>
         </p>
 
-        {/* OK BUTTON */}
-        <button
-          onClick={onClose}
-          className="mt-6 w-full rounded-lg bg-black py-2.5 text-white font-medium hover:bg-gray-900"
-           style={{
-              background:
-                "linear-gradient(135deg, #23aeb8 0%, #53bec6 50%, #5cc2d6 100%)",
-            }}
-        >
-          OK
-        </button>
+        <div className="mt-6 flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 rounded-lg border border-gray-200 bg-gray-50 py-2.5 text-gray-700 font-medium hover:bg-gray-100"
+          >
+            OK
+          </button>
+
+          {onPayNow && (
+            <button
+              onClick={onPayNow}
+              className="flex-1 rounded-lg py-2.5 text-white font-medium hover:opacity-90"
+              style={{
+                background:
+                  "linear-gradient(135deg, #23aeb8 0%, #53bec6 50%, #5cc2d6 100%)",
+              }}
+            >
+              Pay Now
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

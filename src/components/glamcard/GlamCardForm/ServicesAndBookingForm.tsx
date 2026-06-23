@@ -73,68 +73,68 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
     return `https://www.tiktok.com/@${clean}`;
   };
 
- /* ================= INSTAGRAM HANDLES ================= */
-const getHandles = (): string[] => {
-  const sm = data.social_media as any;
-  const handles: string[] = [];
-  if (sm?.instagram) handles.push(sm.instagram);
-  
-  let i = 1;
-  while (sm?.[`instagram${i}`] !== undefined) {
-    handles.push(sm[`instagram${i}`]);
-    i++;
-  }
-  return handles.length > 0 ? handles : [""];
-};
+  /* ================= INSTAGRAM HANDLES ================= */
+  const getHandles = (): string[] => {
+    const sm = data.social_media as any;
+    const handles: string[] = [];
+    if (sm?.instagram) handles.push(sm.instagram);
 
-const addInstagramHandle = () => {
-  const sm = data.social_media as any;
-  
-  // Count existing keys
-  let count = 0;
-  if (sm?.instagram !== undefined) count++;
-  let i = 1;
-  while (sm?.[`instagram${i}`] !== undefined) {
-    count++;
-    i++;
-  }
-
-  // Next key: instagram → instagram1 → instagram2 → instagram3...
-  const nextKey = count === 0 ? "instagram" : `instagram${count}`;
-
-  setData((prev) => ({
-    ...prev,
-    social_media: { ...prev.social_media, [nextKey]: "" },
-  }));
-};
-
-const updateInstagramHandle = (idx: number, value: string) => {
-  const key = idx === 0 ? "instagram" : `instagram${idx}`;
-  setData((prev) => ({
-    ...prev,
-    social_media: { ...prev.social_media, [key]: formatInstagram(value) },
-  }));
-};
-
-const removeInstagramHandle = (idx: number) => {
-  setData((prev) => {
-    const sm = { ...(prev.social_media as any) };
-    // Remove all instagram keys and re-build from remaining handles
-    const handles = getHandles().filter((_, i) => i !== idx);
-    delete sm.instagram;
     let i = 1;
-    while (sm[`instagram${i}`] !== undefined) {
-      delete sm[`instagram${i}`];
+    while (sm?.[`instagram${i}`] !== undefined) {
+      handles.push(sm[`instagram${i}`]);
       i++;
     }
-    // Re-assign
-    handles.forEach((val, i) => {
-      const key = i === 0 ? "instagram" : `instagram${i}`;
-      sm[key] = val;
+    return handles.length > 0 ? handles : [""];
+  };
+
+  const addInstagramHandle = () => {
+    const sm = data.social_media as any;
+
+    // Count existing keys
+    let count = 0;
+    if (sm?.instagram !== undefined) count++;
+    let i = 1;
+    while (sm?.[`instagram${i}`] !== undefined) {
+      count++;
+      i++;
+    }
+
+    // Next key: instagram → instagram1 → instagram2 → instagram3...
+    const nextKey = count === 0 ? "instagram" : `instagram${count}`;
+
+    setData((prev) => ({
+      ...prev,
+      social_media: { ...prev.social_media, [nextKey]: "" },
+    }));
+  };
+
+  const updateInstagramHandle = (idx: number, value: string) => {
+    const key = idx === 0 ? "instagram" : `instagram${idx}`;
+    setData((prev) => ({
+      ...prev,
+      social_media: { ...prev.social_media, [key]: formatInstagram(value) },
+    }));
+  };
+
+  const removeInstagramHandle = (idx: number) => {
+    setData((prev) => {
+      const sm = { ...(prev.social_media as any) };
+      // Remove all instagram keys and re-build from remaining handles
+      const handles = getHandles().filter((_, i) => i !== idx);
+      delete sm.instagram;
+      let i = 1;
+      while (sm[`instagram${i}`] !== undefined) {
+        delete sm[`instagram${i}`];
+        i++;
+      }
+      // Re-assign
+      handles.forEach((val, i) => {
+        const key = i === 0 ? "instagram" : `instagram${i}`;
+        sm[key] = val;
+      });
+      return { ...prev, social_media: sm };
     });
-    return { ...prev, social_media: sm };
-  });
-};
+  };
   /* ================= OTHER LINKS ================= */
   const addOtherLink = () => {
     setData((prev) => ({
@@ -197,8 +197,8 @@ const removeInstagramHandle = (idx: number) => {
             onClick={addSpecialty}
             disabled={data.specialties.length >= 5 || !specialtyInput.trim()}
             className={`rounded-lg px-5 text-sm font-medium transition ${data.specialties.length >= 5 || !specialtyInput.trim()
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-teal-600 text-white hover:bg-teal-700"
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "bg-teal-600 text-white hover:bg-teal-700"
               }`}
           >
             + Add
@@ -264,49 +264,49 @@ const removeInstagramHandle = (idx: number) => {
           </div>
 
           {/* Instagram — 3 fixed slots */}
-        
-           {/* Instagram — dynamic */}
-<div className="md:col-span-2">
-  <div className="flex items-center justify-between mb-2">
-    <div>
-      <label className={labelClass}>Instagram</label>
-      <p className="text-xs text-gray-500">Add multiple Instagram handles</p>
-    </div>
-    <button
-      type="button"
-      onClick={addInstagramHandle}
-      className="text-xs text-[#23AEB8] hover:underline font-medium"
-    >
-      + Add Instagram
-    </button>
-  </div>
-  <div className="space-y-2">
-    {getHandles().map((value, idx) => (
-      <div key={idx} className="flex items-center gap-2">
-        <span className="text-xs text-gray-400 w-24 shrink-0">
-          {idx === 0 ? "Instagram" : `Instagram ${idx}`}
-        </span>
-        <input
-          className={`${inputClass} flex-1`}
-          placeholder="@yourusername or full URL"
-          value={value}
-          required={idx === 0 && data.preferred_booking_method === BOOKING_METHODS.INSTAGRAM}
-          onChange={(e) => updateInstagramHandle(idx, e.target.value)}
-        />
-        {getHandles().length > 1 && (
-          <button
-            type="button"
-            onClick={() => removeInstagramHandle(idx)}
-            className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 hover:bg-red-100"
-          >
-            ×
-          </button>
-        )}
-      </div>
-    ))}
-  </div>
-</div>
-          
+
+          {/* Instagram — dynamic */}
+          <div className="md:col-span-2">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <label className={labelClass}>Instagram</label>
+                <p className="text-xs text-gray-500">Add multiple Instagram handles</p>
+              </div>
+              <button
+                type="button"
+                onClick={addInstagramHandle}
+                className="text-xs text-[#23AEB8] hover:underline font-medium"
+              >
+                + Add Instagram
+              </button>
+            </div>
+            <div className="space-y-2">
+              {getHandles().map((value, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400 w-24 shrink-0">
+                    {idx === 0 ? "Instagram" : `Instagram ${idx}`}
+                  </span>
+                  <input
+                    className={`${inputClass} flex-1`}
+                    placeholder="@yourusername or full URL"
+                    value={value}
+                    required={idx === 0 && data.preferred_booking_method === BOOKING_METHODS.INSTAGRAM}
+                    onChange={(e) => updateInstagramHandle(idx, e.target.value)}
+                  />
+                  {getHandles().length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeInstagramHandle(idx)}
+                      className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 hover:bg-red-100"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
 
           {/* TikTok */}
           <div>
@@ -441,70 +441,72 @@ const removeInstagramHandle = (idx: number) => {
         </div>
       </div>
 
-    <div>
-  <div className="flex items-center gap-2 relative">
-    <label className={labelClass}>Preferred Booking Methods</label>
-  </div>
+      <div>
+        <div className="flex items-center gap-2 relative">
+          <label className={labelClass}>Preferred Booking Methods</label>
+        </div>
 
-<div
-  className="mt-3"
-  style={{ display: "flex", gap: "8px" }}
->
-    {[
-      BOOKING_METHODS.LINK,
-      BOOKING_METHODS.CALL,
-      BOOKING_METHODS.INSTAGRAM,
-    ].map((method) => (
-      <label
-        key={method}
-        className="flex items-center gap-2 cursor-pointer m-0" 
-      >
-        <input
-          type="checkbox"
-          checked={data.preferred_booking_methods?.includes(method)}
-          onChange={(e) => {
-            setData((prev) => ({
-              ...prev,
-              preferred_booking_methods: e.target.checked
-                ? [...(prev.preferred_booking_methods || []), method]
-                : (prev.preferred_booking_methods || []).filter(
-                    (m) => m !== method
-                  ),
-            }));
-          }}
-        />
+        <div
+          className="mt-3"
+          style={{ display: "flex", gap: "8px" }}
+        >
+          {[
+            BOOKING_METHODS.LINK,
+            BOOKING_METHODS.CALL,
+            BOOKING_METHODS.INSTAGRAM,
+          ].map((method) => (
+            <label
+              key={method}
+              className="flex items-center gap-2 cursor-pointer m-0"
+            >
+              <input
+                type="checkbox"
+                checked={data.preferred_booking_methods?.includes(method)}
+                onChange={(e) => {
+                  setData((prev) => ({
+                    ...prev,
+                    preferred_booking_methods: e.target.checked
+                      ? [...(prev.preferred_booking_methods || []), method]
+                      : (prev.preferred_booking_methods || []).filter(
+                        (m) => m !== method
+                      ),
+                  }));
+                }}
+              />
 
-        <span>
-          {method === BOOKING_METHODS.LINK && "Go to Booking Link"}
-          {method === BOOKING_METHODS.CALL && "Call / Text"}
-          {method === BOOKING_METHODS.INSTAGRAM && "DM on Instagram"}
-        </span>
-      </label>
-    ))}
-  </div>
+              <span>
+                {method === BOOKING_METHODS.LINK && "Go to Booking Link"}
+                {method === BOOKING_METHODS.CALL && "Call / Text"}
+                {method === BOOKING_METHODS.INSTAGRAM && "DM on Instagram"}
+              </span>
+            </label>
+          ))}
+        </div>
 
-  {data.preferred_booking_methods?.includes(BOOKING_METHODS.LINK) && (
-    <div className="mt-4">
-      <label className={labelClass} m-0>Booking Link</label>
-      <input
-        type="url"
-        className={inputClass}
-        placeholder="https://booksy.com/yourprofile"
-        value={data.booking_link || ""}
-        onChange={(e) =>
-          setData((prev) => ({
-            ...prev,
-            booking_link: e.target.value,
-          }))
-        }
-      />
-    </div>
-  )}
-</div>
+        {data.preferred_booking_methods?.includes(BOOKING_METHODS.LINK) && (
+          <div className="mt-4">
+            <label className={`${labelClass} m-0`}>
+              Booking Link
+            </label>
+            <input
+              type="url"
+              className={inputClass}
+              placeholder="https://booksy.com/yourprofile"
+              value={data.booking_link || ""}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  booking_link: e.target.value,
+                }))
+              }
+            />
+          </div>
+        )}
+      </div>
 
       {/* Important Info */}
       <div className="space-y-3">
-        <label className={labelClass} m-0>
+        <label className={`${labelClass} m-0`}>
           Important Information
         </label>
         {data.important_info.length > 0 && (

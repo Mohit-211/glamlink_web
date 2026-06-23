@@ -69,43 +69,56 @@ export default function VerifyOtp() {
         const focusIdx = Math.min(pasted.length, OTP_LENGTH - 1);
         inputRefs.current[focusIdx]?.focus();
     };
-    const handleVerify = async () => {
-        const code = otp.join("");
-        if (code.length < OTP_LENGTH) {
-            setErrorMsg("Please enter all 4 digits.");
+   const handleVerify = async () => {
+    const code = otp.join("");
+
+    console.log("Email:", email);
+    console.log("OTP:", code);
+    console.log("Type:", type);
+
+    if (code.length < OTP_LENGTH) {
+        setErrorMsg("Please enter all 4 digits.");
+        return;
+    }
+
+    try {
+        setStatus("loading");
+        setErrorMsg("");
+
+        const response = await verifyOtp({
+            email,
+            otp: code,
+            type,
+        });
+
+        console.log("Verify OTP Response:", response);
+
+        if (response?.success) {
+            setStatus("success");
+
+            setTimeout(() => {
+                router.push("/login");
+            }, 2000);
+
             return;
         }
-        try {
-            setStatus("loading");
-            setErrorMsg("");
-            const response = await verifyOtp({
-                email,
-                otp: code,
-                type,
-            });
-            console.log("Verify OTP Response:", response);
-            if (response?.success) {
-                setStatus("success");
-                setTimeout(() => {
-                    router.push("/login");
-                }, 2000);
-                return;
-            }
-            setStatus("error");
-            setErrorMsg(
-                response?.message || "Invalid OTP"
-            );
-        } catch (error: any) {
-            console.error(error);
-            setStatus("error");
-            setErrorMsg(
-                error?.response?.data?.message ||
-                "OTP verification failed"
-            );
-            setOtp(Array(OTP_LENGTH).fill(""));
-            inputRefs.current[0]?.focus();
-        }
-    };
+
+        setStatus("error");
+        setErrorMsg(response?.message || "Invalid OTP");
+    } catch (error: any) {
+        console.error("Verify OTP Error:", error?.response?.data);
+
+        setStatus("error");
+
+        setErrorMsg(
+            error?.response?.data?.message ||
+            "OTP verification failed"
+        );
+
+        setOtp(Array(OTP_LENGTH).fill(""));
+        inputRefs.current[0]?.focus();
+    }
+};
     const handleResend = useCallback(async () => {
         if (!canResend) return;
         try {

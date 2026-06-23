@@ -3,7 +3,6 @@
 import { getAllStates, getCitiesByState } from "@/api/Api";
 import React, { useEffect, useRef, useState } from "react";
 
-
 interface Location {
   location_type: "exact_address" | "city_only";
   address?: string;
@@ -24,6 +23,28 @@ interface FieldsProps {
   onUpdate: (updates: Partial<Location>) => void;
 }
 
+// Helper: Convert state abbreviation to numeric ID using states array
+const findStateIdByAbbreviationOrName = (
+  stateValue: string | undefined,
+  statesArray: any[]
+): string | undefined => {
+  if (!stateValue || !statesArray.length) return undefined;
+  
+  // If already numeric, return as-is
+  if (!isNaN(Number(stateValue))) {
+    return String(stateValue);
+  }
+  
+  // Search by name or abbreviation
+  const found = statesArray.find(
+    (s: any) => 
+      s.name?.toLowerCase() === stateValue.toLowerCase() ||
+      s.abbreviation?.toLowerCase() === stateValue.toLowerCase()
+  );
+  
+  return found ? String(found.id) : undefined;
+};
+
 const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
 
@@ -40,49 +61,87 @@ const LocationFormFields: React.FC<FieldsProps> = ({
   const autocompleteRef =
     useRef<google.maps.places.Autocomplete | null>(null);
 
-  // ✅ NEW STATE
   const [states, setStates] = useState<any[]>([]);
   const [cities, setCities] = useState<any[]>([]);
+  const [statesLoading, setStatesLoading] = useState(false);
+  const [citiesLoading, setCitiesLoading] = useState(false);
+  const [normalizedState, setNormalizedState] = useState<string | undefined>(undefined);
 
-  // =============================
-  // 📌 Load States
-  // =============================
+  /* =============================
+     📌 Load States
+     ============================= */
   useEffect(() => {
     const fetchStates = async () => {
+      setStatesLoading(true);
       try {
         const res = await getAllStates();
-        setStates(res?.data || res || []);
+        const statesArray = res?.data?.all_state || res || [];
+        setStates(statesArray);
       } catch (err) {
         console.error("State fetch error", err);
+        setStates([]);
+      } finally {
+        setStatesLoading(false);
       }
     };
     fetchStates();
   }, []);
 
-  // =============================
-  // 📌 Load Cities when State changes
-  // =============================
+  /* =============================
+     📌 Normalize state on change
+     ============================= */
   useEffect(() => {
-    if (!location.state) return;
+    if (location.state && states.length > 0) {
+      const normalized = findStateIdByAbbreviationOrName(String(location.state), states);
+      setNormalizedState(normalized);
+    }
+  }, [location.state, states]);
+
+  /* =============================
+     📌 Load Cities when State changes
+     ============================= */
+  useEffect(() => {
+    const stateValue = location.state;
+    if (!stateValue) {
+      setCities([]);
+      return;
+    }
+
+    // If state is an abbreviation (e.g., "NV"), find its numeric ID from states array
+    let stateId = stateValue;
+    if (typeof stateValue === 'string' && isNaN(Number(stateValue))) {
+      const foundState = states.find(
+        (s: any) => s.name?.toUpperCase() === stateValue.toUpperCase() || 
+                    s.abbreviation?.toUpperCase() === stateValue.toUpperCase()
+      );
+      if (foundState) {
+        stateId = foundState.id;
+      } else {
+        // Abbreviation not found, reset cities
+        setCities([]);
+        return;
+      }
+    }
 
     const fetchCities = async () => {
+      setCitiesLoading(true);
       try {
-            if (!location.state) return;
-        const res = await getCitiesByState(location.state);
-        console.log(res?.data,"res======>>>")
-        setCities(res?.data );
+        const res = await getCitiesByState(stateId);
+        setCities(res?.data?.all_city || res?.all_city || []);
       } catch (err) {
         console.error("City fetch error", err);
+        setCities([]);
+      } finally {
+        setCitiesLoading(false);
       }
     };
 
-    
     fetchCities();
-  }, [location.state]);
-console.log(cities,"===>")
-  // =============================
-  // 📌 Google Autocomplete
-  // =============================
+  }, [location.state, states]);
+
+  /* =============================
+     📌 Google Autocomplete
+     ============================= */
   useEffect(() => {
     if (location.location_type !== "exact_address") return;
     if (!addressInputRef.current) return;
@@ -128,7 +187,7 @@ console.log(cities,"===>")
         );
       }
     };
-  }, [location.location_type]);
+  }, [location.location_type, onUpdate]);
 
   const canConfirmExact =
     location.location_type === "exact_address" &&
@@ -140,8 +199,6 @@ console.log(cities,"===>")
     !!location.state;
 
   const handleConfirmExact = () => {
-    console.log(canConfirmExact,"canConfirmExact")
-    console.log("Confirming exact address with data:", location);
     if (!canConfirmExact) return;
 
     if (!location.latitude || !location.longitude) {
@@ -172,12 +229,8 @@ console.log(cities,"===>")
       longitude: undefined,
       isSet: false,
     });
-    setCities([]); // ✅ reset cities
+    setCities([]);
   };
-
-  const WORD_LIMIT = 50;
-  const getWordCount = (text: string) =>
-    text.trim() ? text.trim().split(/\s+/).length : 0;
 
   return (
     <div className="space-y-6">
@@ -235,19 +288,22 @@ console.log(cities,"===>")
               <label className={labelClass}>State</label>
               <select
                 className={inputClass}
-                value={location.state ?? ""}
+                value={String(location.state ?? "")}
                 onChange={(e) => {
                   onUpdate({
                     state: e.target.value,
                     city: "",
                   });
                 }}
+                disabled={statesLoading}
               >
-                <option value="">Select state</option>
+                <option value="">
+                  {statesLoading ? "Loading states..." : "Select state"}
+                </option>
                 {states.map((state: any) => (
                   <option
                     key={state.id}
-                    value={state.id}
+                    value={String(state.id)}
                   >
                     {state.name}
                   </option>
@@ -264,11 +320,17 @@ console.log(cities,"===>")
                 onChange={(e) =>
                   onUpdate({ city: e.target.value })
                 }
-                disabled={!location.state}
+                disabled={!location.state || citiesLoading}
               >
-                <option value="">Select city</option>
+                <option value="">
+                  {citiesLoading
+                    ? "Loading cities..."
+                    : !location.state
+                      ? "Select state first"
+                      : "Select city"}
+                </option>
                 {cities?.map((city: any) => (
-                  <option key={city?.id} value={city?.name}>
+                  <option key={city?.id} value={String(city?.id)}>
                     {city?.name}
                   </option>
                 ))}
@@ -278,12 +340,11 @@ console.log(cities,"===>")
 
           <button
             type="button"
-            disabled={!canSetCity}
-            className={`w-full ${buttonClass} ${
-              canSetCity
-                ? "bg-purple-600 hover:bg-purple-700"
-                : "bg-gray-300 cursor-not-allowed"
-            }`}
+            disabled={!canSetCity || citiesLoading}
+            className={`w-full ${buttonClass} ${canSetCity && !citiesLoading
+              ? "bg-purple-600 hover:bg-purple-700"
+              : "bg-gray-300 cursor-not-allowed"
+              }`}
             onClick={handleSetCity}
           >
             Set Location
@@ -305,15 +366,15 @@ console.log(cities,"===>")
               onChange={(e) =>
                 onUpdate({ address: e.target.value })
               }
+              placeholder="Start typing an address..."
             />
             <button
               type="button"
               disabled={!canConfirmExact}
-              className={`${buttonClass} ${
-                canConfirmExact
-                  ? "bg-gray-600"
-                  : "bg-gray-300"
-              }`}
+              className={`${buttonClass} ${canConfirmExact
+                ? "bg-purple-600 hover:bg-purple-700"
+                : "bg-gray-300 cursor-not-allowed"
+                }`}
               onClick={handleConfirmExact}
             >
               Confirm

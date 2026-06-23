@@ -57,11 +57,24 @@ export default function Login() {
             refreshToken
           );
         }
-     
+
         // message.success(
         //   response?.message || "Login successful"
         // );
-        router.push("/dashboard");
+        // Notify header/auth components
+window.dispatchEvent(new Event("auth-change"));
+
+        const redirectPath = localStorage.getItem(
+          "postLoginRedirect"
+        );
+
+        if (redirectPath) {
+          localStorage.removeItem("postLoginRedirect");
+
+          router.push(redirectPath);
+        } else {
+          router.push("/dashboard");
+        }
         return;
       }
       // message.error(response?.message || "Login failed");
