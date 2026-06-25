@@ -18,6 +18,7 @@ import { AddressTab } from './AddressTab';
 import OrderHistory from './PaymentHistory';
 import { SubscriptionPaymentModal } from './SubscriptionPay';
 import PaymentHistory from './PaymentHistory';
+import EditAccessCard from './accessCardEdit';
 // import CreateOrEditCard from './CreateOrEditCard'; // adjust path/name to your actual component
 
 type TabId = 'my-card' | 'edit-card' | 'payment-history' | 'qr-code' | 'addresses';
@@ -226,6 +227,24 @@ export default function DashboardPage() {
                 <ShowQRCode cardData={businessCard} error={error} />
               )}
               {activeTab === 'addresses' && <AddressTab />}
+              {activeTab === 'edit-card' && hasValidCardId && (
+                <EditAccessCard
+                  cardId={effectiveCardId}
+                  cardData={businessCard}
+                  onCancel={() => setActiveTab('my-card')}
+                  onSave={async (updated) => {
+                    setBusinessCard(updated);
+                    await fetchDashboardData();
+                    setActiveTab('my-card');
+                  }}
+                />
+              )}
+              {activeTab === 'edit-card' && !hasValidCardId && (
+                <div className="p-6 text-sm text-muted-foreground">
+                  No business card found to edit yet.
+                </div>
+              )}
+
             </div>
           </main>
         </div>
