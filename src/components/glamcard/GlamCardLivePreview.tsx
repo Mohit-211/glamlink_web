@@ -564,7 +564,14 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     <>
                       <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm">
                         {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
-                          <video src={galleryPreviews[thumbnailIndex]} poster={thumbnailPreviews[thumbnailIndex]} className="h-full w-full object-cover" controls />
+                          // <video src={galleryPreviews[thumbnailIndex]} poster={thumbnailPreviews[thumbnailIndex]} className="h-full w-full object-cover" controls />
+                          <video
+                            src={galleryPreviews[thumbnailIndex]}
+                            poster={thumbnailPreviews[thumbnailIndex]}
+                            className="h-full w-full object-cover"
+                            controls
+                            playsInline
+                          />
                         ) : (
                           <img src={normalizedImages[thumbnailIndex]?.thumbnail_uri || galleryPreviews[thumbnailIndex]} className="h-full w-full object-cover transition hover:scale-105 duration-300" alt="Featured work" />
                         )}
@@ -608,8 +615,8 @@ const GlamCardLivePreview: React.FC<Props> = ({
                                 : [selectedLocation.city?.trim(), selectedLocation.state?.trim(), selectedLocation.area?.trim()].filter(Boolean).join(", ") || "Location not fully set"}
                             </p>
                             {(selectedLocation?.phone || data.phone) && data.is_phone_visible && (
-  <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>
-)}
+                              <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>
+                            )}
                             {selectedLocation.description && <p className="text-xs text-gray-500 italic">{selectedLocation.description}</p>}
                           </div>
                         )}
@@ -759,9 +766,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           ? selectedLocation.address?.trim() || "Address not provided"
                           : [selectedLocation.city?.trim(), selectedLocation.state?.trim(), selectedLocation.area?.trim()].filter(Boolean).join(", ")}
                       </p>
-                     {(selectedLocation?.phone || data.phone) && data.is_phone_visible && (
-  <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>
-)}
+                      {(selectedLocation?.phone || data.phone) && data.is_phone_visible && (
+                        <p className="text-gray-600">📞 {selectedLocation.phone || data.phone}</p>
+                      )}
                     </div>
                   )}
                   {mapSrc ? (
@@ -873,76 +880,76 @@ const GlamCardLivePreview: React.FC<Props> = ({
             </div>
 
             {/* ===== SOCIAL ICONS (desktop only — mobile shown in hero) ===== */}
-         <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
-  {data?.website && (
-    <a
-      href={data.website}
-      target="_blank"
-      rel="noopener noreferrer"
-      title={data.website}
-      className="p-2 rounded-full hover:bg-gray-100 transition"
-    >
-      <Globe className="w-5 h-5 text-gray-500 hover:text-teal-600 transition" />
-    </a>
-  )}
+            <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
+              {data?.website && (
+                <a
+                  href={data.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={data.website}
+                  className="p-2 rounded-full hover:bg-gray-100 transition"
+                >
+                  <Globe className="w-5 h-5 text-gray-500 hover:text-teal-600 transition" />
+                </a>
+              )}
 
-  {allInstagramHandles.map(({ key, url }) => (
-    <a
-      key={key}
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      title={url}
-      className="p-2 rounded-full hover:bg-gray-100 transition"
-    >
-      <Instagram className="w-5 h-5 text-gray-500 hover:text-pink-600 transition" />
-    </a>
-  ))}
+              {allInstagramHandles.map(({ key, url }) => (
+                <a
+                  key={key}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={url}
+                  className="p-2 rounded-full hover:bg-gray-100 transition"
+                >
+                  <Instagram className="w-5 h-5 text-gray-500 hover:text-pink-600 transition" />
+                </a>
+              ))}
 
-  {socialMedia?.facebook && (
-    <a
-      href={socialMedia.facebook}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="p-2 rounded-full hover:bg-gray-100 transition"
-    >
-      <Facebook className="w-5 h-5 text-gray-500 hover:text-blue-600 transition" />
-    </a>
-  )}
+              {socialMedia?.facebook && (
+                <a
+                  href={socialMedia.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-full hover:bg-gray-100 transition"
+                >
+                  <Facebook className="w-5 h-5 text-gray-500 hover:text-blue-600 transition" />
+                </a>
+              )}
 
-  {socialMedia?.linkedin && (
-    <a
-      href={socialMedia.linkedin}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="p-2 rounded-full hover:bg-gray-100 transition"
-    >
-      <Linkedin className="w-5 h-5 text-gray-500 hover:text-blue-700 transition" />
-    </a>
-  )}
+              {socialMedia?.linkedin && (
+                <a
+                  href={socialMedia.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-full hover:bg-gray-100 transition"
+                >
+                  <Linkedin className="w-5 h-5 text-gray-500 hover:text-blue-700 transition" />
+                </a>
+              )}
 
-  {socialMedia?.youtube && (
-    <a
-      href={socialMedia.youtube}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="p-2 rounded-full hover:bg-gray-100 transition"
-    >
-      <Youtube className="w-5 h-5 text-gray-500 hover:text-red-600 transition" />
-    </a>
-  )}
+              {socialMedia?.youtube && (
+                <a
+                  href={socialMedia.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-full hover:bg-gray-100 transition"
+                >
+                  <Youtube className="w-5 h-5 text-gray-500 hover:text-red-600 transition" />
+                </a>
+              )}
 
-  {socialMedia?.tiktok && (
-    <a
-      href={socialMedia.tiktok}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="p-2 rounded-full hover:bg-gray-100 transition"
-    >
-      <Music2 className="w-5 h-5 text-gray-500 hover:text-black transition" />
-    </a>
-  )}
-</div>
+              {socialMedia?.tiktok && (
+                <a
+                  href={socialMedia.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-full hover:bg-gray-100 transition"
+                >
+                  <Music2 className="w-5 h-5 text-gray-500 hover:text-black transition" />
+                </a>
+              )}
+            </div>
 
 
           </div>
