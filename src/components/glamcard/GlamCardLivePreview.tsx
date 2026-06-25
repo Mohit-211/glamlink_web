@@ -400,12 +400,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
             >
               <QrCode size={15} strokeWidth={2.5} />
             </button>
-            {/* <button
-              onClick={() => setIsDownloadModalOpen(true)}
-              className="h-8 w-8 flex items-center justify-center rounded-full bg-[#23B9CD]/10 text-[#23B9CD] transition active:scale-95"
-            >
-              <Download size={15} strokeWidth={2.5} />
-            </button> */}
           </div>
         </div>
       )}
@@ -439,9 +433,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <button onClick={() => setIsQrModalOpen(true)} className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200">
                   <QrCode size={18} strokeWidth={2.5} />
                 </button>
-                {/* <button onClick={() => setIsDownloadModalOpen(true)} className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200">
-                  <Download size={18} strokeWidth={2.5} />
-                </button> */}
               </div>
             )}
 
@@ -489,37 +480,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     <p className="text-white/70 text-xs mt-0.5 truncate">
                       {data.business_name || "Business Name"}
                     </p>
-
-                    {/* quick social row */}
-                    {/* {hasSocials && (
-                      <div className="flex items-center gap-2 mt-2">
-                        {data?.website && (
-                          <a href={data.website} target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                            <Globe className="w-3.5 h-3.5 text-white" />
-                          </a>
-                        )}
-                        {allInstagramHandles[0] && (
-                          <a href={allInstagramHandles[0].url} target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                            <Instagram className="w-3.5 h-3.5 text-white" />
-                          </a>
-                        )}
-                        {socialMedia?.facebook && (
-                          <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                            <Facebook className="w-3.5 h-3.5 text-white" />
-                          </a>
-                        )}
-                        {socialMedia?.youtube && (
-                          <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                            <Youtube className="w-3.5 h-3.5 text-white" />
-                          </a>
-                        )}
-                        {socialMedia?.tiktok && (
-                          <a href={socialMedia.tiktok} target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                            <Music2 className="w-3.5 h-3.5 text-white" />
-                          </a>
-                        )}
-                      </div>
-                    )} */}
                   </div>
                 </div>
               </div>
@@ -558,19 +518,21 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   )}
                 </SectionBox>
 
-                {/* SIGNATURE WORK */}
+                {/* SIGNATURE WORK — DESKTOP */}
                 <SectionBox title="Signature Work" titleAlign="center">
                   {normalizedImages.length > 0 && thumbnailIndex !== null ? (
                     <>
                       <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm">
                         {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
-                          // <video src={galleryPreviews[thumbnailIndex]} poster={thumbnailPreviews[thumbnailIndex]} className="h-full w-full object-cover" controls />
+                          /* ✅ iOS FIX: playsInline + preload + key */
                           <video
+                            key={galleryPreviews[thumbnailIndex]}
                             src={galleryPreviews[thumbnailIndex]}
                             poster={thumbnailPreviews[thumbnailIndex]}
                             className="h-full w-full object-cover"
                             controls
                             playsInline
+                            preload="metadata"
                           />
                         ) : (
                           <img src={normalizedImages[thumbnailIndex]?.thumbnail_uri || galleryPreviews[thumbnailIndex]} className="h-full w-full object-cover transition hover:scale-105 duration-300" alt="Featured work" />
@@ -688,12 +650,21 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </SectionBox>
               )}
 
-              {/* GALLERY — full-width swipeable feel */}
+              {/* GALLERY — MOBILE */}
               {normalizedImages.length > 0 && thumbnailIndex !== null && (
                 <SectionBox title="Signature Work" titleAlign="center">
                   <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 shadow-sm">
                     {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
-                      <video src={galleryPreviews[thumbnailIndex]} poster={thumbnailPreviews[thumbnailIndex]} className="h-full w-full object-cover" controls />
+                      /* ✅ iOS FIX: playsInline + preload + key */
+                      <video
+                        key={galleryPreviews[thumbnailIndex]}
+                        src={galleryPreviews[thumbnailIndex]}
+                        poster={thumbnailPreviews[thumbnailIndex]}
+                        className="h-full w-full object-cover"
+                        controls
+                        playsInline
+                        preload="metadata"
+                      />
                     ) : (
                       <img src={normalizedImages[thumbnailIndex]?.thumbnail_uri || galleryPreviews[thumbnailIndex]} className="h-full w-full object-cover" alt="Featured work" />
                     )}
@@ -816,7 +787,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 )}
               </SectionBox>
 
-              {/* SPECIALTIES mobile  */}
+              {/* SPECIALTIES mobile */}
               {specialtiesArray.length > 0 && (
                 <SectionBox title="Specialties" titleAlign="center">
                   <DotList items={specialtiesArray} placeholder="Your specialties will appear here" />
@@ -879,84 +850,45 @@ const GlamCardLivePreview: React.FC<Props> = ({
               <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent to-teal-400" />
             </div>
 
-            {/* ===== SOCIAL ICONS (desktop only — mobile shown in hero) ===== */}
+            {/* ===== SOCIAL ICONS ===== */}
             <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
               {data?.website && (
-                <a
-                  href={data.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={data.website}
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
+                <a href={data.website} target="_blank" rel="noopener noreferrer" title={data.website} className="p-2 rounded-full hover:bg-gray-100 transition">
                   <Globe className="w-5 h-5 text-gray-500 hover:text-teal-600 transition" />
                 </a>
               )}
-
               {allInstagramHandles.map(({ key, url }) => (
-                <a
-                  key={key}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={url}
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
+                <a key={key} href={url} target="_blank" rel="noopener noreferrer" title={url} className="p-2 rounded-full hover:bg-gray-100 transition">
                   <Instagram className="w-5 h-5 text-gray-500 hover:text-pink-600 transition" />
                 </a>
               ))}
-
               {socialMedia?.facebook && (
-                <a
-                  href={socialMedia.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
+                <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-gray-100 transition">
                   <Facebook className="w-5 h-5 text-gray-500 hover:text-blue-600 transition" />
                 </a>
               )}
-
               {socialMedia?.linkedin && (
-                <a
-                  href={socialMedia.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
+                <a href={socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-gray-100 transition">
                   <Linkedin className="w-5 h-5 text-gray-500 hover:text-blue-700 transition" />
                 </a>
               )}
-
               {socialMedia?.youtube && (
-                <a
-                  href={socialMedia.youtube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
+                <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-gray-100 transition">
                   <Youtube className="w-5 h-5 text-gray-500 hover:text-red-600 transition" />
                 </a>
               )}
-
               {socialMedia?.tiktok && (
-                <a
-                  href={socialMedia.tiktok}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
+                <a href={socialMedia.tiktok} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-gray-100 transition">
                   <Music2 className="w-5 h-5 text-gray-500 hover:text-black transition" />
                 </a>
               )}
             </div>
 
-
           </div>
         </div>
       </div>
 
-      {/* ===== BOOKING MODAL — bottom-sheet on mobile ===== */}
+      {/* ===== BOOKING MODAL ===== */}
       {isBookingModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50"
@@ -966,17 +898,13 @@ const GlamCardLivePreview: React.FC<Props> = ({
             className="bg-white rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-sm sm:mx-4 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* drag handle */}
             <div className="sm:hidden w-10 h-1 rounded-full bg-gray-300 mx-auto mb-4" />
-
             <div className="flex justify-between items-center mb-1">
               <p className="text-base font-bold text-gray-800">How would you like to connect?</p>
               <button onClick={() => setIsBookingModalOpen(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">✕</button>
             </div>
             <p className="text-xs text-gray-500 mb-4">Choose your preferred booking method</p>
-
             <div className="flex flex-col gap-2.5">
-              {/* BOOK VIA LINK */}
               {preferredBookingMethods.includes("GO_TO_BOOKING_LINK") && (
                 <a
                   href={data.booking_link || "#"}
@@ -992,8 +920,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   </div>
                 </a>
               )}
-
-              {/* CALL / TEXT */}
               {preferredBookingMethods.includes("CALL_TEXT") && (
                 <a
                   href={data.phone ? `tel:${data.phone}` : "#"}
@@ -1007,8 +933,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   </div>
                 </a>
               )}
-
-              {/* INSTAGRAM */}
               {preferredBookingMethods.includes("DM_INSTAGRAM") && (
                 allInstagramHandles.length > 0 ? (
                   allInstagramHandles.map(({ key, url }, idx) => (
@@ -1050,7 +974,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
         datadownload={data}
       />
 
-      {/* ===== QR CODE MODAL — bottom-sheet on mobile ===== */}
+      {/* ===== QR CODE MODAL ===== */}
       {isQrModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60"
@@ -1060,14 +984,11 @@ const GlamCardLivePreview: React.FC<Props> = ({
             className="bg-white rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-md sm:mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* drag handle */}
             <div className="sm:hidden w-10 h-1 rounded-full bg-gray-300 mx-auto mb-4" />
-
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-bold text-gray-800">Business Card QR Code</h3>
               <button onClick={() => setIsQrModalOpen(false)} className="text-gray-500 hover:text-gray-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition">✕</button>
             </div>
-
             {data?.business_card_qr ? (
               <>
                 <div className="flex justify-center mb-4">
@@ -1075,7 +996,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     <img src={data.business_card_qr} alt="Business Card QR" className="w-52 h-52 sm:w-64 sm:h-64 object-contain rounded-lg" />
                   </div>
                 </div>
-
                 <div className="mb-2">
                   <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Business Card Link</label>
                   <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 p-2.5">
