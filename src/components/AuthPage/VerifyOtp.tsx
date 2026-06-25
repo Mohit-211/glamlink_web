@@ -173,9 +173,7 @@ export default function VerifyOtp() {
                         <p className="mt-2 text-sm text-muted-foreground max-w-xs">
                             Your account is now active. Welcome to Glamlink — let&apos;s get you started.
                         </p>
-                        <Link href="/dashboard" className="btn-primary mt-8 w-full justify-center">
-                            Go to dashboard
-                        </Link>
+                       
                     </div>
                 </div>
             </div>

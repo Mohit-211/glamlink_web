@@ -1,10 +1,11 @@
+
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import Header from "@/components/common/Header";
-import Footer from "@/components/common/Footer";
+
 import Providers from "./providers";
 import ScrollToTop from "@/components/ScrollToTop";
+import LayoutWrapper from "@/components/LayoutWrapper";
 
 import "../styles/globals.css"
 
@@ -57,7 +58,7 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: "https://glamlink.net/oglayout.png", // ✅ absolute URL
+        url: "https://glamlink.net/oglayout.png",
         width: 1200,
         height: 630,
         alt: "Glamlink Beauty & Wellness Platform",
@@ -73,8 +74,7 @@ export const metadata: Metadata = {
     title: "Glamlink | Beauty & Wellness Professionals",
     description:
       "Discover beauty and wellness professionals, services, and industry insights on Glamlink",
-
-    images: ["https://glamlink.net/oglayout.png"], // ✅ same image
+    images: ["https://glamlink.net/oglayout.png"],
   },
 
   icons: {
@@ -109,7 +109,11 @@ export const viewport: Viewport = {
    Layout
 --------------------------*/
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
     <html lang="en">
       <head>
@@ -153,7 +157,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
 
-     <body className="min-h-screen bg-background" suppressHydrationWarning>
+      <body className="min-h-screen bg-background" suppressHydrationWarning>
         {/* Google Tag Manager (noscript fallback) */}
         <noscript>
           <iframe
@@ -163,11 +167,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
+
         <ScrollToTop />
+
         <Providers>
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <LayoutWrapper>{children}</LayoutWrapper>
         </Providers>
       </body>
     </html>

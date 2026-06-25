@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Sparkles } from "lucide-react";
 import { loginUser, sendOtp } from "@/api/Api";
+import { message } from "antd";
 // import { message } from "antd";
 export default function Login() {
   const router = useRouter();
@@ -13,88 +14,121 @@ export default function Login() {
     email: "",
     password: "",
   });
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      const response = await loginUser({
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    setLoading(true);
+
+    const response = await loginUser({
+      email: form.email,
+      password: form.password,
+    });
+
+    console.log("Login Response:", response);
+
+    // User not verified
+    if (
+      response?.message?.includes(
+        "User is not verified yet"
+      )
+    ) {
+      message.warning(response?.message);
+
+      await sendOtp({
         email: form.email,
-        password: form.password,
+        type: "email_varification",
       });
-      console.log("Login Response:", response);
-      // User not verified
-      if (
-        response?.message?.includes(
-          "User is not verified yet"
-        )
-      ) {
-        await sendOtp({
-          email: form.email,
-          type: "email_varification",
-        });
-        router.push(
-          `/verify-otp?email=${encodeURIComponent(
-            form.email
-          )}`
+
+      router.push(
+        `/verify-otp?email=${encodeURIComponent(
+          form.email
+        )}&type=email_varification`
+      );
+
+      return;
+    }
+
+    // Success
+    if (response?.success) {
+      const accessToken =
+        response?.data?.tokens?.access?.token;
+
+      const refreshToken =
+        response?.data?.tokens?.refresh?.token;
+
+      if (accessToken) {
+        localStorage.setItem(
+          "GlamlinkaccessToken",
+          accessToken
         );
-        return;
       }
-      // Login Success
-      if (response?.success) {
-        const accessToken =
-          response?.data?.tokens?.access?.token;
-        const refreshToken =
-          response?.data?.tokens?.refresh?.token;
-        if (accessToken) {
-          localStorage.setItem(
-            "GlamlinkaccessToken",
-            accessToken
-          );
-        }
-        if (refreshToken) {
-          localStorage.setItem(
-            "GlamlinkrefreshToken",
-            refreshToken
-          );
-        }
 
-        // message.success(
-        //   response?.message || "Login successful"
-        // );
-        // Notify header/auth components
-window.dispatchEvent(new Event("auth-change"));
+      if (refreshToken) {
+        localStorage.setItem(
+          "GlamlinkrefreshToken",
+          refreshToken
+        );
+      }
 
-        const redirectPath = localStorage.getItem(
+      message.success(
+        response?.message || "Login successful"
+      );
+
+      window.dispatchEvent(
+        new Event("auth-change")
+      );
+
+      const redirectPath = localStorage.getItem(
+        "postLoginRedirect"
+      );
+
+      if (redirectPath) {
+        localStorage.removeItem(
           "postLoginRedirect"
         );
 
-        if (redirectPath) {
-          localStorage.removeItem("postLoginRedirect");
+        router.push(redirectPath);
+      } else {
+        router.push("/dashboard");
+      }
 
-          router.push(redirectPath);
-        } else {
-          router.push("/dashboard");
-        }
-        return;
-      }
-      // message.error(response?.message || "Login failed");
-    } catch (error: any) {
-      console.error(error);
-      if (
-        error?.response?.data?.message.toLowerCase().includes("not verified")
-      ) {
-        // message.warning(error?.response?.data?.message);
-        router.push(
-          `/verify-otp?email=${encodeURIComponent(
-            form.email
-          )}&type=email_varification`
-        );
-        return;
-      }
-    } finally {
-      setLoading(false);
+      return;
     }
-  };
+
+    // API success:false
+    message.error(
+      response?.message || "Login failed"
+    );
+  } catch (error: any) {
+    console.error(error);
+
+    const errorMessage =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Something went wrong";
+
+    if (
+      errorMessage
+        .toLowerCase()
+        .includes("not verified")
+    ) {
+      message.warning(errorMessage);
+
+      router.push(
+        `/verify-otp?email=${encodeURIComponent(
+          form.email
+        )}&type=email_varification`
+      );
+
+      return;
+    }
+
+    message.error(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="page-soft min-h-screen flex items-center justify-center m-5 p-20">
       {/* Ambient blobs */}

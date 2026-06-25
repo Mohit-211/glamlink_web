@@ -8,6 +8,7 @@ import HeroSection from "./HeroSection";
 import { issues2025, issues2026, Issue } from "@/data/issues";
 import { useRouter } from "next/navigation";
 import EducationPage from "./JournalEducation";
+import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
 /* ─────────────────────────────────────────────────────────────
    Constants
 ───────────────────────────────────────────────────────────── */
@@ -324,66 +325,69 @@ const JournalClient = ({ path }: { path: string }) => {
   };
   console.log(path, "path in client===")
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-[1700px] mx-auto px-4 sm:px-6 xl:px-14 py-8 lg:py-14">
-        {/* ── Mobile layout ── */}
-        <div className="lg:hidden space-y-4">
-          {/* Horizontal category nav */}
-          <CategoryNav
-            activeCategory={activeCategory}
-            setActiveCategory={setActiveCategory}
-          />
-          {/* Magazine carousel with pagination */}
-          <MobileMagazineCarousel onIssueClick={handleIssueClick} />
-          {path === "journal" &&
-            <>
-              <HeroSection />
-              <BlogGrid activeCategory={activeCategory} />
-            </>
-          }
-        </div>
-        {/* ── Desktop 3-column layout ── */}
-        <div className="hidden lg:grid grid-cols-[200px_1fr_300px] xl:grid-cols-[220px_1fr_300px] 2xl:grid-cols-[240px_1fr_320px] gap-10 xl:gap-14">
-          {/* LEFT – category nav */}
-          <aside>
+    <>
+      <NewsletterPopup openDelay={3000} />
+      <div className="min-h-screen bg-background">
+        <div className="max-w-[1700px] mx-auto px-4 sm:px-6 xl:px-14 py-8 lg:py-14">
+          {/* ── Mobile layout ── */}
+          <div className="lg:hidden space-y-4">
+            {/* Horizontal category nav */}
+            <CategoryNav
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
+            />
+            {/* Magazine carousel with pagination */}
+            <MobileMagazineCarousel onIssueClick={handleIssueClick} />
+            {path === "journal" &&
+              <>
+                <HeroSection />
+                <BlogGrid activeCategory={activeCategory} />
+              </>
+            }
+          </div>
+          {/* ── Desktop 3-column layout ── */}
+          <div className="hidden lg:grid grid-cols-[200px_1fr_300px] xl:grid-cols-[220px_1fr_300px] 2xl:grid-cols-[240px_1fr_320px] gap-10 xl:gap-14">
+            {/* LEFT – category nav */}
+            <aside>
 
-            <div className="sticky top-28 pr-4">
-              <CategoryNav
-                activeCategory={activeCategory}
-                setActiveCategory={setActiveCategory}
-                vertical
-                path={path}
-              />
-            </div>
-
-          </aside>
-          {path === "journal" ?
-            <main className="space-y-6 min-w-0">
-              <HeroSection />
-              <BlogGrid activeCategory={activeCategory} />
-            </main>
-            :
-            <EducationPage />
-          }
-          {/* RIGHT – magazine sidebar */}
-          <aside>
-            <div className="sticky top-28 space-y-10 pl-4">
-              <MagazineSidebar
-                activeIssue={selectedIssue}
-                onIssueClick={handleIssueClick}
-              />
-              <div className="border border-border/40 rounded-xl p-6 text-center text-sm text-muted-foreground">
-                Ad Space
+              <div className="sticky top-28 pr-4">
+                <CategoryNav
+                  activeCategory={activeCategory}
+                  setActiveCategory={setActiveCategory}
+                  vertical
+                  path={path}
+                />
               </div>
-            </div>
-          </aside>
+
+            </aside>
+            {path === "journal" ?
+              <main className="space-y-6 min-w-0">
+                <HeroSection />
+                <BlogGrid activeCategory={activeCategory} />
+              </main>
+              :
+              <EducationPage />
+            }
+            {/* RIGHT – magazine sidebar */}
+            <aside>
+              <div className="sticky top-28 space-y-10 pl-4">
+                <MagazineSidebar
+                  activeIssue={selectedIssue}
+                  onIssueClick={handleIssueClick}
+                />
+                <div className="border border-border/40 rounded-xl p-6 text-center text-sm text-muted-foreground">
+                  Ad Space
+                </div>
+              </div>
+            </aside>
+          </div>
         </div>
+        <FlipbookPanel
+          issue={selectedIssue}
+          onClose={() => setSelectedIssue(null)}
+        />
       </div>
-      <FlipbookPanel
-        issue={selectedIssue}
-        onClose={() => setSelectedIssue(null)}
-      />
-    </div>
+    </>
   );
 };
 export default JournalClient;

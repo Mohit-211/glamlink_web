@@ -8,6 +8,7 @@ import FounderBadge from "@/components/home/FounderBadge";
 import ProfessionalsMarketplace from "@/components/professionals/ProfessionalsMarketplace";
 import DirectoryApplySection from "@/components/home/DirectoryApplySection";
 import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
+import AccessByGlamlink from "@/components/AccessByGlamlink/AccessByGlamlink";
 
 /* --------------------------------
    Page Metadata
@@ -84,10 +85,11 @@ export default function HomePage() {
 
       <Hero />
       <AccessSection />
-      <DirectoryApplySection />
-      <ProfessionalsMarketplace />
-      <WhyGlamlinkSection />
-      <FounderBadge />
+      <AccessByGlamlink/>
+      {/* <DirectoryApplySection /> */}
+      {/* <ProfessionalsMarketplace /> */}
+      {/* <WhyGlamlinkSection /> */}
+      {/* <FounderBadge /> */}
       <ConditionalGetFeatured />
     </>
   );
