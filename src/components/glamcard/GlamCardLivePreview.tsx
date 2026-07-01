@@ -610,7 +610,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                               src={galleryPreviews[thumbnailIndex]}
                               type="video/mp4"
                             />
-                            Your browser does not support video.
+                            {/* Your browser does not support video. */}
                           </video>
                         ) : (
                           <img
@@ -851,7 +851,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           src={galleryPreviews[thumbnailIndex]}
                           type="video/mp4"
                         />
-                        Your browser does not support video.
+                        {/* Your browser does not support video. */}
                       </video>
                     ) : (
                       <img
