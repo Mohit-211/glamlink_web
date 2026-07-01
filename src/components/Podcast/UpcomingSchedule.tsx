@@ -29,11 +29,20 @@ function getInitials(name: string) {
 }
 
 function formatDate(dateString: string) {
-  const date = new Date(dateString);
+  if (!dateString) return "";
+
+  const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateString);
+
+  const date = isDateOnly
+    ? new Date(`${dateString}T00:00:00`)
+    : new Date(dateString);
+
+  if (isNaN(date.getTime())) return "";
 
   return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -85,7 +94,7 @@ export default function UpcomingSchedule() {
       setLoading(true);
 
       const response = await getAllPodcast();
-
+console.log(response,"response=====")
       setSchedule(response?.data || []);
     } catch (error) {
       console.error("Podcast fetch error:", error);
@@ -140,11 +149,9 @@ export default function UpcomingSchedule() {
               transform: visible
                 ? "translateY(0)"
                 : "translateY(10px)",
-              transition: `opacity 0.45s ease ${
-                i * 70
-              }ms, transform 0.45s ease ${
-                i * 70
-              }ms, background 0.15s ease`,
+              transition: `opacity 0.45s ease ${i * 70
+                }ms, transform 0.45s ease ${i * 70
+                }ms, background 0.15s ease`,
               background:
                 hoveredIndex === i
                   ? "hsl(184 40% 97%)"

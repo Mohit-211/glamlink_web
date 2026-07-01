@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
    Types
 ───────────────────────────────────────────────────────────── */
 interface BlogPost {
+  publish_date: number;
   journal_author?: { name?: string };
   journal_category?: { title?: string };
   id: number;
@@ -135,11 +136,12 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
           const category = item?.journal_category?.title || "General";
           const image = item.cover_image || "/assets/fallback.jpg";
           const excerpt = item.short_description || "";
-          const date = new Date(item.created_at || Date.now()).toLocaleDateString(
-            "en-US",
-            { year: "numeric", month: "short", day: "numeric" }
-          );
-
+          const date = new Date("2026-06-01T17:30:29.000Z").toLocaleString("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+ 
+});
           return (
             <Link
               key={item.id}

@@ -22,6 +22,7 @@ const BlogCard = ({
   date,
   featured = false,
 }: BlogCardProps) => {
+  console.log(date,"===")
   return (
     <article className="group cursor-pointer flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300">
 

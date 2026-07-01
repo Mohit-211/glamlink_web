@@ -15,7 +15,7 @@ interface BlogData {
   short_description: string;
   content: string;
   cover_image: string;
-  created_at: string;
+  publish_date: string;
   slug?: string;
 }
 
@@ -31,7 +31,7 @@ export async function generateMetadata({
   const { id, title } = await params;
 
   const response = await getBlogsById(id);
-  console.log(response,"response")
+  console.log(response, "response")
   const article: BlogData = response?.data;
 
   if (!article) {
@@ -83,6 +83,7 @@ export default async function Article({
   const { id, title } = await params;
 
   const response = await getBlogsById(id);
+  console.log(response,"response")
   const article: BlogData = response?.data;
 
   if (!article) {
@@ -92,13 +93,14 @@ export default async function Article({
   const articleUrl = `https://glamlink.net/journal/${id}/${title}`;
   const imageUrl = article.cover_image || "/assets/fallback-blog.jpg";
 
-  const formattedDate = article.created_at
-    ? new Date(article.created_at).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "";
+const formattedDate = article?.publish_date
+  ? new Date(article.publish_date).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+     
+    })
+  : "";
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -118,7 +120,7 @@ export default async function Article({
         url: "https://glamlink.net/favicon.png",
       },
     },
-    datePublished: article.created_at,
+    datePublished: article?.publish_date,
     mainEntityOfPage: articleUrl,
   };
 
@@ -165,75 +167,75 @@ export default async function Article({
         <article className="max-w-[900px] mx-auto px-5 pb-20 pt-20">
 
           {/* ── HERO ── */}
-        {/* ── HERO ── */}
-<section>
+          {/* ── HERO ── */}
+          <section>
 
-  {/* Category pill */}
-  <div className="mb-6 mt-6">
-    <span
-      className="inline-flex items-center gap-1.5 text-[10px] font-medium tracking-widest uppercase text-[#23AEB8] px-3 py-1.5 rounded-full"
-      style={{ background: "rgba(35,174,184,0.08)", border: "1px solid rgba(35,174,184,0.25)" }}
-    >
-      <span className="w-1.5 h-1.5 rounded-full bg-[#23AEB8]" />
-      {article?.journal_category?.title ?? "From the Treatment Room"}
-    </span>
-  </div>
+            {/* Category pill */}
+            <div className="mb-6 mt-6">
+              <span
+                className="inline-flex items-center gap-1.5 text-[10px] font-medium tracking-widest uppercase text-[#23AEB8] px-3 py-1.5 rounded-full"
+                style={{ background: "rgba(35,174,184,0.08)", border: "1px solid rgba(35,174,184,0.25)" }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#23AEB8]" />
+                {article?.journal_category?.title ?? "From the Treatment Room"}
+              </span>
+            </div>
 
-  {/* TOP ROW — Title | Image */}
-  <div className="grid md:grid-cols-2 gap-8 items-center mb-7">
+            {/* TOP ROW — Title | Image */}
+            <div className="grid md:grid-cols-2 gap-8 items-center mb-7">
 
-    {/* Title only */}
-    <h1 className="font-serif text-[clamp(30px,4vw,44px)] leading-[1.08] tracking-tight text-gray-900">
-      {article.title}
-    </h1>
+              {/* Title only */}
+              <h1 className="font-serif text-[clamp(30px,4vw,44px)] leading-[1.08] tracking-tight text-gray-900">
+                {article.title}
+              </h1>
 
-    {/* Image 16:9 */}
-    <div className="relative rounded-2xl overflow-hidden w-full">
-      <div className="relative w-full aspect-video">
-        <Image
-          unoptimized={process.env.NODE_ENV === "development"}
-          src={imageUrl}
-          alt={article.title}
-          fill
-          className="object-cover hover:scale-[1.03] transition-transform duration-700"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-        <div
-          className="absolute bottom-0 left-0 right-0 px-4 py-3"
-          style={{ background: "rgba(0,0,0,0.48)" }}
-        >
-         
-          <p className="text-[13px] text-white font-medium">
-            {article?.journal_category?.title ?? "Glamlink Journal"}
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
+              {/* Image 16:9 */}
+              <div className="relative rounded-2xl overflow-hidden w-full">
+                <div className="relative w-full aspect-video">
+                  <Image
+                    unoptimized={process.env.NODE_ENV === "development"}
+                    src={imageUrl}
+                    alt={article.title}
+                    fill
+                    className="object-cover hover:scale-[1.03] transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+                  <div
+                    className="absolute bottom-0 left-0 right-0 px-4 py-3"
+                    style={{ background: "rgba(0,0,0,0.48)" }}
+                  >
 
-  {/* BOTTOM — Description + Author */}
-  <div className="flex flex-col md:flex-row md:items-start gap-6 pt-6 border-t border-gray-100">
+                    <p className="text-[13px] text-white font-medium">
+                      {article?.journal_category?.title ?? "Glamlink Journal"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-    {/* Description */}
-    <p className="flex-1 text-[15px] leading-[1.75] text-gray-500 font-light">
-      {article.short_description}
-    </p>
+            {/* BOTTOM — Description + Author */}
+            <div className="flex flex-col md:flex-row md:items-start gap-6 pt-6 border-t border-gray-100">
 
-    {/* Author */}
-    <div className="flex items-center gap-3 md:pl-6 md:border-l md:border-gray-100 flex-shrink-0">
-      <div className="w-9 h-9 rounded-full bg-[#23AEB8] text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
-        {article?.journal_author?.name?.charAt(0) ?? "A"}
-      </div>
-      <div>
-        <p className="text-sm font-medium text-gray-800 whitespace-nowrap">
-          {article?.journal_author?.name}
-        </p>
-        <p className="text-xs text-gray-400 mt-0.5">{formattedDate}</p>
-      </div>
-    </div>
+              {/* Description */}
+              <p className="flex-1 text-[15px] leading-[1.75] text-gray-500 font-light">
+                {article.short_description}
+              </p>
 
-  </div>
-</section>
+              {/* Author */}
+              <div className="flex items-center gap-3 md:pl-6 md:border-l md:border-gray-100 flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#23AEB8] text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
+                  {article?.journal_author?.name?.charAt(0) ?? "A"}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-800 whitespace-nowrap">
+                    {article?.journal_author?.name}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">{formattedDate}</p>
+                </div>
+              </div>
+
+            </div>
+          </section>
 
           {/* ── DIVIDER ── */}
           <div className="border-t border-gray-100 my-12" />
@@ -278,18 +280,18 @@ export default async function Article({
           <div className="border-t border-gray-100 my-14 mx-auto" />
 
           {/* ── RELATED ARTICLES ── */}
-     <section style={{justifyItems:"center"}}>
-  <div className="text-center mb-8 mx-auto max-w-2xl">
-    <p className="text-[10px] tracking-[.15em] uppercase text-gray-400 mb-2">
-      Continue reading
-    </p>
-    <h2 className="font-serif text-3xl text-gray-900">
-      Related articles
-    </h2>
-  </div>
+          <section style={{ justifyItems: "center" }}>
+            <div className="text-center mb-8 mx-auto max-w-2xl">
+              <p className="text-[10px] tracking-[.15em] uppercase text-gray-400 mb-2">
+                Continue reading
+              </p>
+              <h2 className="font-serif text-3xl text-gray-900">
+                Related articles
+              </h2>
+            </div>
 
-  <RelatedArticles category_id={article?.category_id} />
-</section>
+            <RelatedArticles category_id={article?.category_id} />
+          </section>
 
         </article>
       </main>
