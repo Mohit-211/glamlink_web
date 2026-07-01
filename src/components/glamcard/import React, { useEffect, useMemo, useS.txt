@@ -209,7 +209,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   /* ================= IMAGE NORMALIZATION ================= */
   const normalizedImages = useMemo(() => {
     const rawImages = data?.images || [];
-    return rawImages.map((item: any, index: number) => {
+    return rawimages?.map((item: any, index: number) => {
       const meta = data?.gallery_meta?.[index];
       const isVideo = resolveIsVideo(item);
 
@@ -256,12 +256,12 @@ if (mode === "live" && meta?.thumbnail_file instanceof File) {
   const galleryPreviews = useMemo(
     () =>
       mode === "live"
-        ? normalizedImages.map((item, idx) =>
+        ? normalizedimages?.map((item, idx) =>
             isFile(data?.images?.[idx])
               ? URL.createObjectURL(data.images[idx])
               : item.url
           )
-        : normalizedImages.map((item) => item.url),
+        : normalizedimages?.map((item) => item.url),
     [mode, normalizedImages, data?.images]
   );
 console.log(normalizedImages[4],"normalizedImages")
@@ -291,7 +291,7 @@ console.log(normalizedImages[4],"normalizedImages")
   }, [normalizedImages, galleryMeta, thumbnailIndex]);
 
   const otherIndexes = useMemo(
-    () => normalizedImages.map((_, i) => i),
+    () => normalizedimages?.map((_, i) => i),
     [normalizedImages]
   );
 

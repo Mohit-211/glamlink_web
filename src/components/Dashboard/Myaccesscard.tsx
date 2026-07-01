@@ -96,7 +96,9 @@ export default function MyAccessCard({
             return {};
         }
     })();
-
+    const isPaid = ["paid", "completed"].includes(
+        (cardData?.payment_status || "").toLowerCase()
+    );
     return (
         <>
             <div className="space-y-4">
@@ -226,29 +228,65 @@ export default function MyAccessCard({
                     <div className="flex flex-col gap-3 border-t border-border bg-secondary/40 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex flex-1 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
                             <span className="flex-1 truncate font-mono text-[12px] text-muted-foreground">
-                                {cardData?.business_card_link}
+                                {isPaid
+                                    ? cardData?.business_card_link
+                                    : "••••••••••••••••••••••••••••••"}
                             </span>
-                            <button onClick={handleCopy} className="flex-shrink-0 rounded-lg p-1 hover:bg-accent transition-colors" aria-label="Copy link">
-                                {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
-                            </button>
+
+                            {isPaid && (
+                                <button
+                                    onClick={handleCopy}
+                                    className="flex-shrink-0 rounded-lg p-1 hover:bg-accent transition-colors"
+                                    aria-label="Copy link"
+                                >
+                                    {copied ? (
+                                        <Check className="h-3.5 w-3.5 text-green-600" />
+                                    ) : (
+                                        <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+                                    )}
+                                </button>
+                            )}
                         </div>
+
                         <div className="flex items-center gap-2 flex-shrink-0">
-                            {/* <button
-                                onClick={() => setShowQR(true)}
-                                className="btn-outline !px-4 !py-2 !text-xs !rounded-xl flex items-center gap-1.5"
-                            >
-                                <QrCode className="h-3.5 w-3.5" />
-                                QR Code
-                            </button> */}
-                            <a
-                                href={cardData?.business_card_link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn-primary !px-4 !py-2 !text-xs !rounded-xl flex items-center gap-1.5"
-                            >
-                                <ExternalLink className="h-3.5 w-3.5" />
-                                View my access card
-                            </a>
+                            {isPaid ? (
+                                <a
+                                    href={cardData?.business_card_link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-primary !px-4 !py-2 !text-xs !rounded-xl flex items-center gap-1.5"
+                                >
+                                    <ExternalLink className="h-3.5 w-3.5" />
+                                    View my access card
+                                </a>
+                            ) : (
+                                <div className="relative group">
+                                    <button
+                                        onClick={onPayNow}
+                                        className="btn-primary !px-4 !py-2 !text-xs !rounded-xl flex items-center gap-1.5 opacity-70 cursor-pointer"
+                                    >
+                                        <ExternalLink className="h-3.5 w-3.5" />
+                                        View my access card
+                                    </button>
+
+                                    {/* Tooltip */}
+                                    <div
+                                        className="
+          absolute bottom-full  -translate-x-1/2 mb-3
+          whitespace-nowrap rounded-lg bg-black px-3 py-2
+          text-xs text-white shadow-lg
+          opacity-0 invisible
+          group-hover:opacity-100 group-hover:visible
+          transition-all duration-200  
+        "
+                                    >
+                                        Please pay now to unlock your access card.
+
+                                        {/* Arrow */}
+                                        <div className="absolute top-full -translate-x-1/2 border-4 border-transparent border-t-black" />
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

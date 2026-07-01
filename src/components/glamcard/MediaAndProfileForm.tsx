@@ -15,6 +15,38 @@ const sectionClass =
   "space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm";
 const labelClass = "text-sm font-medium text-gray-700";
 
+/* ================= HELPERS =================
+   data.images can hold a mix of shapes:
+   - new File uploads (from <input type="file">)
+   - plain string URLs
+   - server objects returned by the API, e.g.
+     { id, file_type, file_uri, thumbnail_uri, ... }
+   These helpers normalize any single entry into a renderable URL / video flag
+   so the rest of the component doesn't need to care which shape it got. */
+const getImageUrl = (item: any): string => {
+  if (item instanceof File) return URL.createObjectURL(item);
+  if (typeof item === "string") return item;
+  if (item && typeof item === "object") return item.file_uri || item.url || "";
+  return "";
+};
+
+const isVideoItem = (item: any): boolean => {
+  if (item instanceof File) return item.type?.startsWith("video/") ?? false;
+  if (item && typeof item === "object") {
+    if (item.file_type === "video") return true;
+    const uri = item.file_uri || item.url || "";
+    return /\.(mp4|mov|webm|avi|mkv)$/i.test(uri);
+  }
+  return false;
+};
+
+const getThumbnailUrl = (item: any): string => {
+  if (item && typeof item === "object" && !(item instanceof File)) {
+    return item.thumbnail_uri || "";
+  }
+  return "";
+};
+
 const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
   /* ================= PROFILE IMAGE ================= */
 
@@ -30,6 +62,12 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
       const url = URL.createObjectURL(data.profile_image);
       setProfilePreview(url);
       return () => URL.revokeObjectURL(url);
+    }
+    if (typeof data.profile_image === "string" && data.profile_image) {
+      // Existing profile image URL from the server (edit mode) — render directly, no object URL needed.
+      setProfilePreview(data.profile_image);
+    } else {
+      setProfilePreview(null);
     }
   }, [data.profile_image]);
 
@@ -63,23 +101,41 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
   const gallery_meta: GalleryMetaItem[] = data.gallery_meta || [];
 
   useEffect(() => {
-    const urls = data.images.map((file) => URL.createObjectURL(file));
+    // data.images can hold a mix of new File uploads, plain string URLs, and
+    // server objects ({file_uri, file_type, thumbnail_uri, ...}) in edit mode.
+    // Only File instances need an object URL — everything else is already
+    // renderable once we pull the right field out.
+    const urls = (data.images || []).map((item) => getImageUrl(item));
     setGalleryPreview(urls);
-    return () => urls.forEach((url) => URL.revokeObjectURL(url));
+    return () => {
+      (data.images || []).forEach((item, i) => {
+        if (item instanceof File) URL.revokeObjectURL(urls[i]);
+      });
+    };
   }, [data.images]);
 
   useEffect(() => {
     const entries: Record<string, string> = {};
-    gallery_meta.forEach((item) => {
+    gallery_meta.forEach((item, index) => {
       if (item.thumbnail_file instanceof File) {
         entries[item.id] = URL.createObjectURL(item.thumbnail_file);
+      } else {
+        // Fall back to a thumbnail URL that may have come from the server
+        // alongside this gallery item (e.g. for existing videos in edit mode).
+        const sourceImage = data.images?.[index];
+        const serverThumb = getThumbnailUrl(sourceImage);
+        if (serverThumb) entries[item.id] = serverThumb;
       }
     });
     setVideoThumbPreviews(entries);
     return () => {
-      Object.values(entries).forEach((url) => URL.revokeObjectURL(url));
+      gallery_meta.forEach((item) => {
+        if (item.thumbnail_file instanceof File && entries[item.id]) {
+          URL.revokeObjectURL(entries[item.id]);
+        }
+      });
     };
-  }, [data.gallery_meta]);
+  }, [data.gallery_meta, data.images]);
 
   const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -207,7 +263,8 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
       {gallery_meta.length ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {gallery_meta.map((item, index) => {
-            const isVideo = data.images[index]?.type?.startsWith("video/");
+            const currentFile = data.images[index];
+            const isVideo = isVideoItem(currentFile);
             const thumbPreview = videoThumbPreviews[item.id];
 
             return (
@@ -218,18 +275,39 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
                 {/* Media preview */}
                 <div className="relative">
                   {isVideo ? (
-                    <div className="h-32 w-full rounded-lg bg-gray-900 flex items-center justify-center">
-                      <svg
-                        className="w-10 h-10 text-white opacity-70"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                      <span className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded">
-                        Video
-                      </span>
-                    </div>
+                    thumbPreview ? (
+                      <div className="relative h-32 w-full rounded-lg overflow-hidden">
+                        <img
+                          src={thumbPreview}
+                          className="h-full w-full object-cover"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                          <svg
+                            className="w-10 h-10 text-white opacity-90"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                        <span className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded">
+                          Video
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="h-32 w-full rounded-lg bg-gray-900 flex items-center justify-center">
+                        <svg
+                          className="w-10 h-10 text-white opacity-70"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                        <span className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded">
+                          Video
+                        </span>
+                      </div>
+                    )
                   ) : (
                     <img
                       src={galleryPreview[index]}

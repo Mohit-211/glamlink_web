@@ -77,6 +77,7 @@ export default function DashboardPage() {
     try {
       setLoading(true);
       const cardRes = await getMyBusinessCardForDashboard();
+      console.log(cardRes,"cardRes")
       setBusinessCard(cardRes?.data || cardRes);
 
       const paymentRes = await getPaymenthistory();

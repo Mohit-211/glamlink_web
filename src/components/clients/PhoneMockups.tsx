@@ -45,7 +45,7 @@ const PhoneMockups = () => {
           <div className="absolute w-[180px] md:w-[260px] h-[180px] md:h-[260px] bg-[#24bbcb]/10 rounded-full blur-3xl -z-10 animate-pulse-slow" />
 
           <div className="flex flex-row items-end justify-center gap-4 xs:gap-6 sm:gap-8 md:gap-12 lg:gap-16 perspective-[900px]">
-            {images.map((image, index) => {
+            {images?.map((image, index) => {
               const isCenter = index === 1;
               const tilt = isCenter
                 ? "rotateY(0deg)"

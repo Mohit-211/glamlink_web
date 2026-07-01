@@ -29,19 +29,19 @@ const findStateIdByAbbreviationOrName = (
   statesArray: any[]
 ): string | undefined => {
   if (!stateValue || !statesArray.length) return undefined;
-  
+
   // If already numeric, return as-is
   if (!isNaN(Number(stateValue))) {
     return String(stateValue);
   }
-  
+
   // Search by name or abbreviation
   const found = statesArray.find(
-    (s: any) => 
+    (s: any) =>
       s.name?.toLowerCase() === stateValue.toLowerCase() ||
       s.abbreviation?.toLowerCase() === stateValue.toLowerCase()
   );
-  
+
   return found ? String(found.id) : undefined;
 };
 
@@ -111,7 +111,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({
     let stateId = stateValue;
     if (typeof stateValue === 'string' && isNaN(Number(stateValue))) {
       const foundState = states.find(
-        (s: any) => s.name?.toUpperCase() === stateValue.toUpperCase() || 
+        (s: any) => s.name?.toUpperCase() === stateValue.toUpperCase() ||
                     s.abbreviation?.toUpperCase() === stateValue.toUpperCase()
       );
       if (foundState) {
@@ -338,17 +338,24 @@ const LocationFormFields: React.FC<FieldsProps> = ({
             </div>
           </div>
 
-          <button
-            type="button"
-            disabled={!canSetCity || citiesLoading}
-            className={`w-full ${buttonClass} ${canSetCity && !citiesLoading
-              ? "bg-purple-600 hover:bg-purple-700"
-              : "bg-gray-300 cursor-not-allowed"
-              }`}
-            onClick={handleSetCity}
-          >
-            Set Location
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              disabled={!canSetCity || citiesLoading}
+              className={`w-full ${buttonClass} ${canSetCity && !citiesLoading
+                ? "bg-purple-600 hover:bg-purple-700"
+                : "bg-gray-300 cursor-not-allowed"
+                }`}
+              onClick={handleSetCity}
+            >
+              Set Location
+            </button>
+            {location.isSet && (
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+                ✓
+              </span>
+            )}
+          </div>
         </div>
       )}
 
@@ -358,7 +365,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({
       {location.location_type === "exact_address" && (
         <div>
           <label className={labelClass}>Address</label>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
             <input
               ref={addressInputRef}
               className={inputClass}
@@ -379,6 +386,11 @@ const LocationFormFields: React.FC<FieldsProps> = ({
             >
               Confirm
             </button>
+            {location.isSet && (
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+                ✓
+              </span>
+            )}
           </div>
         </div>
       )}

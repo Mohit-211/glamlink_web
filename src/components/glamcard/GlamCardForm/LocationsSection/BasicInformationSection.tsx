@@ -2,16 +2,20 @@
 
 import React from "react";
 import dynamic from "next/dynamic";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 import { GlamCardFormData } from "../types";
 
 /* ================= SSR SAFE CKEDITOR ================= */
-const CKEditorComponent = dynamic(
-  () => Promise.resolve(CKEditor),
-  { ssr: false }
-);
+// The editor and its build are isolated in their own client-only file.
+// dynamic() only skips SSR if the import itself is deferred like this —
+// importing CKEditor/ClassicEditor directly in this file (even if unused
+// afterwards) would still evaluate them on the server and crash.
+const BioEditor = dynamic(() => import("./Bioeditor"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-32 w-full animate-pulse rounded-lg border border-gray-200 bg-gray-50" />
+  ),
+});
 
 /* ================= TYPES ================= */
 
@@ -103,54 +107,48 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         </div>
 
         {/* PHONE */}
-     {/* PHONE */}
-<div>
-  <div className="mb-2 flex items-center justify-between">
-    <label className={labelClass}>Phone *</label>
+        <div>
+          <div className="mb-2 flex items-center justify-between">
+            <label className={labelClass}>Phone *</label>
 
-    <label className="flex items-center gap-2 cursor-pointer">
-      <input
-  type="checkbox"
-  checked={data.is_phone_visible ?? true}
-  onChange={(e) =>
-    setData((p) => ({
-      ...p,
-      is_phone_visible: e.target.checked,
-    }))
-  }
-  className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-/>
-      <span className="text-xs font-medium text-gray-600">
-        Show phone number on card
-      </span>
-    </label>
-  </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={data.is_phone_visible ?? true}
+                onChange={(e) =>
+                  setData((p) => ({
+                    ...p,
+                    is_phone_visible: e.target.checked,
+                  }))
+                }
+                className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+              />
+              <span className="text-xs font-medium text-gray-600">
+                Show phone number on card
+              </span>
+            </label>
+          </div>
 
-  <input
-    className={inputClass}
-    value={data.phone || ""}
-    onChange={(e) =>
-      setData((p) => ({
-        ...p,
-        phone: e.target.value,
-      }))
-    }
-  />
-</div>
+          <input
+            className={inputClass}
+            value={data.phone || ""}
+            onChange={(e) =>
+              setData((p) => ({
+                ...p,
+                phone: e.target.value,
+              }))
+            }
+          />
+        </div>
 
         {/* BIO */}
         <div className="md:col-span-2">
           <label className={labelClass}>Professional Bio</label>
 
-          <CKEditorComponent
-            editor={ClassicEditor as any}
-            data={data.bio || ""}
-            config={{
-              licenseKey: "GPL",
-              placeholder: "Write your bio...",
-            }}
-            onChange={(_, editor) => {
-              const html = editor.getData();
+          <BioEditor
+            value={data.bio || ""}
+            placeholder="Write your bio..."
+            onChange={(html) => {
               const text = html.replace(/<[^>]*>/g, "").trim();
 
               if (text.length <= CHARACTER_LIMIT) {

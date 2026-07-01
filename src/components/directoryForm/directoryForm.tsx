@@ -415,7 +415,7 @@ console.log(categories,"==")
 
   const setLocation = (idx: number, key: keyof Location, value: string | boolean | number) =>
     setForm((prev) => {
-      const locs = [...prev.locations]
+      const locs = [...prev?.locations]
       locs[idx] = { ...locs[idx], [key]: value }
       return { ...prev, locations: locs }
     })
@@ -588,7 +588,7 @@ const addLocation = () => {
     return {
       ...prev,
       locations: [
-        ...prev.locations,
+        ...prev?.locations,
         {
           label: '',
           location_type:

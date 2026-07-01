@@ -33,7 +33,7 @@ const LocationsSection: React.FC<SectionProps> = ({ data, setData }) => {
   const addLocation = () => {
     setData((prev) => ({
       ...prev,
-      locations: [...prev.locations, createEmptyLocation(prev.locations.length)],
+      locations: [...prev?.locations, createEmptyLocation(prev.locations?.length)],
     }));
   };
 
@@ -42,7 +42,7 @@ const LocationsSection: React.FC<SectionProps> = ({ data, setData }) => {
       if (updates.isPrimary === true) {
         return {
           ...prev,
-          locations: prev.locations.map((loc) => ({
+          locations: prev.locations?.map((loc) => ({
             ...loc,
             isPrimary: loc.id === id,
           })),
@@ -50,7 +50,7 @@ const LocationsSection: React.FC<SectionProps> = ({ data, setData }) => {
       }
       return {
         ...prev,
-        locations: prev.locations.map((loc) =>
+        locations: prev.locations?.map((loc) =>
           loc.id === id ? { ...loc, ...updates } : loc
         ),
       };
@@ -59,8 +59,8 @@ const LocationsSection: React.FC<SectionProps> = ({ data, setData }) => {
 
   const removeLocation = (id: string) => {
     setData((prev) => {
-      const remaining = prev.locations.filter((l) => l.id !== id);
-      if (remaining.length > 0 && !remaining.some((l) => l.isPrimary)) {
+      const remaining = prev.locations?.filter((l) => l.id !== id);
+      if (remaining?.length > 0 && !remaining.some((l) => l.isPrimary)) {
         remaining[0].isPrimary = true;
       }
       return { ...prev, locations: remaining };
@@ -71,7 +71,7 @@ const LocationsSection: React.FC<SectionProps> = ({ data, setData }) => {
     <section className={sectionClass}>
       <h3 className="text-lg font-semibold">Business Locations *</h3>
       <div className="space-y-5">
-        {data.locations.map((loc) => (
+        {data.locations?.map((loc) => (
           <LocationCard
             key={loc.id}
             location={loc}

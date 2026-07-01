@@ -16,6 +16,21 @@ const inputClass =
 const INSTAGRAM_KEYS = ["instagram", "instagram1", "instagram2"] as const;
 type InstagramKey = (typeof INSTAGRAM_KEYS)[number];
 
+/* ================= HELPERS ================= */
+const parseOtherLinks = (value: any): { title: string; url: string }[] => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
 const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
   const [specialtyInput, setSpecialtyInput] = useState("");
   const [infoInput, setInfoInput] = useState("");
@@ -54,7 +69,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
   const removeInfo = (index: number) => {
     setData((prev) => ({
       ...prev,
-      important_info: prev.important_info.filter((_, i) => i !== index),
+      important_info: prev.important_info?.filter((_, i) => i !== index),
     }));
   };
 
@@ -139,20 +154,22 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
   const addOtherLink = () => {
     setData((prev) => ({
       ...prev,
-      other_links: [...(prev.other_links || []), { title: "", url: "" }],
+      other_links: [...parseOtherLinks(prev.other_links), { title: "", url: "" }],
     }));
   };
 
   const removeOtherLink = (index: number) => {
     setData((prev) => ({
       ...prev,
-      other_links: prev.other_links.filter((_: any, i: number) => i !== index),
+      other_links: parseOtherLinks(prev.other_links).filter(
+        (_: any, i: number) => i !== index,
+      ),
     }));
   };
 
   const updateOtherLink = (index: number, field: "title" | "url", value: string) => {
     setData((prev) => {
-      const updated = [...(prev.other_links || [])];
+      const updated = [...parseOtherLinks(prev.other_links)];
       updated[index] = { ...updated[index], [field]: value };
       return { ...prev, other_links: updated };
     });
@@ -290,7 +307,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                     className={`${inputClass} flex-1`}
                     placeholder="@yourusername or full URL"
                     value={value}
-                    required={idx === 0 && data.preferred_booking_method === BOOKING_METHODS.INSTAGRAM}
+                    required={
+                      idx === 0 &&
+                      !!data.preferred_booking_methods?.includes(
+                        BOOKING_METHODS.INSTAGRAM
+                      )
+                    }
                     onChange={(e) => updateInstagramHandle(idx, e.target.value)}
                   />
                   {getHandles().length > 1 && (
@@ -400,7 +422,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             </button>
           </div>
           <div className="space-y-3">
-            {(data.other_links || []).map(
+            {parseOtherLinks(data?.other_links).map(
               (link: { title: string; url: string }, index: number) => (
                 <div
                   key={index}
@@ -432,7 +454,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                 </div>
               )
             )}
-            {(data.other_links?.length ?? 0) === 0 && (
+            {parseOtherLinks(data?.other_links).length === 0 && (
               <div className="rounded-lg border border-gray-200 bg-white p-4 text-center text-sm text-gray-500">
                 No links added yet. Click "Add Link" to get started.
               </div>
@@ -461,7 +483,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             >
               <input
                 type="checkbox"
-                checked={data.preferred_booking_methods?.includes(method)}
+                checked={!!data.preferred_booking_methods?.includes(method)}
                 onChange={(e) => {
                   setData((prev) => ({
                     ...prev,
@@ -509,9 +531,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
         <label className={`${labelClass} m-0`}>
           Important Information
         </label>
-        {data.important_info.length > 0 && (
+        {data.important_info?.length > 0 && (
           <div className="space-y-2">
-            {data.important_info.map((item, i) => (
+            {data.important_info?.map((item, i) => (
               <div key={i} className="flex items-center gap-2">
                 <input
                   className={`${inputClass} bg-gray-50`}

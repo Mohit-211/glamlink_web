@@ -107,7 +107,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
     const waitForImagesToLoad = async (element: HTMLElement) => {
     const images = Array.from(element.querySelectorAll("img"));
     await Promise.all(
-      images.map(
+      images?.map(
         (img) =>
           new Promise<void>((resolve) => {
             if (img.complete && img.naturalWidth > 0) return resolve();
@@ -174,7 +174,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
     const restorations: { img: HTMLImageElement; originalSrc: string }[] = [];
 
     await Promise.all(
-      images.map(async (img) => {
+      images?.map(async (img) => {
         const originalSrc = img.getAttribute("src") || "";
         if (!originalSrc || originalSrc.startsWith("data:")) return;
         const base64 = await toBase64DataUrl(originalSrc);

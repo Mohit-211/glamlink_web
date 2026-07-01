@@ -14,29 +14,29 @@ interface Props {
   error?: string;
 }
 
-export default function ShowQRCode({ cardData ,error}: Props) {
-const [copied, setCopied] = useState(false);
+export default function ShowQRCode({ cardData, error }: Props) {
+  const [copied, setCopied] = useState(false);
 
-if (error === "Business card not found." || !cardData) {
-  return (
-    <div className="flex flex-col items-center justify-center py-16">
-      <h2 className="text-2xl font-semibold text-gray-900">
-        Create Your Business Card
-      </h2>
+  if (error === "Business card not found." || !cardData) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <h2 className="text-2xl font-semibold text-gray-900">
+          Create Your Business Card
+        </h2>
 
-      <p className="mt-2 text-sm text-gray-500 text-center max-w-md">
-        You need to create a business card before generating a QR code.
-      </p>
+        <p className="mt-2 text-sm text-gray-500 text-center max-w-md">
+          You need to create a business card before generating a QR code.
+        </p>
 
-      <button
-        onClick={() => (window.location.href = "/apply/digital-card")}
-        className="mt-6 rounded-xl bg-primary px-6 py-3 text-white font-medium"
-      >
-        Create Business Card
-      </button>
-    </div>
-  );
-}
+        <button
+          onClick={() => (window.location.href = "/apply/digital-card")}
+          className="mt-6 rounded-xl bg-primary px-6 py-3 text-white font-medium"
+        >
+          Create Business Card
+        </button>
+      </div>
+    );
+  }
 
   const handleCopy = async () => {
     try {
@@ -69,9 +69,8 @@ if (error === "Business card not found." || !cardData) {
       const link = document.createElement('a');
 
       link.href = url;
-      link.download = `${
-        cardData?.name || 'access-card'
-      }-qr.png`;
+      link.download = `${cardData?.name || 'access-card'
+        }-qr.png`;
 
       document.body.appendChild(link);
 
@@ -84,7 +83,11 @@ if (error === "Business card not found." || !cardData) {
       console.error('QR Download Error:', error);
     }
   };
-
+  console.log(cardData, "cardData")
+const isPaid =
+  (cardData?.payment_status ?? "").trim().toLowerCase() === "paid" ||
+  (cardData?.payment_status ?? "").trim().toLowerCase() === "completed";
+  console.log(isPaid,"isPaid")
   return (
     <div className="space-y-6">
       <div>
@@ -101,43 +104,95 @@ if (error === "Business card not found." || !cardData) {
       <div className="flex flex-col md:flex-row gap-6 items-start">
         {/* QR Card */}
         <div className="card-glamlink !hover:transform-none w-full md:w-auto flex-shrink-0">
-          <div className="flex justify-center rounded-xl bg-white p-6 border border-border">
-            {cardData?.business_card_qr ? (
-              <img
-                src={cardData.business_card_qr}
-                alt="GlamCard QR Code"
-                className="h-52 w-52 object-contain"
-              />
-            ) : (
-              <div className="h-52 w-52 flex items-center justify-center bg-secondary rounded-xl text-muted-foreground text-sm">
-                No QR available
-              </div>
-            )}
+          <div className="card-glamlink !hover:transform-none w-full md:w-auto flex-shrink-0">
+            <div className="relative flex justify-center rounded-xl bg-white p-6 border border-border overflow-hidden">
+              {cardData?.business_card_qr ? (
+                <>
+                  <img
+                    src={cardData.business_card_qr}
+                    alt="GlamCard QR Code"
+                    className={`h-52 w-52 object-contain transition-all duration-300 ${isPaid
+                      ? ""
+                      : "blur-md opacity-30 pointer-events-none select-none"
+                      }`}
+                  />
+
+                  {!isPaid && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <div className="rounded-xl bg-white p-4 text-center shadow-xl">
+                        <p className="text-lg">🔒</p>
+
+                        <p className="font-semibold text-gray-900">
+                          QR Code Locked
+                        </p>
+
+                        <p className="mt-1 text-xs text-gray-600">
+                          Please pay to unlock your QR Code.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="h-52 w-52 flex items-center justify-center bg-secondary rounded-xl text-muted-foreground text-sm">
+                  No QR available
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 flex gap-2">
+              {isPaid && (
+                <button
+                  onClick={handleCopy}
+                  className="btn-outline flex-1 !text-xs !py-2 flex items-center justify-center gap-1.5"
+                >
+                  {copied ? (
+                    <Check className="h-3.5 w-3.5 text-green-600" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                  )}
+
+                  {copied ? "Copied!" : "Copy Link"}
+                </button>
+              )}
+
+              {isPaid && cardData?.business_card_qr && (
+                <button
+                  onClick={handleDownloadQR}
+                  className="btn-outline !text-xs !py-2 flex items-center gap-1.5 !px-3"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Download
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="mt-4 flex gap-2">
-            <button
-              onClick={handleCopy}
-              className="btn-outline flex-1 !text-xs !py-2 flex items-center justify-center gap-1.5"
-            >
-              {copied ? (
-                <Check className="h-3.5 w-3.5 text-green-600" />
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
+              {isPaid && (
+                <button
+                  onClick={handleCopy}
+                  className="btn-outline flex-1 !text-xs !py-2 flex items-center justify-center gap-1.5"
+                >
+                  {copied ? (
+                    <Check className="h-3.5 w-3.5 text-green-600" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                  )}
+
+                  {copied ? "Copied!" : "Copy Link"}
+                </button>
               )}
 
-              {copied ? 'Copied!' : 'Copy Link'}
-            </button>
-
-            {cardData?.business_card_qr && (
-              <button
-                onClick={handleDownloadQR}
-                className="btn-outline !text-xs !py-2 flex items-center gap-1.5 !px-3"
-              >
-                <Download className="h-3.5 w-3.5" />
-                Download
-              </button>
-            )}
+            {isPaid && cardData?.business_card_qr && (
+                <button
+                  onClick={handleDownloadQR}
+                  className="btn-outline !text-xs !py-2 flex items-center gap-1.5 !px-3"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Download
+                </button>
+              )}
           </div>
         </div>
 
@@ -176,20 +231,23 @@ if (error === "Business card not found." || !cardData) {
 
                 <div className="flex items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2">
                   <span className="flex-1 truncate font-mono text-[11px] text-muted-foreground">
-                    {cardData?.business_card_link ||
-                      'No Link Available'}
+                    {isPaid
+                      ? cardData?.business_card_link
+                      : "••••••••••••••••••••••••••••••"}
                   </span>
 
-                  <button
-                    onClick={handleCopy}
-                    className="flex-shrink-0 rounded-md p-1 hover:bg-accent transition-colors"
-                  >
-                    {copied ? (
-                      <Check className="h-3.5 w-3.5 text-green-600" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5 text-muted-foreground" />
-                    )}
-                  </button>
+                  {isPaid && (
+                    <button
+                      onClick={handleCopy}
+                      className="flex-shrink-0 rounded-md p-1 hover:bg-accent transition-colors"
+                    >
+                      {copied ? (
+                        <Check className="h-3.5 w-3.5 text-green-600" />
+                      ) : (
+                        <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -224,17 +282,7 @@ if (error === "Business card not found." || !cardData) {
           </div>
 
           {/* View Card */}
-          {cardData?.business_card_link && (
-            <a
-              href={cardData.business_card_link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary w-full !text-sm flex items-center justify-center gap-2"
-            >
-              <ExternalLink className="h-4 w-4" />
-              View My Access Card
-            </a>
-          )}
+         
         </div>
       </div>
     </div>

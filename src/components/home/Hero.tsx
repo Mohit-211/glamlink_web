@@ -83,9 +83,8 @@ const Hero = () => {
                 font-family: 'DM Sans', sans-serif;
                 line-height: 1;
                 letter-spacing: -0.02em;
-              ">${
-                selectedProfessional.name?.charAt(0)?.toUpperCase() || "?"
-              }</span>
+              ">${selectedProfessional.name?.charAt(0)?.toUpperCase() || "?"
+          }</span>
             </div>
             <div style="
               width: 0; height: 0;
@@ -130,7 +129,7 @@ const Hero = () => {
             );
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [selectedProfessional, selectedLocationIndex]);
 
@@ -200,11 +199,13 @@ const Hero = () => {
 
   // ─── Select → fetch full profile ─────────────────────────────────────────────
   const handleSelectProfessional = async (pro: any) => {
+    console.log(pro, "pro")
+    const slug = pro?.business_card_link.split("/").pop()
     try {
       setShowDropdown(false);
       setSearchQuery(pro.name || "");
 
-      const res = await getBusinessCardBySlug(pro.slug);
+      const res = await getBusinessCardBySlug(slug);
       const fullData = res?.data?.data || res?.data;
       setSelectedProfessional(fullData);
     } catch (error) {
@@ -228,6 +229,7 @@ const Hero = () => {
       try {
         setLoading(true);
         const data = await getBusinessProfile();
+        console.log(data, "==")
         const filtered = (data?.data || []).filter(
           (pro: any) => pro.is_details === true
         );
@@ -475,11 +477,10 @@ const Hero = () => {
                                 hoveredIndex === i
                                   ? "rgba(36,187,203,0.15)"
                                   : "rgba(36,187,203,0.08)",
-                              border: `1.5px solid ${
-                                hoveredIndex === i
+                              border: `1.5px solid ${hoveredIndex === i
                                   ? "rgba(36,187,203,0.4)"
                                   : "rgba(36,187,203,0.15)"
-                              }`,
+                                }`,
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
@@ -526,7 +527,7 @@ const Hero = () => {
                                 textOverflow: "ellipsis",
                               }}
                             >
-                              {pro.primary_specialty || "—"}
+                              {pro.business_name || pro.primary_specialty || "—"}
                             </div>
                           </div>
                         </button>
@@ -550,9 +551,8 @@ const Hero = () => {
             <p className="text-sm text-gray-500">
               {selectedProfessional
                 ? "Professional selected — view profile below"
-                : `Showing ${mapProfessionals.length} professional${
-                    mapProfessionals.length !== 1 ? "s" : ""
-                  } on map`}
+                : `Showing ${mapProfessionals.length} professional${mapProfessionals.length !== 1 ? "s" : ""
+                } on map`}
             </p>
           </div>
 

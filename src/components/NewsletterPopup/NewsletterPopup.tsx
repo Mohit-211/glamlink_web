@@ -81,7 +81,7 @@ export default function NewsletterPopup({
       setLoading(false);
     }
   };
-
+if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-[999999]">
       {/* Overlay */}
@@ -97,7 +97,7 @@ export default function NewsletterPopup({
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-primary/10 to-transparent rounded-full blur-3xl -z-10" />
           
           <div className="relative p-8 md:p-10">
-            {!subscribed && (
+            {/* {!subscribed && (
               <button
                 onClick={handleClose}
                 disabled={!isFormValid}
@@ -107,7 +107,7 @@ export default function NewsletterPopup({
               >
                 <X size={20} />
               </button>
-            )}
+            )} */}
 
             {!subscribed ? (
               <>

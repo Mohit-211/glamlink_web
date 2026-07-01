@@ -188,7 +188,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   /* ================= IMAGE NORMALIZATION ================= */
   const normalizedImages = useMemo(() => {
     const rawImages = data?.images || [];
-    return rawImages.map((item: any, index: number) => {
+    return rawImages?.map((item: any, index: number) => {
       if (typeof item === "string")
         return {
           url: item,
@@ -239,18 +239,18 @@ const GlamCardLivePreview: React.FC<Props> = ({
   const galleryPreviews = useMemo(
     () =>
       mode === "live"
-        ? normalizedImages.map((item, idx) => {
+        ? normalizedImages?.map((item, idx) => {
             const raw = data?.images?.[idx];
             return isFile(raw) ? URL.createObjectURL(raw) : item.url;
           })
-        : normalizedImages.map((item) => item.url),
+        : normalizedImages?.map((item) => item.url),
     [mode, normalizedImages, data?.images],
   );
 
   /* ================= THUMBNAIL PREVIEWS ================= */
   const thumbnailPreviews = useMemo(
     () =>
-      normalizedImages.map((item, idx) => {
+      normalizedImages?.map((item, idx) => {
         const meta = galleryMeta[idx];
         if (item.file_type === "video") {
           if (meta?.thumbnail_file instanceof File)
@@ -287,7 +287,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   }, [normalizedImages, galleryMeta, thumbnailIndex]);
 
   const otherIndexes = useMemo(
-    () => normalizedImages.map((_, i) => i),
+    () => normalizedImages?.map((_, i) => i),
     [normalizedImages],
   );
 
