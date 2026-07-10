@@ -7,12 +7,15 @@ import { Menu, X, User, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import logo from "../../../public/header_logo.png";
+import { LogoutUser } from "@/api/Api";
 
 const navLinks = [
   { label: "Home", href: "/", id: "home" },
   { label: "Magazine", href: "/magazine", id: "magazine" },
   { label: "Podcast", href: "/podcast", id: "podcast" },
   { label: "Journal", href: "/journal", id: "journal" },
+  { label: "Access", href: "/apply/digital-card", id: "access" },
+
 ];
 
 export default function Header({ activeRoute }: any) {
@@ -23,22 +26,22 @@ export default function Header({ activeRoute }: any) {
   const router = useRouter();
   const pathname = usePathname();
 
- useEffect(() => {
-  const checkLoginStatus = () => {
-    const token = localStorage.getItem("GlamlinkaccessToken");
-    setIsLoggedIn(!!token);
-  };
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem("GlamlinkaccessToken");
+      setIsLoggedIn(!!token);
+    };
 
-  checkLoginStatus();
+    checkLoginStatus();
 
-  window.addEventListener("auth-change", checkLoginStatus);
-  window.addEventListener("storage", checkLoginStatus);
+    window.addEventListener("auth-change", checkLoginStatus);
+    window.addEventListener("storage", checkLoginStatus);
 
-  return () => {
-    window.removeEventListener("auth-change", checkLoginStatus);
-    window.removeEventListener("storage", checkLoginStatus);
-  };
-}, []);
+    return () => {
+      window.removeEventListener("auth-change", checkLoginStatus);
+      window.removeEventListener("storage", checkLoginStatus);
+    };
+  }, []);
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -60,15 +63,22 @@ export default function Header({ activeRoute }: any) {
 
   const hideAuthButton = pathname.startsWith("/dashboard");
 
- const handleLogout = () => {
-  localStorage.removeItem("GlamlinkaccessToken");
-  localStorage.removeItem("GlamlinkrefreshToken");
+  const handleLogout = async () => {
+    try {
+      await LogoutUser(); // Logout API
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      localStorage.removeItem("GlamlinkaccessToken");
+      localStorage.removeItem("GlamlinkrefreshToken");
+      localStorage.removeItem("postLoginRedirect");
 
-  window.dispatchEvent(new Event("auth-change"));
+      window.dispatchEvent(new Event("auth-change"));
 
-  setProfileDropdownOpen(false);
-  router.push("/login");
-};
+      setProfileDropdownOpen(false);
+      router.push("/login");
+    }
+  };
 
   const handleDashboard = () => {
     setProfileDropdownOpen(false);
@@ -97,11 +107,10 @@ export default function Header({ activeRoute }: any) {
               <Link
                 key={link.id}
                 href={link.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(link.href)
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive(link.href)
                     ? "text-primary bg-primary/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>
@@ -186,11 +195,10 @@ export default function Header({ activeRoute }: any) {
                 key={link.id}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`px-4 py-3 rounded-lg text-base font-medium ${
-                  isActive(link.href)
+                className={`px-4 py-3 rounded-lg text-base font-medium ${isActive(link.href)
                     ? "bg-primary/10 text-primary"
                     : "text-foreground hover:bg-muted"
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>

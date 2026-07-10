@@ -55,7 +55,7 @@ const AccessSection: React.FC = () => {
                          hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 
                          hover:scale-[1.02] active:scale-[0.98]"
             >
-              <span>Claim Your FREE Access Card</span>
+              <span>Claim Your Access Card</span>
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </button>
           </div>

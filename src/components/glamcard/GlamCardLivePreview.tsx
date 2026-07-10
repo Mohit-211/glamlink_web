@@ -74,7 +74,9 @@ const SectionBox: React.FC<{
       className="rounded-2xl p-3 sm:p-4 h-full"
       style={{
         background: "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
+        boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
       }}
+
     >
       {titleAlign === "center" ? (
         <div className="flex items-center gap-2 mb-3">
@@ -95,7 +97,10 @@ const SectionBox: React.FC<{
           </p>
         </div>
       )}
-      <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm">{children}</div>
+      <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm" style={{
+        boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+
+      }}>{children}</div>
     </div>
   </div>
 );
@@ -133,7 +138,7 @@ const DotList: React.FC<{ items: any[]; placeholder: string }> = ({
     {items.length ? (
       items.map((item, i) => (
         <li key={i} className="flex items-start gap-2.5">
-          <span className="mt-1.5 w-2 h-2 rounded-full bg-[#23B9CD] flex-shrink-0" />
+          {/* <span className="mt-1.5 w-2 h-2 rounded-full bg-[#23B9CD] flex-shrink-0" /> */}
           <span className="text-gray-700 leading-snug">
             {typeof item === "string" ? item : item?.note || item?.text || ""}
           </span>
@@ -203,7 +208,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
           : "image");
       const resolvedFileType =
         fileType === "image" &&
-        (item.file_uri || item.url || "").match(/\.(mp4|mov|webm|avi|mkv)$/i)
+          (item.file_uri || item.url || "").match(/\.(mp4|mov|webm|avi|mkv)$/i)
           ? "video"
           : fileType;
       return {
@@ -240,9 +245,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
     () =>
       mode === "live"
         ? normalizedImages?.map((item, idx) => {
-            const raw = data?.images?.[idx];
-            return isFile(raw) ? URL.createObjectURL(raw) : item.url;
-          })
+          const raw = data?.images?.[idx];
+          return isFile(raw) ? URL.createObjectURL(raw) : item.url;
+        })
         : normalizedImages?.map((item) => item.url),
     [mode, normalizedImages, data?.images],
   );
@@ -408,10 +413,12 @@ const GlamCardLivePreview: React.FC<Props> = ({
     socialMedia?.tiktok;
 
   /* ================= RENDER ================= */
-  console.log(selectedLocation, "selectedLocation");
+  const socialIconStyle = {
+    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+  };
   return (
     <div
-      className={`${mode !== "download" ? "min-h-screen" : ""} flex flex-col bg-[#F0F7FF]`}
+      className={`${mode !== "download" ? "min-h-screen" : ""} flex flex-col`}
     >
       {/* ===== MOBILE STICKY TOP BAR (view mode) ===== */}
       {mode === "view" && (
@@ -452,8 +459,8 @@ const GlamCardLivePreview: React.FC<Props> = ({
         <div
           className="w-full max-w-lg lg:max-w-3xl p-[2px] rounded-2xl"
           style={{
-            background:
-              "linear-gradient(135deg, #23B9CD, #a8edea 50%, #23B9CD)",
+            background: "linear-gradient(135deg, #23B9CD, #a8edea 50%, #23B9CD)",
+            boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
           }}
         >
           <div className="rounded-2xl bg-[#F4F9FF] p-4 sm:p-6 shadow-sm">
@@ -469,7 +476,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
               <div className="hidden lg:flex justify-end gap-2 mb-3">
                 <button
                   onClick={() => downloadVCF(data)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#23B9CD] hover:bg-[#1ea8b5] text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#23B9CD] hover:bg-[#1ea8b5] text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap" style={socialIconStyle}
                 >
                   <svg
                     className="w-4 h-4 flex-shrink-0"
@@ -488,7 +495,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </button>
                 <button
                   onClick={() => setIsQrModalOpen(true)}
-                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200"
+                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200" style={socialIconStyle}
                 >
                   <QrCode size={18} strokeWidth={2.5} />
                 </button>
@@ -595,7 +602,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     <>
                       <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm">
                         {normalizedImages[thumbnailIndex]?.file_type ===
-                        "video" ? (
+                          "video" ? (
                           /* ✅ iOS FIX: playsInline + preload + key */
                           <video
                             key={galleryPreviews[thumbnailIndex]}
@@ -618,7 +625,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
                               normalizedImages[thumbnailIndex]?.thumbnail_uri ||
                               galleryPreviews[thumbnailIndex]
                             }
-                            className="h-full w-full object-cover transition hover:scale-105 duration-300"
+                            className="h-full w-full object-cover transition hover:scale-105 duration-300" style={{
+                              boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+
+                            }}
                             alt="Featured work"
                           />
                         )}
@@ -629,7 +639,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             <button
                               key={index}
                               onClick={() => setThumbnailIndex(index)}
-                              className={`relative h-14 w-14 overflow-hidden rounded-lg border shadow-sm flex-shrink-0 ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}`}
+                              className={`relative h-14 w-14 overflow-hidden rounded-lg border shadow-sm flex-shrink-0 ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}`} style={{
+                                boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+
+                              }}
                             >
                               <img
                                 src={thumbnailPreviews[index]}
@@ -663,6 +676,8 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     style={{
                       background:
                         "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
+                      boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+
                     }}
                   >
                     {data.locations?.length ? (
@@ -691,16 +706,16 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             )}
                             <p className="text-gray-600 leading-relaxed">
                               {selectedLocation.location_type ===
-                              "exact_address"
+                                "exact_address"
                                 ? selectedLocation.address?.trim() ||
-                                  "Address not provided"
+                                "Address not provided"
                                 : [
-                                    selectedLocation.city?.trim(),
-                                    selectedLocation.state?.trim(),
-                                    selectedLocation.area?.trim(),
-                                  ]
-                                    .filter(Boolean)
-                                    .join(", ") || "Location not fully set"}
+                                  selectedLocation.city?.trim(),
+                                  selectedLocation.state?.trim(),
+                                  selectedLocation.area?.trim(),
+                                ]
+                                  .filter(Boolean)
+                                  .join(", ") || "Location not fully set"}
                             </p>
                             {(selectedLocation?.phone || data.phone) &&
                               data.is_phone_visible && (
@@ -716,7 +731,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           </div>
                         )}
                         {mapSrc ? (
-                          <div className="relative rounded-xl overflow-hidden shadow-sm">
+                          <div className="relative rounded-xl overflow-hidden shadow-sm" style={{
+                            boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+
+                          }}>
                             <iframe
                               title="Business Location Map"
                               className="w-full h-48 sm:h-52"
@@ -730,7 +748,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                               href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 text-sm whitespace-nowrap"
+                              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 text-sm whitespace-nowrap" style={{boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)"}}
                             >
                               <svg
                                 className="w-4 h-4"
@@ -763,7 +781,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         </p>
                         <span className="flex-1 h-px bg-gray-400/60" />
                       </div>
-                      <div className="rounded-xl bg-white p-4 shadow-sm">
+                      <div className="rounded-xl bg-white p-4 shadow-sm" style={{
+                        boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+
+                      }}>
                         {data.business_hour.length !== 0 ? (
                           <ul className="space-y-1.5 text-sm">
                             {data.business_hour.map(
@@ -955,14 +976,14 @@ const GlamCardLivePreview: React.FC<Props> = ({
                       <p className="text-gray-600 text-sm leading-relaxed">
                         {selectedLocation.location_type === "exact_address"
                           ? selectedLocation.address?.trim() ||
-                            "Address not provided"
+                          "Address not provided"
                           : [
-                              selectedLocation.city?.trim(),
-                              selectedLocation.state?.trim(),
-                              selectedLocation.area?.trim(),
-                            ]
-                              .filter(Boolean)
-                              .join(", ")}
+                            selectedLocation.city?.trim(),
+                            selectedLocation.state?.trim(),
+                            selectedLocation.area?.trim(),
+                          ]
+                            .filter(Boolean)
+                            .join(", ")}
                       </p>
                       {(selectedLocation?.phone || data.phone) &&
                         data.is_phone_visible && (
@@ -1068,6 +1089,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 className="rounded-2xl p-[2px] mt-3"
                 style={{
                   background: "linear-gradient(135deg, #23B9CD33, #a8edea55)",
+
                 }}
               >
                 <div
@@ -1075,6 +1097,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   style={{
                     background:
                       "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
+                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
                   }}
                 >
                   <div className="flex items-center gap-2 mb-3">
@@ -1084,7 +1107,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     </p>
                     <span className="flex-1 h-px bg-gray-400/60" />
                   </div>
-                  <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm">
+                  <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm" style={{
+                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                  }}>
                     <DotList
                       items={importantInfoArray}
                       placeholder="Important information will appear here"
@@ -1107,6 +1132,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   style={{
                     background:
                       "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
+                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
                   }}
                 >
                   <div className="flex items-center gap-2 mb-3">
@@ -1116,7 +1142,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     </p>
                     <span className="flex-1 h-px bg-gray-400/60" />
                   </div>
-                  <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm space-y-2">
+                  <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm space-y-2" style={{
+                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+
+                  }}>
                     {otherLinks
                       .filter((link: any) => link?.url)
                       .map(
@@ -1129,7 +1158,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-700 transition hover:border-teal-300 hover:bg-teal-50 active:scale-[0.98]"
+                            className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-700 transition hover:border-teal-300 hover:bg-teal-50 active:scale-[0.98]" style={socialIconStyle}
                           >
                             <ExternalLink className="h-4 w-4 text-teal-600 flex-shrink-0" />
                             <span className="truncate font-medium">
@@ -1148,7 +1177,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
               <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent to-teal-400" />
               <button
                 onClick={() => setIsBookingModalOpen(true)}
-                className="flex items-center gap-2 bg-[#23B9CD] hover:bg-[#1ea8b5] active:scale-95 text-white px-7 py-2.5 rounded-full text-sm font-bold tracking-widest transition-all whitespace-nowrap uppercase shadow-md shadow-[#23B9CD]/30"
+                className="flex items-center gap-2 bg-[#23B9CD] hover:bg-[#1ea8b5] active:scale-95 text-white px-7 py-2.5 rounded-full text-sm font-bold tracking-widest transition-all whitespace-nowrap uppercase shadow-md shadow-[#23B9CD]/30" style={{
+                  boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                }}
               >
                 <svg
                   className="w-4 h-4"
@@ -1171,69 +1202,89 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
             {/* ===== SOCIAL ICONS ===== */}
             <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
-              {data?.website && (
-                <a
-                  href={data.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={data.website}
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
-                  <Globe className="w-5 h-5 text-gray-500 hover:text-teal-600 transition" />
-                </a>
-              )}
-              {allInstagramHandles.map(({ key, url }) => (
-                <a
-                  key={key}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={url}
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
-                  <Instagram className="w-5 h-5 text-gray-500 hover:text-pink-600 transition" />
-                </a>
-              ))}
-              {socialMedia?.facebook && (
-                <a
-                  href={socialMedia.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
-                  <Facebook className="w-5 h-5 text-gray-500 hover:text-blue-600 transition" />
-                </a>
-              )}
-              {socialMedia?.linkedin && (
-                <a
-                  href={socialMedia.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
-                  <Linkedin className="w-5 h-5 text-gray-500 hover:text-blue-700 transition" />
-                </a>
-              )}
-              {socialMedia?.youtube && (
-                <a
-                  href={socialMedia.youtube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
-                  <Youtube className="w-5 h-5 text-gray-500 hover:text-red-600 transition" />
-                </a>
-              )}
-              {socialMedia?.tiktok && (
-                <a
-                  href={socialMedia.tiktok}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
-                  <Music2 className="w-5 h-5 text-gray-500 hover:text-black transition" />
-                </a>
-              )}
+
+
+              <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
+                {data?.website && (
+                  <a
+                    href={data.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={data.website}
+                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
+                    style={socialIconStyle}
+                  >
+                    <Globe className="w-5 h-5 text-gray-500 hover:text-teal-600 transition-colors duration-300" />
+                  </a>
+                )}
+
+                {allInstagramHandles.map(({ key, url }) => (
+                  <a
+                    key={key}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={url}
+                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
+                    style={socialIconStyle}
+                  >
+                    <Instagram className="w-5 h-5 text-gray-500 hover:text-pink-600 transition-colors duration-300" />
+                  </a>
+                ))}
+
+                {socialMedia?.facebook && (
+                  <a
+                    href={socialMedia.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Facebook"
+                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
+                    style={socialIconStyle}
+                  >
+                    <Facebook className="w-5 h-5 text-gray-500 hover:text-blue-600 transition-colors duration-300" />
+                  </a>
+                )}
+
+                {socialMedia?.linkedin && (
+                  <a
+                    href={socialMedia.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="LinkedIn"
+                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
+                    style={socialIconStyle}
+                  >
+                    <Linkedin className="w-5 h-5 text-gray-500 hover:text-blue-700 transition-colors duration-300" />
+                  </a>
+                )}
+
+                {socialMedia?.youtube && (
+                  <a
+                    href={socialMedia.youtube}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="YouTube"
+                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
+                    style={socialIconStyle}
+                  >
+                    <Youtube className="w-5 h-5 text-gray-500 hover:text-red-600 transition-colors duration-300" />
+                  </a>
+                )}
+
+                {socialMedia?.tiktok && (
+                  <a
+                    href={socialMedia.tiktok}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="TikTok"
+                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
+                    style={socialIconStyle}
+                  >
+                    <Music2 className="w-5 h-5 text-gray-500 hover:text-black transition-colors duration-300" />
+                  </a>
+                )}
+
+              </div>
             </div>
           </div>
         </div>

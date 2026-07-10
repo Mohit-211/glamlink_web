@@ -31,7 +31,7 @@ const DigitalCardSection: React.FC = () => {
             </p>
 
             <button className="mt-10 rounded-full bg-teal-500 px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-teal-600">
-              Claim Your FREE Digital Card
+              Claim Your Digital Card
             </button>
           </div>
 

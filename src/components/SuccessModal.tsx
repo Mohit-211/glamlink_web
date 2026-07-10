@@ -4,23 +4,33 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onPayNow?: () => void;
+  title?: string;
+  message?: React.ReactNode;
 }
 
-const SuccessModal: React.FC<Props> = ({ open, onClose, onPayNow }) => {
+const SuccessModal: React.FC<Props> = ({
+  open,
+  onClose,
+  onPayNow,
+  title = "Success",
+  message = (
+    <>
+      Your business card was created successfully.
+      <br />
+      <strong>Please check your email.</strong>
+    </>
+  ),
+}) => {
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl text-center">
         <h2 className="text-xl font-semibold text-gray-900">
-          ✅ Success
+          ✅ {title}
         </h2>
 
-        <p className="mt-3 text-gray-600">
-          Your business card was created successfully.
-          <br />
-          <strong>Please check your email.</strong>
-        </p>
+        <p className="mt-3 text-gray-600">{message}</p>
 
         <div className="mt-6 flex gap-3">
           <button

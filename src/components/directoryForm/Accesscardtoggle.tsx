@@ -41,14 +41,14 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
 
     <div className="flex-1 min-w-0">
       <h3 className="font-poppins text-[17px] font-semibold text-[#1A3A42] mb-1.5">
-        Your FREE Access Digital Business Card{' '}
-        <span className="
+        Your Access Digital Business Card{' '}
+        {/* <span className="
           inline-block bg-[#3BBDD4] text-white
           text-[10px] font-bold tracking-widest uppercase
           px-2.5 py-0.5 rounded-full align-middle ml-1
         ">
           FREE
-        </span>
+        </span> */}
       </h3>
 
       <p className="text-[13px] text-[#4A7A88] leading-[1.65] mb-3.5">
@@ -95,7 +95,7 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
         </div>
         <div>
           <p className="text-sm font-bold text-[#1A3A42]">
-            Yes — create my FREE Access digital business card & map listing
+            Yes — create my Access digital business card & map listing
           </p>
           <p className="text-[11px] text-[#7AAAB8] mt-0.5">
             No credit card · Activates instantly on approval

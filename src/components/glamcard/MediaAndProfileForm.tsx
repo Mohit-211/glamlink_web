@@ -47,15 +47,117 @@ const getThumbnailUrl = (item: any): string => {
   return "";
 };
 
+/* Crop modal can be applied to three different targets. "gallery" crops
+   are processed one file at a time via galleryCropQueue so multi-select
+   uploads still get cropped individually before being added. */
+type CropContext = "profile" | "gallery" | "thumbnail";
+
+const MAX_VIDEO_SECONDS = 60;
+
+const isMp4File = (file: File): boolean =>
+  file.type === "video/mp4" || /\.mp4$/i.test(file.name);
+
+// Reads duration via a throwaway <video> element's loaded metadata —
+// no upload or decode needed, just enough to read the header.
+const getVideoDuration = (file: File): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const videoEl = document.createElement("video");
+    videoEl.preload = "metadata";
+    videoEl.onloadedmetadata = () => {
+      URL.revokeObjectURL(url);
+      resolve(videoEl.duration);
+    };
+    videoEl.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Could not read video metadata"));
+    };
+    videoEl.src = url;
+  });
+};
+
 const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
-  /* ================= PROFILE IMAGE ================= */
+  /* ================= CROP MODAL (shared) ================= */
 
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [profilePreview, setProfilePreview] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
   const [isCropOpen, setIsCropOpen] = useState(false);
+  const [cropAspect, setCropAspect] = useState(16 / 9);
+
+  const [cropContext, setCropContext] = useState<CropContext>("profile");
+  const [cropThumbnailId, setCropThumbnailId] = useState<string | null>(null);
+  const [galleryCropQueue, setGalleryCropQueue] = useState<File[]>([]);
+
+  const onCropComplete = useCallback((_: any, pixels: any) => {
+    setCroppedAreaPixels(pixels);
+  }, []);
+
+  const openCropper = (
+    file: File,
+    context: CropContext,
+    aspect: number,
+    thumbnailId?: string
+  ) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageSrc(reader.result as string);
+      setCropContext(context);
+      setCropAspect(aspect);
+      setCropThumbnailId(thumbnailId ?? null);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setIsCropOpen(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const cancelCrop = () => {
+    setIsCropOpen(false);
+    setGalleryCropQueue([]);
+    setCropThumbnailId(null);
+  };
+
+  const applyCrop = async () => {
+    if (!imageSrc || !croppedAreaPixels) return;
+    const croppedFile = await getCroppedImg(imageSrc, croppedAreaPixels);
+
+    if (cropContext === "profile") {
+      setData((prev) => ({ ...prev, profile_image: croppedFile }));
+      setIsCropOpen(false);
+      return;
+    }
+
+    if (cropContext === "thumbnail") {
+      if (cropThumbnailId) {
+        setData((prev) => ({
+          ...prev,
+          gallery_meta: prev.gallery_meta.map((m) =>
+            m.id === cropThumbnailId ? { ...m, thumbnail_file: croppedFile } : m
+          ),
+        }));
+      }
+      setIsCropOpen(false);
+      setCropThumbnailId(null);
+      return;
+    }
+
+    // cropContext === "gallery"
+    addImagesToGallery([croppedFile]);
+
+    if (galleryCropQueue.length) {
+      const [next, ...rest] = galleryCropQueue;
+      setGalleryCropQueue(rest);
+      openCropper(next, "gallery", 16 / 9);
+    } else {
+      setIsCropOpen(false);
+    }
+  };
+
+  /* ================= PROFILE IMAGE ================= */
+
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (data.profile_image instanceof File) {
@@ -71,32 +173,18 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
     }
   }, [data.profile_image]);
 
-  const onCropComplete = useCallback((_: any, pixels: any) => {
-    setCroppedAreaPixels(pixels);
-  }, []);
-
   const handleProfileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImageSrc(reader.result as string);
-      setIsCropOpen(true);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const applyCrop = async () => {
-    if (!imageSrc || !croppedAreaPixels) return;
-    const croppedFile = await getCroppedImg(imageSrc, croppedAreaPixels);
-    setData((prev) => ({ ...prev, profile_image: croppedFile }));
-    setIsCropOpen(false);
+    openCropper(file, "profile", 16 / 9);
+    e.target.value = "";
   };
 
   /* ================= GALLERY ================= */
 
   const [galleryPreview, setGalleryPreview] = useState<string[]>([]);
   const [videoThumbPreviews, setVideoThumbPreviews] = useState<Record<string, string>>({});
+  const [mediaError, setMediaError] = useState<string | null>(null);
 
   const gallery_meta: GalleryMetaItem[] = data.gallery_meta || [];
 
@@ -137,10 +225,8 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
     };
   }, [data.gallery_meta, data.images]);
 
-  const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
-
+  // Shared by direct video uploads and cropped-gallery-image results.
+  const addImagesToGallery = (files: File[]) => {
     setData((prev) => {
       const existingImages = prev.images || [];
       const allowed = files.slice(0, 5 - existingImages.length);
@@ -159,6 +245,57 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
         gallery_meta: [...(prev.gallery_meta || []), ...newMeta],
       };
     });
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    setMediaError(null);
+
+    const existingCount = data.images?.length || 0;
+    const allowed = files.slice(0, 5 - existingCount);
+    if (!allowed.length) {
+      e.target.value = "";
+      return;
+    }
+
+    const videoFiles = allowed.filter((f) => f.type?.startsWith("video/"));
+    const imageFiles = allowed.filter((f) => !f.type?.startsWith("video/"));
+
+    // Videos aren't croppable, but they must be validated first: .mp4 only,
+    // under 60 seconds. Invalid ones are skipped with an inline error.
+    const validVideos: File[] = [];
+    for (const file of videoFiles) {
+      if (!isMp4File(file)) {
+        setMediaError(`"${file.name}" isn't an .mp4 file — only .mp4 videos are supported.`);
+        continue;
+      }
+      try {
+        const duration = await getVideoDuration(file);
+        if (duration > MAX_VIDEO_SECONDS) {
+          setMediaError(
+            `"${file.name}" is ${Math.round(duration)}s long — videos must be under 60 seconds.`
+          );
+          continue;
+        }
+      } catch {
+        setMediaError(`Couldn't read "${file.name}" — please try a different video.`);
+        continue;
+      }
+      validVideos.push(file);
+    }
+
+    if (validVideos.length) addImagesToGallery(validVideos);
+
+    // Images go through the shared crop modal, one at a time.
+    if (imageFiles.length) {
+      const [first, ...rest] = imageFiles;
+      setGalleryCropQueue(rest);
+      openCropper(first, "gallery", 16 / 9);
+    }
+
+    e.target.value = "";
   };
 
   const removeMedia = (id: string) => {
@@ -202,13 +339,8 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    setData((prev) => ({
-      ...prev,
-      gallery_meta: prev.gallery_meta.map((m) =>
-        m.id === id ? { ...m, thumbnail_file: file } : m
-      ),
-    }));
+    openCropper(file, "thumbnail", 16 / 9, id);
+    e.target.value = "";
   };
 
   /* ================= RENDER ================= */
@@ -246,18 +378,27 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
 
       {/* GALLERY HEADER */}
       <div className="flex justify-between items-center pt-2">
-        <label className={labelClass}>Gallery (Max 5)</label>
+        <div>
+          <label className={labelClass}>Gallery (Max 5)</label>
+          <p className="text-xs text-gray-400">Videos must be .mp4 and under 60 seconds</p>
+        </div>
         <label className="cursor-pointer rounded-lg bg-teal-500 px-4 py-2 text-white hover:bg-teal-600">
           + Upload
           <input
             type="file"
             hidden
             multiple
-            accept="image/*,video/*"
+            accept="image/*,video/mp4"
             onChange={handleGalleryUpload}
           />
         </label>
       </div>
+
+      {mediaError && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+          {mediaError}
+        </p>
+      )}
 
       {/* GALLERY GRID */}
       {gallery_meta.length ? (
@@ -403,16 +544,22 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
         <p className="text-gray-400 text-sm">No media uploaded</p>
       )}
 
-      {/* CROP MODAL */}
+      {/* CROP MODAL — shared by profile photo, gallery photos, and video thumbnails */}
       {isCropOpen && (
-        <Modal onClose={() => setIsCropOpen(false)}>
+        <Modal onClose={cancelCrop}>
           <div className="w-[90vw] max-w-md space-y-4">
+            {cropContext === "gallery" && galleryCropQueue.length > 0 && (
+              <p className="text-center text-xs text-gray-500">
+                {galleryCropQueue.length} more photo
+                {galleryCropQueue.length > 1 ? "s" : ""} to crop after this one
+              </p>
+            )}
             <div className="relative h-80 bg-black rounded overflow-hidden">
               <Cropper
                 image={imageSrc!}
                 crop={crop}
                 zoom={zoom}
-                aspect={1}
+                aspect={cropAspect}
                 onCropChange={setCrop}
                 onCropComplete={onCropComplete}
                 onZoomChange={setZoom}
@@ -429,7 +576,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
             />
             <div className="flex gap-3">
               <button
-                onClick={() => setIsCropOpen(false)}
+                onClick={cancelCrop}
                 className="flex-1 border rounded py-2"
               >
                 Cancel

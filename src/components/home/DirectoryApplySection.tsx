@@ -76,7 +76,7 @@ const DirectoryApplySection: React.FC = () => {
               <input type="checkbox" checked readOnly className="mt-1 accent-[#24bbcb]" />
               <p className="text-sm text-gray-700 leading-relaxed">
                 Yes, create my <span className="font-semibold text-[#24bbcb]">
-                FREE Access digital business card
+                Access digital business card
                 </span> and map listing.
               </p>
             </div>

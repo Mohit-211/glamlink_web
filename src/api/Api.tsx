@@ -80,9 +80,8 @@ export const getBusinessCardBySlug = async (
 /* 📌 Search Business Card */
 /* ============================= */
 export const searchBusinessCard = async (params: {
-  specialty?: string;
-  location?: string;
-  name?: string;
+  search?: string;
+
 }) => {
   const { data } = await api.get(
     "businessCard/search",
@@ -163,7 +162,6 @@ export const getCitiesByState = async (state_id: string | number) => {
   if (!state_id) {
     return { data: [] };
   }
-  
   // If already a number, use it directly
   if (typeof state_id === 'number') {
     try {
@@ -174,7 +172,6 @@ export const getCitiesByState = async (state_id: string | number) => {
       return { data: [] };
     }
   }
-  
   // Try to parse as numeric string first
   const numericId = parseInt(state_id, 10);
   if (!isNaN(numericId)) {
@@ -186,7 +183,6 @@ export const getCitiesByState = async (state_id: string | number) => {
       return { data: [] };
     }
   }
-  
   // If not numeric, it might be a state abbreviation or name - log and return empty
   console.warn(`State value "${state_id}" is not numeric. Please ensure state is stored as numeric ID.`);
   return { data: [] };
@@ -226,6 +222,16 @@ export const loginUser = async (payload: {
       },
     }
   );
+  return data;
+};
+export const LogoutUser = async () => {
+  const { data } = await api.get("user/auth/logout", {
+    headers: {
+      "x-access-token": getToken(),
+      role_id: "7",
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
+  });
   return data;
 };
 export const sendOtp = async (payload: {
@@ -270,6 +276,22 @@ export const verifyOtp = async (payload: {
     console.error("Payload:", payload);
     throw error;
   }
+};
+export const ChangePassword = async (payload: {
+  old_password: string;
+  new_password: string;
+  confirm_password: string;
+}) => {
+  const { data } = await api.post(
+    "user/auth/reset-password",
+    payload,
+    {
+      headers: {
+        "x-access-token": getToken(),
+      },
+    }
+  );
+  return data;
 };
 /* ============================= */
 /* 📌 Single Business Card For Dashboard */
@@ -347,6 +369,18 @@ export const deleteAddress = async (
 export const addShippingAddress = async (payload: any) => {
   const { data } = await api.post(
     "businessCard/shipping-rate",
+    payload,
+    {
+      headers: {
+        "x-access-token": getToken(),
+      },
+    }
+  );
+  return data;
+};
+export const SelectAddressApi = async (payload: any) => {
+  const { data } = await api.post(
+    "businessCard/select-address",
     payload,
     {
       headers: {

@@ -292,6 +292,7 @@ export function AddressTab() {
   const [editError, setEditError] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<NewFormState> | null>(null);
   const [deletingId, setDeletingId] = useState<string | number | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   /* ── fetch ── */
   const fetchAddresses = useCallback(async () => {
     setLoading(true);
@@ -407,22 +408,40 @@ export function AddressTab() {
       setEditSaving(false);
     }
   }
-  /* ── delete ── */
+  /* ── delete ──
+     Fixed: this previously never set/cleared `deletingId`, so the button's
+     loading state never actually rendered and there was nothing stopping a
+     double-click from firing two deletes at once. Also now callable
+     straight from the card (not just from inside edit mode), with a confirm
+     step first since it's a destructive action. */
   const handleDelete = async (addressId: string | number) => {
+    if (deletingId) return; // guard against double-clicks / concurrent deletes
+    const confirmed = window.confirm('Remove this address? This can’t be undone.');
+    if (!confirmed) return;
+
+    setDeletingId(addressId);
+    setDeleteError(null);
     try {
       const res = await deleteAddress(addressId);
-      if (res?.success) {
-        setAddresses((prev) =>
-          prev.filter((item) => item.id !== addressId)
-        );
-        setEditing(null);
-        setEditForm(null);
+      if (res?.success !== false) {
+        setAddresses((prev) => prev.filter((item) => item.id !== addressId));
+        if (editing === addressId) {
+          setEditing(null);
+          setEditForm(null);
+        }
         message.success("Address deleted successfully.");
       } else {
-        alert(res?.message || "Delete failed");
+        setDeleteError(res?.message || "Failed to delete address.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Delete Error:", error);
+      setDeleteError(
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to delete address. Please try again."
+      );
+    } finally {
+      setDeletingId(null);
     }
   };
   /* ── after modal saves ── */
@@ -440,12 +459,12 @@ export function AddressTab() {
             {loading ? 'Loading…' : `${addresses.length} address${addresses.length !== 1 ? 'es' : ''} saved`}
           </p>
         </div>
-        {/* <button
+        <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition"
         >
           <Plus className="h-4 w-4" /> Add
-        </button> */}
+        </button>
       </div>
       {/* Fetch error */}
       {fetchError && (
@@ -454,6 +473,16 @@ export function AddressTab() {
           <span>{fetchError}</span>
           <button onClick={fetchAddresses} className="ml-auto text-xs font-semibold underline underline-offset-2">
             Retry
+          </button>
+        </div>
+      )}
+      {/* Delete error (surfaced at list level since delete can be triggered from any card) */}
+      {deleteError && (
+        <div className="flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 mb-5 text-sm text-red-700">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span>{deleteError}</span>
+          <button onClick={() => setDeleteError(null)} className="ml-auto text-xs font-semibold underline underline-offset-2">
+            Dismiss
           </button>
         </div>
       )}
@@ -516,16 +545,33 @@ export function AddressTab() {
                         )}
                       </div>
                     </div>
-                    <button
-                      onClick={() =>
-                        isEditing
-                          ? (setEditing(null), setEditForm(null), setEditError(null))
-                          : openEdit(addr)
-                      }
-                      className="text-xs font-semibold text-primary hover:underline underline-offset-2 transition shrink-0 ml-3"
-                    >
-                      {isEditing ? 'Close' : 'Edit'}
-                    </button>
+                    {/* Quick actions — Edit + Delete, both available without opening edit mode first */}
+                    <div className="flex items-center gap-3 shrink-0 ml-3">
+                      <button
+                        onClick={() =>
+                          isEditing
+                            ? (setEditing(null), setEditForm(null), setEditError(null))
+                            : openEdit(addr)
+                        }
+                        disabled={isDeleting}
+                        className="text-xs font-semibold text-primary hover:underline underline-offset-2 transition disabled:opacity-50"
+                      >
+                        {isEditing ? 'Close' : 'Edit'}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(addr.id)}
+                        disabled={isDeleting || (editSaving && isEditing)}
+                        aria-label="Delete address"
+                        className="flex items-center gap-1 text-xs font-semibold text-red-600 hover:underline underline-offset-2 transition disabled:opacity-50"
+                      >
+                        {isDeleting ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-3.5 w-3.5" />
+                        )}
+                        {isDeleting ? 'Removing…' : 'Delete'}
+                      </button>
+                    </div>
                   </div>
                   <p className="text-xs text-muted-foreground pl-10">
                     {addr?.user_city?.name || addr.city_name}, {addr?.user_state?.name || addr.state_name} · {addr.postal_code}

@@ -158,7 +158,7 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
 )}
 
       {/* ================= ELITE SETUP ================= */}
-      <label className="flex items-start gap-2 rounded-lg border border-gray-300 p-4 text-sm">
+      {/* <label className="flex items-start gap-2 rounded-lg border border-gray-300 p-4 text-sm">
         <input
           type="checkbox"
           checked={data.elite_setup}
@@ -176,7 +176,7 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
           curate your first clips, photo albums, and service menu so you can
           launch instantly.
         </span>
-      </label>
+      </label> */}
     </section>
   );
 };

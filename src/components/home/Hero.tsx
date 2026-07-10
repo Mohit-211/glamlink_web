@@ -156,46 +156,32 @@ const Hero = () => {
   }, [searchQuery]);
 
   // ─── Sequential search ───────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!debouncedQuery) {
-      setProfessionals([]);
-      setShowDropdown(false);
-      return;
+// ─── Sequential search ───────────────────────────────────────────────────────
+useEffect(() => {
+  if (!debouncedQuery) {
+    setProfessionals([]);
+    setShowDropdown(false);
+    return;
+  }
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await searchBusinessCard({ search: debouncedQuery });
+      const result = res?.data?.data || res?.data || [];
+
+      setProfessionals(result);
+      setShowDropdown(true);
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        let result: any[] = [];
+  fetchData();
+}, [debouncedQuery]);
 
-        const specialtyRes = await searchBusinessCard({
-          specialty: debouncedQuery,
-        });
-        result = specialtyRes?.data?.data || specialtyRes?.data || [];
-
-        if (!result.length) {
-          const locationRes = await searchBusinessCard({
-            location: debouncedQuery,
-          });
-          result = locationRes?.data?.data || locationRes?.data || [];
-        }
-
-        if (!result.length) {
-          const nameRes = await searchBusinessCard({ name: debouncedQuery });
-          result = nameRes?.data?.data || nameRes?.data || [];
-        }
-
-        setProfessionals(result);
-        setShowDropdown(true);
-      } catch (error) {
-        console.error("Search error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [debouncedQuery]);
 
   // ─── Select → fetch full profile ─────────────────────────────────────────────
   const handleSelectProfessional = async (pro: any) => {

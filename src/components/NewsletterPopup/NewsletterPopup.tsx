@@ -81,11 +81,11 @@ export default function NewsletterPopup({
       setLoading(false);
     }
   };
-if (!isOpen) return null;
+  if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-[999999]">
       {/* Overlay */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/50 backdrop-blur-md"
         onClick={isFormValid && !subscribed ? handleClose : undefined}
       />
@@ -95,19 +95,18 @@ if (!isOpen) return null;
         <div className="relative w-full max-w-lg rounded-3xl bg-card shadow-2xl overflow-hidden border border-border/30">
           {/* Background gradient decoration */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-primary/10 to-transparent rounded-full blur-3xl -z-10" />
-          
+
           <div className="relative p-8 md:p-10">
-            {/* {!subscribed && (
+            {
               <button
                 onClick={handleClose}
-                disabled={!isFormValid}
                 className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-secondary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Close"
                 title={!isFormValid ? "Please fill in the form first" : "Close"}
               >
                 <X size={20} />
               </button>
-            )} */}
+            }
 
             {!subscribed ? (
               <>
