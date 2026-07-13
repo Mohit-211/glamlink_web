@@ -731,7 +731,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           </div>
                         )}
                         {mapSrc ? (
-                          <div className="rounded-xl overflow-hidden shadow-sm" style={{
+                          <div className="relative rounded-xl overflow-hidden shadow-sm" style={{
                             boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
 
                           }}>
@@ -994,7 +994,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     </div>
                   )}
                   {mapSrc ? (
-                    <div className="rounded-xl overflow-hidden shadow-sm">
+                    <div className="relative rounded-xl overflow-hidden shadow-sm">
                       <iframe
                         title="Business Location Map"
                         className="w-full h-40"
