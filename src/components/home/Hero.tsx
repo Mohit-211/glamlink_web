@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, MapPin, Loader2, UserCheck, AlertCircle } from "lucide-react";
 import {
@@ -9,27 +8,23 @@ import {
 } from "@/api/Api";
 import ProfessionalsMap from "./ProfessionalsMap";
 import BusinessCardPage from "../BusinessCardPage";
-
 // ─── Leaflet types (loaded dynamically) ───────────────────────────────────────
 declare global {
   interface Window {
     L: any;
   }
 }
-
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [professionals, setProfessionals] = useState<any[]>([]);
   const [mapProfessionals, setMapProfessionals] = useState<any[]>([]);
-
   const [selectedProfessional, setSelectedProfessional] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedLocationIndex, setSelectedLocationIndex] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   // Map refs
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -37,31 +32,24 @@ const Hero = () => {
   const selectedMarkerRef = useRef<any>(null);
   const leafletLoadedRef = useRef(false);
   // ─── Load Leaflet CSS + JS dynamically ───────────────────────────────────────
-
   // ─── Init Leaflet map ─────────────────────────────────────────────────────────
-
   // ─── When a professional is selected, fly to their location + highlight marker ─
   useEffect(() => {
     if (!selectedProfessional || !mapInstanceRef.current || !window.L) return;
     const L = window.L;
     const map = mapInstanceRef.current;
-
     const locations = selectedProfessional?.locations || [];
     const loc = locations[selectedLocationIndex] || locations[0];
     if (!loc) return;
-
     const lat = parseFloat(loc.latitude || loc.lat);
     const lng = parseFloat(loc.longitude || loc.lng || loc.lon);
-
     if (!isNaN(lat) && !isNaN(lng)) {
       map.flyTo([lat, lng], 15, { duration: 1.2 });
-
       // Remove previous selected marker
       if (selectedMarkerRef.current) {
         selectedMarkerRef.current.remove();
         selectedMarkerRef.current = null;
       }
-
       // Add a highlighted marker for selected professional
       const selectedIcon = L.divIcon({
         className: "",
@@ -99,7 +87,6 @@ const Hero = () => {
         iconAnchor: [23, 56],
         popupAnchor: [0, -58],
       });
-
       const marker = L.marker([lat, lng], { icon: selectedIcon })
         .addTo(map)
         .bindPopup(
@@ -107,7 +94,6 @@ const Hero = () => {
           { closeButton: false }
         )
         .openPopup();
-
       selectedMarkerRef.current = marker;
     } else {
       // Fallback: geocode via display string
@@ -132,7 +118,6 @@ const Hero = () => {
         .catch(() => { });
     }
   }, [selectedProfessional, selectedLocationIndex]);
-
   // ─── Close dropdown on outside click ────────────────────────────────────────
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -146,7 +131,6 @@ const Hero = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
   // ─── Debounce ────────────────────────────────────────────────────────────────
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -154,35 +138,29 @@ const Hero = () => {
     }, 500);
     return () => clearTimeout(timer);
   }, [searchQuery]);
-
   // ─── Sequential search ───────────────────────────────────────────────────────
-// ─── Sequential search ───────────────────────────────────────────────────────
-useEffect(() => {
-  if (!debouncedQuery) {
-    setProfessionals([]);
-    setShowDropdown(false);
-    return;
-  }
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const res = await searchBusinessCard({ search: debouncedQuery });
-      const result = res?.data?.data || res?.data || [];
-
-      setProfessionals(result);
-      setShowDropdown(true);
-    } catch (error) {
-      console.error("Search error:", error);
-    } finally {
-      setLoading(false);
+  // ─── Sequential search ───────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!debouncedQuery) {
+      setProfessionals([]);
+      setShowDropdown(false);
+      return;
     }
-  };
-
-  fetchData();
-}, [debouncedQuery]);
-
-
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await searchBusinessCard({ search: debouncedQuery });
+        const result = res?.data?.data || res?.data || [];
+        setProfessionals(result);
+        setShowDropdown(true);
+      } catch (error) {
+        console.error("Search error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [debouncedQuery]);
   // ─── Select → fetch full profile ─────────────────────────────────────────────
   const handleSelectProfessional = async (pro: any) => {
     console.log(pro, "pro")
@@ -190,7 +168,6 @@ useEffect(() => {
     try {
       setShowDropdown(false);
       setSearchQuery(pro.name || "");
-
       const res = await getBusinessCardBySlug(slug);
       const fullData = res?.data?.data || res?.data;
       setSelectedProfessional(fullData);
@@ -198,7 +175,6 @@ useEffect(() => {
       console.error("Profile fetch error:", error);
     }
   };
-
   // ─── Set primary location index ───────────────────────────────────────────────
   useEffect(() => {
     if (selectedProfessional?.locations?.length) {
@@ -208,7 +184,6 @@ useEffect(() => {
       setSelectedLocationIndex(primaryIdx >= 0 ? primaryIdx : 0);
     }
   }, [selectedProfessional]);
-
   // ─── Fetch mapProfessionals ───────────────────────────────────────────────────
   useEffect(() => {
     const fetchProfessionals = async () => {
@@ -228,7 +203,6 @@ useEffect(() => {
     };
     fetchProfessionals();
   }, []);
-
   // ─── Location selector for selected professional ──────────────────────────────
   const locations = selectedProfessional?.locations || [];
   const address = "7575 S Rainbow Blvd";
@@ -238,26 +212,20 @@ useEffect(() => {
   useEffect(() => {
     if (!mapInstanceRef.current || !window.L) return;
     if (!mapProfessionals.length) return;
-
     const L = window.L;
     const map = mapInstanceRef.current;
-
     // Remove existing markers
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
-
     // Pick the first professional with a valid location
     const proWithLocation = mapProfessionals.find(
       (pro) => pro.locations && pro.locations.length > 0
     );
     if (!proWithLocation) return;
-
     const loc = proWithLocation.locations[0]; // first location
     const address =
       loc.address?.trim() || [loc.city, loc.state].filter(Boolean).join(", ");
-
     if (!address) return;
-
     // Geocode dynamically
     fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
@@ -267,17 +235,13 @@ useEffect(() => {
       .then((res) => res.json())
       .then((data) => {
         if (!data || !data[0]) return;
-
         const lat = parseFloat(data[0].lat);
         const lon = parseFloat(data[0].lon);
-
         const marker = L.marker([lat, lon])
           .addTo(map)
           .bindPopup(`<b>${address}</b>`)
           .openPopup();
-
         markersRef.current.push(marker);
-
         // Center map on this dynamic pin
         map.setView([lat, lon], 15);
       })
@@ -287,23 +251,19 @@ useEffect(() => {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
-
         @keyframes dropdownIn {
           from { opacity: 0; transform: translateY(-8px) scale(0.98); }
           to   { opacity: 1; transform: translateY(0) scale(1); }
         }
-
         .pro-dropdown {
           animation: dropdownIn 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
-
         .pro-dropdown::-webkit-scrollbar { width: 4px; }
         .pro-dropdown::-webkit-scrollbar-track { background: transparent; }
         .pro-dropdown::-webkit-scrollbar-thumb {
           background: rgba(36, 187, 203, 0.25);
           border-radius: 99px;
         }
-
         /* Leaflet popup custom style */
         .glam-popup .leaflet-popup-content-wrapper {
           border-radius: 12px;
@@ -317,13 +277,11 @@ useEffect(() => {
         .glam-popup .leaflet-popup-content {
           margin: 0;
         }
-
         /* Fix Leaflet z-index in Next.js */
         .leaflet-container {
           z-index: 0;
         }
       `}</style>
-
       <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 bg-gradient-to-b from-white via-gray-50/50 to-white overflow-hidden">
         <div className="px-5 md:px-8">
           {/* Hero text block */}
@@ -332,11 +290,9 @@ useEffect(() => {
               Discover Beauty Professionals Near You
               <br className="hidden sm:block" />
             </h1>
-
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
               Browse by location or specialty
             </p>
-
             {/* Search */}
             <div className="relative max-w-2xl mx-auto mb-6" ref={dropdownRef}>
               <div className="relative group">
@@ -356,7 +312,6 @@ useEffect(() => {
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 />
               </div>
-
               {/* Dropdown */}
               {showDropdown && searchQuery && (
                 <div
@@ -427,7 +382,6 @@ useEffect(() => {
                           {professionals.length}
                         </span>
                       </div>
-
                       {professionals.map((pro, i) => (
                         <button
                           key={i}
@@ -464,8 +418,8 @@ useEffect(() => {
                                   ? "rgba(36,187,203,0.15)"
                                   : "rgba(36,187,203,0.08)",
                               border: `1.5px solid ${hoveredIndex === i
-                                  ? "rgba(36,187,203,0.4)"
-                                  : "rgba(36,187,203,0.15)"
+                                ? "rgba(36,187,203,0.4)"
+                                : "rgba(36,187,203,0.15)"
                                 }`,
                               display: "flex",
                               alignItems: "center",
@@ -533,7 +487,6 @@ useEffect(() => {
                 </div>
               )}
             </div>
-
             <p className="text-sm text-gray-500">
               {selectedProfessional
                 ? "Professional selected — view profile below"
@@ -541,7 +494,6 @@ useEffect(() => {
                 } on map`}
             </p>
           </div>
-
           {/* Map + Preview grid */}
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8">
             {/* ── Map panel (Leaflet, multi-marker) ── */}
@@ -564,7 +516,6 @@ useEffect(() => {
                   </select>
                 </div>
               )}
-
               {/* Map container */}
               <div className="relative flex-1">
                 <ProfessionalsMap
@@ -573,7 +524,6 @@ useEffect(() => {
                 />
               </div>
             </div>
-
             {/* Live preview panel */}
             <div className="rounded-2xl border border-gray-200/80 overflow-hidden bg-white shadow-sm h-[400px] md:h-[700px] flex flex-col">
               {selectedProfessional ? (
@@ -607,5 +557,4 @@ useEffect(() => {
     </>
   );
 };
-
 export default Hero;
