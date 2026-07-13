@@ -505,7 +505,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
             {/* ===== MOBILE HERO: PROFILE CARD ===== */}
             <div className="lg:hidden mb-4">
               <div
-                className="relative rounded-2xl overflow-hidden shadow-md"
+                className="rounded-2xl overflow-hidden shadow-md"
                 style={{
                   background:
                     "linear-gradient(135deg, #23B9CD 0%, #0e8fa0 100%)",
@@ -517,7 +517,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white -translate-x-6 translate-y-6" />
                 </div>
 
-                <div className="relative flex items-center gap-4 p-4">
+                <div className="flex items-center gap-4 p-4">
                   {/* avatar */}
                   <div className="w-28 h-28 rounded-full overflow-hidden bg-white/20 border-2 border-white shadow-lg flex-shrink-0">
                     {data?.profile_image ? (
@@ -639,7 +639,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             <button
                               key={index}
                               onClick={() => setThumbnailIndex(index)}
-                              className={`relative h-14 w-14 overflow-hidden rounded-lg border shadow-sm flex-shrink-0 ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}`} style={{
+                              className={` h-14 w-14 overflow-hidden rounded-lg border shadow-sm flex-shrink-0 ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}`} style={{
                                 boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
 
                               }}
@@ -731,7 +731,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           </div>
                         )}
                         {mapSrc ? (
-                          <div className="relative rounded-xl overflow-hidden shadow-sm" style={{
+                          <div className="rounded-xl overflow-hidden shadow-sm" style={{
                             boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
 
                           }}>
@@ -856,7 +856,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
               {/* GALLERY — MOBILE */}
               {normalizedImages.length > 0 && thumbnailIndex !== null && (
                 <SectionBox title="Signature Work" titleAlign="center">
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 shadow-sm">
+                  <div className=" aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 shadow-sm">
                     {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
                       /* ✅ iOS FIX: playsInline + preload + key */
                       <video
@@ -932,7 +932,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         <button
                           key={index}
                           onClick={() => setThumbnailIndex(index)}
-                          className={`relative h-12 w-12 overflow-hidden rounded-lg border flex-shrink-0 snap-start transition-all ${thumbnailIndex === index ? "ring-2 ring-[#23B9CD] border-[#23B9CD]" : "border-gray-200 opacity-70"}`}
+                          className={` h-12 w-12 overflow-hidden rounded-lg border flex-shrink-0 snap-start transition-all ${thumbnailIndex === index ? "ring-2 ring-[#23B9CD] border-[#23B9CD]" : "border-gray-200"}`}
                         >
                           <img
                             src={thumbnailPreviews[index]}
@@ -994,7 +994,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     </div>
                   )}
                   {mapSrc ? (
-                    <div className="relative rounded-xl overflow-hidden shadow-sm">
+                    <div className="rounded-xl overflow-hidden shadow-sm">
                       <iframe
                         title="Business Location Map"
                         className="w-full h-40"
