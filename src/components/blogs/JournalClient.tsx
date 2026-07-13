@@ -7,13 +7,25 @@ import BlogGrid from "./BlogGrid";
 import HeroSection from "./HeroSection";
 import { issues2025, issues2026, Issue } from "@/data/issues";
 import { useRouter } from "next/navigation";
-import EducationPage from "./JournalEducation";
 import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
+import JournalEducation from "./JournalEducation";
+import JournalEvent from "./JournalEvent";
+import JournalShop from "./JournalShop";
 /* ─────────────────────────────────────────────────────────────
    Constants
 ───────────────────────────────────────────────────────────── */
 const MOBILE_ISSUES_PER_PAGE = 4;
 const SIDEBAR_ISSUES_PER_PAGE = 3;
+
+const TOP_TABS = [
+  { label: "Journal", path: "journal", href: "/journal" },
+  { label: "Education", path: "education", href: "/journal/education" },
+  { label: "Events", path: "event", href: "/journal/events" },
+  { label: "Shop", path: "shop", href: "/journal/shop" },
+];
+
+// Only the "journal" tab shows Category nav + Magazine sidebar
+const isFullLayout = (path: string) => path === "journal";
 /* ─────────────────────────────────────────────────────────────
    Helpers
 ───────────────────────────────────────────────────────────── */
@@ -64,6 +76,41 @@ const PaginationControls = ({
         {!compact && "Next"}
         <ChevronRight className="h-3.5 w-3.5" />
       </button>
+    </div>
+  );
+};
+/* ─────────────────────────────────────────────────────────────
+   Top Tabs (Journal / Education / Events / Shop)
+───────────────────────────────────────────────────────────── */
+const TopTabs = ({ path }: { path: string }) => {
+  const router = useRouter();
+  return (
+    <div className="w-full flex justify-center mb-4 lg:mb-6">
+      <div
+        role="tablist"
+        className="inline-flex items-center gap-1 p-1 rounded-full
+          bg-muted/40 border border-border/40"
+      >
+        {TOP_TABS.map((tab) => {
+          const isActive = path === tab.path;
+          return (
+            <button
+              key={tab.path}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => router.push(tab.href)}
+              className={`cursor-pointer px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold uppercase tracking-wide
+                rounded-full whitespace-nowrap transition-all duration-200
+                ${isActive
+                  ? "bg-background text-[#24bbcb] shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };
@@ -316,6 +363,9 @@ const MagazineSidebar = ({
 };
 /* ─────────────────────────────────────────────────────────────
    MAIN LAYOUT
+   Only the "journal" tab shows the 3-column shell (Category nav +
+   main content + Magazine sidebar). Education/Events/Shop render
+   only their centered main content.
 ───────────────────────────────────────────────────────────── */
 const JournalClient = ({ path }: { path: string }) => {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -323,69 +373,104 @@ const JournalClient = ({ path }: { path: string }) => {
   const handleIssueClick = (issue: Issue) => {
     setSelectedIssue((prev) => (prev?.slug === issue.slug ? null : issue));
   };
-  console.log(path, "path in client===")
+
+  const fullLayout = isFullLayout(path);
+
+  const renderMainContent = () => {
+    switch (path) {
+      case "journal":
+        return (
+          <main className="space-y-6 min-w-0">
+            <HeroSection />
+            <BlogGrid activeCategory={activeCategory} />
+          </main>
+        );
+      case "education":
+        return (
+          <main className="space-y-6 min-w-0">
+            <JournalEducation />
+          </main>
+        );
+      case "event":
+        return (
+          <main className="space-y-6 min-w-0">
+            <JournalEvent />
+          </main>
+        );
+      case "shop":
+        return (
+          <main className="space-y-6 min-w-0">
+            <JournalShop />
+          </main>
+        );
+      default:
+        return (
+          <main className="space-y-6 min-w-0">
+            <HeroSection />
+            <BlogGrid activeCategory={activeCategory} />
+          </main>
+        );
+    }
+  };
+
   return (
     <>
       <NewsletterPopup openDelay={3000} />
       <div className="min-h-screen bg-background">
-        <div className="max-w-[1700px] mx-auto px-4 sm:px-6 xl:px-14 py-8 lg:py-14">
-          {/* ── Mobile layout ── */}
-          <div className="lg:hidden space-y-4">
-            {/* Horizontal category nav */}
-            <CategoryNav
-              activeCategory={activeCategory}
-              setActiveCategory={setActiveCategory}
-            />
-            {/* Magazine carousel with pagination */}
-            <MobileMagazineCarousel onIssueClick={handleIssueClick} />
-            {path === "journal" &&
-              <>
-                <HeroSection />
-                <BlogGrid activeCategory={activeCategory} />
-              </>
-            }
-          </div>
-          {/* ── Desktop 3-column layout ── */}
-          <div className="hidden lg:grid grid-cols-[200px_1fr_300px] xl:grid-cols-[220px_1fr_300px] 2xl:grid-cols-[240px_1fr_320px] gap-10 xl:gap-14">
-            {/* LEFT – category nav */}
-            <aside>
+        <div className="max-w-[1700px] mx-auto px-4 sm:px-6 xl:px-14 mt-[120px] pb-8 lg:pb-14">
+          {/* ── Top tab navigation (Journal / Education / Events / Shop) ── */}
+          <TopTabs path={path} />
 
-              <div className="sticky top-28 pr-4">
+          {fullLayout ? (
+            <>
+              {/* ── Mobile layout (Journal only) ── */}
+              <div className="lg:hidden space-y-4">
                 <CategoryNav
                   activeCategory={activeCategory}
                   setActiveCategory={setActiveCategory}
-                  vertical
-                  path={path}
                 />
+                <MobileMagazineCarousel onIssueClick={handleIssueClick} />
+                {renderMainContent()}
               </div>
 
-            </aside>
-            {path === "journal" ?
-              <main className="space-y-6 min-w-0">
-                <HeroSection />
-                <BlogGrid activeCategory={activeCategory} />
-              </main>
-              :
-              <EducationPage />
-            }
-            {/* RIGHT – magazine sidebar */}
-            <aside>
-              <div className="sticky top-28 space-y-10 pl-4">
-                <MagazineSidebar
-                  activeIssue={selectedIssue}
-                  onIssueClick={handleIssueClick}
-                />
-                <div className="border border-border/40 rounded-xl p-6 text-center text-sm text-muted-foreground">
-                  Ad Space
-                </div>
+              {/* ── Desktop 3-column layout (Journal only) ── */}
+              <div className="hidden lg:grid grid-cols-[200px_1fr_300px] xl:grid-cols-[220px_1fr_300px] 2xl:grid-cols-[240px_1fr_320px] gap-10 xl:gap-14">
+                <aside>
+                  <div className="sticky top-28 pr-4">
+                    <CategoryNav
+                      activeCategory={activeCategory}
+                      setActiveCategory={setActiveCategory}
+                      vertical
+                      path={path}
+                    />
+                  </div>
+                </aside>
+
+                {renderMainContent()}
+
+                <aside>
+                  <div className="sticky top-28 space-y-10 pl-4">
+                    <MagazineSidebar
+                      activeIssue={selectedIssue}
+                      onIssueClick={handleIssueClick}
+                    />
+                    <div className="border border-border/40 rounded-xl p-6 text-center text-sm text-muted-foreground">
+                      Ad Space
+                    </div>
+                  </div>
+                </aside>
               </div>
-            </aside>
-          </div>
+
+              <FlipbookPanel
+                issue={selectedIssue}
+                onClose={() => setSelectedIssue(null)}
+              />
+            </>
+          ) : (
+            /* ── Centered single-column layout (Education / Events / Shop) ── */
+            <div className="max-w-4xl mx-auto">{renderMainContent()}</div>
+          )}
         </div>
-        <FlipbookPanel
-          issue={selectedIssue}
-          onClose={() => setSelectedIssue(null)}
-        />
       </div>
     </>
   );

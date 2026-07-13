@@ -21,7 +21,7 @@ const IssueCard = ({ issue }: IssueCardProps) => {
 
   return (
     <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-muted/10 shadow-md hover:shadow-xl hover:shadow-[#24bbcb]/20 transition-all duration-400 ease-out border border-border/30 hover:border-[#24bbcb]/30">
-      
+
       <div className="relative aspect-[3/4] overflow-hidden">
         {issue.cover && (
           <img
@@ -52,17 +52,17 @@ const IssueCard = ({ issue }: IssueCardProps) => {
       <div className="absolute bottom-4 mt-10 left-4 right-4 translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 md:block hidden">
         <Button
           onClick={handleDigitalEdition}
-          className="w-full rounded-full bg-[#24bbcb] hover:bg-[#1ea8b5] text-white shadow-lg shadow-[#24bbcb]/30 hover:shadow-xl hover:shadow-[#24bbcb]/40 transition-all duration-300 font-medium text-sm sm:text-base active:scale-[0.98]"
+          className="w-full rounded-full bg-[#24bbcb] hover:bg-[#1ea8b5] text-white shadow-lg shadow-[#24bbcb]/30 hover:shadow-xl hover:shadow-[#24bbcb]/40 transition-all duration-300 font-medium text-sm sm:text-base active:scale-[0.98] cursor-pointer"
         >
           <Download className="mr-2 h-4 w-4" />
           Digital Edition
         </Button>
       </div>
 
-      <div className="p-5 pt-3 md:hidden bg-gradient-to-t from-background/90 to-transparent mt-20">
+      <div className="p-5 pt-3 md:hidden bg-gradient-to-t from-background/90 to-transparent mt-20 ">
         <Button
           onClick={handleDigitalEdition}
-          className="w-full rounded-full bg-[#24bbcb]/95 hover:bg-[#24bbcb] text-white text-sm"
+          className="w-full rounded-full bg-[#24bbcb]/95 hover:bg-[#24bbcb] text-white text-sm cursor-pointer"
         >
           <Download className="mr-2 h-4 w-4" />
           Digital Edition

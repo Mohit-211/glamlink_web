@@ -1,12 +1,12 @@
 import JournalClient from '@/components/blogs/JournalClient'
 import React from 'react'
 
-const JournalEducationPage = () => {
+const JournalEventPage = () => {
   return (
     <div>
-      <JournalClient path="education" />
+      <JournalClient path="event" />
     </div>
   )
 }
 
-export default JournalEducationPage
+export default JournalEventPage

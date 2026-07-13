@@ -83,16 +83,36 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
     setPage(1);
   }, [activeCategory]);
 
+  /* Determine the same "featured" post HeroSection shows, so we can exclude it here.
+     Mirrors HeroSection's logic exactly: prefer a "Cover Feature" category blog,
+     otherwise fall back to the first blog in the list. */
+  const featuredId = useMemo(() => {
+    if (!allBlogs.length) return null;
+    const featuredBlog =
+      allBlogs.find(
+        (blog) =>
+          blog?.journal_category?.title?.trim().toLowerCase() ===
+          "cover feature"
+      ) || allBlogs[0];
+    return featuredBlog?.id ?? null;
+  }, [allBlogs]);
+
   /* Filter */
   const filteredBlogs = useMemo(() => {
-    if (!activeCategory || activeCategory === "All") return allBlogs;
-    return allBlogs.filter((blog) =>
+    // Exclude the featured/cover-feature post so it isn't duplicated in the grid
+    const withoutFeatured =
+      featuredId != null
+        ? allBlogs.filter((blog) => blog.id !== featuredId)
+        : allBlogs;
+
+    if (!activeCategory || activeCategory === "All") return withoutFeatured;
+    return withoutFeatured.filter((blog) =>
       blog?.journal_category?.title
         ?.toLowerCase()
         .trim()
         .includes(activeCategory.toLowerCase().trim())
     );
-  }, [activeCategory, allBlogs]);
+  }, [activeCategory, allBlogs, featuredId]);
 
   /* Paginate */
   const totalPages = Math.max(1, Math.ceil(filteredBlogs.length / POSTS_PER_PAGE));

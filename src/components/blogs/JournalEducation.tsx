@@ -1,187 +1,84 @@
 "use client";
+import Image from "next/image";
+import { Clock, BarChart2 } from "lucide-react";
 
-import RelatedArticles from "@/components/blogs/RelatedArticles";
-
-const partners = [
-  {
-    id: 1,
-    companyName: "Circadia Education",
-    description:
-      "Professional skincare education and certification training designed for beauty professionals looking to expand their expertise.",
-    logo: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=300",
-    upcomingDates: [
-      { date: "June 12", location: "Valencia, CA" },
-      { date: "June 20", location: "Dallas, TX" },
-      { date: "July 08", location: "Online" },
-      { date: "July 22", location: "Las Vegas, NV" },
-    ],
-  },
-  {
-    id: 2,
-    companyName: "ABACT Training",
-    description:
-      "Advanced beauty and wellness certification programs taught by industry-leading educators.",
-    logo: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=300",
-    upcomingDates: [{ date: "June 12", location: "Las Vegas, NV" }],
-  },
-  {
-    id: 3,
-    companyName: "Lash Map",
-    description:
-      "Premium lash education, workshops, and hands-on training opportunities.",
-    logo: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=300",
-    upcomingDates: [],
-  },
+const educationItems = [
+  { id: 1, title: "Skincare 101: Building Your Perfect Routine", description: "Learn the fundamentals of a daily skincare routine tailored to your skin type, from cleansing to SPF.", image: "https://picsum.photos/seed/skincare101/600/375", category: "Skincare", level: "Beginner", duration: "12 min read" },
+  { id: 2, title: "The Science of Hair Color: What Really Happens", description: "A deep dive into hair pigmentation, bleaching, and how to keep color-treated hair healthy and vibrant.", image: "https://picsum.photos/seed/haircolor/600/375", category: "Hair", level: "Intermediate", duration: "9 min read" },
+  { id: 3, title: "Mastering Makeup Application for Beginners", description: "Step-by-step guidance on foundation, blending, and creating a natural everyday look.", image: "https://picsum.photos/seed/makeupbasics/600/375", category: "Makeup", level: "Beginner", duration: "15 min read" },
+  { id: 4, title: "Understanding Ingredient Labels Like a Pro", description: "Decode common cosmetic ingredients so you can shop smarter and avoid what doesn't work for you.", image: "https://picsum.photos/seed/ingredients/600/375", category: "Wellness", level: "Intermediate", duration: "7 min read" },
+  { id: 5, title: "Nail Care Fundamentals: Health Before Polish", description: "Why nail health matters more than color, and the routine that keeps nails strong between manicures.", image: "https://picsum.photos/seed/nailcare/600/375", category: "Nails", level: "Beginner", duration: "6 min read" },
+  { id: 6, title: "Advanced Contouring Techniques", description: "Take your contour and highlight game further with professional blending tools and tricks.", image: "https://picsum.photos/seed/contouring/600/375", category: "Makeup", level: "Advanced", duration: "11 min read" },
 ];
 
-export default function EducationPage() {
+const levelColor: Record<string, string> = {
+  Beginner: "bg-emerald-500/10 text-emerald-600",
+  Intermediate: "bg-amber-500/10 text-amber-600",
+  Advanced: "bg-rose-500/10 text-rose-600",
+};
+
+const JournalEducation = () => {
   return (
- <div className="min-h-screen">
-      {/* Hero Section */}
-<section className="relative  md:pt-20 overflow-hidden bg-white">
-  {/* Subtle background texture */}
-  <div className="absolute inset-0 pointer-events-none opacity-[0.006]">
-    <div
-      className="w-full h-full"
-      style={{
-        backgroundImage:
-          "radial-gradient(circle at 2px 2px, #e0e0e0 1px, transparent 0)",
-        backgroundSize: "50px 50px",
-      }}
-    />
-  </div>
-
-  <div className="container-glamlink px-5 md:px-8 relative z-10">
-    <div className="max-w-5xl mx-auto text-center">
-      {/* Badge */}
-      <div className="mb-8">
-        <span className="inline-flex px-5 py-2 rounded-full bg-[#24bbcb]/10 text-[#24bbcb] text-sm font-medium border border-[#24bbcb]/20">
-          JOURNAL • EDUCATION
-        </span>
-      </div>
-
-      {/* Heading */}
-      <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-light text-gray-950 tracking-tight leading-none mb-8 md:mb-10">
-        <span className="italic text-[#24bbcb]">Education</span>
-      </h1>
-
-      {/* Description */}
-      <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed ">
-        Explore beauty and wellness trainings, certifications,
-      workshops, events, and educational articles for professionals.
-      </p>
-
-    
-    </div>
-  </div>
-</section>
-
-   <section className="max-w-7xl mx-auto px-6 py-20">
-  <div className="text-center mb-14">
-    <span className="inline-block text-[#23AEB8] text-xs font-semibold tracking-[0.25em] uppercase mb-4">
-      Featured Education Partners
-    </span>
-
-    <h2 className="text-4xl md:text-5xl font-serif text-[#1F2937] mb-4">
-      Upcoming Trainings & Certifications
-    </h2>
-
-    <p className="max-w-3xl mx-auto text-gray-600 text-lg leading-relaxed">
-      Discover training opportunities, certifications, workshops, and
-      continuing education programs from trusted beauty and wellness educators.
-    </p>
-  </div>
-
-  <div className="grid grid-cols-1 md:grid-cols-1 xl:grid-cols-2 gap-8">
-    {partners.map((partner) => (
-      <div
-        key={partner.id}
-        className="bg-white rounded-[28px] border border-[#23AEB8]/10 p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
-      >
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <img
-            src={partner.logo}
-            alt={partner.companyName}
-            className="w-16 h-16 rounded-2xl object-cover border border-[#23AEB8]/10"
-          />
-
-          <div>
-            <h3 className="text-xl font-semibold text-[#1F2937]">
-              {partner.companyName}
-            </h3>
-
-            <span className="text-xs uppercase tracking-widest text-[#23AEB8]">
-              Education Partner
-            </span>
-          </div>
-        </div>
-
-        {/* Description */}
-        <p className="text-gray-600 leading-relaxed mb-6">
-          {partner.description}
+    <section className="space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <p className="text-[11px] uppercase tracking-widest text-[#24bbcb] font-semibold">
+          Learn &amp; Grow
         </p>
-
-        {/* Upcoming Trainings */}
-        <div className="mb-8">
-          <h4 className="font-semibold text-[#1F2937] mb-4">
-            Upcoming Trainings
-          </h4>
-
-          {partner.upcomingDates.length > 0 ? (
-            <ul className="space-y-3">
-              {partner.upcomingDates.map((item, index) => (
-                <li
-                  key={index}
-                  className="flex items-start gap-3 text-sm"
-                >
-                  <span className="w-2 h-2 rounded-full bg-[#23AEB8] mt-2 flex-shrink-0" />
-
-                  <span className="text-gray-700">
-                    <span className="font-medium">{item.date}</span>
-                    {" — "}
-                    {item.location}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="bg-[#F4FBFC] rounded-2xl px-4 py-3 text-sm text-gray-600">
-              Coming Soon / View Upcoming Trainings
-            </div>
-          )}
-        </div>
-
-        {/* Learn More */}
-        <button className="mt-auto text-[#23AEB8] font-semibold flex items-center gap-2 hover:gap-3 transition-all">
-          Learn More
-          <span>→</span>
-        </button>
+        <h1 className="font-display text-2xl md:text-3xl tracking-tight">
+          Beauty Education Hub
+        </h1>
+        <p className="text-sm text-muted-foreground max-w-lg mx-auto">
+          Guides, tutorials, and expert breakdowns to help you understand the
+          &quot;why&quot; behind every beauty routine.
+        </p>
       </div>
-    ))}
-  </div>
-</section>
 
-     <section className="bg-[#F8FCFC] py-24">
-  <div className="max-w-7xl mx-auto px-6">
-    <div className="text-center mb-14">
-      <span className="inline-block text-[#23AEB8] text-xs font-semibold tracking-[0.25em] uppercase mb-4">
-        Latest Education Articles
-      </span>
-
-      <h2 className="text-4xl md:text-5xl font-serif text-[#1F2937] mb-4">
-        Keep Learning
-      </h2>
-
-      <p className="max-w-2xl mx-auto text-gray-600">
-        Stay informed with industry insights, professional development
-        resources, and educational content from beauty and wellness experts.
-      </p>
-    </div>
-
-    <RelatedArticles category_id="17" />
-  </div>
-</section>
-    </div>
+      {/* Grid */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {educationItems.map((item) => (
+          <div
+            key={item.id}
+            className="group border border-border/40 rounded-xl overflow-hidden bg-background
+              hover:border-[#24bbcb]/50 hover:shadow-sm transition-all duration-200 cursor-pointer"
+          >
+            <div className="relative aspect-[16/10] bg-muted/30 overflow-hidden">
+              <Image
+                src={item?.image}
+                alt={item?.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <span
+                className={`absolute top-3 left-3 text-[10px] font-semibold px-2 py-1 rounded-full ${levelColor[item.level]}`}
+              >
+                {item.level}
+              </span>
+            </div>
+            <div className="p-4 space-y-2">
+              <p className="text-[10px] uppercase tracking-widest text-[#24bbcb] font-semibold">
+                {item.category}
+              </p>
+              <h3 className="font-display text-sm md:text-base leading-snug group-hover:text-[#24bbcb] transition-colors">
+                {item.title}
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                {item.description}
+              </p>
+              <div className="flex items-center gap-3 pt-2 text-[11px] text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" /> {item.duration}
+                </span>
+                <span className="flex items-center gap-1">
+                  <BarChart2 className="h-3 w-3" /> {item.level}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
-}
+};
+
+export default JournalEducation;
