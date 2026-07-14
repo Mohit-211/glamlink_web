@@ -287,7 +287,7 @@ const Hero = () => {
           {/* Hero text block */}
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-2xl sm:text-2xl md:text-5xl tracking-tight text-gray-900 mb-5 leading-tight">
-              Discover Beauty Professionals Near You Bhavya
+              Discover Beauty Professionals Near You
               <br className="hidden sm:block" />
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
