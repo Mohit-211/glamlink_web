@@ -25,7 +25,7 @@ import EditAccessCard from './accessCardEdit';
 import ChangePasswordTab from './Changepasswordtab';
 // import CreateOrEditCard from './CreateOrEditCard'; // adjust path/name to your actual component
 
-type TabId = 'my-card' | 'edit-card' | 'payment-history' | 'qr-code' | 'addresses'|'change-password';
+type TabId = 'my-card' | 'edit-card' | 'payment-history' | 'qr-code' | 'addresses' | 'change-password';
 
 const NAV_ITEMS = [
   {
@@ -58,15 +58,59 @@ const NAV_ITEMS = [
     description: 'Manage saved addresses',
     icon: <MapPin className="h-5 w-5" />,
   },
-
-
-{
-  id: "change-password",
-  label: "Change Password",
-  description: "Update your account password",
-  icon: <Lock className="h-5 w-5" />,
-},
+  {
+    id: 'change-password',
+    label: 'Change Password',
+    description: 'Update your account password',
+    icon: <Lock className="h-5 w-5" />,
+  },
 ] as const;
+
+// Small local error boundary so a crash inside the Edit Card form (or any
+// tab content) shows an inline message instead of taking down the whole
+// dashboard / app with "Application error: a client-side exception".
+class TabErrorBoundary extends React.Component<
+  { children: React.ReactNode; onReset: () => void },
+  { hasError: boolean; message: string }
+> {
+  constructor(props: { children: React.ReactNode; onReset: () => void }) {
+    super(props);
+    this.state = { hasError: false, message: '' };
+  }
+
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, message: error?.message || 'Something went wrong' };
+  }
+
+  componentDidCatch(error: any, info: any) {
+    console.error('Dashboard tab crashed:', error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-6 text-sm">
+          <p className="mb-3 font-medium text-destructive">
+            Something went wrong loading this section.
+          </p>
+          <p className="mb-4 text-xs text-muted-foreground break-words">
+            {this.state.message}
+          </p>
+          <button
+            onClick={() => {
+              this.setState({ hasError: false, message: '' });
+              this.props.onReset();
+            }}
+            className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+          >
+            Try again
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -88,13 +132,12 @@ export default function DashboardPage() {
   // card's id (or nothing), regardless of which card the user clicked.
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
-  // NEW: tracks which specific card the user clicked "Edit" on.
+  // Tracks which specific card the user clicked "Edit" on.
   // This is intentionally SEPARATE from selectedCardId/createdCardId
   // (which drive the payment flow) — otherwise paying for card A would
   // also make card A the one that opens in the Edit tab, and vice versa.
   const [editCardId, setEditCardId] = useState<string | null>(null);
 
-  console.log(businessCard, "businessCard")
   useEffect(() => {
     // Guard: if there's no auth token, bounce straight to /login instead
     // of trying to load dashboard data that will just 401.
@@ -110,7 +153,6 @@ export default function DashboardPage() {
     try {
       setLoading(true);
       const cardRes = await getMyBusinessCardForDashboard();
-      console.log(cardRes, "cardRes")
       setBusinessCard(cardRes?.data || cardRes);
 
       const paymentRes = await getPaymenthistory();
@@ -146,16 +188,16 @@ export default function DashboardPage() {
 
       await LogoutUser(); // Logout API call
 
-      localStorage.removeItem("GlamlinkaccessToken");
-      localStorage.removeItem("GlamlinkrefreshToken");
-      localStorage.removeItem("postLoginRedirect");
+      localStorage.removeItem('GlamlinkaccessToken');
+      localStorage.removeItem('GlamlinkrefreshToken');
+      localStorage.removeItem('postLoginRedirect');
 
       // Notify auth listeners
-      window.dispatchEvent(new Event("auth-change"));
+      window.dispatchEvent(new Event('auth-change'));
 
-      router.push("/login");
+      router.push('/login');
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error('Logout failed:', error);
     } finally {
       setSigningOut(false);
     }
@@ -164,8 +206,7 @@ export default function DashboardPage() {
   useEffect(() => {
     userProfile()
       .then((res) => {
-        console.log(res, "====");
-        setUserData(res?.data?.user_profile)
+        setUserData(res?.data?.user_profile);
       })
       .catch((error) => {
         console.error(error);
@@ -195,21 +236,20 @@ export default function DashboardPage() {
   // Priority: the card the user explicitly clicked "Pay Now" on
   // -> the card that was just created
   // -> fall back to the first card in the list (covers the single-card case)
-  console.log(createdCardId, "createdCardId")
-  console.log(selectedCardId, "selectedCardId")
   const effectivePaymentCardId = String(
     selectedCardId ?? createdCardId ?? cardsArray[0]?.id ?? ''
   );
-  const hasValidPaymentCardId =
-    effectivePaymentCardId !== '' && !Number.isNaN(Number(effectivePaymentCardId));
+  // NOTE: card ids aren't necessarily numeric (could be UUIDs / Mongo
+  // ObjectIds), so we only check that we resolved a non-empty string —
+  // Number.isNaN(Number(id)) would wrongly disable payment for non-numeric ids.
+  const hasValidPaymentCardId = effectivePaymentCardId !== '';
 
   // ── Edit-flow card id ──
   // Priority: the card the user explicitly clicked "Edit" on
   // -> fall back to the first card (covers the single-card case, e.g.
   //    someone navigating to the Edit tab directly from the sidebar)
   const effectiveEditCardId = String(editCardId ?? cardsArray[0]?.id ?? '');
-  const hasValidEditCardId =
-    effectiveEditCardId !== '' && !Number.isNaN(Number(effectiveEditCardId));
+  const hasValidEditCardId = effectiveEditCardId !== '';
 
   // The actual card object being edited — resolved by id from the full
   // list, NOT just "whatever businessCard happens to hold" — otherwise
@@ -236,17 +276,6 @@ export default function DashboardPage() {
               Manage your access card, orders, and account settings
             </p>
           </div>
-
-          {/* Sign out — also available in the sidebar, kept here too for
-              quick access on wide screens */}
-          {/* <button
-            onClick={handleSignOut}
-            disabled={signingOut}
-            className="hidden md:inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground transition hover:bg-secondary hover:text-foreground disabled:opacity-50"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-            {signingOut ? 'Signing out...' : 'Sign Out'}
-          </button> */}
         </div>
 
         {/* Main Layout */}
@@ -346,62 +375,61 @@ export default function DashboardPage() {
             )}
 
             <div className="card-glamlink min-h-[400px]">
-              {activeTab === 'my-card' && (
-                <MyAccessCard
-                  cardData={businessCard}
-                  user={userdata}
-                  error={error}
-                  onPayNow={(card: any) => {
-                    // Capture the id of the exact card that was clicked
-                    // (MyAccessCard passes it back to us), rather than
-                    // always opening the modal with a stale/empty id.
-                    setSelectedCardId(String(card?.id ?? ''));
-                    setPayOpen(true);
-                  }}
-                  onEdit={(card: any) => {
-                    // Capture the id of the exact card that was clicked
-                    // "Edit" on, so EditAccessCard opens with the right
-                    // card even when there are multiple.
-                    setEditCardId(String(card?.id ?? ''));
-                    setActiveTab('edit-card');
-                    // The card list can be long, so the Edit button may be
-                    // clicked far down the page — jump back to the top so
-                    // the user actually sees the edit form open.
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                />
-              )}
-              {/* {activeTab === 'edit-card' && (
-                <CreateOrEditCard onSuccess={handleCardCreated} />
-              )} */}
-              {activeTab === 'payment-history' && <PaymentHistory payments={paymentHistory} />}
-              {activeTab === 'qr-code' && (
-                <ShowQRCode cardData={businessCard} error={error} />
-              )}
-              {activeTab === 'addresses' && <AddressTab />}
-              {activeTab === 'change-password' && <ChangePasswordTab />}
+              <TabErrorBoundary onReset={() => fetchDashboardData()}>
+                {activeTab === 'my-card' && (
+                  <MyAccessCard
+                    cardData={businessCard}
+                    user={userdata}
+                    error={error}
+                    onPayNow={(card: any) => {
+                      // Capture the id of the exact card that was clicked
+                      // (MyAccessCard passes it back to us), rather than
+                      // always opening the modal with a stale/empty id.
+                      setSelectedCardId(String(card?.id ?? ''));
+                      setPayOpen(true);
+                    }}
+                    onEdit={(card: any) => {
+                      // Capture the id of the exact card that was clicked
+                      // "Edit" on, so EditAccessCard opens with the right
+                      // card even when there are multiple.
+                      setEditCardId(String(card?.id ?? ''));
+                      setActiveTab('edit-card');
+                      // The card list can be long, so the Edit button may be
+                      // clicked far down the page — jump back to the top so
+                      // the user actually sees the edit form open.
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  />
+                )}
 
-              {activeTab === 'edit-card' && hasValidEditCardId && (
-                <EditAccessCard
-                  cardId={effectiveEditCardId}
-                  cardData={editingCard}
-                  onCancel={() => {
-                    setEditCardId(null);
-                    setActiveTab('my-card');
-                  }}
-                  onSave={async (updated) => {
-                    await fetchDashboardData();
-                    setEditCardId(null);
-                    setActiveTab('my-card');
-                  }}
-                />
-              )}
-              {activeTab === 'edit-card' && !hasValidEditCardId && (
-                <div className="p-6 text-sm text-muted-foreground">
-                  No business card found to edit yet.
-                </div>
-              )}
+                {activeTab === 'payment-history' && <PaymentHistory payments={paymentHistory} />}
+                {activeTab === 'qr-code' && (
+                  <ShowQRCode cardData={businessCard} error={error} />
+                )}
+                {activeTab === 'addresses' && <AddressTab />}
+                {activeTab === 'change-password' && <ChangePasswordTab />}
 
+                {activeTab === 'edit-card' && hasValidEditCardId && editingCard && (
+                  <EditAccessCard
+                    cardId={effectiveEditCardId}
+                    cardData={editingCard}
+                    onCancel={() => {
+                      setEditCardId(null);
+                      setActiveTab('my-card');
+                    }}
+                    onSave={async (updated: any) => {
+                      await fetchDashboardData();
+                      setEditCardId(null);
+                      setActiveTab('my-card');
+                    }}
+                  />
+                )}
+                {activeTab === 'edit-card' && (!hasValidEditCardId || !editingCard) && (
+                  <div className="p-6 text-sm text-muted-foreground">
+                    No business card found to edit yet.
+                  </div>
+                )}
+              </TabErrorBoundary>
             </div>
           </main>
         </div>
@@ -415,10 +443,12 @@ export default function DashboardPage() {
           setCreatedCardId(null);
           setSelectedCardId(null);
           fetchDashboardData();
-        } }
-        businessCardId={effectivePaymentCardId} onGoToAddresses={function (): void {
-          throw new Error('Function not implemented.');
-        } }      // onGoToAddresses={() => setActiveTab('addresses')}
+        }}
+        businessCardId={effectivePaymentCardId}
+        onGoToAddresses={() => {
+          setPayOpen(false);
+          setActiveTab('addresses');
+        }}
       />
     </div>
   );

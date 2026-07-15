@@ -70,12 +70,12 @@ const LocationCard: React.FC<CardProps> = ({
           </p>
 
           {/* ✅ Optional coordinate display */}
-          {location.latitude && location.longitude && (
-            <p className="text-[11px] text-gray-400 mt-1">
-              {location.latitude.toFixed(5)} ,{" "}
-              {location.longitude.toFixed(5)}
-            </p>
-          )}
+       {location && (
+  <p className="text-[11px] text-gray-400 mt-1">
+    {Number(location?.latitude ?? 0).toFixed(6)},{' '}
+    {Number(location?.longitude ?? 0).toFixed(6)}
+  </p>
+)}
         </div>
 
         <div className="flex items-center gap-4 sm:gap-6">
