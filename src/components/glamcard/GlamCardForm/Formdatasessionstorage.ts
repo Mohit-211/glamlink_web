@@ -5,6 +5,29 @@
 
 const FORM_STORAGE_KEY = "glamcard_submit_payload";
 
+// sessionStorage survives a page reload (F5) — it's only cleared when the
+// tab/window itself closes. That means a payload saved on one visit could
+// silently linger and get picked up again after a refresh, even though
+// nothing about this module ties that payload to "we're intentionally
+// resuming a submit" the way GlamCardForm's postLoginRedirect flag does
+// for its own draft key.
+//
+// To keep this key from outliving a single page load, we clear it once,
+// as a side effect, the moment this module is first evaluated in the
+// browser. Since the JS module graph is re-executed fresh on every full
+// reload, this effectively means: "whatever was saved before this reload
+// is gone." Anything saved via saveFormDataToSession() *during* the
+// current page's lifetime (e.g. right before an in-page redirect to
+// /login) is unaffected, since that save happens after this module has
+// already finished loading.
+if (typeof window !== "undefined") {
+  try {
+    sessionStorage.removeItem(FORM_STORAGE_KEY);
+  } catch (err) {
+    console.error("Failed to clear stale formData payload on load:", err);
+  }
+}
+
 /**
  * Turns a FormData into a plain object suitable for JSON.stringify.
  * If a key appears multiple times (e.g. "images" appended several times),

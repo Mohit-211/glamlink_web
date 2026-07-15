@@ -68,19 +68,37 @@ const GlamCardForm: React.FC<Props> = ({
     null
   );
 
-  // Restore form data from localStorage on mount (create flow only — edit loads from server data via props)
+  // Restore form data from localStorage on mount (create flow only — edit loads from server data via props).
+  //
+  // The draft in FORM_STORAGE_KEY is ONLY meant to survive the intentional
+  // "logged out -> save draft -> redirect to /login -> come back" flow
+  // (see handleLogin below, which sets postLoginRedirect right before
+  // saving the draft). We use that flag to distinguish "we just came back
+  // from login" from "the user simply refreshed the page" — on a plain
+  // reload there's no reason to silently repopulate the form with
+  // whatever was last saved, possibly from a much earlier session, so we
+  // clear it instead of restoring it.
   useEffect(() => {
     if (isEdit) return;
+
+    const cameFromLoginRedirect =
+      localStorage.getItem("postLoginRedirect") === "/apply/digital-card";
     const storedData = localStorage.getItem(FORM_STORAGE_KEY);
-    if (storedData) {
+
+    if (cameFromLoginRedirect && storedData) {
       try {
         const parsed = JSON.parse(storedData);
         setData(parsed);
-        localStorage.removeItem(FORM_STORAGE_KEY);
       } catch (error) {
         console.error(error);
       }
     }
+
+    // Either way, clear both keys now: if we just consumed the draft, it's
+    // no longer needed; if this was a plain reload, we don't want a stale
+    // draft or redirect flag lingering around for next time.
+    localStorage.removeItem(FORM_STORAGE_KEY);
+    localStorage.removeItem("postLoginRedirect");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setData, isEdit]);
 
@@ -476,7 +494,7 @@ const GlamCardForm: React.FC<Props> = ({
         />
       )}
 
-     
+
       {!isEdit && (
         <Modal
           open={isAuthModalOpen}
@@ -484,7 +502,7 @@ const GlamCardForm: React.FC<Props> = ({
           footer={null}
           centered
           width={480}
-          destroyOnClose
+          destroyOnHidden
         >
           {authStep === "register" && (
             <Register
