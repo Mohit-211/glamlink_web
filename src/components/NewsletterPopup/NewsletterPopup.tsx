@@ -19,20 +19,16 @@ export default function NewsletterPopup({
     email: "",
   });
 
-  useEffect(() => {
-    const alreadySubscribed = localStorage.getItem(
-      "glamlink_newsletter_subscribed"
-    );
+ useEffect(() => {
+  if (sessionStorage.getItem("newsletter_popup_seen")) return;
 
-    if (alreadySubscribed === "true") return;
+  const timer = setTimeout(() => {
+    setIsOpen(true);
+    sessionStorage.setItem("newsletter_popup_seen", "true");
+  }, openDelay);
 
-    const timer = setTimeout(() => {
-      setIsOpen(true);
-    }, openDelay);
-
-    return () => clearTimeout(timer);
-  }, [openDelay]);
-
+  return () => clearTimeout(timer);
+}, [openDelay]);
   const handleClose = () => {
     setIsOpen(false);
   };
