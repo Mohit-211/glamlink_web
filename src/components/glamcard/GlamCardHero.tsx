@@ -6,73 +6,78 @@ interface GlamCardHeroProps {
   onApplyClick: () => void;
 }
 
+const features = [
+  {
+    title: "YOUR BUSINESS. ALL IN ONE PLACE.",
+    description:
+      "Share your services, booking, photos, videos, social media, hours, location, and everything clients need to connect with you.",
+  },
+  {
+    title: "SHARE IT ANYWHERE.",
+    description:
+      "Add your Access link to Instagram, send in a text, email it to clients, or display your QR code. It's always with you.",
+  },
+  {
+    title: "TAP. SCAN. CONNECT.",
+    description:
+      "Your NFC keychain makes it easy for clients to instantly access your profile with a tap or scan.",
+  },
+  {
+    title: "ALWAYS UP TO DATE.",
+    description:
+      "Update your information anytime. No reprinting business cards or sending outdated links.",
+  },
+  {
+    title: "BE FOUND.",
+    description:
+      "Your Access profile is listed in the Glamlink Directory, making it easier for new clients to discover you.",
+  },
+];
+
 const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
   return (
-    <section className="w-full bg-white py-16 lg:py-24">
-      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-          {/* Left Column - Text Content */}
-          <div className="max-w-3xl">
-            <h2 className="text-2xl sm:text-2xl md:text-5xl  tracking-tight text-gray-900 mb-5 leading-tight">
-              The Link in Bio, Evolved.
-            </h2>
+    <section className="section-glamlink page-soft">
+      <div className="container-glamlink">
+        {/* Hero */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Left */}
+          <div className="max-w-2xl animate-fade-up">
+            <h1 className="font-display text-5xl md:text-6xl xl:text-7xl leading-tight text-foreground">
+              Everything your clients
+              <br />
+              need to know—
+              <br />
+              <span className="text-primary">in one tap.</span>
+            </h1>
 
-            <p className="text-m sm:text-l text-gray-700 leading-relaxed mb-6">
-              Your digital presence should be as refined as your craft. The{" "}
-              <strong>Glam Card</strong> is the new industry standard—a
-              high-conversion storefront designed to turn followers into clients
-              instantly.
+            <p className="mt-8 text-lg leading-8 text-muted-foreground">
+              One profile. One QR code. One link for your services, booking,
+              photos, videos, social media, business hours, location, and more.
             </p>
 
-            <p className="text-m sm:text-l text-gray-700 leading-relaxed mb-8">
-              Feature a <strong>personal video greeting</strong>, a tour of your
-              space, or a <strong>promo of your signature work</strong>{" "}
-              alongside integrated mapping and{" "}
-              <strong>one-touch booking</strong>.
-            </p>
-
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
-              Powered by Glamlink. Built for the Beauty + Wellness Pro.
-            </h3>
-
-            <p className="text-m sm:text-l text-gray-700 leading-relaxed mb-4">
-              Centralize your entire brand in one destination—from{" "}
-              <strong>Service Menus</strong> and <strong>Direct Booking</strong>{" "}
-              to <strong>Clips</strong> and <strong>Photo Albums</strong>.
-            </p>
-
-            <p className="text-m sm:text-l text-gray-700 leading-relaxed mb-10">
-              Build authority with <strong>Verified Reviews</strong> and prepare
-              to scale with an <strong>Integrated Shop</strong> coming soon.
-            </p>
+            <div className="mt-8 flex items-center gap-4 text-xl font-semibold text-foreground">
+              <span>$39.99 SETUP</span>
+              <span className="text-primary">•</span>
+              <span>$4.99/MONTH</span>
+            </div>
 
             <button
               onClick={onApplyClick}
-              className="
-                inline-flex items-center px-10 py-5 text-base sm:text-lg font-semibold 
-                text-white rounded-full shadow-md hover:shadow-lg 
-                transition-all duration-300 hover:scale-[1.02] active:scale-98
-              "
-              style={{
-                background:
-                  "linear-gradient(135deg, #23aeb8 0%, #53bec6 50%, #5cc2d6 100%)",
-              }}
+              className="mt-10 inline-flex items-center justify-center rounded-md bg-[#23AEB8] px-10 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-[#1d98a2]"
             >
-              Apply for Your Glam Card
+              CREATE YOUR ACCESS CARD
             </button>
+
+            <p className="mt-4 text-sm italic text-muted-foreground">
+              NFC keychain included.
+            </p>
           </div>
 
-          {/* Right Column - Mockup Card */}
-          {/* Right Column - Video Only */}
+          {/* Right */}
           <div className="flex justify-center lg:justify-end">
-            <div
-              className="
-      relative w-full max-w-md rounded-2xl 
-      shadow-xl border border-gray-200 overflow-hidden
-    "
-            >
+            <div className="w-full max-w-md overflow-hidden rounded-3xl border border-border bg-card shadow-[var(--shadow-large)]">
               <video
-                className="w-full h-full object-cover"
+                className="aspect-[9/16] w-full object-cover"
                 autoPlay
                 muted
                 loop
@@ -83,6 +88,35 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
                 Your browser does not support the video tag.
               </video>
             </div>
+          </div>
+        </div>
+
+        {/* Features */}
+        <div className="mx-auto mt-28 max-w-3xl">
+          {features.map((feature) => (
+            <div
+              key={feature.title}
+              className="border-t border-border py-10 text-center"
+            >
+              <h2 className="text-2xl font-semibold uppercase tracking-[0.15em] text-foreground">
+                {feature.title}
+              </h2>
+
+              <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
+                {feature.description}
+              </p>
+            </div>
+          ))}
+
+          {/* Footer */}
+          <div className="border-t border-border pt-12 text-center">
+            <p className="text-lg font-medium uppercase tracking-[0.18em] text-primary">
+              ONE TAP CAN OPEN THE DOOR TO NEW CONNECTIONS.
+            </p>
+
+            <p className="mt-8 font-display text-3xl uppercase tracking-[0.2em] text-foreground">
+              ACCESS BY <span className="text-primary">GLAMLINK</span>
+            </p>
           </div>
         </div>
       </div>
