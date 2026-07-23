@@ -3,6 +3,7 @@
 import React, { useRef } from "react";
 import dynamic from "next/dynamic";
 import Script from "next/script";
+import AccessPricingSection from "@/components/AccessPricingSection/AccessPricingSection";
 
 const GlamCardHero = dynamic(
   () => import("@/components/glamcard/GlamCardHero"),
@@ -55,7 +56,9 @@ export default function DigitalApplyPage() {
         <section className="pb-20">
           <GlamCardHero onApplyClick={scrollToApply} />
         </section>
-
+        <section className="pb-20">
+          <AccessPricingSection />
+        </section>
         <section ref={applyRef} className="bg-muted/30 py-20 scroll-mt-24">
           <div className="px-4 sm:px-6 lg:px-8">
             <GlamCardApplication />
