@@ -51,7 +51,7 @@ const inputClass =
 const labelClass = "text-sm font-medium text-gray-700 block mb-1.5";
 
 const buttonClass =
-  "min-w-[120px] rounded-lg px-5 py-2.5 text-sm font-medium text-white transition";
+  "min-w-[120px] rounded-lg bg-[#23AEB8] px-5 py-2.5 text-sm font-medium text-white transition";
 
 const LocationFormFields: React.FC<FieldsProps> = ({
   location,
@@ -112,7 +112,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({
     if (typeof stateValue === 'string' && isNaN(Number(stateValue))) {
       const foundState = states.find(
         (s: any) => s.name?.toUpperCase() === stateValue.toUpperCase() ||
-                    s.abbreviation?.toUpperCase() === stateValue.toUpperCase()
+          s.abbreviation?.toUpperCase() === stateValue.toUpperCase()
       );
       if (foundState) {
         stateId = foundState.id;
@@ -342,10 +342,10 @@ const LocationFormFields: React.FC<FieldsProps> = ({
             <button
               type="button"
               disabled={!canSetCity || citiesLoading}
-              className={`w-full ${buttonClass} ${canSetCity && !citiesLoading
-                ? "bg-purple-600 hover:bg-purple-700"
-                : "bg-gray-300 cursor-not-allowed"
-                }`}
+              className={`w-full ${canSetCity && !citiesLoading
+                  ? "bg-[#23AEB8] hover:bg-[#23AEB8] text-white"
+                  : "bg-gray-300 cursor-not-allowed text-white"
+                } ${buttonClass}`}
               onClick={handleSetCity}
             >
               Set Location
@@ -375,17 +375,18 @@ const LocationFormFields: React.FC<FieldsProps> = ({
               }
               placeholder="Start typing an address..."
             />
-            <button
-              type="button"
-              disabled={!canConfirmExact}
-              className={`${buttonClass} ${canConfirmExact
-                ? "bg-purple-600 hover:bg-purple-700"
-                : "bg-gray-300 cursor-not-allowed"
-                }`}
-              onClick={handleConfirmExact}
-            >
-              Confirm
-            </button>
+          <button
+  type="button"
+  disabled={!canConfirmExact}
+  className={`${buttonClass} ${
+    canConfirmExact
+      ? "bg-[#23AEB8] hover:bg-[#1F9CA5]"
+      : "bg-gray-300 cursor-not-allowed"
+  }`}
+  onClick={handleConfirmExact}
+>
+  Confirm
+</button>
             {location.isSet && (
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
                 ✓
