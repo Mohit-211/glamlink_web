@@ -734,7 +734,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           <div className="text-sm mb-3 space-y-1">
                             {data.locations.length === 1 &&
                               selectedLocation.label && (
-                                <p className="text-sm font-medium text-teal-700">
+                                     <p className="font-semibold text-gray-800">
                                   {selectedLocation.label}
                                 </p>
                               )}
