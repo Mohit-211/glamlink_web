@@ -10,7 +10,6 @@ interface Location {
   state?: string;
   area?: string;
   label?: string;
-  business_name?: string;
   phone?: string;
   description?: string;
   latitude?: number;

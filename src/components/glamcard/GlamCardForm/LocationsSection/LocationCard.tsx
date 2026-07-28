@@ -27,23 +27,22 @@ const LocationCard: React.FC<CardProps> = ({
   const locationSummary =
     location.location_type === "city_only"
       ? [location.area, location.city, location.state]
-          .filter(Boolean)
-          .join(", ") || "City / Area not set"
+        .filter(Boolean)
+        .join(", ") || "City / Area not set"
       : location.address ||
-        [location.city, location.state]
-          .filter(Boolean)
-          .join(", ") ||
-        "Not configured";
+      [location.city, location.state]
+        .filter(Boolean)
+        .join(", ") ||
+      "Not configured";
 
   return (
     <div className="rounded-lg border border-gray-200 overflow-hidden bg-white shadow-sm">
       {/* Header */}
       <div
-        className={`flex items-center justify-between px-5 py-3.5 border-b ${
-          isPrimary
+        className={`flex items-center justify-between px-5 py-3.5 border-b ${isPrimary
             ? "bg-yellow-50/80 border-yellow-200"
             : "bg-gray-50/70 border-gray-200"
-        }`}
+          }`}
       >
         <div>
           <div className="flex items-center gap-2.5">
@@ -70,12 +69,12 @@ const LocationCard: React.FC<CardProps> = ({
           </p>
 
           {/* ✅ Optional coordinate display */}
-       {location && (
-  <p className="text-[11px] text-gray-400 mt-1">
-    {Number(location?.latitude ?? 0).toFixed(6)},{' '}
-    {Number(location?.longitude ?? 0).toFixed(6)}
-  </p>
-)}
+          {location && (
+            <p className="text-[11px] text-gray-400 mt-1">
+              {Number(location?.latitude ?? 0).toFixed(6)},{' '}
+              {Number(location?.longitude ?? 0).toFixed(6)}
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-4 sm:gap-6">

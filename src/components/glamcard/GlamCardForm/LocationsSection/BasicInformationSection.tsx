@@ -168,7 +168,19 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         </div>
       </div>
       {/* BUSINESS NAME */}
-
+      <div>
+        <label className={labelClass}>Business Name</label>
+        <input
+          className={`${inputClass} w-full`}
+          value={data.business_name || ""}
+          onChange={(e) =>
+            setData((p) => ({
+              ...p,
+              business_name: e.target.value,
+            }))
+          }
+        />
+      </div>
     </section>
   );
 };

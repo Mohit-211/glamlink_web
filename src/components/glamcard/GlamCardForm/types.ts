@@ -14,7 +14,6 @@ export interface Location {
   latitude?: number;
   longitude?: number;
   isSet?: boolean;
-  business_name: string;
   phone: string;
   description: string;
   isPrimary: boolean;
@@ -34,7 +33,7 @@ export interface GlamCardFormData {
   other_links: any;
   /* BASIC INFO */
   name: string;
-
+ business_name: string;
   professional_title: string;
   profession?: string;
   email: string;
