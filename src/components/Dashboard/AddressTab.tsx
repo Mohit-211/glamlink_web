@@ -234,22 +234,24 @@ function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
               </select>
             </div>
           </div>
-          {/* Postal code */}
+          {/* Zip code */}
           <div>
             <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
-              Postal Code <span className="text-red-500">*</span>
+              Zip Code <span className="text-red-500">*</span>
             </label>
             <input
               value={form.postal_code}
               onChange={(e) =>
                 setForm((prev) => ({
                   ...prev,
-                  postal_code: e.target.value.replace(/\D/g, "").slice(0, 6),
+                  postal_code: e.target.value.toUpperCase(),
                 }))
               }
-              placeholder="Enter 6 digit PIN code"
-              inputMode="numeric"
-              maxLength={6}
+              placeholder="Enter ZIP Code"
+              maxLength={10}
+
+
+
               disabled={saving}
               className={INPUT}
             />

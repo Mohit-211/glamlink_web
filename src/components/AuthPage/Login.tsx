@@ -13,7 +13,6 @@ import { SubscriptionPaymentModal } from "../Dashboard/SubscriptionPay";
 
 interface BusinessCardSummary {
   business_name: string;
-  
   id: string | number;
   payment_status: string; // "pending" | "paid" | ...
 }
@@ -34,6 +33,11 @@ interface LoginProps {
   onPaymentRequired?: (businessCardId: string | number | null) => void;
 }
 
+type FieldErrors = {
+  email?: string;
+  password?: string;
+};
+
 export default function Login({
   onSuccess,
   onNeedsVerification,
@@ -46,6 +50,7 @@ export default function Login({
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState<FieldErrors>({});
 
   // "form"       -> normal email/password sign-in
   // "selectCard" -> user has multiple business cards; must pick which
@@ -60,7 +65,6 @@ export default function Login({
   // onPaymentRequired passed in) — e.g. the real /login page.
   const [payOpen, setPayOpen] = useState(false);
   const [pendingCardId, setPendingCardId] = useState<string | number | null>(null);
-  
 
   useEffect(() => {
     const storedPayload = getFormDataFromSession();
@@ -92,8 +96,33 @@ export default function Login({
     goToPayment(selectedCardId);
   };
 
+  const validate = (): FieldErrors => {
+    const next: FieldErrors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!form.email.trim()) {
+      next.email = "Please enter your email address";
+    } else if (!emailRegex.test(form.email)) {
+      next.email = "Please enter a valid email address";
+    }
+
+    if (!form.password) {
+      next.password = "Please enter your password";
+    }
+
+    return next;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const fieldErrors = validate();
+    setErrors(fieldErrors);
+    if (Object.keys(fieldErrors).length > 0) {
+      const firstError = Object.values(fieldErrors)[0];
+      if (firstError) message.error(firstError);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -129,11 +158,17 @@ export default function Login({
         const accessToken = response?.data?.tokens?.access?.token;
         const refreshToken = response?.data?.tokens?.refresh?.token;
 
-        if (accessToken) {
-          localStorage.setItem("GlamlinkaccessToken", accessToken);
-        }
-        if (refreshToken) {
-          localStorage.setItem("GlamlinkrefreshToken", refreshToken);
+        try {
+          if (accessToken) {
+            localStorage.setItem("GlamlinkaccessToken", accessToken);
+          }
+          if (refreshToken) {
+            localStorage.setItem("GlamlinkrefreshToken", refreshToken);
+          }
+        } catch (storageError) {
+          // localStorage can throw (private browsing, disabled storage, SSR
+          // edge cases). Don't let that masquerade as a login failure.
+          console.error("Failed to persist auth tokens:", storageError);
         }
 
         message.success(response?.message || "Login successful");
@@ -237,6 +272,14 @@ export default function Login({
       router.replace("/dashboard");
     }
   }, [router]);
+
+  const updateField = (field: keyof typeof form, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
+
   return (
     <div className="page-soft min-h-screen flex items-center justify-center">
       {/* Ambient blobs */}
@@ -262,7 +305,7 @@ export default function Login({
             <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
               Sign in
             </h1>
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
               {/* Email */}
               <div className="space-y-1.5">
                 <label
@@ -275,12 +318,17 @@ export default function Login({
                   id="email"
                   type="email"
                   autoComplete="email"
-                  required
                   placeholder="you@example.com"
                   value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  onChange={(e) => updateField("email", e.target.value)}
+                  aria-invalid={!!errors.email}
+                  className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
+                    errors.email ? "border-red-500" : "border-input"
+                  }`}
                 />
+                {errors.email && (
+                  <p className="text-xs text-red-500">{errors.email}</p>
+                )}
               </div>
               {/* Password */}
               <div className="space-y-1.5">
@@ -303,11 +351,13 @@ export default function Login({
                     id="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
-                    required
                     placeholder="••••••••"
                     value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    className="w-full rounded-xl border border-input bg-background px-4 py-2.5 pr-11 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    onChange={(e) => updateField("password", e.target.value)}
+                    aria-invalid={!!errors.password}
+                    className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
+                      errors.password ? "border-red-500" : "border-input"
+                    }`}
                   />
                   <button
                     type="button"
@@ -322,6 +372,9 @@ export default function Login({
                     )}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="text-xs text-red-500">{errors.password}</p>
+                )}
               </div>
               {/* Submit */}
               <button

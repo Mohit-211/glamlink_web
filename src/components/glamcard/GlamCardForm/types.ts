@@ -23,7 +23,7 @@ export interface Location {
 /* ================= GALLERY ================= */
 export interface GalleryMetaItem {
   id: string;
-  caption: string;
+  caption?: string;
   is_thumbnail: boolean;
   sort_order: number;
   thumbnail_file?: File;

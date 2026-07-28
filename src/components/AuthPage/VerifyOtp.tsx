@@ -21,7 +21,9 @@ export default function VerifyOtp({
 }: VerifyOtpProps) {
   const router = useRouter();
   const [otp, setOtp] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(RESEND_SECONDS);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -34,13 +36,27 @@ export default function VerifyOtp({
     };
   }, []);
 
+  const validateOtp = (): string | null => {
+    const trimmed = otp.trim();
+    if (!trimmed) {
+      return "Please enter the verification code";
+    }
+    if (!/^\d{4,8}$/.test(trimmed)) {
+      return "Please enter a valid verification code";
+    }
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!/^\d{4,8}$/.test(otp.trim())) {
-      alert("Please enter the verification code");
+    const validationError = validateOtp();
+    if (validationError) {
+      setError(validationError);
+      message.error(validationError);
       return;
     }
+    setError(null);
 
     try {
       setLoading(true);
@@ -75,8 +91,9 @@ export default function VerifyOtp({
   };
 
   const handleResend = async () => {
-    if (resendCooldown > 0) return;
+    if (resendCooldown > 0 || resending) return;
     try {
+      setResending(true);
       await sendOtp({ email, type });
       message.success("Verification code resent");
       setResendCooldown(RESEND_SECONDS);
@@ -84,6 +101,8 @@ export default function VerifyOtp({
       const errorMessage =
         error?.response?.data?.message || error?.message || "Failed to resend code";
       message.error(errorMessage);
+    } finally {
+      setResending(false);
     }
   };
 
@@ -107,18 +126,24 @@ export default function VerifyOtp({
           <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
             Verify your email
           </h1>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div className="space-y-1.5">
               <label className="block text-sm font-medium">Verification Code</label>
               <input
                 type="text"
                 inputMode="numeric"
-                required
                 placeholder="Enter code"
                 value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-center text-lg tracking-[0.3em] text-sm"
+                onChange={(e) => {
+                  setOtp(e.target.value.replace(/\D/g, ""));
+                  if (error) setError(null);
+                }}
+                aria-invalid={!!error}
+                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-center text-lg tracking-[0.3em] text-sm ${
+                  error ? "border-red-500" : "border-input"
+                }`}
               />
+              {error && <p className="text-xs text-red-500 text-center">{error}</p>}
             </div>
             <button
               type="submit"
@@ -132,10 +157,14 @@ export default function VerifyOtp({
               <button
                 type="button"
                 onClick={handleResend}
-                disabled={resendCooldown > 0}
+                disabled={resendCooldown > 0 || resending}
                 className="font-medium text-primary hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline"
               >
-                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
+                {resendCooldown > 0
+                  ? `Resend in ${resendCooldown}s`
+                  : resending
+                    ? "Resending..."
+                    : "Resend code"}
               </button>
             </p>
           </form>

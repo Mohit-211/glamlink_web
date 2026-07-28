@@ -244,7 +244,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
       </div>
 
       {/* Custom Handle */}
-      <div>
+      {/* <div>
         <label className={labelClass}>Claim Your Custom Handle</label>
         <input
           className={inputClass}
@@ -254,7 +254,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             setData((prev) => ({ ...prev, custom_handle: e.target.value }))
           }
         />
-      </div>
+      </div> */}
 
       {/* Socials & Website */}
       <div className="space-y-4">
@@ -465,7 +465,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
 
       <div>
         <div className="flex items-center gap-2 relative">
-          <label className={labelClass}>Preferred Booking Methods</label>
+          <label className={labelClass}>Ways To Connects</label>
         </div>
 
         <div
@@ -510,18 +510,18 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             <label className={`${labelClass} m-0`}>
               Booking Link
             </label>
-            <input
-              type="url"
-              className={inputClass}
-              placeholder="https://booksy.com/yourprofile"
-              value={data.booking_link || ""}
-              onChange={(e) =>
-                setData((prev) => ({
-                  ...prev,
-                  booking_link: e.target.value,
-                }))
-              }
-            />
+           <input
+  type="url"
+  className={inputClass}
+  placeholder="https://yourwebsite.com"
+  value={data.booking_link || data.website || ""}
+  onChange={(e) =>
+    setData((prev) => ({
+      ...prev,
+      booking_link: e.target.value,
+    }))
+  }
+/>
           </div>
         )}
       </div>

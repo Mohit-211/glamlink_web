@@ -250,25 +250,26 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
                     </select>
                 </div>
             </div>
-            <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                    Postal code
-                </label>
-                <input
-                    value={form.postal_code}
-                    onChange={(e) =>
-                        setForm((prev) => ({
-                            ...prev,
-                            postal_code: e.target.value.replace(/\D/g, '').slice(0, 6),
-                        }))
-                    }
-                    placeholder="Enter 6 digit PIN code"
-                    inputMode="numeric"
-                    maxLength={6}
-                    disabled={status === 'saving'}
-                    className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition disabled:opacity-50"
-                />
-            </div>
+       <div className="space-y-1.5">
+  <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+    ZIP Code
+  </label>
+
+  <input
+    value={form.postal_code}
+    onChange={(e) =>
+      setForm((prev) => ({
+        ...prev,
+        postal_code: e.target.value.toUpperCase(),
+      }))
+    }
+    placeholder="Enter ZIP Code"
+    inputMode="text"
+    maxLength={10}
+    disabled={status === "saving"}
+    className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition disabled:opacity-50"
+  />
+</div>
             <div className="flex gap-3">
                 <button
                     onClick={onCancel}

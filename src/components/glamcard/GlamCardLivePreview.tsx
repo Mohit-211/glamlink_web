@@ -597,10 +597,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </SectionBox>
 
                 {/* SIGNATURE WORK — DESKTOP */}
-                <SectionBox title="Signature Work" titleAlign="center">
+                <SectionBox title="Gallery" titleAlign="center">
                   {normalizedImages.length > 0 && thumbnailIndex !== null ? (
                     <>
-                      <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm">
+                      <div className="relative aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
                         {normalizedImages[thumbnailIndex]?.file_type ===
                           "video" ? (
                           /* ✅ iOS FIX: playsInline + preload + key */
@@ -631,6 +631,39 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             }}
                             alt="Featured work"
                           />
+                        )}
+
+                        {/* prev / next arrows — desktop gallery carousel */}
+                        {normalizedImages.length > 1 && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setThumbnailIndex(
+                                  (prev) =>
+                                    ((prev ?? 0) - 1 + normalizedImages.length) %
+                                    normalizedImages.length,
+                                )
+                              }
+                              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity active:scale-90"
+                              aria-label="Previous image"
+                            >
+                              <ChevronLeft size={18} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setThumbnailIndex(
+                                  (prev) =>
+                                    ((prev ?? 0) + 1) % normalizedImages.length,
+                                )
+                              }
+                              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity active:scale-90"
+                              aria-label="Next image"
+                            >
+                              <ChevronRight size={18} />
+                            </button>
+                          </>
                         )}
                       </div>
                       {otherIndexes.length > 0 && (
@@ -663,7 +696,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
               </div>
 
               {/* ---- RIGHT COLUMN ---- */}
-              <div className="flex flex-col gap-5">
+             <div className="flex flex-col gap-5">
                 {/* LOCATION + HOURS desktop */}
                 <div
                   className="rounded-2xl p-[2px]"
@@ -699,6 +732,12 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         )}
                         {selectedLocation && (
                           <div className="text-sm mb-3 space-y-1">
+                            {data.locations.length === 1 &&
+                              selectedLocation.label && (
+                                <p className="text-sm font-medium text-teal-700">
+                                  {selectedLocation.label}
+                                </p>
+                              )}
                             {selectedLocation.business_name && (
                               <p className="font-semibold text-gray-800">
                                 {selectedLocation.business_name}
@@ -855,7 +894,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
 
               {/* GALLERY — MOBILE */}
               {normalizedImages.length > 0 && thumbnailIndex !== null && (
-                <SectionBox title="Signature Work" titleAlign="center">
+                <SectionBox title="Gallery" titleAlign="center">
                   <div className=" aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 shadow-sm">
                     {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
                       /* ✅ iOS FIX: playsInline + preload + key */

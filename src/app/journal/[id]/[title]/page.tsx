@@ -5,6 +5,16 @@ import Image from "next/image";
 import { getBlogsById } from "@/api/Api";
 import ArticleContent from "@/components/blogs/ArticleContent";
 import RelatedArticles from "@/components/blogs/RelatedArticles";
+import DownloadButton from "@/components/Downloadbutton";
+
+interface DownloadItem {
+  id: number;
+  title: string;
+  description: string;
+  file_name: string;
+  button_text: string;
+  sort_order?: number;
+}
 
 interface BlogData {
   journal_category: any;
@@ -17,6 +27,17 @@ interface BlogData {
   cover_image: string;
   publish_date: string;
   slug?: string;
+  downloads?: DownloadItem[];
+}
+
+/* --------------------------------
+   Helpers
+-------------------------------- */
+
+function getFileExt(url: string) {
+  const clean = url.split("?")[0];
+  const ext = clean.split(".").pop();
+  return ext ? ext.toUpperCase() : "";
 }
 
 /* --------------------------------
@@ -101,6 +122,12 @@ const formattedDate = article?.publish_date
      
     })
   : "";
+
+  const downloads = Array.isArray(article?.downloads)
+    ? [...article.downloads].sort(
+        (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
+      )
+    : [];
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -275,6 +302,62 @@ const formattedDate = article?.publish_date
               <ArticleContent content={article.content ?? ""} />
             </div>
           </section>
+
+          {/* ── DOWNLOADS ── */}
+          {downloads.length > 0 && (
+            <>
+              <div className="border-t border-gray-100 my-14" />
+
+              <section>
+                <div className="mb-8">
+                  <p className="text-[10px] tracking-[.15em] uppercase text-gray-400 mb-2">
+                    Resources
+                  </p>
+                  <h2 className="font-serif text-3xl text-gray-900">
+                    Downloads
+                  </h2>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-5">
+                  {downloads.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex flex-col justify-between rounded-2xl border border-gray-100 p-6 hover:border-[#23AEB8]/40 hover:shadow-sm transition-all duration-300"
+                      style={{ background: "rgba(35,174,184,0.03)" }}
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <h3 className="font-serif text-lg text-gray-900 leading-snug">
+                            {item.title}
+                          </h3>
+                          {getFileExt(item.file_name) && (
+                            <span
+                              className="flex-shrink-0 text-[10px] font-medium tracking-wider uppercase text-[#23AEB8] px-2 py-1 rounded-md"
+                              style={{
+                                background: "rgba(35,174,184,0.1)",
+                                border: "1px solid rgba(35,174,184,0.25)",
+                              }}
+                            >
+                              {getFileExt(item.file_name)}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500 font-light leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      <DownloadButton
+                        fileUrl={item.file_name}
+                        label={item.button_text || "Download"}
+                        className="mt-5 inline-flex items-center justify-center gap-2 text-sm font-medium text-white px-4 py-2.5 rounded-full bg-[#23AEB8] hover:bg-[#1d9aa3] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </>
+          )}
 
           {/* ── DIVIDER ── */}
           <div className="border-t border-gray-100 my-14 mx-auto" />
