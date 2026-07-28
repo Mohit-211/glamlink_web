@@ -43,103 +43,102 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
         "pexels-pixabay-159780.jpg"
       ),
     ]);
-  return {
-    /* ================= BASIC INFO ================= */
-    name: "Sophia Martinez",
-    professional_title:
-      "Master Hair Stylist & Colorist",
-    email: "sophia@luxebeauty.com",
-    phone: "123-456-7890",
-    booking_phone: "123-456-7890",
-    business_name: "Luxe Beauty Studio",
-    bio: `
-      <p>Founder of Glamlink</p>
-      <p>The Glamlink Edit</p>
-      <p>The Beauty Vault</p>
-    `,
-    /* ================= SPECIALTIES ================= */
-    primary_specialty: "Hair Styling & Color",
-    specialties: [
-      "Balayage",
-      "Color Correction",
-      "Bridal Styling",
-      "Extensions",
-    ],
-    /* ================= HANDLES ================= */
-    custom_handle: "luxebeauty",
-    instagram_handle: "luxebeauty",
-    website: "https://luxebeauty.com",
-    /* ================= SOCIAL MEDIA ================= */
-    social_media: {
-      instagram: "",
-      tiktok: "",
-      linkedin:
-        "",
-      youtube:
-        "",
-      facebook:
-        "",
-    },
+ return {
+  /* ================= BASIC INFO ================= */
+  name: "John Doe",
+  professional_title: "Your Profession",
+  email: "example@email.com",
+  phone: "000-000-0000",
+  booking_phone: "000-000-0000",
+  bio: `
+    <p>This is sample bio text.</p>
+    <p>Replace it with your own information.</p>
+  `,
 
-    other_links: [],
-    preferred_booking_methods: [
-     
-    ],
-    booking_link: "",
-    important_info: [
-      "Deposit required to secure booking",
-    ],
-    /* ================= BUSINESS HOURS ================= */
-    business_hour: [],
-    /* ================= LOCATION ================= */
-    locations: [
-      {
-        id: "location-1",
-        label:
-          "Luxe Beauty Studio - Las Vegas",
-        location_type: "exact_address",
-        address:
-          "7575 S Rainbow Blvd UNIT 107, Las Vegas, NV 89139, USA",
-        city: "Las Vegas",
-        area: "Southwest",
-        state: "NV",
-        business_name: "Luxe Beauty Studio",
-        phone: "123-456-7890",
-        description:
-          "Located in SW Las Vegas near Rainbow Blvd",
-        isPrimary: true,
-        isOpen: true,
-      },
-    ],
-    /* ================= MEDIA ================= */
-    profile_image,
-    images: [img1, img2, img3],
-    gallery_meta: [
-      {
-        id: "sample-1",
-        caption:
-          "Stunning Balayage Transformation",
-        is_thumbnail: true,
-        sort_order: 0,
-      },
-      {
-        id: "sample-2",
-        caption: "Color Correction Result",
-        is_thumbnail: false,
-        sort_order: 1,
-      },
-      {
-        id: "sample-3",
-        caption: "Bridal Styling",
-        is_thumbnail: false,
-        sort_order: 2,
-      },
-    ],
-    /* ================= MARKETING ================= */
-    elite_setup: false,
-    offer_promotion: undefined,
-    promotion_details: "",
-    excites_about_glamlink: [],
-    biggest_pain_points: [],
-  };
+  /* ================= SPECIALTIES ================= */
+  primary_specialty: "Your Specialty",
+  specialties: [
+    "Specialty 1",
+    "Specialty 2",
+    "Specialty 3",
+    "Specialty 4",
+  ],
+
+  /* ================= HANDLES ================= */
+  custom_handle: "yourhandle",
+  instagram_handle: "yourhandle",
+  website: "https://example.com",
+
+  /* ================= SOCIAL ================= */
+  social_media: {
+    instagram: "",
+    facebook: "",
+    linkedin: "",
+    youtube: "",
+    tiktok: "",
+  },
+
+  other_links: [],
+
+  preferred_booking_methods: [],
+
+  booking_link: "",
+
+  important_info: [
+    "Add your important information here.",
+  ],
+
+  /* ================= BUSINESS HOURS ================= */
+  business_hour: [],
+
+  /* ================= LOCATION ================= */
+  locations: [
+    {
+      id: "location-1",
+      label: "Main Office",
+      location_type: "exact_address",
+      address: "123 Sample Street",
+      city: "Sample City",
+      state: "Sample State",
+      area: "Sample Area",
+      business_name: "Your Business Name",
+      phone: "000-000-0000",
+      description: "Replace with your business address.",
+      isPrimary: true,
+      isOpen: true,
+    },
+  ],
+
+  /* ================= IMAGES ================= */
+  profile_image,
+  images: [img1, img2, img3],
+
+  gallery_meta: [
+    {
+      id: "1",
+      caption: "Sample Image 1",
+      is_thumbnail: true,
+      sort_order: 0,
+    },
+    {
+      id: "2",
+      caption: "Sample Image 2",
+      is_thumbnail: false,
+      sort_order: 1,
+    },
+    {
+      id: "3",
+      caption: "Sample Image 3",
+      is_thumbnail: false,
+      sort_order: 2,
+    },
+  ],
+
+  /* ================= MARKETING ================= */
+  elite_setup: false,
+  offer_promotion: undefined,
+  promotion_details: "",
+  excites_about_glamlink: [],
+  biggest_pain_points: [],
+};
 }

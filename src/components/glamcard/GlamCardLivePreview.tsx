@@ -600,7 +600,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <SectionBox title="Gallery" titleAlign="center">
                   {normalizedImages.length > 0 && thumbnailIndex !== null ? (
                     <>
-                      <div className="relative aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
+                      <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
                         {normalizedImages[thumbnailIndex]?.file_type ===
                           "video" ? (
                           /* ✅ iOS FIX: playsInline + preload + key */
@@ -738,11 +738,11 @@ const GlamCardLivePreview: React.FC<Props> = ({
                                   {selectedLocation.label}
                                 </p>
                               )}
-                            {selectedLocation.business_name && (
+                            {/* {selectedLocation.business_name && (
                               <p className="font-semibold text-gray-800">
                                 {selectedLocation.business_name}
                               </p>
-                            )}
+                            )} */}
                             <p className="text-gray-600 leading-relaxed">
                               {selectedLocation.location_type ===
                                 "exact_address"
@@ -1007,11 +1007,11 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   )}
                   {selectedLocation && (
                     <div className="mb-3 space-y-1">
-                      {selectedLocation.business_name && (
+                      {/* {selectedLocation.business_name && (
                         <p className="font-semibold text-gray-800 text-sm">
                           {selectedLocation.business_name}
                         </p>
-                      )}
+                      )} */}
                       <p className="text-gray-600 text-sm leading-relaxed">
                         {selectedLocation.location_type === "exact_address"
                           ? selectedLocation.address?.trim() ||

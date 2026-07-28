@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Modal, message } from "antd";
 import { Loader2 } from "lucide-react";
 import SuccessModal from "@/components/SuccessModal";
-
 import { GlamCardFormData } from "./types";
 import BasicInfoForm from "./BasicInfoForm";
 import MediaAndProfileForm from "../MediaAndProfileForm";
@@ -14,7 +13,6 @@ import VerifyOtp from "@/components/AuthPage/VerifyOtp";
 import Register from "@/components/AuthPage/Register";
 import Login from "@/components/AuthPage/Login";
 import { SubscriptionPaymentModal } from "../../Dashboard/SubscriptionPay";
-
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
@@ -27,14 +25,11 @@ interface Props {
   /** shown as a Cancel action when mode === "edit" */
   onCancel?: () => void;
 }
-
 const FORM_STORAGE_KEY = "glamcard_form_draft";
-
 // "payment" is intentionally NOT rendered inside the register/otp/login
 // Modal below — it's shown via its own SubscriptionPaymentModal instance so
 // the two modals never stack on top of one another.
 type AuthStep = "register" | "otp" | "login" | "payment" | null;
-
 const GlamCardForm: React.FC<Props> = ({
   data,
   setData,
@@ -47,13 +42,11 @@ const GlamCardForm: React.FC<Props> = ({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
   // Auth flow state — shown when a card is created for a user who doesn't
   // have a Glamlink login yet (result.data.user_login === false).
   // Flow: register -> otp -> login -> (payment, if pending)
   const [authStep, setAuthStep] = useState<AuthStep>(null);
   const [createdCardEmail, setCreatedCardEmail] = useState<string>("");
-
   // What should happen once the success popup is dismissed. We always show
   // the "your card was created" popup first now — this just decides what
   // comes after it: straight to the dashboard, or into the register flow
@@ -61,13 +54,11 @@ const GlamCardForm: React.FC<Props> = ({
   const [postSuccessAction, setPostSuccessAction] = useState<
     "dashboard" | "register" | null
   >(null);
-
   // Owned here (not by Login) so the payment modal survives the
   // register/otp/login Modal closing and doesn't stack two modals at once.
   const [pendingCardId, setPendingCardId] = useState<string | number | null>(
     null
   );
-
   // Restore form data from localStorage on mount (create flow only — edit loads from server data via props).
   //
   // The draft in FORM_STORAGE_KEY is ONLY meant to survive the intentional
@@ -80,11 +71,9 @@ const GlamCardForm: React.FC<Props> = ({
   // clear it instead of restoring it.
   useEffect(() => {
     if (isEdit) return;
-
     const cameFromLoginRedirect =
       localStorage.getItem("postLoginRedirect") === "/apply/digital-card";
     const storedData = localStorage.getItem(FORM_STORAGE_KEY);
-
     if (cameFromLoginRedirect && storedData) {
       try {
         const parsed = JSON.parse(storedData);
@@ -93,7 +82,6 @@ const GlamCardForm: React.FC<Props> = ({
         console.error(error);
       }
     }
-
     // Either way, clear both keys now: if we just consumed the draft, it's
     // no longer needed; if this was a plain reload, we don't want a stale
     // draft or redirect flag lingering around for next time.
@@ -101,7 +89,6 @@ const GlamCardForm: React.FC<Props> = ({
     localStorage.removeItem("postLoginRedirect");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setData, isEdit]);
-
   /* ================= REQUIRED VALIDATION =================
      Pulled out so it can run before we even check for login,
      without needing to touch handleSubmit's flow. */
@@ -167,19 +154,16 @@ const GlamCardForm: React.FC<Props> = ({
     }
     return true;
   };
-
   /* ================= BUILD FORM DATA =================
      Pulled out of handleSubmit so it can run — and get stored to
      sessionStorage — regardless of whether the user is logged in. */
   const buildFormData = (): FormData => {
     const formData = new FormData();
-
     // Profile image: only send if a NEW file was picked. If it's still the
     // existing string URL (edit mode, untouched), don't re-upload it.
     if (data.profile_image instanceof File) {
       formData.append("profile_image", data.profile_image);
     }
-
     // Gallery images/videos: split into new File uploads vs existing URLs
     const newImageFiles = (data.images ?? []).filter(
       (file): file is File =>
@@ -193,14 +177,11 @@ const GlamCardForm: React.FC<Props> = ({
     const existingImageUrls = (data.images ?? []).filter(
       (file: unknown): file is string => typeof file === "string"
     );
-
     newImageFiles.forEach((file) => formData.append("images", file));
-
     if (isEdit && existingImageUrls.length) {
       // NOTE: confirm this field name matches what updateBusinessCard expects
       formData.append("existing_images", JSON.stringify(existingImageUrls));
     }
-
     if (data.gallery_meta?.length) {
       formData.append(
         "gallery_meta",
@@ -213,18 +194,15 @@ const GlamCardForm: React.FC<Props> = ({
         )
       );
     }
-
     newVideoItems.forEach(({ file, meta }) => {
       formData.append("videos", file);
       if (meta?.thumbnail_file) {
         formData.append("video_thumbnails", meta.thumbnail_file);
       }
     });
-
     if (data.social_media) {
       formData.append("social_media", JSON.stringify(data.social_media));
     }
-
     // preferred_booking_methods is an array (multi-select) in the form
     // state, but the backend expects it under the singular key
     // "preferred_booking_method" — still as a JSON array, not a single
@@ -245,14 +223,12 @@ const GlamCardForm: React.FC<Props> = ({
         formData.append(field, JSON.stringify(value));
       }
     });
-
     if (data.preferred_booking_methods !== undefined) {
       formData.append(
         "preferred_booking_method",
         JSON.stringify(data.preferred_booking_methods)
       );
     }
-
     const primitiveFields = [
       "name",
       "email",
@@ -274,17 +250,12 @@ const GlamCardForm: React.FC<Props> = ({
         formData.append(field, String(value));
       }
     });
-
     formData.append("is_phone_visible", String(data.is_phone_visible ?? true));
-
     return formData;
   };
-
   const checkAuthAndSubmit = () => {
     if (!validateData()) return;
-
     const formData = buildFormData();
-
     // Session storage is only a hand-off mechanism for the logged-out ->
     // login -> resume-submit flow (see the useEffect above that reads
     // FORM_STORAGE_KEY on mount, and handleLogin below). A logged-in user
@@ -294,7 +265,6 @@ const GlamCardForm: React.FC<Props> = ({
     if (!token) {
       saveFormDataToSession(formData);
     }
-
     // if (!token) {
     //   if (isEdit) {
     //     alert("Your session has expired. Please log in again.");
@@ -313,10 +283,8 @@ const GlamCardForm: React.FC<Props> = ({
     //   });
     //   return;
     // }
-
     handleSubmit(formData);
   };
-
   // Fires once the success popup is dismissed, whether that's via its own
   // auto-close timer or a user clicking a close/"see your card" button
   // inside it. Guarded by postSuccessAction so it's safe to fire twice
@@ -332,16 +300,13 @@ const GlamCardForm: React.FC<Props> = ({
       return null;
     });
   };
-
   const handleLogin = () => {
     localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(data));
     localStorage.setItem("postLoginRedirect", "/apply/digital-card");
     window.location.href = "/login";
   };
-
   const handleSubmit = async (formData: FormData) => {
     console.log("FINAL DATA 👉", data);
-
     // newVideoItems thumbnail check still needs to run before the actual
     // network call — kept here since it can short-circuit with a UI alert.
     const newVideoItems = (data.images ?? [])
@@ -355,7 +320,6 @@ const GlamCardForm: React.FC<Props> = ({
         return;
       }
     }
-
     try {
       setLoading(true);
       const token = localStorage.getItem("GlamlinkaccessToken");
@@ -364,7 +328,6 @@ const GlamCardForm: React.FC<Props> = ({
         : token
           ? "https://node.glamlink.net:5000/api/v1/businessCard/createBusinessCard"
           : "https://node.glamlink.net:5000/api/v1/businessCard";
-
       const res = await fetch(endpoint, {
         method: isEdit ? "PUT" : "POST",
         headers: {
@@ -373,17 +336,13 @@ const GlamCardForm: React.FC<Props> = ({
         },
         body: formData,
       });
-
       console.log(res, "res====");
-
       if (!res.ok) {
         throw new Error(
           isEdit ? "Failed to update GlamCard" : "Failed to create GlamCard"
         );
       }
-
       const result = await res.json();
-
       if (isEdit) {
         message.success(result?.message || "GlamCard updated successfully!");
         onSuccess?.(result?.data ?? result);
@@ -400,7 +359,7 @@ const GlamCardForm: React.FC<Props> = ({
           setPostSuccessAction("dashboard");
         }
         setShowSuccess(true);
-        setTimeout(advanceAfterSuccess, 2000);
+        setTimeout(advanceAfterSuccess, 6000);
       }
     } catch (error) {
       console.error("ERROR 👉", error);
@@ -411,13 +370,11 @@ const GlamCardForm: React.FC<Props> = ({
       setLoading(false);
     }
   };
-
   // register/otp/login share one Modal; "payment" is deliberately excluded
   // so it renders via its own SubscriptionPaymentModal instance below,
   // instead of stacking on top of this one.
   const isAuthModalOpen =
     authStep === "register" || authStep === "otp" || authStep === "login";
-
   return (
     <>
       <div className="h-[90dvh] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
@@ -436,18 +393,15 @@ const GlamCardForm: React.FC<Props> = ({
               </div>
             </div>
           )}
-
           <div
             aria-busy={loading}
-            className={`space-y-10 pb-6 transition-opacity duration-150 ${
-              loading ? "pointer-events-none opacity-50" : ""
-            }`}
+            className={`space-y-10 pb-6 transition-opacity duration-150 ${loading ? "pointer-events-none opacity-50" : ""
+              }`}
           >
             <BasicInfoForm data={data} setData={setData} />
             <MediaAndProfileForm data={data} setData={setData} />
             <ServicesAndBookingForm data={data} setData={setData} />
             {/* <GlamlinkIntegrationForm data={data} setData={setData} /> */}
-
             <div className="mt-10 flex gap-3">
               {isEdit && onCancel && (
                 <button
@@ -484,18 +438,17 @@ const GlamCardForm: React.FC<Props> = ({
           </div>
         </div>
       </div>
-
       {!isEdit && (
         <SuccessModal
           open={showSuccess}
           onClose={advanceAfterSuccess}
-          title="Business card created"
-          message="Your business card was created successfully. See your card to finish setting it up."
+          title="Thanks! Your Access Card request has been received."
+          message="
+Your Access Card is currently under review. Once approved, we'll email you with instructions to access your account and view your Access Card.
+"
         />
       )}
-
-
-      {!isEdit && (
+      {/* {!isEdit && (
         <Modal
           open={isAuthModalOpen}
           onCancel={() => setAuthStep(null)}
@@ -539,9 +492,7 @@ const GlamCardForm: React.FC<Props> = ({
           )}
         </Modal>
       )}
-
-      {/* Payment modal — owned here (not by Login) so it doesn't stack on
-          top of the register/otp/login Modal above. */}
+    
       {!isEdit && (
         <SubscriptionPaymentModal
           open={authStep === "payment"}
@@ -556,9 +507,8 @@ const GlamCardForm: React.FC<Props> = ({
             router.push("/dashboard?tab=addresses");
           }}
         />
-      )}
+      )} */}
     </>
   );
 };
-
 export default GlamCardForm;

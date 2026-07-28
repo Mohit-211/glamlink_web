@@ -23,7 +23,7 @@ export interface Location {
 /* ================= GALLERY ================= */
 export interface GalleryMetaItem {
   id: string;
-  caption?: string;
+  caption: string;
   is_thumbnail: boolean;
   sort_order: number;
   thumbnail_file?: File;
@@ -34,7 +34,7 @@ export interface GlamCardFormData {
   other_links: any;
   /* BASIC INFO */
   name: string;
-  business_name: string;
+
   professional_title: string;
   profession?: string;
   email: string;

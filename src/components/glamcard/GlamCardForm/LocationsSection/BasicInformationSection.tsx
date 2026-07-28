@@ -90,7 +90,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
           />
         </div>
 
-    
+
 
         {/* EMAIL */}
         <div>
@@ -167,20 +167,8 @@ const BasicInformationSection: React.FC<SectionProps> = ({
           </p>
         </div>
       </div>
-            {/* BUSINESS NAME */}
-        <div>
-          <label className={labelClass}>Business Name</label>
-          <input
-              className={`${inputClass} w-full`}
-            value={data.business_name || ""}
-            onChange={(e) =>
-              setData((p) => ({
-                ...p,
-                business_name: e.target.value,
-              }))
-            }
-          />
-        </div>
+      {/* BUSINESS NAME */}
+
     </section>
   );
 };

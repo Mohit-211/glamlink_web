@@ -497,7 +497,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
               />
 
               <span>
-                {method === BOOKING_METHODS.LINK && "Go to Booking Link"}
+                {method === BOOKING_METHODS.LINK && "Go to Website"}
                 {method === BOOKING_METHODS.CALL && "Call / Text"}
                 {method === BOOKING_METHODS.INSTAGRAM && "DM on Instagram"}
               </span>
