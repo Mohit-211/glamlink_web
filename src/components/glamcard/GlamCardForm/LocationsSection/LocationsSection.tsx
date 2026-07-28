@@ -21,8 +21,6 @@ const createEmptyLocation = (index: number): Location => ({
 
   latitude: undefined,     // ✅ UPDATED
   longitude: undefined,    // ✅ UPDATED
-
-  business_name: "",
   phone: "",
   description: "",
   isPrimary: index === 0,
