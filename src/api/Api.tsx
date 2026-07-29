@@ -406,6 +406,18 @@ export const CreateSubscription = async (payload: any) => {
   );
   return data;
 };
+export const CancelSubscription = async (payload: any) => {
+  const { data } = await api.post(
+    "businessCard/cancel-subscription",
+    payload,
+    {
+      headers: {
+        "x-access-token": getToken(),
+      },
+    }
+  );
+  return data;
+};
 export const getPaymenthistory = async () => {
   const { data } = await api.get(
     "businessCard/payment-history",

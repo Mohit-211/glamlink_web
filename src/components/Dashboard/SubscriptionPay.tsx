@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import {
@@ -22,16 +23,24 @@ import {
     MapPin,
     Pencil,
 } from 'lucide-react';
-import { addShippingAddress, CreateSubscription, SelectAddressApi } from '../../api/Api';
-// NOTE: `editAddress` is assumed to exist alongside `addNewAddress` in your Api module,
-// with a signature like `editAddress(payload: { id: string | number; ...fields })`.
-// If it doesn't exist yet, add it (mirroring addNewAddress but hitting your PATCH/PUT
-// "update address" endpoint) or swap the call below for whatever your backend expects.
-import { addNewAddress, editAddress, getAllUserAddress, getAllStates, getCitiesByState } from '../../api/Api';
+import {
+    addShippingAddress,
+    CreateSubscription,
+    SelectAddressApi,
+    addNewAddress,
+    editAddress,
+    getAllUserAddress,
+    getAllStates,
+    getCitiesByState,
+} from '../../api/Api';
+import { PurchaseType } from './Purchasetypes';
+import { useRouter } from 'next/navigation';
+
 // ── Stripe init ──────────────────────────────────────────────────────────────
 const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY ?? ''
 );
+
 const ELEMENT_STYLE = {
     style: {
         base: {
@@ -43,13 +52,36 @@ const ELEMENT_STYLE = {
         invalid: { color: '#ef4444' },
     },
 };
+
+// ── Error helpers ─────────────────────────────────────────────────────────────
+// API errors come back shaped like:
+// { success: false, status: 400, message: "NFC card already purchased", data: "" }
+// Axios wraps that in err.response.data, but plain JS errors (Stripe, etc.)
+// only carry err.message — this pulls whichever is actually available.
+const getApiErrorMessage = (err: any, fallback: string): string => {
+    const data = err?.response?.data;
+    if (data && typeof data === 'object' && typeof data.message === 'string' && data.message.trim()) {
+        return data.message;
+    }
+    if (typeof err?.message === 'string' && err.message.trim()) {
+        return err.message;
+    }
+    return fallback;
+};
+
+const isAlreadyPurchasedError = (message: string): boolean =>
+    message.toLowerCase().includes('already purchased');
+
 // ── Types ────────────────────────────────────────────────────────────────────
 interface ShippingData {
+    nfc_price?: number;
+    subscription_price?: number;
     shipping_amount: number;
     carrier: string;
     service: string;
     total_due_today: number;
 }
+
 interface AddressFormData {
     address_line_1: string;
     address_lat: string;
@@ -58,6 +90,7 @@ interface AddressFormData {
     city_id: string;
     postal_code: string;
 }
+
 const EMPTY_ADDRESS: AddressFormData = {
     address_line_1: '',
     address_lat: '',
@@ -66,14 +99,17 @@ const EMPTY_ADDRESS: AddressFormData = {
     city_id: '',
     postal_code: '',
 };
+
 interface StateItem {
     id: number;
     name: string;
 }
+
 interface CityItem {
     id: number;
     name: string;
 }
+
 interface Address {
     id: string | number;
     address_line_1: string;
@@ -84,13 +120,15 @@ interface Address {
     user_state?: { id: number; name: string };
     is_default?: boolean;
 }
-// ── Step 1a: Address Form (shown inline when no address exists, or when editing) ─
+
+// ── Step 1a: Add / Edit Address Form ─────────────────────────────────────────
 interface AddressStepProps {
     businessCardId?: string | number | null;
     editingAddress?: Address | null;
     onSaved: () => void;
     onCancel: () => void;
 }
+
 function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: AddressStepProps) {
     const isEditing = !!editingAddress;
     const [form, setForm] = useState<AddressFormData>(() => {
@@ -110,6 +148,7 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
     const [cities, setCities] = useState<CityItem[]>([]);
     const [status, setStatus] = useState<'idle' | 'saving' | 'error'>('idle');
     const [errorMsg, setErrorMsg] = useState('');
+
     useEffect(() => {
         const fetchStates = async () => {
             try {
@@ -121,6 +160,7 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
         };
         fetchStates();
     }, []);
+
     useEffect(() => {
         if (!form.state_id) {
             setCities([]);
@@ -136,11 +176,13 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
         };
         fetchCities();
     }, [form.state_id]);
+
     const isValid =
         form.address_line_1.trim() &&
         form.state_id &&
         form.city_id &&
         form.postal_code.trim();
+
     const handleSubmit = async () => {
         if (!isValid) {
             setErrorMsg('Please fill in all required fields.');
@@ -162,6 +204,7 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
                 isEditing && editingAddress
                     ? await editAddress(editingAddress.id, payload)
                     : await addNewAddress(payload);
+
             if (response?.success === false) {
                 setErrorMsg(
                     response?.message || 'Please enter a valid address, city, state and PIN code.'
@@ -181,6 +224,7 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
             setStatus('error');
         }
     };
+
     return (
         <div className="space-y-4">
             <div className="flex items-start gap-2 rounded-xl border border-primary/20 bg-accent/40 px-4 py-3">
@@ -250,26 +294,25 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
                     </select>
                 </div>
             </div>
-       <div className="space-y-1.5">
-  <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-    ZIP Code
-  </label>
-
-  <input
-    value={form.postal_code}
-    onChange={(e) =>
-      setForm((prev) => ({
-        ...prev,
-        postal_code: e.target.value.toUpperCase(),
-      }))
-    }
-    placeholder="Enter ZIP Code"
-    inputMode="text"
-    maxLength={10}
-    disabled={status === "saving"}
-    className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition disabled:opacity-50"
-  />
-</div>
+            <div className="space-y-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    ZIP Code
+                </label>
+                <input
+                    value={form.postal_code}
+                    onChange={(e) =>
+                        setForm((prev) => ({
+                            ...prev,
+                            postal_code: e.target.value.toUpperCase(),
+                        }))
+                    }
+                    placeholder="Enter ZIP Code"
+                    inputMode="text"
+                    maxLength={10}
+                    disabled={status === "saving"}
+                    className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition disabled:opacity-50"
+                />
+            </div>
             <div className="flex gap-3">
                 <button
                     onClick={onCancel}
@@ -299,26 +342,26 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
         </div>
     );
 }
-// ── Step 1: Shipping Summary ─────────────────────────────────────────────────
+
+// ── Step 1: Select Address & Shipping Summary ────────────────────────────────
 interface ShippingStepProps {
     businessCardId?: string | number | null;
     onContinue: (shipping: ShippingData) => void;
     onCancel: () => void;
     onNeedsAddress: () => void;
     onEditAddress: (address: Address) => void;
+    purchaseType: string
 }
-function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, onEditAddress }: ShippingStepProps) {
+
+function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, onEditAddress, purchaseType }: ShippingStepProps) {
     const [status, setStatus] = useState<
-        'loading' | 'select-address' | 'calculating' | 'ready' | 'error' | 'no-address'
+        'loading' | 'select-address' | 'calculating' | 'ready' | 'error' | 'no-address' | 'already-purchased'
     >('loading');
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | number | null>(null);
     const [shipping, setShipping] = useState<ShippingData | null>(null);
-    console.log(shipping, "shipping")
     const [errorMsg, setErrorMsg] = useState('');
 
-    // Step A: load the address list. Empty -> "no-address" flow (unchanged).
-    // Non-empty -> let the user pick which one to ship to.
     useEffect(() => {
         let cancelled = false;
         const loadAddresses = async () => {
@@ -351,8 +394,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
         };
     }, [businessCardId]);
 
-
-
     const handleCalculateShipping = async () => {
         if (!selectedAddressId || !businessCardId) return;
         setStatus('calculating');
@@ -363,23 +404,30 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
                 user_address_id: selectedAddressId,
             });
 
-            const res = await addShippingAddress({ business_card_id: String(businessCardId) });
+            const res = await addShippingAddress({
+                business_card_id: String(businessCardId),
+                purchase_type: purchaseType,
+            });
             setShipping(res.data);
             setStatus('ready');
         } catch (err: any) {
-            const msg: string = err?.response?.data?.message ?? '';
-            const lowerMsg = msg?.toLowerCase() || '';
+            const msg = getApiErrorMessage(err, 'Could not calculate shipping.');
+            const lowerMsg = msg.toLowerCase();
             if (
                 lowerMsg.includes('address not found') ||
                 lowerMsg.includes('please verify address first')
             ) {
                 setStatus('no-address');
+            } else if (isAlreadyPurchasedError(msg)) {
+                setErrorMsg(msg);
+                setStatus('already-purchased');
             } else {
-                setErrorMsg(msg || 'Could not calculate shipping.');
+                setErrorMsg(msg);
                 setStatus('error');
             }
         }
     };
+
     if (status === 'loading') {
         return (
             <div className="flex flex-col items-center justify-center gap-3 py-12">
@@ -388,44 +436,70 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
             </div>
         );
     }
+
+    if (status === 'already-purchased') {
+        return (
+            <div className="space-y-4">
+                <div className="flex flex-col items-center justify-center gap-3 py-6 text-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent">
+                        <Package className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                        <p className="text-sm font-semibold text-foreground">Already purchased</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            {errorMsg || "You've already purchased an NFC card for this business card."}
+                        </p>
+                    </div>
+                </div>
+                <button
+                    onClick={onCancel}
+                    className="w-full btn-primary !rounded-xl !py-2.5 !text-sm"
+                >
+                    Close
+                </button>
+            </div>
+        );
+    }
+
     if (status === 'no-address') {
         return (
-            <div className="flex flex-col items-center gap-5 py-6 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-50 border border-amber-200">
-                    <MapPin className="h-8 w-8 text-amber-500" />
+            <div className="space-y-5">
+                <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground">Where should we ship your NFC card?</p>
                 </div>
-                <div>
-                    <p className="text-base font-semibold text-foreground">No address found</p>
-                    <p className="text-sm text-muted-foreground mt-1.5 max-w-[260px] mx-auto">
-                        Please add a shipping address before completing your purchase.
-                    </p>
-                </div>
-                <div className="flex flex-col gap-2.5 w-full">
-                    <button
-                        onClick={onNeedsAddress}
-                        className="w-full btn-primary !rounded-xl !py-2.5 !text-sm flex items-center justify-center gap-2"
-                    >
-                        <MapPin className="h-4 w-4" />
-                        Add Address Now
-                    </button>
+                <button
+                    onClick={onNeedsAddress}
+                    className="w-full rounded-xl border border-dashed border-border py-4 text-sm font-medium text-foreground hover:border-primary/40 hover:bg-accent/30 transition-colors flex items-center justify-center gap-2"
+                >
+                    <span className="text-base leading-none">+</span>
+                    Add a new address
+                </button>
+                <div className="flex gap-3 pt-1">
                     <button
                         onClick={onCancel}
-                        className="w-full rounded-xl border border-border bg-secondary/60 py-2.5 text-sm font-medium text-foreground hover:bg-secondary transition-colors"
+                        className="flex-1 rounded-xl border border-border bg-secondary/60 py-2.5 text-sm font-medium text-foreground hover:bg-secondary transition-colors"
                     >
                         Cancel
+                    </button>
+                    <button
+                        disabled
+                        className="flex-1 btn-primary !rounded-xl !py-2.5 !text-sm flex items-center justify-center gap-2 disabled:opacity-60"
+                    >
+                        Continue to order
                     </button>
                 </div>
             </div>
         );
     }
+
     if (status === 'select-address') {
         return (
             <div className="space-y-4">
-                {addresses.length > 1 && (
-                    <p className="text-[12px] text-muted-foreground">
-                        Choose which address you'd like this shipped to.
-                    </p>
-                )}
+                <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground">Where should we ship your NFC card?</p>
+                </div>
                 {errorMsg && (
                     <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
                         <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
@@ -483,9 +557,10 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
                 </div>
                 <button
                     onClick={onNeedsAddress}
-                    className="text-xs font-semibold text-primary hover:underline underline-offset-2"
+                    className="w-full rounded-xl border border-dashed border-border py-3.5 text-sm font-medium text-foreground hover:border-primary/40 hover:bg-accent/30 transition-colors flex items-center justify-center gap-2"
                 >
-                    + Ship to a different address
+                    <span className="text-base leading-none">+</span>
+                    Add a new address
                 </button>
                 <div className="flex gap-3 pt-1">
                     <button
@@ -499,21 +574,23 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
                         disabled={!selectedAddressId}
                         className="flex-1 btn-primary !rounded-xl !py-2.5 !text-sm flex items-center justify-center gap-2 disabled:opacity-60"
                     >
-                        Continue
+                        Continue to order
                         <ChevronRight className="h-4 w-4" />
                     </button>
                 </div>
             </div>
         );
     }
+
     if (status === 'calculating') {
         return (
             <div className="flex flex-col items-center justify-center gap-3 py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground">Calculating shipping…</p>
+                <p className="text-sm text-muted-foreground">Calculating shipping fees…</p>
             </div>
         );
     }
+
     if (status === 'error') {
         return (
             <div className="space-y-4">
@@ -522,18 +599,18 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
                     <p className="text-sm text-red-700">{errorMsg}</p>
                 </div>
                 <button
-                    onClick={onCancel}
+                    onClick={() => setStatus('select-address')}
                     className="w-full rounded-xl border border-border bg-secondary/60 py-2.5 text-sm font-medium text-foreground hover:bg-secondary transition-colors"
                 >
-                    Close
+                    Try Another Address
                 </button>
             </div>
         );
     }
+
     const selectedAddress = addresses.find((a) => a.id === selectedAddressId);
     return (
         <div className="space-y-5">
-            {/* Selected address recap */}
             {selectedAddress && (
                 <div className="flex items-start justify-between gap-3 rounded-xl border border-border bg-secondary/30 px-4 py-3">
                     <div className="flex items-start gap-2 min-w-0">
@@ -550,46 +627,57 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
                             </p>
                         </div>
                     </div>
-                    {/* <div className="flex items-center gap-3 flex-shrink-0">
-                        <button
-                            onClick={() => onEditAddress(selectedAddress)}
-                            className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline underline-offset-2"
-                        >
-                            <Pencil className="h-3 w-3" />
-                            Edit
-                        </button>
-                        <button
-                            onClick={() => setStatus('select-address')}
-                            className="text-[11px] font-semibold text-primary hover:underline underline-offset-2"
-                        >
-                            Change
-                        </button>
-                    </div> */}
+                    <button
+                        onClick={() => setStatus('select-address')}
+                        className="text-[11px] font-semibold text-primary hover:underline underline-offset-2 flex-shrink-0"
+                    >
+                        Change
+                    </button>
                 </div>
             )}
-            {/* Shipping breakdown */}
             <div className="rounded-xl border border-border bg-secondary/30 overflow-hidden">
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
                     <Truck className="h-4 w-4 text-primary flex-shrink-0" />
                     <div className="flex-1">
-                        <p className="text-xs font-semibold text-foreground">{shipping!.carrier} · {shipping!.service}</p>
-                        <p className="text-[11px] text-muted-foreground">Estimated delivery method</p>
+                        <p className="text-xs font-semibold text-foreground">
+                            {shipping?.carrier} · {shipping?.service}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                            Estimated delivery method
+                        </p>
                     </div>
-                    <p className="text-sm font-semibold text-foreground">${shipping!.shipping_amount.toFixed(2)}</p>
+                    <p className="text-sm font-semibold text-foreground">
+                        ${shipping?.shipping_amount.toFixed(2)}
+                    </p>
                 </div>
+
                 <div className="px-4 py-3 space-y-2">
+                    {shipping?.nfc_price !== undefined && (
+                        <div className="flex justify-between text-[13px] text-muted-foreground">
+                            <span>NFC Card</span>
+                            <span>${shipping.nfc_price.toFixed(2)}</span>
+                        </div>
+                    )}
+
+                    {shipping?.subscription_price !== undefined && (
+                        <div className="flex justify-between text-[13px] text-muted-foreground">
+                            <span>Subscription</span>
+                            <span>${shipping.subscription_price.toFixed(2)}</span>
+                        </div>
+                    )}
+
                     <div className="flex justify-between text-[13px] text-muted-foreground">
-                        <span>Subscription</span>
-                        <span>${(shipping!.total_due_today - shipping!.shipping_amount).toFixed(2)}</span>
+                        <span>Shipping ({shipping?.carrier})</span>
+                        <span>${shipping?.shipping_amount.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-[13px] text-muted-foreground">
-                        <span>Shipping ({shipping!.carrier})</span>
-                        <span>${shipping!.shipping_amount.toFixed(2)}</span>
-                    </div>
+
                     <div className="h-px bg-border" />
+
                     <div className="flex justify-between text-sm font-bold text-foreground">
                         <span>Total due today</span>
-                        <span className="text-primary">${shipping!.total_due_today.toFixed(2)}</span>
+                        <span className="text-primary">
+                            ${shipping?.total_due_today.toFixed(2)}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -611,30 +699,42 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
         </div>
     );
 }
-// ── Step 2: Stripe Payment Form ──────────────────────────────────────────────
+
+// ── Step 2: Payment Form ──────────────────────────────────────────────────────
 interface PaymentStepProps {
-    shipping: ShippingData;
+    shipping?: ShippingData | null;
     businessCardId?: string | number | null;
+    allowedPurchaseType?: PurchaseType;
     onSuccess: () => void;
     onBack: () => void;
+    onClose?: () => void;
 }
+
 function PaymentStep({
     shipping,
     businessCardId,
+    allowedPurchaseType = 'SUBSCRIPTION_ONLY',
     onSuccess,
     onBack,
+    onClose,
 }: PaymentStepProps) {
-    console.log(shipping, "shipping==")
+    const router = useRouter()
+
     const stripe = useStripe();
     const elements = useElements();
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [errorMsg, setErrorMsg] = useState('');
+    const [alreadyPurchased, setAlreadyPurchased] = useState(false);
     const [cardName, setCardName] = useState('');
+
+    const totalAmount = shipping ? shipping.total_due_today : 4.99;
+
     const handlePay = async () => {
         if (!stripe || !elements) return;
 
         setStatus('loading');
         setErrorMsg('');
+        setAlreadyPurchased(false);
 
         try {
             const cardNumber = elements.getElement(CardNumberElement);
@@ -645,9 +745,8 @@ function PaymentStep({
 
             const response = await CreateSubscription({
                 business_card_id: Number(businessCardId),
+                purchase_type: allowedPurchaseType,
             });
-
-            console.log('Subscription Response:', response);
 
             const clientSecret =
                 response?.data?.clientSecret ||
@@ -655,7 +754,7 @@ function PaymentStep({
                 response?.client_secret;
 
             if (!clientSecret) {
-                throw new Error('Client secret not received');
+                throw new Error('Client secret not received from server.');
             }
 
             const paymentResult = await stripe.confirmCardPayment(clientSecret, {
@@ -666,8 +765,6 @@ function PaymentStep({
                     },
                 },
             });
-
-            console.log('Stripe Result:', paymentResult);
 
             if (paymentResult.error) {
                 throw new Error(paymentResult.error.message);
@@ -682,97 +779,134 @@ function PaymentStep({
                     onSuccess();
                 }, 1500);
             } else {
-                throw new Error('Payment not completed');
+                throw new Error('Payment was not completed successfully.');
             }
         } catch (err: any) {
             console.error(err);
+            const msg = getApiErrorMessage(err, 'Payment processing failed.');
             setStatus('error');
-            setErrorMsg(err?.message || 'Payment failed');
+            setErrorMsg(msg);
+            setAlreadyPurchased(isAlreadyPurchasedError(msg));
         }
     };
+
     if (status === 'success') {
         return (
             <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
                 <CheckCircle className="h-14 w-14 text-green-500" />
                 <div>
                     <p className="text-base font-semibold text-foreground">Payment successful!</p>
-                    <p className="text-sm text-muted-foreground mt-1">Your subscription is now active.</p>
+                    <p className="text-sm text-muted-foreground mt-1">Your order has been confirmed.</p>
                 </div>
             </div>
         );
     }
-    return (
-        <div className="space-y-5">
-            {/* Total reminder */}
-            <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-accent/40 px-4 py-3">
-                <div className="flex items-center gap-2">
-                    <Package className="h-4 w-4 text-primary" />
+
+    if (alreadyPurchased) {
+        return (
+            <div className="space-y-4">
+                <div className="flex flex-col items-center justify-center gap-3 py-6 text-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent">
+                        <Package className="h-6 w-6 text-primary" />
+                    </div>
                     <div>
-                        <p className="text-[11px] text-muted-foreground">Total due today</p>
-                        <p className="text-sm font-bold text-foreground">${shipping.total_due_today.toFixed(2)}</p>
+                        <p className="text-sm font-semibold text-foreground">Already purchased</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            {errorMsg || "You've already purchased an NFC card for this business card."}
+                        </p>
                     </div>
                 </div>
-                <span className="text-[11px] text-muted-foreground">{shipping.carrier} · {shipping.service}</span>
+             <button
+    onClick={() => {
+        onClose?.();
+        router.push('/dashboard?tab=plans');
+    }}
+    className="w-full btn-primary !rounded-xl !py-2.5 !text-sm"
+>
+    Close
+</button>
             </div>
-            {/* Cardholder name */}
-            <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                    Name on card
-                </label>
-                <input
-                    type="text"
-                    value={cardName}
-                    onChange={(e) => setCardName(e.target.value)}
-                    placeholder="Jane Smith"
-                    className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
-                />
-            </div>
-            {/* Card number */}
-            <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                    Card number
-                </label>
-                <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5 focus-within:ring-2 focus-within:ring-primary/30 transition">
-                    <CreditCard className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                    <div className="flex-1">
-                        <CardNumberElement options={ELEMENT_STYLE} />
-                    </div>
+        );
+    }
+
+    const includesSubscription = ['SUBSCRIPTION_ONLY', 'NFC_WITH_SUBSCRIPTION'].includes(
+        allowedPurchaseType
+    );
+    const payLabel = includesSubscription ? 'Start Subscription' : 'Complete Order';
+
+    return (
+        <div className="space-y-4">
+            <div className="rounded-xl border border-primary/20 bg-accent/40 px-4 py-3.5 space-y-1">
+                <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-foreground">
+                        {shipping ? 'Order Summary' : 'Subscription Plan'}
+                    </span>
+                    <span className="text-sm font-bold text-primary">
+                        {shipping ? `$${totalAmount.toFixed(2)}` : '$4.99 / month'}
+                    </span>
                 </div>
+                <p className="text-[12px] text-muted-foreground">
+                    {shipping
+                        ? `${shipping.carrier} · ${shipping.service} · Total due today $${totalAmount.toFixed(2)}`
+                        : 'Unlocks all digital access card features instantly. Cancel anytime.'}
+                </p>
             </div>
-            {/* Expiry + CVC */}
+
+            <p className="text-sm font-semibold text-foreground pt-1">Enter your card details</p>
+
+            <input
+                type="text"
+                value={cardName}
+                onChange={(e) => setCardName(e.target.value)}
+                placeholder="Name on card"
+                className="w-full rounded-xl border border-border bg-card px-3.5 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+            />
+
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3.5 py-3 focus-within:ring-2 focus-within:ring-primary/30 transition">
+                <div className="flex-1">
+                    <CardNumberElement
+                        options={{
+                            ...ELEMENT_STYLE,
+                            placeholder: 'Card number (16 digits)',
+                        }}
+                    />
+                </div>
+                <CreditCard className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Expiry</label>
-                    <div className="rounded-xl border border-border bg-card px-3 py-2.5 focus-within:ring-2 focus-within:ring-primary/30 transition">
-                        <CardExpiryElement options={ELEMENT_STYLE} />
-                    </div>
+                <div className="rounded-xl border border-border bg-card px-3.5 py-3 focus-within:ring-2 focus-within:ring-primary/30 transition">
+                    <CardExpiryElement options={ELEMENT_STYLE} />
                 </div>
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">CVC</label>
-                    <div className="rounded-xl border border-border bg-card px-3 py-2.5 focus-within:ring-2 focus-within:ring-primary/30 transition">
+                <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3.5 py-3 focus-within:ring-2 focus-within:ring-primary/30 transition">
+                    <div className="flex-1">
                         <CardCvcElement options={ELEMENT_STYLE} />
                     </div>
+                    <Lock className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
                 </div>
             </div>
-            {/* Error */}
+
             {status === 'error' && (
                 <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
                     <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-red-700">{errorMsg}</p>
                 </div>
             )}
-            <div className="flex gap-3">
-                <button
-                    onClick={onBack}
-                    disabled={status === 'loading'}
-                    className="flex-1 rounded-xl border border-border bg-secondary/60 py-2.5 text-sm font-medium text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
-                >
-                    Back
-                </button>
+
+            <div className="flex gap-3 pt-1">
+                {shipping && (
+                    <button
+                        onClick={onBack}
+                        disabled={status === 'loading'}
+                        className="flex-1 rounded-xl border border-border bg-secondary/60 py-2.5 text-sm font-medium text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
+                    >
+                        Back
+                    </button>
+                )}
                 <button
                     onClick={handlePay}
                     disabled={status === 'loading' || !stripe}
-                    className="flex-1 btn-primary !rounded-xl !py-2.5 !text-sm flex items-center justify-center gap-2 disabled:opacity-60"
+                    className="flex-1 btn-primary !rounded-full !py-3 !text-sm flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                     {status === 'loading' ? (
                         <>
@@ -782,69 +916,86 @@ function PaymentStep({
                     ) : (
                         <>
                             <Lock className="h-3.5 w-3.5" />
-                            Pay ${shipping.total_due_today.toFixed(2)}
+                            Pay ${totalAmount.toFixed(2)} &amp; {payLabel}
                         </>
                     )}
                 </button>
             </div>
-            <p className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
-                <Lock className="h-3 w-3" />
-                Secured by Stripe · Your card data never touches our servers
-            </p>
         </div>
     );
 }
-// ── Modal (orchestrates all steps) ──────────────────────────────────────────
+
+// ── Main Subscription Payment Modal ──────────────────────────────────────────
 interface ModalProps {
     open: boolean;
     onClose: () => void;
     onSuccess: () => void;
     businessCardId?: string | number | null;
-    onGoToAddresses: () => void;
+    allowedPurchaseType?: PurchaseType;
+    onGoToAddresses?: () => void;
 }
-export function SubscriptionPaymentModal({ open, onClose, onSuccess, businessCardId }: ModalProps) {
-    console.log(businessCardId, "businessCardId")
+
+export function SubscriptionPaymentModal({
+    open,
+    onClose,
+    onSuccess,
+    businessCardId,
+    allowedPurchaseType = 'SUBSCRIPTION_ONLY',
+}: ModalProps) {
+
     const [step, setStep] = useState<'shipping' | 'address' | 'payment'>('shipping');
     const [shippingData, setShippingData] = useState<ShippingData | null>(null);
     const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+
+    // NFC purchases always go through Address -> Shipping -> Payment steps
+    const requiresShipping = ['NFC_ONLY', 'NFC_WITH_SUBSCRIPTION'].includes(allowedPurchaseType);
+
     useEffect(() => {
         if (open) {
-            setStep('shipping');
+            setStep(requiresShipping ? 'shipping' : 'payment');
             setShippingData(null);
             setEditingAddress(null);
         }
-    }, [open]);
+    }, [open, requiresShipping]);
+
     if (!open) return null;
+
     const handleShippingContinue = (data: ShippingData) => {
         setShippingData(data);
         setStep('payment');
     };
+
     const handleAddressSaved = () => {
-        // Re-mounting ShippingStep re-runs its fetch effect, picking up the
-        // address that was just added/edited.
         setEditingAddress(null);
         setStep('shipping');
     };
+
     const handleEditAddress = (address: Address) => {
         setEditingAddress(address);
         setStep('address');
     };
+
     const handleAddressCancel = () => {
         setEditingAddress(null);
         setStep('shipping');
     };
+
     const handleSuccess = () => {
         onSuccess?.();
         onClose();
     };
+
     const STEP_LABELS = {
-        shipping: { num: 1, title: 'Shipping Summary', sub: 'Review costs before paying' },
+        shipping: { num: 1, title: 'Shipping Address', sub: 'Select address to calculate shipping' },
         address: editingAddress
-            ? { num: 1, title: 'Edit Address', sub: 'Update your delivery address' }
-            : { num: 1, title: 'Shipping Address', sub: 'Add your delivery address to continue' },
-        payment: { num: 2, title: 'Payment', sub: 'Enter your card details' },
+            ? { num: 1, title: 'Edit Address', sub: 'Update your delivery details' }
+            : { num: 1, title: 'Add Address', sub: 'Add a delivery address to continue' },
+        payment: { num: requiresShipping ? 2 : 1, title: 'Payment', sub: 'Enter card payment details' },
     };
+
     const current = STEP_LABELS[step];
+    const isSubscribeOnlyPayment = step === 'payment' && !requiresShipping;
+
     return (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4"
@@ -855,25 +1006,53 @@ export function SubscriptionPaymentModal({ open, onClose, onSuccess, businessCar
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="mb-5 flex items-start justify-between">
-                    <div>
-                        <div className="flex items-center gap-2 mb-1">
-                            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wider">
-                                Step {current.num} of 2
-                            </span>
+                {isSubscribeOnlyPayment ? (
+                    <div className="mb-5 flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
+                                <CreditCard className="h-4 w-4 text-primary" />
+                            </div>
+                            <div>
+                                <h2 className="text-base font-semibold text-foreground">Subscribe</h2>
+                                <p className="text-[12px] text-muted-foreground">Digital Business Card Subscription</p>
+                            </div>
                         </div>
-                        <h2 className="text-base font-semibold text-foreground">{current.title}</h2>
-                        <p className="text-[12px] text-muted-foreground mt-0.5">{current.sub}</p>
+                        <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-secondary transition-colors">
+                            <X className="h-4 w-4 text-muted-foreground" />
+                        </button>
                     </div>
-                    <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-secondary transition-colors">
-                        <X className="h-4 w-4 text-muted-foreground" />
-                    </button>
-                </div>
+                ) : (step === 'shipping' || step === 'address') && requiresShipping ? (
+                    <div className="mb-4 pb-4 border-b border-border flex items-center justify-between">
+                        <h2 className="text-base font-semibold text-foreground">Buy NFC Card</h2>
+                        <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-secondary transition-colors">
+                            <X className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                    </div>
+                ) : (
+                    <div className="mb-5 flex items-start justify-between">
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wider">
+                                    Step {current.num} of {requiresShipping ? 2 : 1}
+                                </span>
+                            </div>
+                            <h2 className="text-base font-semibold text-foreground">{current.title}</h2>
+                            <p className="text-[12px] text-muted-foreground mt-0.5">{current.sub}</p>
+                        </div>
+                        <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-secondary transition-colors">
+                            <X className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                    </div>
+                )}
+
                 {/* Progress bar */}
-                <div className="flex gap-1.5 mb-6">
-                    <div className="h-1 flex-1 rounded-full bg-primary" />
-                    <div className={`h-1 flex-1 rounded-full transition-colors ${step === 'payment' ? 'bg-primary' : 'bg-border'}`} />
-                </div>
+                {requiresShipping && step === 'payment' && (
+                    <div className="flex gap-1.5 mb-6">
+                        <div className="h-1 flex-1 rounded-full bg-primary" />
+                        <div className={`h-1 flex-1 rounded-full transition-colors ${step === 'payment' ? 'bg-primary' : 'bg-border'}`} />
+                    </div>
+                )}
+
                 {step === 'shipping' && (
                     <ShippingStep
                         businessCardId={businessCardId}
@@ -881,8 +1060,11 @@ export function SubscriptionPaymentModal({ open, onClose, onSuccess, businessCar
                         onCancel={onClose}
                         onNeedsAddress={() => setStep('address')}
                         onEditAddress={handleEditAddress}
+                        purchaseType={allowedPurchaseType}
+
                     />
                 )}
+
                 {step === 'address' && (
                     <AddressStep
                         businessCardId={businessCardId}
@@ -891,13 +1073,22 @@ export function SubscriptionPaymentModal({ open, onClose, onSuccess, businessCar
                         onCancel={handleAddressCancel}
                     />
                 )}
-                {step === 'payment' && shippingData && (
+
+                {step === 'payment' && (
                     <Elements stripe={stripePromise}>
                         <PaymentStep
                             shipping={shippingData}
                             businessCardId={businessCardId}
+                            allowedPurchaseType={allowedPurchaseType}
                             onSuccess={handleSuccess}
-                            onBack={() => setStep('shipping')}
+                            onClose={onClose}
+                            onBack={() => {
+                                if (requiresShipping) {
+                                    setStep('shipping');
+                                } else {
+                                    onClose();
+                                }
+                            }}
                         />
                     </Elements>
                 )}

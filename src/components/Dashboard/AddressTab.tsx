@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
-import { Home, Briefcase, Plus, Trash2, Loader2, AlertCircle, X, MapPin } from 'lucide-react';
+import { Home, Plus, Trash2, Loader2, AlertCircle, X, MapPin, Pencil, CheckCircle2 } from 'lucide-react';
 import { message } from "antd";
 import {
   addNewAddress,
@@ -50,7 +50,8 @@ interface CityItem {
   name: string;
 }
 const INPUT =
-  'w-full rounded-xl border border-input bg-secondary/50 px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition disabled:opacity-50';
+  'w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50';
+const LABEL = 'mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-muted-foreground';
 /* ══════════════════════════════════════════════
    ADD ADDRESS MODAL
 ══════════════════════════════════════════════ */
@@ -58,7 +59,7 @@ interface AddAddressModalProps {
   onClose: () => void;
   onSaved: () => void;
 }
-function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
+export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
   const [form, setForm] = useState<NewFormState>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [states, setStates] = useState<StateItem[]>([]);
@@ -145,26 +146,29 @@ function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
   return (
     <div
       onClick={handleBackdrop}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-foreground/25 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/30 p-0 backdrop-blur-sm sm:p-4"
     >
-      <div className="w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl border border-border bg-card shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-200">
+      <div className="w-full overflow-hidden rounded-t-3xl border border-border bg-card duration-200 animate-in slide-in-from-bottom-4 sm:max-w-md sm:rounded-3xl sm:slide-in-from-bottom-0">
         {/* Modal header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
               <MapPin className="h-4 w-4 text-primary" />
             </span>
-            <p className="text-sm font-bold text-foreground">Add Delivery Address</p>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Add Delivery Address</p>
+              <p className="text-[12px] text-muted-foreground">Used for shipping physical orders</p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-muted-foreground hover:text-foreground transition"
+            className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-secondary"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
         {/* Form body */}
-        <div className="p-5 space-y-3 max-h-[70vh] overflow-y-auto">
+        <div className="max-h-[65vh] space-y-3.5 overflow-y-auto p-5">
           {error && (
             <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700">
               <AlertCircle className="h-3.5 w-3.5 shrink-0" />
@@ -173,7 +177,7 @@ function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           )}
           {/* Address Line 1 */}
           <div>
-            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
+            <label className={LABEL}>
               Address Line 1 <span className="text-red-500">*</span>
             </label>
             <input
@@ -184,10 +188,10 @@ function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
               className={INPUT}
             />
           </div>
-          {/* State ID / City ID — side by side */}
+          {/* State / City — side by side */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
+              <label className={LABEL}>
                 State <span className="text-red-500">*</span>
               </label>
               <select
@@ -211,8 +215,8 @@ function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
               </select>
             </div>
             <div>
-              <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
-                City<span className="text-red-500">*</span>
+              <label className={LABEL}>
+                City <span className="text-red-500">*</span>
               </label>
               <select
                 value={form.city_id}
@@ -236,7 +240,7 @@ function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           </div>
           {/* Zip code */}
           <div>
-            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
+            <label className={LABEL}>
               Zip Code <span className="text-red-500">*</span>
             </label>
             <input
@@ -249,30 +253,27 @@ function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
               }
               placeholder="Enter ZIP Code"
               maxLength={10}
-
-
-
               disabled={saving}
               className={INPUT}
             />
           </div>
         </div>
         {/* Footer actions */}
-        <div className="flex gap-3 px-5 pb-5 pt-2 border-t border-border">
-          <button
-            onClick={handleSubmit}
-            disabled={saving}
-            className="flex-1 flex items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition disabled:opacity-60"
-          >
-            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-            {saving ? 'Saving…' : 'Save Address'}
-          </button>
+        <div className="flex gap-3 border-t border-border px-5 pb-5 pt-4">
           <button
             onClick={onClose}
             disabled={saving}
-            className="flex-1 rounded-full border border-border bg-secondary py-3 text-sm font-semibold text-foreground hover:bg-accent transition disabled:opacity-60"
+            className="flex-1 rounded-xl border border-border bg-secondary/60 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-50"
           >
             Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={saving}
+            className="btn-primary flex flex-1 items-center justify-center gap-2 !rounded-xl !py-2.5 !text-sm disabled:opacity-60"
+          >
+            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+            {saving ? 'Saving…' : 'Save Address'}
           </button>
         </div>
       </div>
@@ -454,23 +455,23 @@ export function AddressTab() {
   return (
     <div className="max-w-lg">
       {/* Header row with + button */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-foreground">Saved Addresses</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="mt-0.5 text-sm text-muted-foreground">
             {loading ? 'Loading…' : `${addresses.length} address${addresses.length !== 1 ? 'es' : ''} saved`}
           </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition"
+          className="btn-primary flex items-center gap-1.5 !rounded-full !px-4 !py-2.5 !text-sm"
         >
           <Plus className="h-4 w-4" /> Add
         </button>
       </div>
       {/* Fetch error */}
       {fetchError && (
-        <div className="flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 mb-5 text-sm text-red-700">
+        <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{fetchError}</span>
           <button onClick={fetchAddresses} className="ml-auto text-xs font-semibold underline underline-offset-2">
@@ -480,7 +481,7 @@ export function AddressTab() {
       )}
       {/* Delete error (surfaced at list level since delete can be triggered from any card) */}
       {deleteError && (
-        <div className="flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 mb-5 text-sm text-red-700">
+        <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{deleteError}</span>
           <button onClick={() => setDeleteError(null)} className="ml-auto text-xs font-semibold underline underline-offset-2">
@@ -492,30 +493,30 @@ export function AddressTab() {
       {loading && (
         <div className="space-y-4">
           {[1, 2].map(i => (
-            <div key={i} className="rounded-2xl border border-border bg-card p-5 animate-pulse">
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="h-8 w-8 rounded-xl bg-secondary" />
+            <div key={i} className="animate-pulse rounded-3xl border border-border bg-card p-5">
+              <div className="mb-3 flex items-center gap-3">
+                <div className="h-10 w-10 rounded-2xl bg-secondary" />
                 <div className="h-4 w-40 rounded bg-secondary" />
               </div>
-              <div className="h-3 w-3/4 rounded bg-secondary mb-2 ml-10" />
-              <div className="h-3 w-1/2 rounded bg-secondary ml-10" />
+              <div className="mb-2 ml-[52px] h-3 w-3/4 rounded bg-secondary" />
+              <div className="ml-[52px] h-3 w-1/2 rounded bg-secondary" />
             </div>
           ))}
         </div>
       )}
       {/* Empty state */}
       {!loading && !fetchError && addresses.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-14 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent mb-4">
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-secondary/20 py-14 text-center">
+          <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent">
             <MapPin className="h-6 w-6 text-primary" />
           </span>
           <p className="text-sm font-semibold text-foreground">No addresses saved yet</p>
-          <p className="text-xs text-muted-foreground mt-1 mb-5">
+          <p className="mb-5 mt-1 text-xs text-muted-foreground">
             Add a delivery address for your keychain orders.
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition"
+            className="btn-primary flex items-center gap-2 !rounded-full !px-5 !py-2.5 !text-sm"
           >
             <Plus className="h-4 w-4" /> Add your first address
           </button>
@@ -530,70 +531,76 @@ export function AddressTab() {
             return (
               <div
                 key={addr.id}
-                className={`rounded-2xl border-2 bg-card shadow-[var(--shadow-soft)] overflow-hidden transition-all ${addr.is_default ? 'border-primary' : 'border-border'
+                className={`overflow-hidden rounded-3xl border bg-card shadow-[var(--shadow-soft)] transition-all ${addr.is_default ? 'border-primary/60 ring-1 ring-primary/20' : 'border-border'
                   }`}
               >
                 {/* Summary */}
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2.5">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent text-primary">
-                        <Home className="h-4 w-4" />
-                      </span>
-                      <div>
-                        <p className="text-sm font-bold text-foreground">{addr.address_line_1}</p>
-                        {addr.is_default && (
-                          <span className="text-[10px] font-semibold text-primary">Default address</span>
-                        )}
-                      </div>
+                <div className="flex items-start gap-3.5 p-5">
+                  <span
+                    className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl ${addr.is_default ? 'bg-primary text-primary-foreground' : 'bg-accent text-primary'
+                      }`}
+                  >
+                    <Home className="h-4.5 w-4.5" />
+                  </span>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-bold text-foreground">{addr.address_line_1}</p>
+                      {addr.is_default && (
+                        <span className="flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-primary">
+                          <CheckCircle2 className="h-3 w-3" /> Default
+                        </span>
+                      )}
                     </div>
-                    {/* Quick actions — Edit + Delete, both available without opening edit mode first */}
-                    <div className="flex items-center gap-3 shrink-0 ml-3">
-                      <button
-                        onClick={() =>
-                          isEditing
-                            ? (setEditing(null), setEditForm(null), setEditError(null))
-                            : openEdit(addr)
-                        }
-                        disabled={isDeleting}
-                        className="text-xs font-semibold text-primary hover:underline underline-offset-2 transition disabled:opacity-50"
-                      >
-                        {isEditing ? 'Close' : 'Edit'}
-                      </button>
-                      <button
-                        onClick={() => handleDelete(addr.id)}
-                        disabled={isDeleting || (editSaving && isEditing)}
-                        aria-label="Delete address"
-                        className="flex items-center gap-1 text-xs font-semibold text-red-600 hover:underline underline-offset-2 transition disabled:opacity-50"
-                      >
-                        {isDeleting ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-3.5 w-3.5" />
-                        )}
-                        {isDeleting ? 'Removing…' : 'Delete'}
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground pl-10">
-                    {addr?.user_city?.name || addr.city_name}, {addr?.user_state?.name || addr.state_name} · {addr.postal_code}
-                  </p>
-                  {(addr.address_lat || addr.address_long) && (
-                    <p className="text-xs text-muted-foreground/60 pl-10 mt-0.5">
-                      {addr.address_lat}, {addr.address_long}
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {addr?.user_city?.name || addr.city_name}, {addr?.user_state?.name || addr.state_name} · {addr.postal_code}
                     </p>
-                  )}
+                    {(addr.address_lat || addr.address_long) && (
+                      <p className="mt-0.5 text-[11px] text-muted-foreground/60">
+                        {addr.address_lat}, {addr.address_long}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Quick actions — icon buttons, both available without opening edit mode first */}
+                  <div className="flex flex-shrink-0 items-center gap-1.5">
+                    <button
+                      onClick={() =>
+                        isEditing
+                          ? (setEditing(null), setEditForm(null), setEditError(null))
+                          : openEdit(addr)
+                      }
+                      disabled={isDeleting}
+                      aria-label={isEditing ? 'Close edit form' : 'Edit address'}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full transition disabled:opacity-50 ${isEditing ? 'bg-primary text-primary-foreground' : 'bg-secondary text-foreground hover:bg-accent hover:text-primary'
+                        }`}
+                    >
+                      {isEditing ? <X className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(addr.id)}
+                      disabled={isDeleting || (editSaving && isEditing)}
+                      aria-label="Delete address"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                    >
+                      {isDeleting ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 {/* Inline edit */}
                 {isEditing && editForm && (
-                  <div className="px-5 pb-5 space-y-3 border-t border-border pt-4 bg-secondary/20">
+                  <div className="space-y-3.5 border-t border-border bg-secondary/20 px-5 pb-5 pt-4">
                     {editError && (
                       <p className="flex items-center gap-1.5 text-xs text-red-600">
                         <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {editError}
                       </p>
                     )}
                     <div>
-                      <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Address Line 1</label>
+                      <label className={LABEL}>Address Line 1</label>
                       <input
                         value={editForm.address_line_1 ?? ''}
                         onChange={e => setEditForm(f => f && ({ ...f, address_line_1: e.target.value }))}
@@ -604,9 +611,7 @@ export function AddressTab() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
-                          State
-                        </label>
+                        <label className={LABEL}>State</label>
                         <select
                           value={editForm.state_id ?? ""}
                           onChange={(e) => handleEditStateChange(e.target.value)}
@@ -622,9 +627,7 @@ export function AddressTab() {
                         </select>
                       </div>
                       <div>
-                        <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
-                          City
-                        </label>
+                        <label className={LABEL}>City</label>
                         <select
                           value={editForm.city_id ?? ""}
                           onChange={(e) =>
@@ -650,7 +653,7 @@ export function AddressTab() {
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Postal Code</label>
+                      <label className={LABEL}>Postal Code</label>
                       <input
                         value={editForm.postal_code ?? ''}
                         onChange={e => setEditForm(f => f && ({ ...f, postal_code: e.target.value }))}
@@ -663,7 +666,7 @@ export function AddressTab() {
                       <button
                         onClick={() => handleSaveEdit(addr.id)}
                         disabled={editSaving || isDeleting}
-                        className="flex-1 flex items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 transition disabled:opacity-60"
+                        className="btn-primary flex flex-1 items-center justify-center gap-1.5 !rounded-xl !py-2.5 !text-xs disabled:opacity-60"
                       >
                         {editSaving && <Loader2 className="h-3 w-3 animate-spin" />}
                         {editSaving ? 'Saving…' : 'Save changes'}
@@ -671,7 +674,7 @@ export function AddressTab() {
                       <button
                         onClick={() => handleDelete(addr.id)}
                         disabled={isDeleting || editSaving}
-                        className="flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-100 transition disabled:opacity-60"
+                        className="flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 disabled:opacity-60"
                       >
                         {isDeleting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
                         {isDeleting ? 'Removing…' : 'Remove'}

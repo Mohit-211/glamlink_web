@@ -187,11 +187,9 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                   <img
                     src={selectedCard.business_card_qr}
                     alt="GlamCard QR Code"
-                    className={`h-52 w-52 object-contain transition-all duration-300 ${
-                      paid ? '' : 'blur-md opacity-30 pointer-events-none select-none'
-                    }`}
+                    className={`h-52 w-52 object-contain transition-all duration-300 `}
                   />
-                  {!paid && (
+                  {/* {!paid && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                       <div className="rounded-xl bg-white p-4 text-center shadow-xl max-w-[200px]">
                         <p className="text-lg">🔒</p>
@@ -209,7 +207,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                         )}
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </>
               ) : (
                 <div className="h-52 w-52 flex items-center justify-center bg-secondary rounded-xl text-muted-foreground text-sm">
@@ -271,11 +269,12 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                   </p>
                   <div className="flex items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2">
                     <span className="flex-1 truncate font-mono text-[11px] text-muted-foreground">
-                      {paid
+                      {/* {paid
                         ? selectedCard.business_card_link
-                        : '••••••••••••••••••••••••••••••'}
+                        : '••••••••••••••••••••••••••••••'} */}
+                        {selectedCard.business_card_link}
                     </span>
-                    {paid && (
+                    {/* {paid && ( */}
                       <button
                         onClick={() => handleCopy(selectedCard.business_card_link)}
                         className="flex-shrink-0 rounded-md p-1 hover:bg-accent transition-colors cursor-pointer"
@@ -286,7 +285,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                           <Copy className="h-3.5 w-3.5 text-muted-foreground" />
                         )}
                       </button>
-                    )}
+                    {/* )} */}
                   </div>
                 </div>
               </div>
