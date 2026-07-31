@@ -55,13 +55,13 @@ const getThumbnailUrl = (item: any): string => {
    uploads still get cropped individually before being added. Each context
    has a FIXED aspect ratio — this is intentional and shouldn't vary:
    - profile: square (1:1), since it renders inside a circular avatar
-   - gallery: square (1:1), for a clean, uniform photo grid
+   - gallery: 16:9, for a consistent widescreen photo grid
    - thumbnail: 16:9, matching the shape of a video frame/poster */
 type CropContext = "profile" | "gallery" | "thumbnail";
 
 const CROP_ASPECTS: Record<CropContext, number> = {
   profile: 1,
-  gallery: 1,
+  gallery: 4 / 3,
   thumbnail: 16 / 9,
 };
 
@@ -420,7 +420,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
         <div className="relative">
           {isVideo ? (
             thumbPreview ? (
-              <div className="relative h-32 w-full rounded-lg overflow-hidden">
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden">
                 <img src={thumbPreview} className="h-full w-full object-cover" />
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                   <svg className="w-10 h-10 text-white opacity-90" fill="currentColor" viewBox="0 0 24 24">
@@ -432,7 +432,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
                 </span>
               </div>
             ) : (
-              <div className="relative h-32 w-full rounded-lg bg-gray-900 flex items-center justify-center">
+              <div className="relative w-full aspect-video rounded-lg bg-gray-900 flex items-center justify-center">
                 <svg className="w-10 h-10 text-white opacity-70" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
@@ -442,7 +442,10 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
               </div>
             )
           ) : (
-            <img src={galleryPreview[index]} className="h-32 w-full object-cover rounded-lg" />
+            <img
+              src={galleryPreview[index]}
+              className="w-full aspect-[4/3] object-cover rounded-lg"
+            />
           )}
         </div>
 
@@ -453,7 +456,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
 
             {thumbPreview ? (
               <div className="relative">
-                <img src={thumbPreview} className="h-16 w-full object-cover rounded-lg" />
+                <img src={thumbPreview} className="w-full aspect-video object-cover rounded-lg" />
                 <label className="absolute bottom-1 right-1 cursor-pointer bg-black/60 text-white text-xs px-2 py-0.5 rounded hover:bg-black/80">
                   Change
                   <input
@@ -531,8 +534,6 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
         Gallery media: {totalMediaCount}/{MAX_MEDIA_TOTAL} used (photos + videos combined)
       </p>
 
-     
-
       {/* PHOTOS SECTION */}
       <div className="space-y-4 pt-2 border-t border-gray-100">
         <div className="flex justify-between items-center pt-4">
@@ -569,7 +570,6 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
 
       {/* VIDEOS SECTION */}
       <div className="space-y-4 pt-2 border-t border-gray-100">
-        
         <div className="flex justify-between items-center pt-4">
           <div>
             <label className={labelClass}>Videos ({videoCount})</label>
@@ -583,7 +583,6 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
             }`}
           >
             + Upload Videos
-            
             <input
               type="file"
               hidden
@@ -594,11 +593,13 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
             />
           </label>
         </div>
- {mediaError && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-          {mediaError}
-        </p>
-      )}
+
+        {mediaError && (
+          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            {mediaError}
+          </p>
+        )}
+
         {videoCount ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {gallery_meta.map((item, index) =>

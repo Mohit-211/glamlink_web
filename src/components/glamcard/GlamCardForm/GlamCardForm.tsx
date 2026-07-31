@@ -159,55 +159,98 @@ const GlamCardForm: React.FC<Props> = ({
      sessionStorage — regardless of whether the user is logged in. */
   const buildFormData = (): FormData => {
     const formData = new FormData();
-    // Profile image: only send if a NEW file was picked. If it's still the
-    // existing string URL (edit mode, untouched), don't re-upload it.
+
     if (data.profile_image instanceof File) {
       formData.append("profile_image", data.profile_image);
     }
-    // Gallery images/videos: split into new File uploads vs existing URLs
-    const newImageFiles = (data.images ?? []).filter(
-      (file): file is File =>
-        file instanceof File && !file.type.startsWith("video/")
-    );
-    const newVideoItems = (data.images ?? [])
-      .map((file, index) => ({ file, meta: data.gallery_meta?.[index], index }))
+    const images: (File | string)[] = data.images ?? [];
+    const meta = data.gallery_meta ?? [];
+
+    const newImageEntries = images
+      .map((file, index) => ({ file, meta: meta[index], index }))
       .filter(
-        ({ file }) => file instanceof File && (file as File).type.startsWith("video/")
+        (entry): entry is { file: File; meta: typeof meta[number]; index: number } =>
+          entry.file instanceof File && !(entry.file as File).type.startsWith("video/")
       );
-    const existingImageUrls = (data.images ?? []).filter(
-      (file: unknown): file is string => typeof file === "string"
-    );
-    newImageFiles.forEach((file) => formData.append("images", file));
-    if (isEdit && existingImageUrls.length) {
-      // NOTE: confirm this field name matches what updateBusinessCard expects
-      formData.append("existing_images", JSON.stringify(existingImageUrls));
-    }
-    if (data.gallery_meta?.length) {
+
+    const newVideoItems = images
+      .map((file, index) => ({ file, meta: meta[index], index }))
+      .filter(
+        (entry): entry is { file: File; meta: typeof meta[number]; index: number } =>
+          entry.file instanceof File && (entry.file as File).type.startsWith("video/")
+      );
+
+    const existingImageEntries = images
+      .map((file, index) => ({ file, meta: meta[index], index }))
+      .filter((entry) => !(entry.file instanceof File));
+
+    const getExistingId = (file: any): string | undefined =>
+      typeof file === "string" ? file : file?.id ?? file?.file_uri ?? file?.url;
+
+  
+    newImageEntries.forEach(({ file }) => formData.append("images", file));
+
+    if (isEdit) {
+
       formData.append(
-        "gallery_meta",
-        JSON.stringify(
-          data.gallery_meta.map(({ caption, is_thumbnail, sort_order }) => ({
-            caption,
-            is_thumbnail,
-            sort_order,
-          }))
-        )
+        "existing_image_ids",
+        JSON.stringify(existingImageEntries.map(({ file }) => getExistingId(file)))
       );
     }
-    newVideoItems.forEach(({ file, meta }) => {
+
+
+
+
+
+
+    // Send metadata split the SAME way, in the SAME order as the image
+    // arrays above, so index i in each meta array corresponds to index i
+    // in its matching image array.
+    const stripMeta = (m: any) => ({
+      caption: m?.caption,
+      is_thumbnail: m?.is_thumbnail,
+      sort_order: m?.sort_order,
+    });
+
+    if (newImageEntries.length) {
+      formData.append(
+        "new_images_gallery_meta",
+        JSON.stringify(newImageEntries.map(({ meta }) => stripMeta(meta)))
+      );
+    }
+    if (existingImageEntries.length) {
+      formData.append(
+        "existing_images_gallery_meta",
+        JSON.stringify(existingImageEntries.map(({ meta }) => stripMeta(meta)))
+      );
+    }
+
+ newVideoItems.forEach(({ file, meta }) => {
       formData.append("videos", file);
       if (meta?.thumbnail_file) {
         formData.append("video_thumbnails", meta.thumbnail_file);
       }
     });
+
+    const existingVideoEntries = images
+      .map((file, index) => ({ file, meta: meta[index], index }))
+      .filter(
+        (entry) =>
+          !(entry.file instanceof File) &&
+          (entry.meta as any)?.file_type === "video"
+      );
+
+    if (isEdit) {
+      formData.append(
+        "existing_video_ids",
+        JSON.stringify(existingVideoEntries.map(({ file }) => getExistingId(file)))
+      );
+    }
+
     if (data.social_media) {
       formData.append("social_media", JSON.stringify(data.social_media));
     }
-    // preferred_booking_methods is an array (multi-select) in the form
-    // state, but the backend expects it under the singular key
-    // "preferred_booking_method" — still as a JSON array, not a single
-    // string. Handle it separately from jsonFields since the form-state
-    // key and the API key differ.
+
     const jsonFields = [
       "business_hour",
       "other_links",
@@ -223,12 +266,14 @@ const GlamCardForm: React.FC<Props> = ({
         formData.append(field, JSON.stringify(value));
       }
     });
+
     if (data.preferred_booking_methods !== undefined) {
       formData.append(
         "preferred_booking_method",
         JSON.stringify(data.preferred_booking_methods)
       );
     }
+
     const primitiveFields = [
       "name",
       "email",
@@ -250,6 +295,7 @@ const GlamCardForm: React.FC<Props> = ({
         formData.append(field, String(value));
       }
     });
+
     formData.append("is_phone_visible", String(data.is_phone_visible ?? true));
     return formData;
   };

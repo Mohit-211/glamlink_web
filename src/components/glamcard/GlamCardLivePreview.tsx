@@ -597,10 +597,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </SectionBox>
 
                 {/* SIGNATURE WORK — DESKTOP */}
-                <SectionBox title="Gallery" titleAlign="center">
+       <SectionBox title="Gallery" titleAlign="center">
                   {normalizedImages.length > 0 && thumbnailIndex !== null ? (
                     <>
-                      <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
+                  <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
                         {normalizedImages[thumbnailIndex]?.file_type ===
                           "video" ? (
                           /* ✅ iOS FIX: playsInline + preload + key */
@@ -672,7 +672,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             <button
                               key={index}
                               onClick={() => setThumbnailIndex(index)}
-                              className={` h-14 w-14 overflow-hidden rounded-lg border shadow-sm flex-shrink-0 ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}`} style={{
+                              className={`h-12 w-16 aspect-[4/3] cursor-pointer overflow-hidden rounded-lg border shadow-sm flex-shrink-0 ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}`} style={{
                                 boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
 
                               }}
@@ -919,7 +919,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           normalizedImages[thumbnailIndex]?.thumbnail_uri ||
                           galleryPreviews[thumbnailIndex]
                         }
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cove r"
                         alt="Featured work"
                       />
                     )}

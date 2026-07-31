@@ -5,12 +5,47 @@ import GlamCardForm from '../glamcard/GlamCardForm/GlamCardForm';
 import { AccessCardData } from './types';
 import { GlamCardFormData } from '../glamcard/GlamCardForm/types';
 
-
 interface Props {
   cardId: string | number;
   cardData: AccessCardData | null | undefined;
   onSave: (updated: AccessCardData) => void;
   onCancel: () => void;
+}
+
+/**
+ * Keeps `gallery_meta` in sync with `images` by id.
+ *
+ * `images` is the source of truth for WHICH images exist (server objects:
+ * { id, file_type, file_uri, thumbnail_uri, is_thumbnail, sort_order, ... }).
+ * `gallery_meta` carries UI-only metadata per image (caption, is_thumbnail,
+ * sort_order) that the gallery grid renders from.
+ *
+ * Call this ANY time `images` changes (add, remove, reorder) — including
+ * inside upload/remove handlers in the media form — passing the previous
+ * `gallery_meta` so existing captions/thumbnail flags are preserved instead
+ * of being reset. Without this, `images` and `gallery_meta` can drift apart:
+ * e.g. removing an image drops it from `images` but leaves a stale entry in
+ * `gallery_meta`, or uploading a new image adds it to `images` but no
+ * matching `gallery_meta` entry gets created — either way the gallery loop
+ * (which iterates one and looks up the other) ends up rendering fewer
+ * images than actually exist.
+ */
+export function syncGalleryMeta(images: any[], existingMeta: any[] = []) {
+  const safeImages = Array.isArray(images) ? images : [];
+  const safeMeta = Array.isArray(existingMeta) ? existingMeta : [];
+  const metaById = new Map(safeMeta.map((m) => [String(m?.id), m]));
+
+  return safeImages.map((img, index) => {
+    const id = String(img?.id ?? `img-${index}`);
+    const prev = metaById.get(id);
+    return {
+      id,
+      caption: prev?.caption ?? img?.caption ?? '',
+      is_thumbnail:
+        prev?.is_thumbnail ?? Boolean(img?.is_thumbnail) ?? index === 0,
+      sort_order: prev?.sort_order ?? img?.sort_order ?? index,
+    };
+  });
 }
 
 /**
@@ -61,7 +96,8 @@ const normalize = (raw: AccessCardData | null | undefined): GlamCardFormData => 
   // string (e.g. '["GO_TO_BOOKING_LINK"]') rather than an actual array —
   // parse it the same way as specialties/social_media/other_links above,
   // instead of just checking Array.isArray (which fails on a raw string).
-  let preferred_booking_methods = base.preferred_booking_methods ?? base.preferred_booking_method;
+  let preferred_booking_methods =
+    base.preferred_booking_methods ?? base.preferred_booking_method;
   if (typeof preferred_booking_methods === 'string') {
     try {
       preferred_booking_methods = JSON.parse(preferred_booking_methods);
@@ -71,23 +107,12 @@ const normalize = (raw: AccessCardData | null | undefined): GlamCardFormData => 
   }
   if (!Array.isArray(preferred_booking_methods)) preferred_booking_methods = [];
 
-  // The API returns `images` as an array of server objects
-  // ({ id, file_type, file_uri, thumbnail_uri, is_thumbnail, sort_order, ... })
-  // but does NOT return a `gallery_meta` field. MediaAndProfileForm renders the
-  // gallery by looping over `gallery_meta` (one entry per image, in the same
-  // order as `images`), so we synthesize it here from the raw images whenever
-  // the API didn't already provide one — otherwise the gallery loop has
-  // nothing to iterate over and silently shows "No media uploaded".
+  // The API returns `images` as an array of server objects but does NOT
+  // return a `gallery_meta` field on its own — synthesize/sync it here so
+  // the gallery has metadata (caption, is_thumbnail, sort_order) to render,
+  // preserving any gallery_meta the API did happen to send.
   const rawImages = Array.isArray(base.images) ? base.images : [];
-  const gallery_meta =
-    Array.isArray(base.gallery_meta) && base.gallery_meta.length
-      ? base.gallery_meta
-      : rawImages.map((img: any, index: number) => ({
-          id: String(img?.id ?? `img-${index}`),
-          caption: img?.caption || '',
-          is_thumbnail: Boolean(img?.is_thumbnail) || index === 0,
-          sort_order: img?.sort_order ?? index,
-        }));
+  const gallery_meta = syncGalleryMeta(rawImages, base.gallery_meta);
 
   // AccessCardData (the trimmed dashboard shape) doesn't carry these fields —
   // every one of them gets iterated/spread somewhere downstream (locations list,
