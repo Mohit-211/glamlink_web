@@ -1,18 +1,20 @@
 "use client";
 
-import PricingStep from "@/components/Pricing/Pricing1";
+import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import React from "react";
+import PricingStep from "@/components/Pricing/Pricing1";
 
-const PricingPage = () => {
+function PricingContent() {
   const searchParams = useSearchParams();
   const businessCardId = searchParams.get("businessCardId");
 
-  return (
-    <div>
-      <PricingStep businessCardId={businessCardId} />
-    </div>
-  );
-};
+  return <PricingStep businessCardId={businessCardId} />;
+}
 
-export default PricingPage;
+export default function PricingPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PricingContent />
+    </Suspense>
+  );
+}
