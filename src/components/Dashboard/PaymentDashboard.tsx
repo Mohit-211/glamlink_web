@@ -431,10 +431,25 @@ export default function DashboardPage() {
                       setEditCardId(null);
                       setActiveTab('my-card');
                     }}
-                    onSave={async () => {
-                      await fetchDashboardData();
+                    onSave={(updated) => {
+                      // Apply the just-saved record immediately so the
+                      // dashboard reflects it right away instead of waiting
+                      // on (and possibly racing/being stale against) the
+                      // background refetch below.
+                      setBusinessCard((prev: any) =>
+                        Array.isArray(prev)
+                          ? prev.map((c) =>
+                              String(c?.id) === String(updated?.id ?? effectiveEditCardId)
+                                ? { ...c, ...updated }
+                                : c
+                            )
+                          : prev
+                            ? { ...prev, ...updated }
+                            : updated
+                      );
                       setEditCardId(null);
                       setActiveTab('my-card');
+                      fetchDashboardData();
                     }}
                   />
                 )}

@@ -228,6 +228,25 @@ export const loginUser = async (payload: {
   );
   return data;
 };
+export const forgotPasswordApi = async (payload: {
+  email: string;
+  password: string;
+  confirm_password: string;
+  token: string;
+}) => {
+  const { data } = await api.post(
+    "user/auth/forgot-password",
+    payload,
+    {
+      headers: {
+        role_id: "7",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+    }
+  );
+
+  return data;
+};
 export const LogoutUser = async () => {
   const { data } = await api.get("user/auth/logout", {
     headers: {
