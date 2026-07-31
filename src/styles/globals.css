@@ -214,6 +214,23 @@
   .divider-glamlink {
     @apply my-20 border-t border-border/60;
   }
+
+  /* Shadow utility classes — use these instead of shadow-[var(--shadow-soft|medium|primary)] */
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-medium {
+    box-shadow: var(--shadow-medium);
+  }
+
+  .shadow-large {
+    box-shadow: var(--shadow-large);
+  }
+
+  .shadow-primary {
+    box-shadow: var(--shadow-primary);
+  }
 }
 
 /* ────────────────────────────────────────────────
@@ -400,8 +417,8 @@
   list-style: decimal;
   padding-left: 1.5rem;
 }
-/* REMOVE CKEDITOR POWERED BY */
 
+/* REMOVE CKEDITOR POWERED BY */
 .ck.ck-powered-by,
 .ck-powered-by,
 .ck.ck-balloon-panel.ck-powered-by-balloon,

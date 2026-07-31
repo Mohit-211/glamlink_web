@@ -13,7 +13,7 @@ import {
     Lock,
 } from 'lucide-react';
 import { AccessCardData } from './types';
-import SubscriptionPlansTab, { PlanId } from './Subscriptionplanstab';
+import SubscriptionPlansTab, { PlanId } from '../Pricing/SubscriptionPlansTab';
 
 const TikTokIcon = ({ className }: { className?: string }) => (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -338,7 +338,7 @@ export default function MyAccessCard({
                     onClick={() => setSubscriptionPromptKey(null)}
                 >
                     <div
-                        className="card-glamlink w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                        className="card-glamlink w-full max-h-[90vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="mb-2 flex items-start justify-between">

@@ -351,71 +351,72 @@ const GlamCardForm: React.FC<Props> = ({
     localStorage.setItem("postLoginRedirect", "/apply/digital-card");
     window.location.href = "/login";
   };
-  const handleSubmit = async (formData: FormData) => {
-    console.log("FINAL DATA 👉", data);
-    // newVideoItems thumbnail check still needs to run before the actual
-    // network call — kept here since it can short-circuit with a UI alert.
-    const newVideoItems = (data.images ?? [])
-      .map((file, index) => ({ file, meta: data.gallery_meta?.[index], index }))
-      .filter(
-        ({ file }) => file instanceof File && (file as File).type.startsWith("video/")
+ const handleSubmit = async (formData: FormData) => {
+  console.log("FINAL DATA 👉", data);
+
+  const newVideoItems = (data.images ?? [])
+    .map((file, index) => ({ file, meta: data.gallery_meta?.[index], index }))
+    .filter(
+      ({ file }) => file instanceof File && (file as File).type.startsWith("video/")
+    );
+  for (const { meta, index } of newVideoItems) {
+    if (!meta?.thumbnail_file) {
+      alert(`Please upload a thumbnail for video #${index + 1}.`);
+      return;
+    }
+  }
+
+  try {
+    setLoading(true);
+    const token = localStorage.getItem("GlamlinkaccessToken");
+    const endpoint = isEdit
+      ? `https://node.glamlink.net:5000/api/v1/businessCard/updateBusinessCard/${cardId}`
+      : token
+        ? "https://node.glamlink.net:5000/api/v1/businessCard/createBusinessCard"
+        : "https://node.glamlink.net:5000/api/v1/businessCard";
+
+    const res = await fetch(endpoint, {
+      method: isEdit ? "PUT" : "POST",
+      headers: {
+        "x-access-token": token || "",
+        role_id: String(7),
+      },
+      body: formData,
+    });
+
+    console.log(res, "res====");
+    if (!res.ok) {
+      throw new Error(
+        isEdit ? "Failed to update GlamCard" : "Failed to create GlamCard"
       );
-    for (const { meta, index } of newVideoItems) {
-      if (!meta?.thumbnail_file) {
-        alert(`Please upload a thumbnail for video #${index + 1}.`);
+    }
+
+    const result = await res.json();
+
+    if (isEdit) {
+      message.success(result?.message || "GlamCard updated successfully!");
+      onSuccess?.(result?.data ?? result);
+    } else {
+      // New user -> straight to plan selection with the new card's id.
+      if (result?.data?.user_exists === false) {
+        const businessCardId = result?.data?.business_card_id;
+        router.push(`/pricing?businessCardId=${businessCardId}`);
         return;
       }
+      // Existing user -> normal success popup -> dashboard.
+      setPostSuccessAction("dashboard");
+      setShowSuccess(true);
+      setTimeout(advanceAfterSuccess, 6000);
     }
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("GlamlinkaccessToken");
-      const endpoint = isEdit
-        ? `https://node.glamlink.net:5000/api/v1/businessCard/updateBusinessCard/${cardId}`
-        : token
-          ? "https://node.glamlink.net:5000/api/v1/businessCard/createBusinessCard"
-          : "https://node.glamlink.net:5000/api/v1/businessCard";
-      const res = await fetch(endpoint, {
-        method: isEdit ? "PUT" : "POST",
-        headers: {
-          "x-access-token": token || "",
-          role_id: String(7),
-        },
-        body: formData,
-      });
-      console.log(res, "res====");
-      if (!res.ok) {
-        throw new Error(
-          isEdit ? "Failed to update GlamCard" : "Failed to create GlamCard"
-        );
-      }
-      const result = await res.json();
-      if (isEdit) {
-        message.success(result?.message || "GlamCard updated successfully!");
-        onSuccess?.(result?.data ?? result);
-      } else {
-        // Create flow: always show the "your card was created" success
-        // popup first. What happens after it closes depends on whether
-        // this user already has a Glamlink login:
-        // - user_login === false -> walk them into register -> otp -> login
-        // - otherwise -> just send them to the dashboard to see their card
-        if (result?.data?.user_login === false) {
-          setCreatedCardEmail(result?.data?.email ?? "");
-          setPostSuccessAction("register");
-        } else {
-          setPostSuccessAction("dashboard");
-        }
-        setShowSuccess(true);
-        setTimeout(advanceAfterSuccess, 6000);
-      }
-    } catch (error) {
-      console.error("ERROR 👉", error);
-      message.error(
-        isEdit ? "Failed to update Business Card" : "Failed to create Business Card"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (error) {
+    console.error("ERROR 👉", error);
+    message.error(
+      isEdit ? "Failed to update Business Card" : "Failed to create Business Card"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   // register/otp/login share one Modal; "payment" is deliberately excluded
   // so it renders via its own SubscriptionPaymentModal instance below,
   // instead of stacking on top of this one.

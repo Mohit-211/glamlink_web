@@ -459,3 +459,21 @@ export const userProfile = async () => {
   );
   return data;
 };
+export interface SelectPlanPayload {
+  business_card_id: number | string;
+  plan_type: string; // e.g. "free" | "pro"
+}
+
+export const SelectPlanAPI = async (payload: SelectPlanPayload) => {
+  const { data } = await api.post(
+    "businessCard/select-plan",
+    payload,
+    {
+      headers: {
+        "x-access-token": getToken(),
+      },
+    }
+  );
+
+  return data;
+};

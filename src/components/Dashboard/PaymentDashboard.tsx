@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -28,17 +27,15 @@ import ChangePasswordTab from './Changepasswordtab';
 import AccessNfcTab from './Accessnfctab';
 import SubscriptionPlansTab, { PlanId } from './Subscriptionplanstab';
 import { PurchaseType } from './Purchasetypes';
-
 type TabId =
   | 'my-card'
   | 'edit-card'
   | 'payment-history'
   | 'qr-code'
-  | 'nfc-access'
-  | 'plans'
+
+
   | 'addresses'
   | 'change-password';
-
 const NAV_ITEMS = [
   {
     id: 'my-card',
@@ -64,18 +61,8 @@ const NAV_ITEMS = [
     description: 'Share your card link',
     icon: <QrCode className="h-5 w-5" />,
   },
-  {
-    id: 'nfc-access',
-    label: 'NFC Card',
-    description: 'Write your card to an NFC tag',
-    icon: <Nfc className="h-5 w-5" />,
-  },
-  {
-    id: 'plans',
-    label: 'Plans',
-    description: 'Subscription & NFC card plans',
-    icon: <Sparkles className="h-5 w-5" />,
-  },
+ 
+ 
   {
     id: 'addresses',
     label: 'Addresses',
@@ -89,12 +76,10 @@ const NAV_ITEMS = [
     icon: <Lock className="h-5 w-5" />,
   },
 ] as const;
-
 // Mirrors the same check used inside MyAccessCard so the sidebar and the
 // inline "Edit" button always agree on whether editing is unlocked.
 const isSubscriptionActive = (card: any): boolean =>
   ((card?.business_user?.subscription_status || '') as string).toLowerCase() === 'active';
-
 class TabErrorBoundary extends React.Component<
   { children: React.ReactNode; onReset: () => void },
   { hasError: boolean; message: string }
@@ -103,15 +88,12 @@ class TabErrorBoundary extends React.Component<
     super(props);
     this.state = { hasError: false, message: '' };
   }
-
   static getDerivedStateFromError(error: any) {
     return { hasError: true, message: error?.message || 'Something went wrong' };
   }
-
   componentDidCatch(error: any, info: any) {
     console.error('Dashboard tab crashed:', error, info);
   }
-
   render() {
     if (this.state.hasError) {
       return (
@@ -137,7 +119,6 @@ class TabErrorBoundary extends React.Component<
     return this.props.children;
   }
 }
-
 export default function DashboardPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>('my-card');
@@ -152,7 +133,6 @@ export default function DashboardPage() {
   const [signingOut, setSigningOut] = useState(false);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [editCardId, setEditCardId] = useState<string | null>(null);
-
   const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
   // Drives which purchase type SubscriptionPaymentModal is collecting
   // payment for — it must be an NFC type whenever the chosen plan
@@ -162,7 +142,6 @@ export default function DashboardPage() {
   const [payModalPurchaseType, setPayModalPurchaseType] = useState<PurchaseType>(
     'SUBSCRIPTION_ONLY'
   );
-
   useEffect(() => {
     const token = localStorage.getItem('GlamlinkaccessToken');
     if (!token) {
@@ -171,13 +150,11 @@ export default function DashboardPage() {
     }
     fetchDashboardData();
   }, []);
-
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
       const cardRes = await getMyBusinessCardForDashboard();
       setBusinessCard(cardRes?.data || cardRes);
-
       const paymentRes = await getPaymenthistory();
       setPaymentHistory(paymentRes?.data ?? []);
     } catch (error: any) {
@@ -190,7 +167,6 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
-
   const handleSignOut = async () => {
     try {
       setSigningOut(true);
@@ -206,7 +182,6 @@ export default function DashboardPage() {
       setSigningOut(false);
     }
   };
-
   useEffect(() => {
     userProfile()
       .then((res) => {
@@ -216,7 +191,6 @@ export default function DashboardPage() {
         console.error(error);
       });
   }, []);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -224,38 +198,31 @@ export default function DashboardPage() {
       </div>
     );
   }
-
   const activeItem = NAV_ITEMS.find((n) => n.id === activeTab)!;
   const cardsArray: any[] = Array.isArray(businessCard)
     ? businessCard
     : businessCard
-    ? [businessCard]
-    : [];
-
+      ? [businessCard]
+      : [];
   const effectivePaymentCardId = String(
     selectedCardId ?? createdCardId ?? cardsArray[0]?.id ?? ''
   );
   const hasValidPaymentCardId = effectivePaymentCardId !== '';
-
   const effectiveEditCardId = String(editCardId ?? cardsArray[0]?.id ?? '');
   const hasValidEditCardId = effectiveEditCardId !== '';
-
   const editingCard =
     cardsArray.find((c) => String(c?.id) === effectiveEditCardId) ??
     cardsArray[0] ??
     null;
-
   // Sidebar "Edit Access Card" is only enabled once the relevant card's
   // subscription is active. We gate on the card that would actually be
   // edited (falls back to the first card, same as effectiveEditCardId).
   const editCardEnabled = !!editingCard && isSubscriptionActive(editingCard);
-
   const handleSelectNfcPlan = (type: PurchaseType, businessId: string | number) => {
     setSelectedCardId(String(businessId ?? cardsArray[0]?.id ?? ''));
     setPayModalPurchaseType(type);
     setPayOpen(true);
   };
-
   return (
     <div className="min-h-screen bg-background page-soft mt-18">
       <div className="container-glamlink py-8 md:py-12">
@@ -272,7 +239,6 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
-
         <div className="flex flex-col md:flex-row gap-6 items-start">
           <aside className="w-full md:w-64 flex-shrink-0">
             <nav className="rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden">
@@ -290,7 +256,6 @@ export default function DashboardPage() {
                 {NAV_ITEMS.map((item) => {
                   const isEditCard = item.id === 'edit-card';
                   const isDisabled = isEditCard && !editCardEnabled;
-
                   return (
                     <button
                       key={item.id}
@@ -304,13 +269,12 @@ export default function DashboardPage() {
                         }
                         setActiveTab(item.id);
                       }}
-                      className={`w-full flex items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-150 ${
-                        isDisabled
+                      className={`w-full flex items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-150 ${isDisabled
                           ? 'opacity-50 cursor-not-allowed text-muted-foreground'
                           : activeTab === item.id
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-foreground hover:bg-secondary'
-                      }`}
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-foreground hover:bg-secondary'
+                        }`}
                     >
                       {item.icon}
                       <div className="flex-1">
@@ -343,14 +307,12 @@ export default function DashboardPage() {
               </div>
             </nav>
           </aside>
-
           <main className="flex-1 min-w-0">
             <div className="mb-4 flex items-center gap-2 text-xs text-muted-foreground">
               <span>Dashboard</span>
               <ChevronRight className="h-3 w-3" />
               <span className="font-medium text-foreground">{activeItem.label}</span>
             </div>
-
             {showSuccess && (
               <div className="mb-4 flex items-center justify-between gap-4 rounded-xl border border-primary/30 bg-accent px-4 py-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-accent-foreground">
@@ -370,7 +332,6 @@ export default function DashboardPage() {
                 </button>
               </div>
             )}
-
             <div className="card-glamlink min-h-[100dvh]">
               <TabErrorBoundary onReset={() => fetchDashboardData()}>
                 {activeTab === 'my-card' && (
@@ -378,18 +339,18 @@ export default function DashboardPage() {
                     cardData={businessCard}
                     user={userdata}
                     error={error}
-                    onPayNow={(card: any, plan?: PlanId | null) => {
-                      setSelectedCardId(String(card?.id ?? ''));
-                      // "subscription-nfc" bundles a physical NFC card, so it
-                      // must go through the shipping/address step; plain
-                      // "subscription" never needs an address.
-                      setPayModalPurchaseType(
-                        plan === 'subscription-nfc'
-                          ? 'NFC_WITH_SUBSCRIPTION'
-                          : 'SUBSCRIPTION_ONLY'
-                      );
-                      setPayOpen(true);
-                    }}
+                    // onPayNow={(card: any, plan?: PlanId | null) => {
+                    //   setSelectedCardId(String(card?.id ?? ''));
+                    //   // "subscription-nfc" bundles a physical NFC card, so it
+                    //   // must go through the shipping/address step; plain
+                    //   // "subscription" never needs an address.
+                    //   setPayModalPurchaseType(
+                    //     plan === 'subscription-nfc'
+                    //       ? 'NFC_WITH_SUBSCRIPTION'
+                    //       : 'SUBSCRIPTION_ONLY'
+                    //   );
+                    //   setPayOpen(true);
+                    // }}
                     onEdit={(card: any) => {
                       setEditCardId(String(card?.id ?? ''));
                       setActiveTab('edit-card');
@@ -397,32 +358,12 @@ export default function DashboardPage() {
                     }}
                   />
                 )}
-
                 {activeTab === 'payment-history' && <PaymentHistory payments={paymentHistory} />}
                 {activeTab === 'qr-code' && <ShowQRCode cardData={businessCard} error={error} />}
-                {activeTab === 'nfc-access' && (
-                  <AccessNfcTab cardData={businessCard} error={error} onSelectPlan={handleSelectNfcPlan} />
-                )}
-                {activeTab === 'plans' && (
-                  <SubscriptionPlansTab
-                    selectedPlan={selectedPlan}
-                    onSelectPlan={setSelectedPlan}
-                    canContinue={!!selectedPlan && hasValidPaymentCardId}
-                    onContinue={() => {
-                      const cardId = String(cardsArray[0]?.id ?? selectedCardId ?? '');
-                      setSelectedCardId(cardId);
-                      if (selectedPlan === 'subscription') {
-                        setPayModalPurchaseType('SUBSCRIPTION_ONLY');
-                      } else if (selectedPlan === 'subscription-nfc') {
-                        setPayModalPurchaseType('NFC_WITH_SUBSCRIPTION');
-                      }
-                      setPayOpen(true);
-                    }}
-                  />
-                )}
+               
+             
                 {activeTab === 'addresses' && <AddressTab />}
                 {activeTab === 'change-password' && <ChangePasswordTab />}
-
                 {activeTab === 'edit-card' && editCardEnabled && hasValidEditCardId && editingCard && (
                   <EditAccessCard
                     cardId={effectiveEditCardId}
@@ -439,10 +380,10 @@ export default function DashboardPage() {
                       setBusinessCard((prev: any) =>
                         Array.isArray(prev)
                           ? prev.map((c) =>
-                              String(c?.id) === String(updated?.id ?? effectiveEditCardId)
-                                ? { ...c, ...updated }
-                                : c
-                            )
+                            String(c?.id) === String(updated?.id ?? effectiveEditCardId)
+                              ? { ...c, ...updated }
+                              : c
+                          )
                           : prev
                             ? { ...prev, ...updated }
                             : updated
@@ -466,7 +407,6 @@ export default function DashboardPage() {
           </main>
         </div>
       </div>
-
       <SubscriptionPaymentModal
         open={payOpen}
         onClose={() => setPayOpen(false)}
