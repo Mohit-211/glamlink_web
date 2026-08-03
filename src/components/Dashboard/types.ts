@@ -19,6 +19,7 @@ export interface OrderItem {
 }
 
 export interface AccessCardData {
+  status: string;
   id: number;
   name: string;
   professional_title: string;

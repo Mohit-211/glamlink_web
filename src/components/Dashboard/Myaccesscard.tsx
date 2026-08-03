@@ -11,6 +11,8 @@ import {
     Edit3,
     X,
     Lock,
+    Nfc,
+    AlertCircle,
 } from 'lucide-react';
 import { AccessCardData } from './types';
 import SubscriptionPlansTab, { PlanId } from '../Pricing/SubscriptionPlansTab';
@@ -28,6 +30,18 @@ const getCardKey = (card: AccessCardData, index: number): CardKey =>
 
 const isSubscriptionActive = (card: AccessCardData): boolean =>
     ((card as any)?.business_user?.subscription_status || '').toLowerCase() === 'active';
+
+// nfc_status assumed to live alongside subscription_status on business_user.
+// Move this lookup if your API actually returns it elsewhere on the card.
+const getNfcStatus = (card: AccessCardData): string =>
+    ((card as any)?.business_user?.nfc_status || (card as any)?.nfc_status || '').toLowerCase();
+
+const isNfcAlreadyPaid = (card: AccessCardData): boolean => getNfcStatus(card) === 'paid';
+
+// Plan ids that ship / include an NFC card — these should be disabled once
+// nfc_status is already "paid" so the user can't buy a second NFC card.
+// Update these to match your actual PlanId values if they differ.
+const NFC_PLAN_IDS: PlanId[] = ['freeKeychain', 'proKeychain'] as PlanId[];
 
 interface Props {
     cardData: AccessCardData | AccessCardData[];
@@ -48,6 +62,7 @@ export default function MyAccessCard({
     const [qrKey, setQrKey] = useState<CardKey | null>(null);
     const [subscriptionPromptKey, setSubscriptionPromptKey] = useState<CardKey | null>(null);
     const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
+    const [nfcPromptKey, setNfcPromptKey] = useState<CardKey | null>(null);
 
     const cards: AccessCardData[] = Array.isArray(cardData)
         ? cardData
@@ -97,6 +112,13 @@ export default function MyAccessCard({
     const qrCard = cards.find((c, i) => getCardKey(c, i) === qrKey) ?? null;
     const subscriptionPromptCard =
         cards.find((c, i) => getCardKey(c, i) === subscriptionPromptKey) ?? null;
+    const nfcPromptCard = cards.find((c, i) => getCardKey(c, i) === nfcPromptKey) ?? null;
+
+    // Disable NFC-including plans in the prompt once this card's NFC has
+    // already been paid for, so the user can only pick a non-NFC plan.
+    const disabledPlanIds: PlanId[] = subscriptionPromptCard && isNfcAlreadyPaid(subscriptionPromptCard)
+        ? NFC_PLAN_IDS
+        : [];
 
     return (
         <>
@@ -136,7 +158,9 @@ export default function MyAccessCard({
                     })();
 
                     const cardIsSubscribed = isSubscriptionActive(card);
-
+                    const isNfcNotPurchased = (card: any) =>
+                        card?.nfc_status === "not_purchased";
+                    const isRejected = card?.status?.toLowerCase() === "rejected";
                     return (
                         <div
                             key={key}
@@ -146,17 +170,28 @@ export default function MyAccessCard({
                                 <p className="text-xs font-semibold text-muted-foreground">
                                     {card?.business_name || card?.name || ''}
                                 </p>
-                                <button
-                                    onClick={() => handleEditClick(card, key)}
-                                    className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-secondary transition-colors"
-                                >
-                                    {cardIsSubscribed ? (
-                                        <Edit3 className="h-3 w-3" />
-                                    ) : (
-                                        <Lock className="h-3 w-3" />
+                                <div className="flex items-center gap-2">
+                                    {cardIsSubscribed && isNfcNotPurchased(card) && (
+                                        <button
+                                            onClick={() => setNfcPromptKey(key)}
+                                            className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-secondary transition-colors"
+                                        >
+                                            <Nfc className="h-3 w-3" />
+                                            Include NFC
+                                        </button>
                                     )}
-                                    Edit
-                                </button>
+                                    <button
+                                        onClick={() => handleEditClick(card, key)}
+                                        className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-secondary transition-colors"
+                                    >
+                                        {cardIsSubscribed ? (
+                                            <Edit3 className="h-3 w-3" />
+                                        ) : (
+                                            <Lock className="h-3 w-3" />
+                                        )}
+                                        Edit
+                                    </button>
+                                </div>
                             </div>
                             <div className="space-y-4">
                                 <div className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-[var(--shadow-medium)]">
@@ -247,26 +282,47 @@ export default function MyAccessCard({
                                     <div className="flex flex-col gap-3 border-t border-border bg-secondary/40 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
                                         <div className="flex flex-1 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
                                             <span className="flex-1 truncate font-mono text-[12px] text-muted-foreground">
-                                                {card?.business_card_link}
+                                                {isRejected ? "••••••••••••••••••••••" : card?.business_card_link}
                                             </span>
-                                            <button
-                                                onClick={() => handleCopy(card, key)}
-                                                className="flex-shrink-0 rounded-lg p-1 hover:bg-accent transition-colors"
-                                                aria-label="Copy link"
-                                            >
-                                                {copiedKey === key ? (
-                                                    <Check className="h-3.5 w-3.5 text-green-600" />
-                                                ) : (
-                                                    <Copy className="h-3.5 w-3.5 text-muted-foreground" />
-                                                )}
-                                            </button>
+                                            {isRejected && (
+                                                <>
+                                                    <AlertCircle className="mt-0.5 h-5 w-5 text-red-600" />
+                                                    <div>
+                                                        <p className="text-sm font-semibold text-red-700">
+                                                            Your access card has been rejected.
+                                                        </p>
+                                                        <p className="mt-1 text-xs text-red-600">
+                                                            Please update your details and submit your access card again. It will remain unavailable until it is approved.
+                                                        </p>
+                                                    </div>
+                                                </>
+                                            )}
+                                            {!isRejected && (
+                                                <button
+                                                    onClick={() => handleCopy(card, key)}
+                                                    className="flex-shrink-0 rounded-lg p-1 hover:bg-accent transition-colors"
+                                                    aria-label="Copy link"
+                                                >
+                                                    {copiedKey === key ? (
+                                                        <Check className="h-3.5 w-3.5 text-green-600" />
+                                                    ) : (
+                                                        <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+                                                    )}
+                                                </button>
+                                            )}
                                         </div>
+
                                         <div className="flex items-center gap-2 flex-shrink-0">
                                             <a
-                                                href={card?.business_card_link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="btn-primary !px-4 !py-2 !text-xs !rounded-xl flex items-center gap-1.5"
+                                                href={isRejected ? undefined : card?.business_card_link}
+                                                target={isRejected ? undefined : "_blank"}
+                                                rel={isRejected ? undefined : "noopener noreferrer"}
+                                                onClick={(e) => isRejected && e.preventDefault()}
+                                                className={`btn-primary !px-4 !py-2 !text-xs !rounded-xl flex items-center gap-1.5 ${isRejected
+                                                    ? "pointer-events-none opacity-50 cursor-not-allowed"
+                                                    : ""
+                                                    }`}
+                                                aria-disabled={isRejected}
                                             >
                                                 <ExternalLink className="h-3.5 w-3.5" />
                                                 View my access card
@@ -348,6 +404,11 @@ export default function MyAccessCard({
                                     {(subscriptionPromptCard?.business_name || subscriptionPromptCard?.name || 'This card')}'s
                                     subscription is inactive. Choose a plan to unlock editing.
                                 </p>
+                                {disabledPlanIds.length > 0 && (
+                                    <p className="text-[11px] text-muted-foreground mt-1">
+                                        You've already paid for an NFC card on this card, so NFC plans are unavailable.
+                                    </p>
+                                )}
                             </div>
                             <button
                                 onClick={() => setSubscriptionPromptKey(null)}
@@ -359,11 +420,52 @@ export default function MyAccessCard({
                         <SubscriptionPlansTab
                             selectedPlan={selectedPlan}
                             onSelectPlan={setSelectedPlan}
-                            canContinue={!!selectedPlan}
+                            disabledPlanIds={disabledPlanIds}
+                            businessCardId={subscriptionPromptCard?.id}
+                            canContinue={!!selectedPlan && !disabledPlanIds.includes(selectedPlan)}
                             onContinue={() => {
-                                // Pass the chosen plan alongside the card
+                                if (!selectedPlan || disabledPlanIds.includes(selectedPlan)) return;
                                 onPayNow?.(subscriptionPromptCard, selectedPlan);
                                 setSubscriptionPromptKey(null);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* Include NFC Modal — independent of the subscribe-prompt modal */}
+            {nfcPromptCard && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4"
+                    onClick={() => setNfcPromptKey(null)}
+                >
+                    <div
+                        className="card-glamlink w-full max-h-[90vh] overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="mb-2 flex items-start justify-between">
+                            <div>
+                                <h3 className="text-sm font-semibold text-foreground">Add an NFC keychain</h3>
+                                <p className="text-[11px] text-muted-foreground mt-0.5">
+                                    Add a physical NFC keychain to {(nfcPromptCard?.business_name || nfcPromptCard?.name || 'this card')}.
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setNfcPromptKey(null)}
+                                className="rounded-lg p-1.5 hover:bg-secondary transition-colors flex-shrink-0"
+                            >
+                                <X className="h-4 w-4 text-muted-foreground" />
+                            </button>
+                        </div>
+                        <SubscriptionPlansTab
+                            businessCardId={nfcPromptCard.id}
+                            selectedPlan={'freeKeychain' as PlanId}
+                            onSelectPlan={() => { }}
+                            disabledPlanIds={['free', 'pro', 'proKeychain'] as PlanId[]}
+                            canContinue={true}
+                            onContinue={() => {
+                                onPayNow?.(nfcPromptCard, 'freeKeychain' as PlanId);
+                                setNfcPromptKey(null);
                             }}
                         />
                     </div>

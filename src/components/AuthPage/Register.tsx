@@ -92,9 +92,9 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
       next.email = "Please enter a valid email address";
     }
 
-    // Mobile
+    // Mobile (optional) — only validate format if the user entered something
     const mobileRegex = /^[0-9]{10}$/;
-    if (!mobileRegex.test(form.mobile)) {
+    if (form.mobile.trim() && !mobileRegex.test(form.mobile)) {
       next.mobile = "Please enter a valid 10 digit mobile number";
     }
 

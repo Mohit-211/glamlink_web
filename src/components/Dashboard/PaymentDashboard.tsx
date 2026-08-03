@@ -16,7 +16,7 @@ import {
   Nfc,
   Sparkles,
 } from 'lucide-react';
-import { ChangePassword, getMyBusinessCardForDashboard, getPaymenthistory, LogoutUser, userProfile } from '../../api/Api';
+import { getMyBusinessCardForDashboard, getPaymenthistory, LogoutUser, userProfile } from '../../api/Api';
 import MyAccessCard from './Myaccesscard';
 import ShowQRCode from './Showqrcode';
 import { AddressTab } from './AddressTab';
@@ -24,16 +24,14 @@ import { SubscriptionPaymentModal } from './SubscriptionPay';
 import PaymentHistory from './PaymentHistory';
 import EditAccessCard from './accessCardEdit';
 import ChangePasswordTab from './Changepasswordtab';
-import AccessNfcTab from './Accessnfctab';
-import SubscriptionPlansTab, { PlanId } from './Subscriptionplanstab';
 import { PurchaseType } from './Purchasetypes';
+import SubscriptionPlansTab, { PlanId } from '../Pricing/SubscriptionPlansTab';
 type TabId =
   | 'my-card'
   | 'edit-card'
   | 'payment-history'
   | 'qr-code'
-
-
+  | 'subscription-plans'
   | 'addresses'
   | 'change-password';
 const NAV_ITEMS = [
@@ -61,8 +59,12 @@ const NAV_ITEMS = [
     description: 'Share your card link',
     icon: <QrCode className="h-5 w-5" />,
   },
- 
- 
+  {
+    id: 'subscription-plans',
+    label: 'Subscription Plans',
+    description: 'View or upgrade your plan',
+    icon: <Sparkles className="h-5 w-5" />,
+  },
   {
     id: 'addresses',
     label: 'Addresses',
@@ -76,8 +78,6 @@ const NAV_ITEMS = [
     icon: <Lock className="h-5 w-5" />,
   },
 ] as const;
-// Mirrors the same check used inside MyAccessCard so the sidebar and the
-// inline "Edit" button always agree on whether editing is unlocked.
 const isSubscriptionActive = (card: any): boolean =>
   ((card?.business_user?.subscription_status || '') as string).toLowerCase() === 'active';
 class TabErrorBoundary extends React.Component<
@@ -134,11 +134,6 @@ export default function DashboardPage() {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [editCardId, setEditCardId] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
-  // Drives which purchase type SubscriptionPaymentModal is collecting
-  // payment for — it must be an NFC type whenever the chosen plan
-  // bundles NFC (that's what makes it ask for a shipping address). This is
-  // the ONLY payment modal in the app: every entry point (Edit-card prompt,
-  // Plans tab, NFC tab) opens this same modal so the UI never differs.
   const [payModalPurchaseType, setPayModalPurchaseType] = useState<PurchaseType>(
     'SUBSCRIPTION_ONLY'
   );
@@ -214,15 +209,14 @@ export default function DashboardPage() {
     cardsArray.find((c) => String(c?.id) === effectiveEditCardId) ??
     cardsArray[0] ??
     null;
-  // Sidebar "Edit Access Card" is only enabled once the relevant card's
-  // subscription is active. We gate on the card that would actually be
-  // edited (falls back to the first card, same as effectiveEditCardId).
   const editCardEnabled = !!editingCard && isSubscriptionActive(editingCard);
   const handleSelectNfcPlan = (type: PurchaseType, businessId: string | number) => {
     setSelectedCardId(String(businessId ?? cardsArray[0]?.id ?? ''));
     setPayModalPurchaseType(type);
     setPayOpen(true);
   };
+  console.log(showSuccess)
+  console.log(selectedPlan, "--")
   return (
     <div className="min-h-screen bg-background page-soft mt-18">
       <div className="container-glamlink py-8 md:py-12">
@@ -270,10 +264,10 @@ export default function DashboardPage() {
                         setActiveTab(item.id);
                       }}
                       className={`w-full flex items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-150 ${isDisabled
-                          ? 'opacity-50 cursor-not-allowed text-muted-foreground'
-                          : activeTab === item.id
-                            ? 'bg-primary text-primary-foreground'
-                            : 'text-foreground hover:bg-secondary'
+                        ? 'opacity-50 cursor-not-allowed text-muted-foreground'
+                        : activeTab === item.id
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-foreground hover:bg-secondary'
                         }`}
                     >
                       {item.icon}
@@ -339,18 +333,13 @@ export default function DashboardPage() {
                     cardData={businessCard}
                     user={userdata}
                     error={error}
-                    // onPayNow={(card: any, plan?: PlanId | null) => {
-                    //   setSelectedCardId(String(card?.id ?? ''));
-                    //   // "subscription-nfc" bundles a physical NFC card, so it
-                    //   // must go through the shipping/address step; plain
-                    //   // "subscription" never needs an address.
-                    //   setPayModalPurchaseType(
-                    //     plan === 'subscription-nfc'
-                    //       ? 'NFC_WITH_SUBSCRIPTION'
-                    //       : 'SUBSCRIPTION_ONLY'
-                    //   );
-                    //   setPayOpen(true);
-                    // }}
+                    onPayNow={(card: any, plan?: PlanId | null) => {
+                      setSelectedCardId(String(card?.id ?? ''));
+                      setPayModalPurchaseType(
+                        plan && plan.includes('Keychain') ? 'NFC_WITH_SUBSCRIPTION' : 'SUBSCRIPTION_ONLY'
+                      );
+                      setPayOpen(true);
+                    }}
                     onEdit={(card: any) => {
                       setEditCardId(String(card?.id ?? ''));
                       setActiveTab('edit-card');
@@ -360,8 +349,23 @@ export default function DashboardPage() {
                 )}
                 {activeTab === 'payment-history' && <PaymentHistory payments={paymentHistory} />}
                 {activeTab === 'qr-code' && <ShowQRCode cardData={businessCard} error={error} />}
-               
-             
+                {activeTab === 'subscription-plans' && (
+                  <SubscriptionPlansTab
+                    selectedPlan={selectedPlan}
+                    onSelectPlan={setSelectedPlan}
+                    canContinue={!!selectedPlan}
+                    businessCard={cardsArray[0]}
+                    businessCardId={cardsArray[0]?.id}
+                    onContinue={() => {
+                      if (!selectedPlan) return;
+                      setSelectedCardId(String(cardsArray[0]?.id ?? ''));
+                      setPayModalPurchaseType(
+                        selectedPlan.includes('Keychain') ? 'NFC_WITH_SUBSCRIPTION' : 'SUBSCRIPTION_ONLY'
+                      );
+                      setPayOpen(true);
+                    }}
+                  />
+                )}
                 {activeTab === 'addresses' && <AddressTab />}
                 {activeTab === 'change-password' && <ChangePasswordTab />}
                 {activeTab === 'edit-card' && editCardEnabled && hasValidEditCardId && editingCard && (
@@ -373,10 +377,6 @@ export default function DashboardPage() {
                       setActiveTab('my-card');
                     }}
                     onSave={(updated) => {
-                      // Apply the just-saved record immediately so the
-                      // dashboard reflects it right away instead of waiting
-                      // on (and possibly racing/being stale against) the
-                      // background refetch below.
                       setBusinessCard((prev: any) =>
                         Array.isArray(prev)
                           ? prev.map((c) =>

@@ -2,7 +2,7 @@
 
 import { type ReactNode } from "react";
 import { Check, Sparkles, Nfc } from "lucide-react";
-import { PLANS, PRO_FEATURES, FREE_FEATURES, KEYCHAIN_FEATURE, type PlanDef } from "./plans";
+import { PRO_FEATURES, FREE_FEATURES, KEYCHAIN_FEATURE, type PlanDef } from "./plans";
 
 interface FeatureRowProps {
   children: ReactNode;
@@ -56,39 +56,34 @@ interface PlanCardProps {
   plan: PlanDef;
   selected: boolean;
   onSelect: () => void;
-  /** compact = tighter padding/text for use inside the subscribe modal */
   compact?: boolean;
+  disabled?: boolean;
 }
 
-export function PlanCard({ plan, selected, onSelect, compact = false }: PlanCardProps) {
+export function PlanCard({ plan, selected, onSelect, compact = false, disabled = false }: PlanCardProps) {
   const isFeatured = plan.id === "proKeychain";
+  const isSelected = selected && !disabled; // single source of truth
 
   return (
     <div
       role="button"
-      tabIndex={0}
-      onClick={onSelect}
-      onKeyDown={(e) => e.key === "Enter" && onSelect()}
-      className={`card-glamlink relative flex cursor-pointer flex-col overflow-hidden text-left ${
-        compact ? "p-4" : ""
-      } ${
-        selected
+      aria-disabled={disabled}
+      tabIndex={disabled ? -1 : 0}
+      onClick={disabled ? undefined : onSelect}
+      onKeyDown={(e) => {
+        if (disabled) return;
+        if (e.key === "Enter") onSelect();
+      }}
+      className={`card-glamlink relative flex flex-col overflow-hidden text-left ${
+        disabled ? "cursor-not-allowed" : "cursor-pointer"
+      } ${compact ? "p-4" : ""} ${
+        isSelected
           ? plan.isPro
             ? "shadow-primary border-primary bg-accent/40"
             : "shadow-medium border-primary"
           : "border-border"
       }`}
     >
-      {isFeatured && !compact && (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div
-            className="sheen-sweep absolute -top-1/2 h-[220%] w-1/3"
-            style={{
-              background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.10), transparent)",
-            }}
-          />
-        </div>
-      )}
 
       <div className="relative flex items-center justify-between">
         {isFeatured ? (
@@ -134,5 +129,3 @@ export function PlanCard({ plan, selected, onSelect, compact = false }: PlanCard
     </div>
   );
 }
-
-export { PLANS };

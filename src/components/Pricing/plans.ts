@@ -1,6 +1,12 @@
 export type PlanId = "free" | "freeKeychain" | "pro" | "proKeychain";
 export type ProFeature = string | { text: string; soon: true };
 
+export type BackendPlanType =
+  | "free"
+  | "nfc_only"
+  | "subscription_only"
+  | "nfc_with_subscription";
+
 export const PRO_PRICE = 4.99;
 export const KEYCHAIN_PRICE = 39.99;
 
@@ -32,6 +38,7 @@ export interface PlanDef {
   priceLabel: string;
   priceSuffix?: string;
   tagline: string;
+  planType: BackendPlanType;
 }
 
 export const PLANS: PlanDef[] = [
@@ -42,15 +49,17 @@ export const PLANS: PlanDef[] = [
     isPro: false,
     priceLabel: "$0",
     tagline: "Get listed, no cost.",
+    planType: "free",
   },
   {
     id: "freeKeychain",
-    name: "Free + keychain",
+    name: "Keychain",
     hasKeychain: true,
     isPro: false,
     priceLabel: `$${KEYCHAIN_PRICE.toFixed(2)}`,
     priceSuffix: "one-time",
     tagline: "Free listing, plus a tap-to-share NFC keychain.",
+    planType: "nfc_only",
   },
   {
     id: "pro",
@@ -60,6 +69,7 @@ export const PLANS: PlanDef[] = [
     priceLabel: `$${PRO_PRICE.toFixed(2)}`,
     priceSuffix: "/ month",
     tagline: "Everything in Free, plus ongoing control.",
+    planType: "subscription_only",
   },
   {
     id: "proKeychain",
@@ -69,5 +79,6 @@ export const PLANS: PlanDef[] = [
     priceLabel: `$${PRO_PRICE.toFixed(2)}`,
     priceSuffix: `/ month + $${KEYCHAIN_PRICE.toFixed(2)} one-time`,
     tagline: "Full Pro plan with the NFC keychain included.",
+    planType: "nfc_with_subscription",
   },
 ];

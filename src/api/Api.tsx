@@ -334,16 +334,35 @@ export const getMyBusinessCardForDashboard = async () => {
 /* 📌 Address APIs */
 /* ============================= */
 // Add New Address
-export const addNewAddress = async (payload: any) => {
-  const { data } = await api.post(
-    "order/addNewAddress",
-    payload,
-    {
+export const addNewAddress = async (
+  payload: any,
+  withToken: boolean = true
+) => {
+  const config = withToken
+    ? {
       headers: {
         "x-access-token": getToken(),
       },
     }
+    : {};
+
+  const { data } = await api.post(
+    "order/addNewAddress",
+    payload,
+    config
   );
+
+  return data;
+};
+export const addNewAddressWithoutToken = async (
+  payload: any,
+) => {
+  const { data } = await api.post(
+    "order/addNewAddress-public",
+    payload,
+
+  );
+
   return data;
 };
 // Get All User Addresses
@@ -425,6 +444,18 @@ export const CreateSubscription = async (payload: any) => {
   );
   return data;
 };
+export const CreateSubscriptionWIthOutTokenAPI = async (payload: any) => {
+  const { data } = await api.post(
+    "businessCard/create-subscription-public",
+    payload,
+    {
+      headers: {
+        "x-access-token": getToken(),
+      },
+    }
+  );
+  return data;
+};
 export const CancelSubscription = async (payload: any) => {
   const { data } = await api.post(
     "businessCard/cancel-subscription",
@@ -467,6 +498,15 @@ export interface SelectPlanPayload {
 export const SelectPlanAPI = async (payload: SelectPlanPayload) => {
   const { data } = await api.post(
     "businessCard/select-plan",
+    payload,
+    
+  );
+
+  return data;
+};
+export const ShippingRateWithoutTokenApi = async (payload: any) => {
+  const { data } = await api.post(
+    "businessCard/shipping-rate-public",
     payload,
     {
       headers: {

@@ -42,6 +42,8 @@ const GlamCardForm: React.FC<Props> = ({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+    const token = localStorage.getItem("GlamlinkaccessToken");
+
   // Auth flow state — shown when a card is created for a user who doesn't
   // have a Glamlink login yet (result.data.user_login === false).
   // Flow: register -> otp -> login -> (payment, if pending)
@@ -159,50 +161,35 @@ const GlamCardForm: React.FC<Props> = ({
      sessionStorage — regardless of whether the user is logged in. */
   const buildFormData = (): FormData => {
     const formData = new FormData();
-
     if (data.profile_image instanceof File) {
       formData.append("profile_image", data.profile_image);
     }
     const images: (File | string)[] = data.images ?? [];
     const meta = data.gallery_meta ?? [];
-
     const newImageEntries = images
       .map((file, index) => ({ file, meta: meta[index], index }))
       .filter(
         (entry): entry is { file: File; meta: typeof meta[number]; index: number } =>
           entry.file instanceof File && !(entry.file as File).type.startsWith("video/")
       );
-
     const newVideoItems = images
       .map((file, index) => ({ file, meta: meta[index], index }))
       .filter(
         (entry): entry is { file: File; meta: typeof meta[number]; index: number } =>
           entry.file instanceof File && (entry.file as File).type.startsWith("video/")
       );
-
     const existingImageEntries = images
       .map((file, index) => ({ file, meta: meta[index], index }))
       .filter((entry) => !(entry.file instanceof File));
-
     const getExistingId = (file: any): string | undefined =>
       typeof file === "string" ? file : file?.id ?? file?.file_uri ?? file?.url;
-
-  
     newImageEntries.forEach(({ file }) => formData.append("images", file));
-
     if (isEdit) {
-
       formData.append(
         "existing_image_ids",
         JSON.stringify(existingImageEntries.map(({ file }) => getExistingId(file)))
       );
     }
-
-
-
-
-
-
     // Send metadata split the SAME way, in the SAME order as the image
     // arrays above, so index i in each meta array corresponds to index i
     // in its matching image array.
@@ -211,7 +198,6 @@ const GlamCardForm: React.FC<Props> = ({
       is_thumbnail: m?.is_thumbnail,
       sort_order: m?.sort_order,
     });
-
     if (newImageEntries.length) {
       formData.append(
         "new_images_gallery_meta",
@@ -224,14 +210,12 @@ const GlamCardForm: React.FC<Props> = ({
         JSON.stringify(existingImageEntries.map(({ meta }) => stripMeta(meta)))
       );
     }
-
- newVideoItems.forEach(({ file, meta }) => {
+    newVideoItems.forEach(({ file, meta }) => {
       formData.append("videos", file);
       if (meta?.thumbnail_file) {
         formData.append("video_thumbnails", meta.thumbnail_file);
       }
     });
-
     const existingVideoEntries = images
       .map((file, index) => ({ file, meta: meta[index], index }))
       .filter(
@@ -239,18 +223,15 @@ const GlamCardForm: React.FC<Props> = ({
           !(entry.file instanceof File) &&
           (entry.meta as any)?.file_type === "video"
       );
-
     if (isEdit) {
       formData.append(
         "existing_video_ids",
         JSON.stringify(existingVideoEntries.map(({ file }) => getExistingId(file)))
       );
     }
-
     if (data.social_media) {
       formData.append("social_media", JSON.stringify(data.social_media));
     }
-
     const jsonFields = [
       "business_hour",
       "other_links",
@@ -266,14 +247,12 @@ const GlamCardForm: React.FC<Props> = ({
         formData.append(field, JSON.stringify(value));
       }
     });
-
     if (data.preferred_booking_methods !== undefined) {
       formData.append(
         "preferred_booking_method",
         JSON.stringify(data.preferred_booking_methods)
       );
     }
-
     const primitiveFields = [
       "name",
       "email",
@@ -295,7 +274,6 @@ const GlamCardForm: React.FC<Props> = ({
         formData.append(field, String(value));
       }
     });
-
     formData.append("is_phone_visible", String(data.is_phone_visible ?? true));
     return formData;
   };
@@ -351,72 +329,66 @@ const GlamCardForm: React.FC<Props> = ({
     localStorage.setItem("postLoginRedirect", "/apply/digital-card");
     window.location.href = "/login";
   };
- const handleSubmit = async (formData: FormData) => {
-  console.log("FINAL DATA 👉", data);
-
-  const newVideoItems = (data.images ?? [])
-    .map((file, index) => ({ file, meta: data.gallery_meta?.[index], index }))
-    .filter(
-      ({ file }) => file instanceof File && (file as File).type.startsWith("video/")
-    );
-  for (const { meta, index } of newVideoItems) {
-    if (!meta?.thumbnail_file) {
-      alert(`Please upload a thumbnail for video #${index + 1}.`);
-      return;
-    }
-  }
-
-  try {
-    setLoading(true);
-    const token = localStorage.getItem("GlamlinkaccessToken");
-    const endpoint = isEdit
-      ? `https://node.glamlink.net:5000/api/v1/businessCard/updateBusinessCard/${cardId}`
-      : token
-        ? "https://node.glamlink.net:5000/api/v1/businessCard/createBusinessCard"
-        : "https://node.glamlink.net:5000/api/v1/businessCard";
-
-    const res = await fetch(endpoint, {
-      method: isEdit ? "PUT" : "POST",
-      headers: {
-        "x-access-token": token || "",
-        role_id: String(7),
-      },
-      body: formData,
-    });
-
-    console.log(res, "res====");
-    if (!res.ok) {
-      throw new Error(
-        isEdit ? "Failed to update GlamCard" : "Failed to create GlamCard"
+  const handleSubmit = async (formData: FormData) => {
+    console.log("FINAL DATA 👉", data);
+    const newVideoItems = (data.images ?? [])
+      .map((file, index) => ({ file, meta: data.gallery_meta?.[index], index }))
+      .filter(
+        ({ file }) => file instanceof File && (file as File).type.startsWith("video/")
       );
-    }
-
-    const result = await res.json();
-
-    if (isEdit) {
-      message.success(result?.message || "GlamCard updated successfully!");
-      onSuccess?.(result?.data ?? result);
-    } else {
-      // New user -> straight to plan selection with the new card's id.
-      if (result?.data?.user_exists === false) {
-        const businessCardId = result?.data?.business_card_id;
-        router.push(`/pricing?businessCardId=${businessCardId}`);
+    for (const { meta, index } of newVideoItems) {
+      if (!meta?.thumbnail_file) {
+        alert(`Please upload a thumbnail for video #${index + 1}.`);
         return;
       }
-      // Existing user -> normal success popup -> dashboard.
-      setPostSuccessAction("dashboard");
-      setShowSuccess(true);
-      setTimeout(advanceAfterSuccess, 6000);
     }
-  } catch (error) {
-    console.error("ERROR 👉", error);
-    message.error(
-      isEdit ? "Failed to update Business Card" : "Failed to create Business Card"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("GlamlinkaccessToken");
+      const endpoint = isEdit
+        ? `https://node.glamlink.net:5000/api/v1/businessCard/updateBusinessCard/${cardId}`
+        : token
+          ? "https://node.glamlink.net:5000/api/v1/businessCard/createBusinessCard"
+          : "https://node.glamlink.net:5000/api/v1/businessCard";
+      const res = await fetch(endpoint, {
+        method: isEdit ? "PUT" : "POST",
+        headers: {
+          "x-access-token": token || "",
+          role_id: String(7),
+        },
+        body: formData,
+      });
+      console.log(res, "res====");
+      if (!res.ok) {
+        throw new Error(
+          isEdit ? "Failed to update GlamCard" : "Failed to create GlamCard"
+        );
+      }
+      const result = await res.json();
+      if (isEdit) {
+        message.success(result?.message || "GlamCard updated successfully!");
+        onSuccess?.(result?.data ?? result);
+      } else {
+        // New user -> straight to plan selection with the new card's id.
+        if (result?.data?.user_exists === false) {
+          const businessCardId = result?.data?.business_card_id;
+          router.push(`/pricing?businessCardId=${businessCardId}`);
+          return;
+        }
+        // Existing user -> normal success popup -> dashboard.
+        setPostSuccessAction("dashboard");
+        setShowSuccess(true);
+        setTimeout(advanceAfterSuccess, 6000);
+      }
+    } catch (error) {
+      console.error("ERROR 👉", error);
+      message.error(
+        isEdit ? "Failed to update Business Card" : "Failed to create Business Card"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
   // register/otp/login share one Modal; "payment" is deliberately excluded
   // so it renders via its own SubscriptionPaymentModal instance below,
   // instead of stacking on top of this one.
@@ -489,12 +461,13 @@ const GlamCardForm: React.FC<Props> = ({
         <SuccessModal
           open={showSuccess}
           onClose={advanceAfterSuccess}
-          title="Thanks! Your Access Card request has been received."
-          message="
-Your Access Card is currently under review. Once approved, we'll email you with instructions to access your account and view your Access Card.
-"
+          title="Your Access Card has been created successfully!"
+//           message="
+// Your Access Card is currently under review. Once approved, we'll email you with instructions to access your account and view your Access Card.
+// "
         />
       )}
+      
       {/* {!isEdit && (
         <Modal
           open={isAuthModalOpen}
