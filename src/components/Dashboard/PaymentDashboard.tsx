@@ -216,7 +216,17 @@ export default function DashboardPage() {
     setPayOpen(true);
   };
   console.log(showSuccess)
-  console.log(selectedPlan, "--")
+  console.log(businessCard, "--")
+const PLAN_TYPE_LABELS: Record<string, string> = {
+  subscription_only: "Pro",
+  nfc_only: "Free + Keychain",
+  nfc_with_subscription: "Pro + Keychain",
+};
+
+function getActivePlanLabel(planType?: string | null): string {
+  if (!planType) return "Free";
+  return PLAN_TYPE_LABELS[planType.toLowerCase()] || "Free";
+}
   return (
     <div className="min-h-screen bg-background page-soft mt-18">
       <div className="container-glamlink py-8 md:py-12">
@@ -237,14 +247,17 @@ export default function DashboardPage() {
           <aside className="w-full md:w-64 flex-shrink-0">
             <nav className="rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden">
               <div className="px-5 py-4 border-b border-border bg-secondary/30">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground ring-2 ring-primary/20">
-                    {userdata?.name?.slice(0, 2)?.toUpperCase() || 'GL'}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">{userdata?.name || 'User'}</p>
-                  </div>
-                </div>
+       <div className="flex items-center gap-3">
+  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground ring-2 ring-primary/20">
+    {userdata?.name?.slice(0, 2)?.toUpperCase() || 'GL'}
+  </div>
+  <div>
+    <p className="text-sm font-semibold text-foreground">{userdata?.name || 'User'}</p>
+    <span className="inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground mt-0.5">
+      {getActivePlanLabel(businessCard?.plan_type)} Plan
+    </span>
+  </div>
+</div>
               </div>
               <div className="p-2">
                 {NAV_ITEMS.map((item) => {

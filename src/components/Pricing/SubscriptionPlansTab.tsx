@@ -30,8 +30,16 @@ function cardHasSubscription(card: any): boolean {
   return SUBSCRIPTION_PLAN_TYPES.has((card?.plan_type || "").toLowerCase());
 }
 
+const NFC_PURCHASED_STATUSES = new Set(["purchased", "paid"]);
+
 function cardHasNfc(card: any): boolean {
-  return (card?.nfc_status || "").toLowerCase() === "purchased";
+  // "nfc_with_subscription" bundles both, so treat it as NFC being present
+  // too — even if nfc_status hasn't been (or wasn't) separately marked as
+  // purchased. Otherwise a card sitting in this combined state could end
+  // up with some plans still enabled instead of everything being disabled.
+  if ((card?.plan_type || "").toLowerCase() === "nfc_with_subscription") return true;
+  // Real API responses use "paid" (not "purchased") for nfc_status.
+  return NFC_PURCHASED_STATUSES.has((card?.nfc_status || "").toLowerCase());
 }
 
 function isPlanAlreadyIncluded(planId: PlanId, card: any): boolean {
@@ -40,6 +48,27 @@ function isPlanAlreadyIncluded(planId: PlanId, card: any): boolean {
   const hasSubscription = cardHasSubscription(card);
   const hasNfc = cardHasNfc(card);
   return (!req.subscription || hasSubscription) && (!req.nfc || hasNfc);
+}
+
+/**
+ * The plan_type sent to the API must reflect what the card will actually
+ * have AFTER this purchase, not just what the selected plan bundles on its
+ * own. E.g. a card that already has NFC purchased and now buys the `pro`
+ * (subscription-only) plan ends up with both subscription + NFC, so the
+ * API needs "nfc_with_subscription" — not "subscription_only" — or the
+ * two purchases won't be reconciled server-side.
+ */
+function getEffectivePlanType(planId: PlanId, card: any): string | undefined {
+  const req = PLAN_REQUIREMENTS[planId];
+  if (!req) return PLAN_TO_TYPE[planId];
+
+  const willHaveSubscription = req.subscription || cardHasSubscription(card);
+  const willHaveNfc = req.nfc || cardHasNfc(card);
+
+  if (willHaveSubscription && willHaveNfc) return "nfc_with_subscription";
+  if (willHaveSubscription) return "subscription_only";
+  if (willHaveNfc) return "nfc_only";
+  return PLAN_TO_TYPE[planId];
 }
 
 /**
@@ -116,7 +145,7 @@ export default function SubscriptionPlansTab({
   const handleContinue = async () => {
     if (!selectedPlan || !effectiveCanContinue) return;
 
-    const planType = PLAN_TO_TYPE[selectedPlan];
+    const planType = getEffectivePlanType(selectedPlan, businessCard);
     const cardId = businessCardId ?? businessCard?.id;
 
     if (planType && cardId) {
