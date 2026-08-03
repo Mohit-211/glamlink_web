@@ -225,7 +225,7 @@ const PLAN_TYPE_LABELS: Record<string, string> = {
 
 function getActivePlanLabel(planType?: string | null): string {
   if (!planType) return "Free";
-  return PLAN_TYPE_LABELS[planType.toLowerCase()] || "Free";
+  return PLAN_TYPE_LABELS[planType.toLowerCase()]
 }
   return (
     <div className="min-h-screen bg-background page-soft mt-18">
@@ -254,7 +254,7 @@ function getActivePlanLabel(planType?: string | null): string {
   <div>
     <p className="text-sm font-semibold text-foreground">{userdata?.name || 'User'}</p>
     <span className="inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground mt-0.5">
-      {getActivePlanLabel(businessCard?.plan_type)} Plan
+      {getActivePlanLabel(businessCard[0]?.plan_type)} Plan
     </span>
   </div>
 </div>
