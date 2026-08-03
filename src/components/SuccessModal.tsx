@@ -15,9 +15,8 @@ const SuccessModal: React.FC<Props> = ({
   title = "Success",
   message = (
     <>
-      Your business card was created successfully.
-      <br />
-      <strong>Please check your email.</strong>
+     Your Access Card has been created successfully.
+    
     </>
   ),
 }) => {
