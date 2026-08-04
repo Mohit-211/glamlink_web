@@ -1,6 +1,7 @@
 import axios from "axios";
 const api = axios.create({
-  baseURL: "https://node.glamlink.net/api/v1/",
+  // baseURL: "https://node.glamlink.net/api/v1/",
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   
 });
 const getToken = () => {
