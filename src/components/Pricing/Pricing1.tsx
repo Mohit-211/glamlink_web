@@ -29,6 +29,7 @@ import {
   SelectPlanAPI,
   ShippingRateWithoutTokenApi,
   CreateSubscriptionWIthOutTokenAPI,
+  EditAddressWithoutTokenAPI,
 } from "@/api/Api";
 import { PlanCard } from "./PlanCard";
 import { PLANS } from "./plans";
@@ -104,7 +105,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
   const [cities, setCities] = useState<{ id: number; name: string }[]>([]);
   const [statesLoaded, setStatesLoaded] = useState(false);
   const [addressError, setAddressError] = useState<string | null>(null);
-
+const [addressId, setAddressId] = useState<number | null>(null);
   // What the server actually decided the plan_type is (trimmed), and the
   // resulting shipping quote once we have an address for NFC plans.
   const [resolvedPlanType, setResolvedPlanType] = useState<string | null>(null);
@@ -202,24 +203,34 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
     }
   }
 
-  // Step 2 (nfc_only / nfc_with_subscription only) — save the shipping
-  // address, then fetch a shipping rate quote for it.
-  async function handleSaveAddressAndGetShipping() {
-    if (!validateAddress() || !businessCardId) return;
+ async function handleSaveAddressAndGetShipping() {
+  if (!validateAddress() || !businessCardId) return;
 
-    setSubmitting(true);
-    setAddressError(null);
-    try {
-      const addressPayload = {
-        address_line_1: address.address_line_1.trim(),
-        ...(address.address_lat && { address_lat: parseFloat(address.address_lat) }),
-        ...(address.address_long && { address_long: parseFloat(address.address_long) }),
-        state_id: parseInt(address.state_id),
-        city_id: parseInt(address.city_id),
-        postal_code: address.postal_code.trim(),
-        business_card_id: businessCardId,
-      };
+  setSubmitting(true);
+  setAddressError(null);
+  try {
+    const addressPayload = {
+      address_line_1: address.address_line_1.trim(),
+      ...(address.address_lat && { address_lat: parseFloat(address.address_lat) }),
+      ...(address.address_long && { address_long: parseFloat(address.address_long) }),
+      state_id: parseInt(address.state_id),
+      city_id: parseInt(address.city_id),
+      postal_code: address.postal_code.trim(),
+      business_card_id: businessCardId,
+    };
 
+    if (addressId) {
+      // We already created an address earlier in this session — edit it
+      // instead of creating a duplicate.
+      const editRes = await EditAddressWithoutTokenAPI(addressId, addressPayload);
+      if (editRes?.success === false) {
+        setAddressError(
+          editRes?.message || "Please enter a valid address, city, state and postal code."
+        );
+        setSubmitting(false);
+        return;
+      }
+    } else {
       const addressRes = await addNewAddressWithoutToken(addressPayload);
       if (addressRes?.success === false) {
         setAddressError(
@@ -228,35 +239,38 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
         setSubmitting(false);
         return;
       }
-    } catch (error: any) {
-      console.error("ADD ADDRESS ERROR 👉", error);
-      setAddressError(
-        error?.response?.data?.message ===
-          "Address validation failed: Unable to find a valid city, state or 5-digit zip. Please check the accuracy of the submitted address."
-          ? "Please enter a valid address, city, state and postal code."
-          : error?.response?.data?.message || "Failed to save address. Please try again."
-      );
-      setSubmitting(false);
-      return;
+      // Remember the id so a later resubmission edits rather than duplicates.
+      const newAddressId = addressRes?.address_id ?? addressRes?.data?.address_id;
+      if (newAddressId) setAddressId(newAddressId);
     }
-
-    setLoadingShipping(true);
-    setShippingError(null);
-    try {
-      const shipRes = await ShippingRateWithoutTokenApi({ business_card_id: businessCardId });
-      setShippingData(shipRes?.data ?? shipRes);
-      setStep("shipping");
-    } catch (error: any) {
-      console.error("SHIPPING RATE ERROR 👉", error);
-      setShippingError(
-        error?.response?.data?.message || "Could not calculate shipping. Please try again."
-      );
-    } finally {
-      setLoadingShipping(false);
-      setSubmitting(false);
-    }
+  } catch (error: any) {
+    console.error("ADD/EDIT ADDRESS ERROR 👉", error);
+    setAddressError(
+      error?.response?.data?.message ===
+        "Address validation failed: Unable to find a valid city, state or 5-digit zip. Please check the accuracy of the submitted address."
+        ? "Please enter a valid address, city, state and postal code."
+        : error?.response?.data?.message || "Failed to save address. Please try again."
+    );
+    setSubmitting(false);
+    return;
   }
 
+  setLoadingShipping(true);
+  setShippingError(null);
+  try {
+    const shipRes = await ShippingRateWithoutTokenApi({ business_card_id: businessCardId });
+    setShippingData(shipRes?.data ?? shipRes);
+    setStep("shipping");
+  } catch (error: any) {
+    console.error("SHIPPING RATE ERROR 👉", error);
+    setShippingError(
+      error?.response?.data?.message || "Could not calculate shipping. Please try again."
+    );
+  } finally {
+    setLoadingShipping(false);
+    setSubmitting(false);
+  }
+}
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="page-soft w-[90%] px-4 py-14">

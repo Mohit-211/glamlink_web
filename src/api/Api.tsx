@@ -85,7 +85,6 @@ export const getBusinessCardBySlug = async (
 /* ============================= */
 export const searchBusinessCard = async (params: {
   search?: string;
-
 }) => {
   const { data } = await api.get(
     "businessCard/search",
@@ -244,7 +243,6 @@ export const forgotPasswordApi = async (payload: {
       },
     }
   );
-
   return data;
 };
 export const LogoutUser = async () => {
@@ -345,13 +343,11 @@ export const addNewAddress = async (
       },
     }
     : {};
-
   const { data } = await api.post(
     "order/addNewAddress",
     payload,
     config
   );
-
   return data;
 };
 export const addNewAddressWithoutToken = async (
@@ -360,9 +356,17 @@ export const addNewAddressWithoutToken = async (
   const { data } = await api.post(
     "order/addNewAddress-public",
     payload,
-
   );
-
+  return data;
+};
+export const EditAddressWithoutTokenAPI = async (
+  addressId: number | string,
+  payload: any,
+) => {
+  const { data } = await api.put(
+    `order/editAddress-public/${addressId}`,
+    payload,
+  );
   return data;
 };
 // Get All User Addresses
@@ -494,14 +498,11 @@ export interface SelectPlanPayload {
   business_card_id: number | string;
   plan_type: string; // e.g. "free" | "pro"
 }
-
 export const SelectPlanAPI = async (payload: SelectPlanPayload) => {
   const { data } = await api.post(
     "businessCard/select-plan",
     payload,
-    
   );
-
   return data;
 };
 export const ShippingRateWithoutTokenApi = async (payload: any) => {
@@ -514,6 +515,5 @@ export const ShippingRateWithoutTokenApi = async (payload: any) => {
       },
     }
   );
-
   return data;
 };
