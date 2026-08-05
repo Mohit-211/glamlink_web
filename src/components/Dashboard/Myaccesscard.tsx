@@ -28,20 +28,34 @@ type CardKey = string | number;
 const getCardKey = (card: AccessCardData, index: number): CardKey =>
     (card as any)?.id ?? index;
 
-const isSubscriptionActive = (card: AccessCardData): boolean =>
-    ((card as any)?.business_user?.subscription_status || '').toLowerCase() === 'active';
+const getPlanType = (card: AccessCardData): string =>
+    ((card as any)?.plan_type || '').toLowerCase();
+
+// plan_type already bundles NFC (nfc_only / nfc_with_subscription) — hide the
+// "Include NFC" upsell button once the card is on one of those plans.
+const cardHasNfcPlan = (card: AccessCardData): boolean => {
+    const planType = getPlanType(card);
+    return planType === 'nfc_only' || planType === 'nfc_with_subscription';
+};
+
+// Editing is unlocked only for plans that include an active subscription.
+const isCardEditable = (card: AccessCardData): boolean => {
+    const planType = getPlanType(card);
+    return planType === 'subscription_only' || planType === 'nfc_with_subscription';
+};
 
 // nfc_status assumed to live alongside subscription_status on business_user.
 // Move this lookup if your API actually returns it elsewhere on the card.
 const getNfcStatus = (card: AccessCardData): string =>
     ((card as any)?.business_user?.nfc_status || (card as any)?.nfc_status || '').toLowerCase();
 
-const isNfcAlreadyPaid = (card: AccessCardData): boolean => getNfcStatus(card) === 'paid';
+const isNfcAlreadyPaid = (card: AccessCardData): boolean =>
+    cardHasNfcPlan(card) || getNfcStatus(card) === 'paid';
 
 // Plan ids that ship / include an NFC card — these should be disabled once
 // nfc_status is already "paid" so the user can't buy a second NFC card.
 // Update these to match your actual PlanId values if they differ.
-const NFC_PLAN_IDS: PlanId[] = ['freeKeychain', 'proKeychain'] as PlanId[];
+const NFC_PLAN_IDS: PlanId[] = ['nfc_only', 'nfc_with_subscription'] as PlanId[];
 
 interface Props {
     cardData: AccessCardData | AccessCardData[];
@@ -63,7 +77,7 @@ export default function MyAccessCard({
     const [subscriptionPromptKey, setSubscriptionPromptKey] = useState<CardKey | null>(null);
     const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
     const [nfcPromptKey, setNfcPromptKey] = useState<CardKey | null>(null);
-
+console.log(selectedPlan,"selectedPlan")
     const cards: AccessCardData[] = Array.isArray(cardData)
         ? cardData
         : cardData
@@ -101,7 +115,7 @@ export default function MyAccessCard({
     };
 
     const handleEditClick = (card: AccessCardData, key: CardKey) => {
-        if (isSubscriptionActive(card)) {
+        if (isCardEditable(card)) {
             onEdit?.(card);
         } else {
             setSelectedPlan(null);
@@ -156,10 +170,8 @@ export default function MyAccessCard({
                             return {};
                         }
                     })();
-
-                    const cardIsSubscribed = isSubscriptionActive(card);
-                    const isNfcNotPurchased = (card: any) =>
-                        card?.nfc_status === "not_purchased";
+                    const cardIsSubscribed = isCardEditable(card);
+                    const showIncludeNfcButton = !cardHasNfcPlan(card);
                     const isRejected = card?.status?.toLowerCase() === "rejected";
                     return (
                         <div
@@ -171,7 +183,7 @@ export default function MyAccessCard({
                                     {card?.business_name || card?.name || ''}
                                 </p>
                                 <div className="flex items-center gap-2">
-                                    {cardIsSubscribed && isNfcNotPurchased(card) && (
+                                    {cardIsSubscribed && showIncludeNfcButton && (
                                         <button
                                             onClick={() => setNfcPromptKey(key)}
                                             className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-secondary transition-colors"
@@ -459,12 +471,12 @@ export default function MyAccessCard({
                         </div>
                         <SubscriptionPlansTab
                             businessCardId={nfcPromptCard.id}
-                            selectedPlan={'freeKeychain' as PlanId}
+                            selectedPlan={'nfc_only' as PlanId}
                             onSelectPlan={() => { }}
-                            disabledPlanIds={['free', 'pro', 'proKeychain'] as PlanId[]}
+                            disabledPlanIds={['free', 'subscription_only', 'nfc_with_subscription'] as PlanId[]}
                             canContinue={true}
                             onContinue={() => {
-                                onPayNow?.(nfcPromptCard, 'freeKeychain' as PlanId);
+                                onPayNow?.(nfcPromptCard, 'nfc_only' as PlanId);
                                 setNfcPromptKey(null);
                             }}
                         />

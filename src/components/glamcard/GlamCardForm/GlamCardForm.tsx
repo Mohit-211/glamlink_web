@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, message } from "antd";
 import { Loader2 } from "lucide-react";
 import SuccessModal from "@/components/SuccessModal";
-import { GlamCardFormData } from "./types";
+import { BOOKING_METHODS, FieldErrors, GlamCardFormData } from "./types";
 import BasicInfoForm from "./BasicInfoForm";
 import MediaAndProfileForm from "../MediaAndProfileForm";
 import GlamlinkIntegrationForm from "./GlamlinkIntegrationForm";
@@ -26,6 +26,11 @@ interface Props {
   onCancel?: () => void;
 }
 const FORM_STORAGE_KEY = "glamcard_form_draft";
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Digits only — no letters, spaces, or symbols (+, -, parens, etc).
+const PHONE_DIGITS_REGEX = /^\d+$/;
+const isValidPhone = (value: string) =>
+  PHONE_DIGITS_REGEX.test(value) && value.length >= 7 && value.length <= 15;
 // "payment" is intentionally NOT rendered inside the register/otp/login
 // Modal below — it's shown via its own SubscriptionPaymentModal instance so
 // the two modals never stack on top of one another.
@@ -42,7 +47,20 @@ const GlamCardForm: React.FC<Props> = ({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-    const token = localStorage.getItem("GlamlinkaccessToken");
+  const token = localStorage.getItem("GlamlinkaccessToken");
+  // Tracks which required fields currently fail validation, so the relevant
+  // inputs can be outlined in red instead of the user only seeing a toast.
+  // Populated by validateData() below; cleared per-field as the section
+  // components call clearError() once the user fixes that field.
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const clearError = (key: string) => {
+    setErrors((prev) => {
+      if (!prev[key]) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  };
 
   // Auth flow state — shown when a card is created for a user who doesn't
   // have a Glamlink login yet (result.data.user_login === false).
@@ -95,63 +113,73 @@ const GlamCardForm: React.FC<Props> = ({
      Pulled out so it can run before we even check for login,
      without needing to touch handleSubmit's flow. */
   const validateData = (): boolean => {
-    if (!data.name?.trim()) {
-      alert("Please enter your Name");
-      return false;
+    const newErrors: FieldErrors = {};
+    let firstMessage = "";
+    let firstKey = "";
+    const fail = (key: string, msg: string) => {
+      newErrors[key] = msg;
+      if (!firstMessage) {
+        firstMessage = msg;
+        firstKey = key;
+      }
+    };
+
+    if (!data.name?.trim()) fail("name", "Please enter your Name");
+    if (!data.professional_title?.trim())
+      fail("professional_title", "Please enter your Professional Title");
+    if (!data.email?.trim()) fail("email", "Please enter your Email");
+    else if (!EMAIL_REGEX.test(data.email.trim()))
+      fail("email", "Please enter a valid Email address");
+    // Phone is only required when it's set to show on the card — matches
+    // the conditional "Phone number is required." hint under the field in
+    // BasicInformationSection (and the "Show phone number on card" toggle).
+    if ((data.is_phone_visible ?? true) && !data.phone?.trim()) {
+      fail("phone", "Please enter your Phone Number");
+    } else if (
+      (data.is_phone_visible ?? true) &&
+      data.phone?.trim() &&
+      !isValidPhone(data.phone.trim())
+    ) {
+      fail("phone", "Phone Number must contain digits only (7-15 digits)");
     }
-    if (!data.professional_title?.trim()) {
-      alert("Please enter your Professional Title");
-      return false;
-    }
-    if (!data.email?.trim()) {
-      alert("Please enter your Email");
-      return false;
-    }
-    if (!data.phone?.trim()) {
-      alert("Please enter your Phone Number");
-      return false;
-    }
-    if (!data.business_name?.trim()) {
-      alert("Please enter your Business Name");
-      return false;
-    }
-    if (!data.bio?.trim()) {
-      alert("Please enter your Bio");
-      return false;
-    }
-    if (!data.primary_specialty?.trim()) {
-      alert("Please select your Primary Specialty");
-      return false;
-    }
-    if (!data.custom_handle?.trim()) {
-      alert("Please enter your Custom Handle");
-      return false;
-    }
-    if (!data.website?.trim()) {
-      alert("Please enter your Website");
-      return false;
-    }
+    if (!data.business_name?.trim())
+      fail("business_name", "Please enter your Business Name");
+    if (!data.bio?.trim()) fail("bio", "Please enter your Bio");
     if (
       !Array.isArray(data.preferred_booking_methods) ||
       data.preferred_booking_methods.length === 0
     ) {
-      alert("Please select Preferred Booking Method");
-      return false;
+      fail("preferred_booking_methods", "Please select Preferred Booking Method");
     }
-    if (!data.profile_image) {
-      alert("Please upload Profile Image");
-      return false;
+    // "Go to Website" needs somewhere to send clients — either a dedicated
+    // booking link, or the website URL it falls back to (see the Booking
+    // Link field in ServicesAndBookingForm).
+    if (
+      data.preferred_booking_methods?.includes(BOOKING_METHODS.LINK) &&
+      !data.booking_link?.trim() &&
+      !data.website?.trim()
+    ) {
+      fail("booking_link", "Please enter a Booking Link or Website");
     }
-    if (!data.images?.length) {
-      alert("Please upload Gallery Images");
-      return false;
+    // "DM on Instagram" needs a handle to actually DM.
+    if (
+      data.preferred_booking_methods?.includes(BOOKING_METHODS.INSTAGRAM) &&
+      !data.social_media?.instagram?.trim()
+    ) {
+      fail("instagram", "Please enter your Instagram handle");
     }
-    if (!data.specialties?.length) {
-      alert("Please add at least one Specialty");
-      return false;
-    }
-    if (!data.locations?.length) {
-      alert("Please add a Location");
+    if (!data.profile_image) fail("profile_image", "Please upload Profile Image");
+    if (!data.images?.length) fail("images", "Please upload Gallery Images");
+    if (!data.specialties?.length)
+      fail("specialties", "Please add at least one Specialty");
+    if (!data.locations?.length) fail("locations", "Please add a Location");
+
+    setErrors(newErrors);
+    if (firstMessage) {
+      message.info(firstMessage);
+      document
+        .getElementById(`field-${firstKey}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
     return true;
@@ -344,12 +372,14 @@ const GlamCardForm: React.FC<Props> = ({
     }
     try {
       setLoading(true);
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
       const token = localStorage.getItem("GlamlinkaccessToken");
       const endpoint = isEdit
-        ? `https://node.glamlink.net:5000/api/v1/businessCard/updateBusinessCard/${cardId}`
+        ? `${API_URL}/businessCard/updateBusinessCard/${cardId}`
         : token
-          ? "https://node.glamlink.net:5000/api/v1/businessCard/createBusinessCard"
-          : "https://node.glamlink.net:5000/api/v1/businessCard";
+          ? `${API_URL}/businessCard/createBusinessCard`
+          : `${API_URL}/businessCard`;
       const res = await fetch(endpoint, {
         method: isEdit ? "PUT" : "POST",
         headers: {
@@ -417,9 +447,24 @@ const GlamCardForm: React.FC<Props> = ({
             className={`space-y-10 pb-6 transition-opacity duration-150 ${loading ? "pointer-events-none opacity-50" : ""
               }`}
           >
-            <BasicInfoForm data={data} setData={setData} />
-            <MediaAndProfileForm data={data} setData={setData} />
-            <ServicesAndBookingForm data={data} setData={setData} />
+            <BasicInfoForm
+              data={data}
+              setData={setData}
+              errors={errors}
+              clearError={clearError}
+            />
+            <MediaAndProfileForm
+              data={data}
+              setData={setData}
+              errors={errors}
+              clearError={clearError}
+            />
+            <ServicesAndBookingForm
+              data={data}
+              setData={setData}
+              errors={errors}
+              clearError={clearError}
+            />
             {/* <GlamlinkIntegrationForm data={data} setData={setData} /> */}
             <div className="mt-10 flex gap-3">
               {isEdit && onCancel && (
@@ -462,12 +507,12 @@ const GlamCardForm: React.FC<Props> = ({
           open={showSuccess}
           onClose={advanceAfterSuccess}
           title="Your Access Card has been created successfully!"
-//           message="
-// Your Access Card is currently under review. Once approved, we'll email you with instructions to access your account and view your Access Card.
-// "
+        //           message="
+        // Your Access Card is currently under review. Once approved, we'll email you with instructions to access your account and view your Access Card.
+        // "
         />
       )}
-      
+
       {/* {!isEdit && (
         <Modal
           open={isAuthModalOpen}

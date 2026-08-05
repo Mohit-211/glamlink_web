@@ -131,6 +131,16 @@
   .font-display {
     font-family: "Playfair Display", Georgia, serif;
   }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+  }
 }
 
 /* ────────────────────────────────────────────────

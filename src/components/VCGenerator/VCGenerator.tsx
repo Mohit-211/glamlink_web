@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import React, { useState } from "react";
 
 const VCGenerator = () => {
@@ -101,7 +101,7 @@ END:VCARD
 
         <button
           onClick={generateVCF}
-          className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg font-semibold"
+          className="w-full bg-[#24bbcb] hover:bg-[#24bbcb] text-white py-2 rounded-lg font-semibold"
         >
           Download VCF
         </button>

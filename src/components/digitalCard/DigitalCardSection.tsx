@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 
 const DigitalCardSection: React.FC = () => {
   return (
@@ -30,7 +30,7 @@ const DigitalCardSection: React.FC = () => {
               decisions. More bookings.
             </p>
 
-            <button className="mt-10 rounded-full bg-teal-500 px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-teal-600">
+            <button className="mt-10 rounded-full bg-[#24bbcb] px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-[#24bbcb]">
               Claim Your Digital Card
             </button>
           </div>

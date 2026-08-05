@@ -21,6 +21,7 @@ import {
   CreditCard,
   Lock,
   Truck,
+  CheckCircle,
 } from "lucide-react";
 import {
   addNewAddressWithoutToken,
@@ -96,7 +97,7 @@ const SHIPPING_PLAN_TYPES = new Set(["nfc_only", "nfc_with_subscription"]);
 type Step = "plan" | "address" | "shipping" | "payment";
 
 export default function PricingStep({ businessCardId, hasToken = true }: PricingStepProps) {
-  const [selected, setSelected] = useState<PlanId>("proKeychain");
+  const [selected, setSelected] = useState<PlanId>("nfc_with_subscription");
   const [step, setStep] = useState<Step>("plan");
   const [submitting, setSubmitting] = useState(false);
 
@@ -112,6 +113,7 @@ const [addressId, setAddressId] = useState<number | null>(null);
   const [shippingData, setShippingData] = useState<ShippingData | null>(null);
   const [shippingError, setShippingError] = useState<string | null>(null);
   const [loadingShipping, setLoadingShipping] = useState(false);
+  const [showFreeSuccess, setShowFreeSuccess] = useState(false);
 
   const router = useRouter();
   const plan = PLANS.find((p) => p.id === selected)!;
@@ -181,10 +183,14 @@ const [addressId, setAddressId] = useState<number | null>(null);
       setResolvedPlanType(planType);
 
       if (!paymentRequired || planType === "free") {
-        // Free plan — nothing further to pay or ship.
-        router.push("/dashboard");
+        // Free plan — nothing further to pay or ship. Show a confirmation
+        // modal, then move on to the dashboard.
+        setShowFreeSuccess(true);
+        setTimeout(() => router.push("/dashboard"), 2000);
         return;
       }
+
+    
 
       if (SHIPPING_PLAN_TYPES.has(planType)) {
         // nfc_only / nfc_with_subscription — need a shipping address first.
@@ -556,6 +562,28 @@ const [addressId, setAddressId] = useState<number | null>(null);
           )}
         </div>
       </div>
+
+      {showFreeSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4">
+          <div className="card-glamlink w-full max-w-sm text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent">
+              <CheckCircle className="h-7 w-7 text-primary" />
+            </div>
+            <h2 className="font-display mt-4 text-xl text-foreground">Welcome to Glamlink!</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Your {plan.name} plan is now active. You're ready to get started.
+            </p>
+            <button
+              type="button"
+              onClick={() => router.push("/dashboard")}
+              className="btn-primary mt-6 flex w-full items-center justify-center gap-2 py-3"
+            >
+              Go to dashboard
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -616,7 +644,7 @@ function GuestPaymentStep({
 
       if (paymentResult.paymentIntent?.status === "succeeded") {
         setStatus("success");
-        setTimeout(onSuccess, 1500);
+        setTimeout(onSuccess, 2000);
       } else {
         throw new Error("Payment was not completed successfully.");
       }
@@ -633,13 +661,21 @@ function GuestPaymentStep({
 
   if (status === "success") {
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center justify-center gap-4 py-16 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent">
-          <Lock className="h-6 w-6 text-primary" />
-        </div>
-        <div>
-          <p className="text-base font-semibold text-foreground">Payment successful!</p>
-          <p className="mt-1 text-sm text-muted-foreground">Your order has been confirmed.</p>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4">
+        <div className="card-glamlink w-full max-w-sm text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent">
+            <CheckCircle className="h-7 w-7 text-primary" />
+          </div>
+          <h2 className="font-display mt-4 text-xl text-foreground">Payment successful!</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Your order has been confirmed.</p>
+          <button
+            type="button"
+            onClick={onSuccess}
+            className="btn-primary mt-6 flex w-full items-center justify-center gap-2 py-3"
+          >
+            Go to dashboard
+            <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
       </div>
     );

@@ -78,6 +78,22 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
     "bg-emerald-500",
   ][passwordStrength];
 
+  // Live (pre-submit) checks — recomputed on every keystroke so the user
+  // sees "too short" / "doesn't match" instantly instead of only after
+  // hitting submit. Falls back to the submit-time error (from validate())
+  // once that's been set, so the message doesn't flicker/disappear.
+  const livePasswordError =
+    form.password.length > 0 && form.password.length < 8
+      ? "Password must be at least 8 characters"
+      : undefined;
+  const passwordError = errors.password || livePasswordError;
+
+  const liveConfirmError =
+    form.confirm_password.length > 0 && form.password !== form.confirm_password
+      ? "Passwords do not match"
+      : undefined;
+  const confirmPasswordError = errors.confirm_password || liveConfirmError;
+
   const validate = (): FieldErrors => {
     const next: FieldErrors = {};
 
@@ -183,6 +199,24 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
 
   const updateField = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+
+    // Password and confirm-password are cross-validated, so a stale
+    // submit-time error on one can outlive an edit to the other (e.g. submit
+    // fails on mismatch, user then fixes it by editing "password" instead of
+    // "confirm_password" — only editing "confirm_password" would normally
+    // clear that error). Clear both together so the live check above always
+    // wins once either field changes.
+    if (field === "password" || field === "confirm_password") {
+      if (errors.password || errors.confirm_password) {
+        setErrors((prev) => ({
+          ...prev,
+          password: undefined,
+          confirm_password: undefined,
+        }));
+      }
+      return;
+    }
+
     // Clear that field's error as soon as the user edits it.
     if (errors[field as keyof FieldErrors]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -272,9 +306,9 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                   placeholder="Min. 8 characters"
                   value={form.password}
                   onChange={(e) => updateField("password", e.target.value)}
-                  aria-invalid={!!errors.password}
+                  aria-invalid={!!passwordError}
                   className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm ${
-                    errors.password ? "border-red-500" : "border-input"
+                    passwordError ? "border-red-500" : "border-input"
                   }`}
                 />
                 <button
@@ -285,8 +319,8 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-xs text-red-500">{errors.password}</p>
+              {passwordError && (
+                <p className="text-xs text-red-500">{passwordError}</p>
               )}
               {form.password.length > 0 && (
                 <>
@@ -317,13 +351,13 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                 placeholder="Confirm Password"
                 value={form.confirm_password}
                 onChange={(e) => updateField("confirm_password", e.target.value)}
-                aria-invalid={!!errors.confirm_password}
+                aria-invalid={!!confirmPasswordError}
                 className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${
-                  errors.confirm_password ? "border-red-500" : "border-input"
+                  confirmPasswordError ? "border-red-500" : "border-input"
                 }`}
               />
-              {errors.confirm_password && (
-                <p className="text-xs text-red-500">{errors.confirm_password}</p>
+              {confirmPasswordError && (
+                <p className="text-xs text-red-500">{confirmPasswordError}</p>
               )}
             </div>
             {/* Submit */}

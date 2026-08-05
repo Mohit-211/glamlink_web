@@ -1,14 +1,16 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useCallback, useEffect } from "react";
 import Cropper from "react-easy-crop";
 import Modal from "./GlamCardForm/Modal";
-import { GalleryMetaItem, GlamCardFormData } from "./GlamCardForm/types";
+import { FieldErrors, GalleryMetaItem, GlamCardFormData } from "./GlamCardForm/types";
 import getCroppedImg from "./GlamCardForm/cropImageHelper";
 
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
+  errors?: FieldErrors;
+  clearError?: (key: string) => void;
 }
 
 const sectionClass =
@@ -50,13 +52,6 @@ const getThumbnailUrl = (item: any): string => {
   return "";
 };
 
-/* Crop modal can be applied to three different targets. "gallery" crops
-   are processed one file at a time via galleryCropQueue so multi-select
-   uploads still get cropped individually before being added. Each context
-   has a FIXED aspect ratio — this is intentional and shouldn't vary:
-   - profile: square (1:1), since it renders inside a circular avatar
-   - gallery: 16:9, for a consistent widescreen photo grid
-   - thumbnail: 16:9, matching the shape of a video frame/poster */
 type CropContext = "profile" | "gallery" | "thumbnail";
 
 const CROP_ASPECTS: Record<CropContext, number> = {
@@ -65,11 +60,26 @@ const CROP_ASPECTS: Record<CropContext, number> = {
   thumbnail: 16 / 9,
 };
 
+const urlToFile = async (url: string): Promise<File> => {
+  let res: Response;
+  try {
+    res = await fetch(url);
+  } catch {
+    throw new Error("Couldn't reach that URL” check the link and try again.");
+  }
+  if (!res.ok) throw new Error(`Couldn't load that image (status ${res.status}).`);
+  const blob = await res.blob();
+  if (!blob.type.startsWith("image/")) {
+    throw new Error("That URL doesn't point to an image.");
+  }
+  const filename = url.split("/").pop()?.split(/[?#]/)[0] || `image-${Date.now()}.jpg`;
+  return new File([blob], filename, { type: blob.type });
+};
+
 const isMp4File = (file: File): boolean =>
   file.type === "video/mp4" || /\.mp4$/i.test(file.name);
 
-// Reads duration via a throwaway <video> element's loaded metadata —
-// no upload or decode needed, just enough to read the header.
+
 const getVideoDuration = (file: File): Promise<number> => {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
@@ -143,7 +153,7 @@ const generateVideoThumbnail = (file: File): Promise<File> => {
   });
 };
 
-const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
+const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearError }) => {
   /* ================= CROP MODAL (shared) ================= */
 
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -189,6 +199,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
 
     if (cropContext === "profile") {
       setData((prev) => ({ ...prev, profile_image: croppedFile }));
+      clearError?.("profile_image");
       setIsCropOpen(false);
       return;
     }
@@ -207,7 +218,6 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
       return;
     }
 
-    // cropContext === "gallery" (photos only — videos are never cropped)
     addMediaToGallery([croppedFile]);
 
     if (galleryCropQueue.length) {
@@ -230,7 +240,6 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
       return () => URL.revokeObjectURL(url);
     }
     if (typeof data.profile_image === "string" && data.profile_image) {
-      // Existing profile image URL from the server (edit mode) — render directly, no object URL needed.
       setProfilePreview(data.profile_image);
     } else {
       setProfilePreview(null);
@@ -242,6 +251,28 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
     if (!file) return;
     openCropper(file, "profile");
     e.target.value = "";
+  };
+
+  const [profileUrlInput, setProfileUrlInput] = useState("");
+  const [profileUrlLoading, setProfileUrlLoading] = useState(false);
+  const [profileUrlError, setProfileUrlError] = useState<string | null>(null);
+
+  const handleProfileUrlAdd = async () => {
+    const url = profileUrlInput.trim();
+    if (!url) return;
+    setProfileUrlError(null);
+    setProfileUrlLoading(true);
+    try {
+      const file = await urlToFile(url);
+      openCropper(file, "profile");
+      setProfileUrlInput("");
+    } catch (err) {
+      setProfileUrlError(
+        err instanceof Error ? err.message : "Couldn't load that image URL."
+      );
+    } finally {
+      setProfileUrlLoading(false);
+    }
   };
 
   /* ================= GALLERY (photos + videos) ================= */
@@ -258,10 +289,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
   const totalMediaCount = photoCount + videoCount;
 
   useEffect(() => {
-    // data.images can hold a mix of new File uploads, plain string URLs, and
-    // server objects ({file_uri, file_type, thumbnail_uri, ...}) in edit mode.
-    // Only File instances need an object URL — everything else is already
-    // renderable once we pull the right field out.
+   
     const urls = images.map((item) => getImageUrl(item));
     setGalleryPreview(urls);
     return () => {
@@ -298,6 +326,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
   // `thumbnailFiles` (parallel to `files`) lets videos carry an
   // auto-generated poster straight into gallery_meta.
   const addMediaToGallery = (files: File[], thumbnailFiles: (File | undefined)[] = []) => {
+    clearError?.("images");
     setData((prev) => {
       const existingImages = prev.images || [];
       const existingMeta = prev.gallery_meta || [];
@@ -336,6 +365,31 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
     setGalleryCropQueue(rest);
     openCropper(first, "gallery");
     e.target.value = "";
+  };
+
+  const [galleryUrlInput, setGalleryUrlInput] = useState("");
+  const [galleryUrlLoading, setGalleryUrlLoading] = useState(false);
+
+  const handleGalleryUrlAdd = async () => {
+    const url = galleryUrlInput.trim();
+    if (!url) return;
+    setMediaError(null);
+
+    if (totalMediaCount >= MAX_MEDIA_TOTAL) {
+      setMediaError(`You can upload up to ${MAX_MEDIA_TOTAL} media items total.`);
+      return;
+    }
+
+    setGalleryUrlLoading(true);
+    try {
+      const file = await urlToFile(url);
+      openCropper(file, "gallery");
+      setGalleryUrlInput("");
+    } catch (err) {
+      setMediaError(err instanceof Error ? err.message : "Couldn't load that image URL.");
+    } finally {
+      setGalleryUrlLoading(false);
+    }
   };
 
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -504,11 +558,15 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
       <h2 className="text-lg font-semibold">Media & Profile</h2>
 
       {/* PROFILE */}
-      <div className="space-y-3">
+      <div id="field-profile_image" className="space-y-3">
         <label className={labelClass}>Profile Image</label>
         <div className="flex items-center gap-5">
           <div className="relative w-32 h-32">
-            <div className="w-32 h-32 rounded-full border overflow-hidden bg-gray-50 flex items-center justify-center">
+            <div
+              className={`w-32 h-32 rounded-full border overflow-hidden bg-gray-50 flex items-center justify-center ${
+                errors?.profile_image ? "border-2 border-red-500" : ""
+              }`}
+            >
               {profilePreview ? (
                 <img src={profilePreview} className="w-full h-full object-cover" />
               ) : (
@@ -519,7 +577,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
                 </span>
               )}
             </div>
-            <label className="absolute bottom-0 right-0 cursor-pointer bg-teal-500 text-white p-2 rounded-full shadow hover:bg-teal-600">
+            <label className="absolute bottom-0 right-0 cursor-pointer bg-[#24bbcb] text-white p-2 rounded-full shadow hover:bg-[#24bbcb]">
               ✎
               <input type="file" hidden accept="image/*" onChange={handleProfileUpload} />
             </label>
@@ -528,21 +586,63 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
             Square image works best. Face centered. Clean background.
           </p>
         </div>
+        {errors?.profile_image && (
+          <p className="text-sm text-red-500">{errors.profile_image}</p>
+        )}
+
+        <div className="flex items-center gap-2">
+          <input
+            type="url"
+            className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+            placeholder="Or paste an image URL"
+            value={profileUrlInput}
+            onChange={(e) => setProfileUrlInput(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={handleProfileUrlAdd}
+            disabled={!profileUrlInput.trim() || profileUrlLoading}
+            className="rounded-lg bg-[#24bbcb] px-4 py-2 text-xs font-medium text-white hover:bg-[#24bbcb] disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            {profileUrlLoading ? "Loading..." : "Add"}
+          </button>
+        </div>
+        {profileUrlError && (
+          <p className="text-xs text-red-500">{profileUrlError}</p>
+        )}
       </div>
 
-      <p className="text-xs text-gray-500 pt-2">
-        Gallery media: {totalMediaCount}/{MAX_MEDIA_TOTAL} used (photos + videos combined)
-      </p>
+      <div id="field-images">
+        <p
+          className={`text-xs pt-2 ${
+            errors?.images ? "text-red-500 font-medium" : "text-gray-500"
+          }`}
+        >
+          Gallery media: {totalMediaCount}/{MAX_MEDIA_TOTAL} used (photos + videos combined)
+        </p>
+        {errors?.images && (
+          <p className="mt-1 text-sm text-red-500">{errors.images}</p>
+        )}
 
-      {/* PHOTOS SECTION */}
-      <div className="space-y-4 pt-2 border-t border-gray-100">
+        {mediaError && (
+          <p className="mt-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            {mediaError}
+          </p>
+        )}
+
+        {/* PHOTOS SECTION */}
+        <div
+          className={`space-y-4 pt-2 border-t ${
+            errors?.images ? "border-red-300" : "border-gray-100"
+          }`}
+        >
         <div className="flex justify-between items-center pt-4">
           <label className={labelClass}>Photos ({photoCount})</label>
           <label
             className={`rounded-lg px-4 py-2 text-white ${
               totalMediaCount >= MAX_MEDIA_TOTAL
                 ? "bg-gray-300 cursor-not-allowed"
-                : "cursor-pointer bg-teal-500 hover:bg-teal-600"
+                : "cursor-pointer bg-[#24bbcb] hover:bg-[#24bbcb]"
             }`}
           >
             + Upload Photos
@@ -557,6 +657,29 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
           </label>
         </div>
 
+        <div className="flex items-center gap-2">
+          <input
+            type="url"
+            className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+            placeholder="Or paste an image URL"
+            value={galleryUrlInput}
+            onChange={(e) => setGalleryUrlInput(e.target.value)}
+            disabled={totalMediaCount >= MAX_MEDIA_TOTAL}
+          />
+          <button
+            type="button"
+            onClick={handleGalleryUrlAdd}
+            disabled={
+              !galleryUrlInput.trim() ||
+              galleryUrlLoading ||
+              totalMediaCount >= MAX_MEDIA_TOTAL
+            }
+            className="rounded-lg bg-[#24bbcb] px-4 py-2 text-xs font-medium text-white hover:bg-[#24bbcb] disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            {galleryUrlLoading ? "Loading..." : "+ Add URL"}
+          </button>
+        </div>
+
         {photoCount ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {gallery_meta.map((item, index) =>
@@ -566,6 +689,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
         ) : (
           <p className="text-gray-400 text-sm">No photos uploaded</p>
         )}
+        </div>
       </div>
 
       {/* VIDEOS SECTION */}
@@ -579,7 +703,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
             className={`rounded-lg px-4 py-2 text-white ${
               totalMediaCount >= MAX_MEDIA_TOTAL
                 ? "bg-gray-300 cursor-not-allowed"
-                : "cursor-pointer bg-teal-500 hover:bg-teal-600"
+                : "cursor-pointer bg-[#24bbcb] hover:bg-[#24bbcb]"
             }`}
           >
             + Upload Videos
@@ -594,12 +718,6 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
           </label>
         </div>
 
-        {mediaError && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-            {mediaError}
-          </p>
-        )}
-
         {videoCount ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {gallery_meta.map((item, index) =>
@@ -611,7 +729,6 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
         )}
       </div>
 
-      {/* CROP MODAL — shared by profile photo, gallery photos, and video thumbnails */}
       {isCropOpen && (
         <Modal onClose={cancelCrop}>
           <div className="w-[90vw] max-w-md space-y-4">
@@ -647,7 +764,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
               </button>
               <button
                 onClick={applyCrop}
-                className="flex-1 bg-teal-500 text-white rounded py-2 hover:bg-teal-600"
+                className="flex-1 bg-[#24bbcb] text-white rounded py-2 hover:bg-[#24bbcb]"
               >
                 Apply Crop
               </button>

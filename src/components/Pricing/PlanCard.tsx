@@ -61,7 +61,7 @@ interface PlanCardProps {
 }
 
 export function PlanCard({ plan, selected, onSelect, compact = false, disabled = false }: PlanCardProps) {
-  const isFeatured = plan.id === "proKeychain";
+  const isFeatured = plan.id === "nfc_with_subscription";
   const isSelected = selected && !disabled; // single source of truth
 
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { GlamCardFormData } from "./GlamCardForm/types";
 import Logo from "../../../public/assets/ACCESS-3.png";
 import Image from "next/image";
@@ -160,7 +160,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   onCopyLink,
 }) => {
   if (!data) return null;
-
+console.log(data,"datata")
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(0);
@@ -596,14 +596,12 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   )}
                 </SectionBox>
 
-                {/* SIGNATURE WORK — DESKTOP */}
        <SectionBox title="Gallery" titleAlign="center">
                   {normalizedImages.length > 0 && thumbnailIndex !== null ? (
                     <>
                   <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
                         {normalizedImages[thumbnailIndex]?.file_type ===
                           "video" ? (
-                          /* ✅ iOS FIX: playsInline + preload + key */
                           <video
                             key={galleryPreviews[thumbnailIndex]}
                             controls
@@ -633,7 +631,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           />
                         )}
 
-                        {/* prev / next arrows — desktop gallery carousel */}
                         {normalizedImages.length > 1 && (
                           <>
                             <button
@@ -756,10 +753,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
                                   .filter(Boolean)
                                   .join(", ") || "Location not fully set"}
                             </p>
-                            {(selectedLocation?.phone || data.phone) &&
+                            {(data.phone) &&
                               data.is_phone_visible && (
                                 <p className="text-gray-600">
-                                  📞 {selectedLocation.phone || data.phone}
+                                  📞 {data.phone || data.phone}
                                 </p>
                               )}
                             {selectedLocation.description && (
@@ -843,7 +840,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                                     key={hour.id ?? index}
                                     className="flex items-start gap-2"
                                   >
-                                    <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0" />
+                                    <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-[#24bbcb] flex-shrink-0" />
                                     <span className="text-gray-700">
                                       {hour.note ? hour.note : timeText}
                                     </span>
@@ -855,7 +852,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         ) : (
                           <ul className="space-y-1.5 text-sm">
                             <li className="flex items-start gap-2">
-                              <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0" />
+                              <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-[#24bbcb] flex-shrink-0" />
                               <span className="text-gray-700">
                                 Appointment on request
                               </span>
@@ -892,12 +889,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </SectionBox>
               )}
 
-              {/* GALLERY — MOBILE */}
               {normalizedImages.length > 0 && thumbnailIndex !== null && (
                 <SectionBox title="Gallery" titleAlign="center">
                   <div className=" aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 shadow-sm">
                     {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
-                      /* ✅ iOS FIX: playsInline + preload + key */
                       <video
                         key={galleryPreviews[thumbnailIndex]}
                         controls
@@ -1024,7 +1019,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             .filter(Boolean)
                             .join(", ")}
                       </p>
-                      {(selectedLocation?.phone || data.phone) &&
+                      {(data.phone || selectedLocation?.phone) &&
                         data.is_phone_visible && (
                           <p className="text-gray-600">
                             📞 {selectedLocation.phone || data.phone}
@@ -1197,7 +1192,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-700 transition hover:border-teal-300 hover:bg-teal-50 active:scale-[0.98]" style={socialIconStyle}
+                            className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-700 transition hover:border-teal-300 hover:bg-[#24bbcb] active:scale-[0.98]" style={socialIconStyle}
                           >
                             <ExternalLink className="h-4 w-4 text-teal-600 flex-shrink-0" />
                             <span className="truncate font-medium">
@@ -1365,8 +1360,8 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   }}
                   className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.booking_link ? "border-gray-200 hover:bg-gray-50" : "border-gray-200 opacity-50 cursor-not-allowed"}`}
                 >
-                  <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center flex-shrink-0 text-lg">
-                    🔗
+                  <div className="w-10 h-10 rounded-full bg-[#24bbcb] flex items-center justify-center flex-shrink-0 text-lg">
+                   🔗
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-800">
@@ -1416,7 +1411,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                       className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors active:scale-[0.98]"
                     >
                       <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0 text-lg">
-                        📸
+                    📸
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-gray-800">

@@ -54,14 +54,12 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     <p>Enter your bio here.</p>
    
   `,
+  is_phone_visible: true,
     business_name: "Your Business Name",
     /* ================= SPECIALTIES ================= */
     primary_specialty: "Your Specialty",
     specialties: [
-      "Specialty 1",
-      "Specialty 2",
-      "Specialty 3",
-      "Specialty 4",
+      
     ],
     /* ================= HANDLES ================= */
     custom_handle: "yourhandle",

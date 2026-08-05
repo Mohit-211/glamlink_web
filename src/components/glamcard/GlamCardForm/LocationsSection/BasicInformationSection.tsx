@@ -3,7 +3,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
 
-import { GlamCardFormData } from "../types";
+import { FieldErrors, GlamCardFormData } from "../types";
 
 /* ================= SSR SAFE CKEDITOR ================= */
 // The editor and its build are isolated in their own client-only file.
@@ -32,6 +32,8 @@ interface SectionProps {
       }
     >
   >;
+  errors?: FieldErrors;
+  clearError?: (key: string) => void;
 }
 
 /* ================= STYLES ================= */
@@ -41,6 +43,8 @@ const sectionClass =
 
 const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
+
+const errorInputClass = "border-red-500 focus:border-red-500 focus:ring-red-200";
 
 const labelClass = "text-sm font-medium text-gray-700";
 
@@ -54,6 +58,8 @@ const getCharacterCount = (html: string) =>
 const BasicInformationSection: React.FC<SectionProps> = ({
   data,
   setData,
+  errors,
+  clearError,
 }) => {
   return (
     <section className={sectionClass}>
@@ -61,125 +67,177 @@ const BasicInformationSection: React.FC<SectionProps> = ({
 
       <div className="grid gap-5 md:grid-cols-2">
         {/* NAME */}
-        <div>
-          <label className={labelClass}>Full Name *</label>
+        <div id="field-name">
+          <label className={labelClass}>
+            Full Name <span className="text-red-500">*</span>
+          </label>
           <input
-            className={inputClass}
+            className={`${inputClass} ${errors?.name ? errorInputClass : ""}`}
             value={data.name || ""}
-            onChange={(e) =>
+            onChange={(e) => {
               setData((p) => ({
                 ...p,
                 name: e.target.value,
-              }))
-            }
+              }));
+              clearError?.("name");
+            }}
           />
+          {errors?.name && (
+            <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+          )}
         </div>
 
         {/* TITLE */}
-        <div>
-          <label className={labelClass}>Professional Title *</label>
+        <div id="field-professional_title">
+          <label className={labelClass}>
+            Professional Title <span className="text-red-500">*</span>
+          </label>
           <input
-            className={inputClass}
+            className={`${inputClass} ${errors?.professional_title ? errorInputClass : ""}`}
             value={data.professional_title || ""}
-            onChange={(e) =>
+            onChange={(e) => {
               setData((p) => ({
                 ...p,
                 professional_title: e.target.value,
-              }))
-            }
+              }));
+              clearError?.("professional_title");
+            }}
           />
+          {errors?.professional_title && (
+            <p className="mt-1 text-sm text-red-500">{errors.professional_title}</p>
+          )}
         </div>
 
 
 
         {/* EMAIL */}
-        <div>
-          <label className={labelClass}>Email *</label>
+        <div id="field-email">
+          <label className={labelClass}>
+            Email <span className="text-red-500">*</span>
+          </label>
           <input
             type="email"
-            className={inputClass}
+            className={`${inputClass} ${errors?.email ? errorInputClass : ""}`}
             value={data.email || ""}
-            onChange={(e) =>
+            onChange={(e) => {
               setData((p) => ({
                 ...p,
                 email: e.target.value,
-              }))
-            }
+              }));
+              clearError?.("email");
+            }}
           />
+          {errors?.email && (
+            <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+          )}
         </div>
 
         {/* PHONE */}
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className={labelClass}>Phone *</label>
+    <div id="field-phone">
+  <div className="mb-2 flex items-center justify-between">
+    <label className={labelClass}>Phone</label>
 
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={data.is_phone_visible ?? true}
-                onChange={(e) =>
-                  setData((p) => ({
-                    ...p,
-                    is_phone_visible: e.target.checked,
-                  }))
-                }
-                className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-              />
-              <span className="text-xs font-medium text-gray-600">
-                Show phone number on card
-              </span>
-            </label>
-          </div>
+    <label className="flex cursor-pointer items-center gap-2">
+      <input
+        type="checkbox"
+        checked={data.is_phone_visible ?? true}
+        onChange={(e) =>
+          setData((p) => ({
+            ...p,
+            is_phone_visible: e.target.checked,
+          }))
+        }
+        className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+      />
+      <span className="text-xs font-medium text-gray-600">
+        Show phone number on card
+      </span>
+    </label>
+  </div>
 
-          <input
-            className={inputClass}
-            value={data.phone || ""}
-            onChange={(e) =>
-              setData((p) => ({
-                ...p,
-                phone: e.target.value,
-              }))
-            }
-          />
-        </div>
+  <input
+    type="tel"
+    inputMode="numeric"
+    maxLength={15}
+    className={`${inputClass} ${errors?.phone ? errorInputClass : ""}`}
+    value={data.phone || ""}
+    required={data.is_phone_visible}
+    onChange={(e) => {
+      const digitsOnly = e.target.value.replace(/\D/g, "");
+      setData((p) => ({
+        ...p,
+        phone: digitsOnly,
+      }));
+      clearError?.("phone");
+    }}
+  />
+
+  {errors?.phone ? (
+    <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
+  ) : (
+    data.is_phone_visible && !data.phone?.trim() && (
+      <p className="mt-1 text-sm text-red-500">
+        Phone number is required.
+      </p>
+    )
+  )}
+</div>
 
         {/* BIO */}
-        <div className="md:col-span-2">
+        <div id="field-bio" className="md:col-span-2">
           <label className={labelClass}>Professional Bio</label>
 
-          <BioEditor
-            value={data.bio || ""}
-            placeholder="Write your bio..."
-            onChange={(html) => {
-              const text = html.replace(/<[^>]*>/g, "").trim();
+          <div
+            className={
+              errors?.bio ? "rounded-lg ring-1 ring-red-500" : undefined
+            }
+          >
+            <BioEditor
+              value={data.bio || ""}
+              placeholder="Write your bio..."
+              onChange={(html) => {
+                const text = html.replace(/<[^>]*>/g, "").trim();
 
-              if (text.length <= CHARACTER_LIMIT) {
-                setData((p) => ({
-                  ...p,
-                  bio: html,
-                }));
-              }
-            }}
-          />
+                if (text.length <= CHARACTER_LIMIT) {
+                  setData((p) => ({
+                    ...p,
+                    bio: html,
+                  }));
+                  clearError?.("bio");
+                }
+              }}
+            />
+          </div>
 
-          <p className="mt-2 text-right text-xs text-gray-500">
-            {getCharacterCount(data.bio || "")} / {CHARACTER_LIMIT}
-          </p>
+          <div className="mt-1 flex items-center justify-between">
+            {errors?.bio ? (
+              <p className="text-sm text-red-500">{errors.bio}</p>
+            ) : (
+              <span />
+            )}
+            <p className="text-right text-xs text-gray-500">
+              {getCharacterCount(data.bio || "")} / {CHARACTER_LIMIT}
+            </p>
+          </div>
         </div>
       </div>
       {/* BUSINESS NAME */}
-      <div>
+      <div id="field-business_name">
         <label className={labelClass}>Business Name</label>
         <input
-          className={`${inputClass} w-full`}
+          className={`${inputClass} w-full ${errors?.business_name ? errorInputClass : ""}`}
           value={data.business_name || ""}
-          onChange={(e) =>
+          onChange={(e) => {
             setData((p) => ({
               ...p,
               business_name: e.target.value,
-            }))
-          }
+            }));
+            clearError?.("business_name");
+          }}
         />
+        {errors?.business_name && (
+          <p className="mt-1 text-sm text-red-500">{errors.business_name}</p>
+        )}
       </div>
     </section>
   );

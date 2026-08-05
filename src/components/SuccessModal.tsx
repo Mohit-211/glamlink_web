@@ -29,7 +29,7 @@ const SuccessModal: React.FC<Props> = ({
           ✅ {title}
         </h2>
 
-        <p className="mt-3 text-gray-600">{message}</p>
+        {/* <p className="mt-3 text-gray-600">{message}</p> */}
 
         <div className="mt-6 flex gap-3">
           <button

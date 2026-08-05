@@ -134,8 +134,9 @@ export default function DashboardPage() {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [editCardId, setEditCardId] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
+  console.log(selectedPlan,"selectedPlan")
   const [payModalPurchaseType, setPayModalPurchaseType] = useState<PurchaseType>(
-    'SUBSCRIPTION_ONLY'
+  
   );
   useEffect(() => {
     const token = localStorage.getItem('GlamlinkaccessToken');
@@ -217,16 +218,18 @@ export default function DashboardPage() {
   };
   console.log(showSuccess)
   console.log(businessCard, "--")
-const PLAN_TYPE_LABELS: Record<string, string> = {
-  subscription_only: "Pro",
-  nfc_only: "Free + Keychain",
-  nfc_with_subscription: "Pro + Keychain",
-};
-
-function getActivePlanLabel(planType?: string | null): string {
-  if (!planType) return "Free";
-  return PLAN_TYPE_LABELS[planType.toLowerCase()]
-}
+  const PLAN_TYPE_LABELS: Record<string, string> = {
+    free: "Free",
+    pro: "Pro",
+    subscription_only: "Pro",
+    nfc_only: "Free + Keychain",
+    nfc_with_subscription: "Pro + Keychain",
+  };
+  function getActivePlanLabel(planType?: string | null): string {
+    if (!planType) return "Free";
+    return PLAN_TYPE_LABELS[planType.toLowerCase()] || "Free";
+  }
+  console.log(cardsArray[0]?.plan_type, "cardarayyy")
   return (
     <div className="min-h-screen bg-background page-soft mt-18">
       <div className="container-glamlink py-8 md:py-12">
@@ -247,17 +250,17 @@ function getActivePlanLabel(planType?: string | null): string {
           <aside className="w-full md:w-64 flex-shrink-0">
             <nav className="rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden">
               <div className="px-5 py-4 border-b border-border bg-secondary/30">
-       <div className="flex items-center gap-3">
-  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground ring-2 ring-primary/20">
-    {userdata?.name?.slice(0, 2)?.toUpperCase() || 'GL'}
-  </div>
-  <div>
-    <p className="text-sm font-semibold text-foreground">{userdata?.name || 'User'}</p>
-    <span className="inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground mt-0.5">
-      {getActivePlanLabel(businessCard[0]?.plan_type)} Plan
-    </span>
-  </div>
-</div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground ring-2 ring-primary/20">
+                    {userdata?.name?.slice(0, 2)?.toUpperCase() || 'GL'}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{userdata?.name || 'User'}</p>
+                    <span className="inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground mt-0.5">
+                      {getActivePlanLabel(cardsArray[0]?.plan_type)} Plan
+                    </span>
+                  </div>
+                </div>
               </div>
               <div className="p-2">
                 {NAV_ITEMS.map((item) => {
@@ -346,13 +349,17 @@ function getActivePlanLabel(planType?: string | null): string {
                     cardData={businessCard}
                     user={userdata}
                     error={error}
-                    onPayNow={(card: any, plan?: PlanId | null) => {
-                      setSelectedCardId(String(card?.id ?? ''));
-                      setPayModalPurchaseType(
-                        plan && plan.includes('Keychain') ? 'NFC_WITH_SUBSCRIPTION' : 'SUBSCRIPTION_ONLY'
-                      );
-                      setPayOpen(true);
-                    }}
+                  onPayNow={(card: any, plan?: PlanId | null) => {
+                    setSelectedCardId(String(card?.id ?? ''));
+                    setPayModalPurchaseType(
+                      plan === 'nfc_with_subscription'
+                        ? 'NFC_WITH_SUBSCRIPTION'
+                        : plan === 'nfc_only'
+                        ? 'NFC_ONLY'
+                        : 'SUBSCRIPTION_ONLY'
+                    );
+                    setPayOpen(true);
+                  }}
                     onEdit={(card: any) => {
                       setEditCardId(String(card?.id ?? ''));
                       setActiveTab('edit-card');
@@ -369,12 +376,9 @@ function getActivePlanLabel(planType?: string | null): string {
                     canContinue={!!selectedPlan}
                     businessCard={cardsArray[0]}
                     businessCardId={cardsArray[0]?.id}
-                    onContinue={() => {
-                      if (!selectedPlan) return;
+                    onContinue={(effectivePlanType: string) => {
                       setSelectedCardId(String(cardsArray[0]?.id ?? ''));
-                      setPayModalPurchaseType(
-                        selectedPlan.includes('Keychain') ? 'NFC_WITH_SUBSCRIPTION' : 'SUBSCRIPTION_ONLY'
-                      );
+                      setPayModalPurchaseType(effectivePlanType.toUpperCase() as PurchaseType);
                       setPayOpen(true);
                     }}
                   />

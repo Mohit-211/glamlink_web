@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import {
@@ -35,12 +34,10 @@ import {
 } from '../../api/Api';
 import { PurchaseType } from './Purchasetypes';
 import { useRouter } from 'next/navigation';
-
 // ── Stripe init ──────────────────────────────────────────────────────────────
 const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY ?? ''
 );
-
 const ELEMENT_STYLE = {
     style: {
         base: {
@@ -52,7 +49,6 @@ const ELEMENT_STYLE = {
         invalid: { color: '#ef4444' },
     },
 };
-
 // ── Error helpers ─────────────────────────────────────────────────────────────
 // API errors come back shaped like:
 // { success: false, status: 400, message: "NFC card already purchased", data: "" }
@@ -68,10 +64,8 @@ const getApiErrorMessage = (err: any, fallback: string): string => {
     }
     return fallback;
 };
-
 const isAlreadyPurchasedError = (message: string): boolean =>
     message.toLowerCase().includes('already purchased');
-
 // ── Types ────────────────────────────────────────────────────────────────────
 interface ShippingData {
     nfc_price?: number;
@@ -81,7 +75,6 @@ interface ShippingData {
     service: string;
     total_due_today: number;
 }
-
 interface AddressFormData {
     address_line_1: string;
     address_lat: string;
@@ -90,7 +83,6 @@ interface AddressFormData {
     city_id: string;
     postal_code: string;
 }
-
 const EMPTY_ADDRESS: AddressFormData = {
     address_line_1: '',
     address_lat: '',
@@ -99,17 +91,14 @@ const EMPTY_ADDRESS: AddressFormData = {
     city_id: '',
     postal_code: '',
 };
-
 interface StateItem {
     id: number;
     name: string;
 }
-
 interface CityItem {
     id: number;
     name: string;
 }
-
 interface Address {
     id: string | number;
     address_line_1: string;
@@ -120,7 +109,6 @@ interface Address {
     user_state?: { id: number; name: string };
     is_default?: boolean;
 }
-
 // ── Step 1a: Add / Edit Address Form ─────────────────────────────────────────
 interface AddressStepProps {
     businessCardId?: string | number | null;
@@ -128,7 +116,6 @@ interface AddressStepProps {
     onSaved: () => void;
     onCancel: () => void;
 }
-
 function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: AddressStepProps) {
     const isEditing = !!editingAddress;
     const [form, setForm] = useState<AddressFormData>(() => {
@@ -148,7 +135,6 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
     const [cities, setCities] = useState<CityItem[]>([]);
     const [status, setStatus] = useState<'idle' | 'saving' | 'error'>('idle');
     const [errorMsg, setErrorMsg] = useState('');
-
     useEffect(() => {
         const fetchStates = async () => {
             try {
@@ -160,7 +146,6 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
         };
         fetchStates();
     }, []);
-
     useEffect(() => {
         if (!form.state_id) {
             setCities([]);
@@ -176,13 +161,11 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
         };
         fetchCities();
     }, [form.state_id]);
-
     const isValid =
         form.address_line_1.trim() &&
         form.state_id &&
         form.city_id &&
         form.postal_code.trim();
-
     const handleSubmit = async () => {
         if (!isValid) {
             setErrorMsg('Please fill in all required fields.');
@@ -204,7 +187,6 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
                 isEditing && editingAddress
                     ? await editAddress(editingAddress.id, payload)
                     : await addNewAddress(payload);
-
             if (response?.success === false) {
                 setErrorMsg(
                     response?.message || 'Please enter a valid address, city, state and PIN code.'
@@ -224,7 +206,6 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
             setStatus('error');
         }
     };
-
     return (
         <div className="space-y-4">
             <div className="flex items-start gap-2 rounded-xl border border-primary/20 bg-accent/40 px-4 py-3">
@@ -342,7 +323,6 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
         </div>
     );
 }
-
 // ── Step 1: Select Address & Shipping Summary ────────────────────────────────
 interface ShippingStepProps {
     businessCardId?: string | number | null;
@@ -350,9 +330,8 @@ interface ShippingStepProps {
     onCancel: () => void;
     onNeedsAddress: () => void;
     onEditAddress: (address: Address) => void;
-    purchaseType: string
+    purchaseType?: PurchaseType;
 }
-
 function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, onEditAddress, purchaseType }: ShippingStepProps) {
     const [status, setStatus] = useState<
         'loading' | 'select-address' | 'calculating' | 'ready' | 'error' | 'no-address' | 'already-purchased'
@@ -361,7 +340,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
     const [selectedAddressId, setSelectedAddressId] = useState<string | number | null>(null);
     const [shipping, setShipping] = useState<ShippingData | null>(null);
     const [errorMsg, setErrorMsg] = useState('');
-
     useEffect(() => {
         let cancelled = false;
         const loadAddresses = async () => {
@@ -371,12 +349,10 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
                 const res = await getAllUserAddress();
                 const list: Address[] = res?.addresses ?? res?.data ?? res ?? [];
                 if (cancelled) return;
-
                 if (!Array.isArray(list) || list.length === 0) {
                     setStatus('no-address');
                     return;
                 }
-
                 setAddresses(list);
                 const defaultAddr = list.find((a) => a.is_default) ?? list[0];
                 setSelectedAddressId(defaultAddr.id);
@@ -393,7 +369,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
             cancelled = true;
         };
     }, [businessCardId]);
-
     const handleCalculateShipping = async () => {
         if (!selectedAddressId || !businessCardId) return;
         setStatus('calculating');
@@ -403,7 +378,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
                 business_card_id: String(businessCardId),
                 user_address_id: selectedAddressId,
             });
-
             const res = await addShippingAddress({
                 business_card_id: String(businessCardId),
                 // purchase_type: purchaseType,
@@ -427,7 +401,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
             }
         }
     };
-
     if (status === 'loading') {
         return (
             <div className="flex flex-col items-center justify-center gap-3 py-12">
@@ -436,7 +409,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
             </div>
         );
     }
-
     if (status === 'already-purchased') {
         return (
             <div className="space-y-4">
@@ -460,7 +432,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
             </div>
         );
     }
-
     if (status === 'no-address') {
         return (
             <div className="space-y-5">
@@ -492,7 +463,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
             </div>
         );
     }
-
     if (status === 'select-address') {
         return (
             <div className="space-y-4">
@@ -581,7 +551,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
             </div>
         );
     }
-
     if (status === 'calculating') {
         return (
             <div className="flex flex-col items-center justify-center gap-3 py-12">
@@ -590,7 +559,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
             </div>
         );
     }
-
     if (status === 'error') {
         return (
             <div className="space-y-4">
@@ -607,7 +575,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
             </div>
         );
     }
-
     const selectedAddress = addresses.find((a) => a.id === selectedAddressId);
     return (
         <div className="space-y-5">
@@ -650,7 +617,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
                         ${shipping?.shipping_amount.toFixed(2)}
                     </p>
                 </div>
-
                 <div className="px-4 py-3 space-y-2">
                     {shipping?.nfc_price !== undefined && (
                         <div className="flex justify-between text-[13px] text-muted-foreground">
@@ -658,21 +624,17 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
                             <span>${shipping.nfc_price.toFixed(2)}</span>
                         </div>
                     )}
-
                     {shipping?.subscription_price !== undefined && (
                         <div className="flex justify-between text-[13px] text-muted-foreground">
                             <span>Subscription</span>
                             <span>${shipping.subscription_price.toFixed(2)}</span>
                         </div>
                     )}
-
                     <div className="flex justify-between text-[13px] text-muted-foreground">
                         <span>Shipping ({shipping?.carrier})</span>
                         <span>${shipping?.shipping_amount.toFixed(2)}</span>
                     </div>
-
                     <div className="h-px bg-border" />
-
                     <div className="flex justify-between text-sm font-bold text-foreground">
                         <span>Total due today</span>
                         <span className="text-primary">
@@ -699,7 +661,6 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
         </div>
     );
 }
-
 // ── Step 2: Payment Form ──────────────────────────────────────────────────────
 interface PaymentStepProps {
     shipping?: ShippingData | null;
@@ -709,54 +670,43 @@ interface PaymentStepProps {
     onBack: () => void;
     onClose?: () => void;
 }
-
 function PaymentStep({
     shipping,
     businessCardId,
-    allowedPurchaseType = 'SUBSCRIPTION_ONLY',
+    allowedPurchaseType,
     onSuccess,
     onBack,
     onClose,
 }: PaymentStepProps) {
     const router = useRouter()
-
     const stripe = useStripe();
     const elements = useElements();
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [errorMsg, setErrorMsg] = useState('');
     const [alreadyPurchased, setAlreadyPurchased] = useState(false);
     const [cardName, setCardName] = useState('');
-
     const totalAmount = shipping ? shipping.total_due_today : 4.99;
-
     const handlePay = async () => {
         if (!stripe || !elements) return;
-
         setStatus('loading');
         setErrorMsg('');
         setAlreadyPurchased(false);
-
         try {
             const cardNumber = elements.getElement(CardNumberElement);
-
             if (!cardNumber) {
                 throw new Error('Card element not found');
             }
-
             const response = await CreateSubscription({
                 business_card_id: Number(businessCardId),
                 // purchase_type: allowedPurchaseType,
             });
-
             const clientSecret =
                 response?.data?.clientSecret ||
                 response?.clientSecret ||
                 response?.client_secret;
-
             if (!clientSecret) {
                 throw new Error('Client secret not received from server.');
             }
-
             const paymentResult = await stripe.confirmCardPayment(clientSecret, {
                 payment_method: {
                     card: cardNumber,
@@ -765,11 +715,9 @@ function PaymentStep({
                     },
                 },
             });
-
             if (paymentResult.error) {
                 throw new Error(paymentResult.error.message);
             }
-
             if (
                 paymentResult.paymentIntent &&
                 paymentResult.paymentIntent.status === 'succeeded'
@@ -789,19 +737,25 @@ function PaymentStep({
             setAlreadyPurchased(isAlreadyPurchasedError(msg));
         }
     };
-
-    if (status === 'success') {
-        return (
-            <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
-                <CheckCircle className="h-14 w-14 text-green-500" />
-                <div>
-                    <p className="text-base font-semibold text-foreground">Payment successful!</p>
-                    <p className="text-sm text-muted-foreground mt-1">Your order has been confirmed.</p>
+if (status === 'success') {
+    return (
+        <div className="flex flex-col items-center justify-center gap-5 py-14 text-center animate-fade-up">
+            <div className="relative flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full bg-primary/15 animate-pulse-slow" />
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 border border-primary/20">
+                    <CheckCircle className="h-8 w-8 text-primary" strokeWidth={2.5} />
                 </div>
             </div>
-        );
-    }
-
+            <div className="space-y-1.5">
+                <p className="text-lg font-semibold text-foreground">
+                    Payment successful!
+                </p>
+               
+            </div>
+            
+        </div>
+    );
+}
     if (alreadyPurchased) {
         return (
             <div className="space-y-4">
@@ -828,12 +782,15 @@ function PaymentStep({
             </div>
         );
     }
-
-    const includesSubscription = ['SUBSCRIPTION_ONLY', 'NFC_WITH_SUBSCRIPTION'].includes(
+    const includesSubscription = !!allowedPurchaseType && ['NFC_ONLY', 'SUBSCRIPTION_ONLY', 'NFC_WITH_SUBSCRIPTION'].includes(
         allowedPurchaseType
     );
-    const payLabel = includesSubscription ? 'Start Subscription' : 'Complete Order';
-
+    const payLabel =
+        allowedPurchaseType === 'NFC_ONLY'
+            ? `Pay $${totalAmount.toFixed(2)} for Keychain`
+            : includesSubscription
+                ? `Pay $${totalAmount.toFixed(2)} & Start Subscription`
+                : `Pay $${totalAmount.toFixed(2)} & Complete Order`;
     return (
         <div className="space-y-4">
             <div className="rounded-xl border border-primary/20 bg-accent/40 px-4 py-3.5 space-y-1">
@@ -851,9 +808,7 @@ function PaymentStep({
                         : 'Unlocks all digital access card features instantly. Cancel anytime.'}
                 </p>
             </div>
-
             <p className="text-sm font-semibold text-foreground pt-1">Enter your card details</p>
-
             <input
                 type="text"
                 value={cardName}
@@ -861,7 +816,6 @@ function PaymentStep({
                 placeholder="Name on card"
                 className="w-full rounded-xl border border-border bg-card px-3.5 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
             />
-
             <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3.5 py-3 focus-within:ring-2 focus-within:ring-primary/30 transition">
                 <div className="flex-1">
                     <CardNumberElement
@@ -873,7 +827,6 @@ function PaymentStep({
                 </div>
                 <CreditCard className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
             </div>
-
             <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-xl border border-border bg-card px-3.5 py-3 focus-within:ring-2 focus-within:ring-primary/30 transition">
                     <CardExpiryElement options={ELEMENT_STYLE} />
@@ -885,14 +838,12 @@ function PaymentStep({
                     <Lock className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
                 </div>
             </div>
-
             {status === 'error' && (
                 <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
                     <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-red-700">{errorMsg}</p>
                 </div>
             )}
-
             <div className="flex gap-3 pt-1">
                 {shipping && (
                     <button
@@ -916,7 +867,7 @@ function PaymentStep({
                     ) : (
                         <>
                             <Lock className="h-3.5 w-3.5" />
-                            Pay ${totalAmount.toFixed(2)} &amp; {payLabel}
+                            {payLabel}
                         </>
                     )}
                 </button>
@@ -924,7 +875,6 @@ function PaymentStep({
         </div>
     );
 }
-
 // ── Main Subscription Payment Modal ──────────────────────────────────────────
 interface ModalProps {
     open: boolean;
@@ -934,22 +884,18 @@ interface ModalProps {
     allowedPurchaseType?: PurchaseType;
     onGoToAddresses?: () => void;
 }
-
 export function SubscriptionPaymentModal({
     open,
     onClose,
     onSuccess,
     businessCardId,
-    allowedPurchaseType = 'SUBSCRIPTION_ONLY',
+    allowedPurchaseType
 }: ModalProps) {
-
     const [step, setStep] = useState<'shipping' | 'address' | 'payment'>('shipping');
     const [shippingData, setShippingData] = useState<ShippingData | null>(null);
     const [editingAddress, setEditingAddress] = useState<Address | null>(null);
-
     // NFC purchases always go through Address -> Shipping -> Payment steps
-    const requiresShipping = ['NFC_ONLY', 'NFC_WITH_SUBSCRIPTION'].includes(allowedPurchaseType);
-
+    const requiresShipping = !!allowedPurchaseType && ['NFC_ONLY', 'NFC_WITH_SUBSCRIPTION'].includes(allowedPurchaseType);
     useEffect(() => {
         if (open) {
             setStep(requiresShipping ? 'shipping' : 'payment');
@@ -957,34 +903,27 @@ export function SubscriptionPaymentModal({
             setEditingAddress(null);
         }
     }, [open, requiresShipping]);
-
     if (!open) return null;
-
     const handleShippingContinue = (data: ShippingData) => {
         setShippingData(data);
         setStep('payment');
     };
-
     const handleAddressSaved = () => {
         setEditingAddress(null);
         setStep('shipping');
     };
-
     const handleEditAddress = (address: Address) => {
         setEditingAddress(address);
         setStep('address');
     };
-
     const handleAddressCancel = () => {
         setEditingAddress(null);
         setStep('shipping');
     };
-
     const handleSuccess = () => {
         onSuccess?.();
         onClose();
     };
-
     const STEP_LABELS = {
         shipping: { num: 1, title: 'Shipping Address', sub: 'Select address to calculate shipping' },
         address: editingAddress
@@ -992,10 +931,8 @@ export function SubscriptionPaymentModal({
             : { num: 1, title: 'Add Address', sub: 'Add a delivery address to continue' },
         payment: { num: requiresShipping ? 2 : 1, title: 'Payment', sub: 'Enter card payment details' },
     };
-
     const current = STEP_LABELS[step];
     const isSubscribeOnlyPayment = step === 'payment' && !requiresShipping;
-
     return (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4"
@@ -1044,7 +981,6 @@ export function SubscriptionPaymentModal({
                         </button>
                     </div>
                 )}
-
                 {/* Progress bar */}
                 {requiresShipping && step === 'payment' && (
                     <div className="flex gap-1.5 mb-6">
@@ -1052,7 +988,6 @@ export function SubscriptionPaymentModal({
                         <div className={`h-1 flex-1 rounded-full transition-colors ${step === 'payment' ? 'bg-primary' : 'bg-border'}`} />
                     </div>
                 )}
-
                 {step === 'shipping' && (
                     <ShippingStep
                         businessCardId={businessCardId}
@@ -1061,10 +996,8 @@ export function SubscriptionPaymentModal({
                         onNeedsAddress={() => setStep('address')}
                         onEditAddress={handleEditAddress}
                         purchaseType={allowedPurchaseType}
-
                     />
                 )}
-
                 {step === 'address' && (
                     <AddressStep
                         businessCardId={businessCardId}
@@ -1073,7 +1006,6 @@ export function SubscriptionPaymentModal({
                         onCancel={handleAddressCancel}
                     />
                 )}
-
                 {step === 'payment' && (
                     <Elements stripe={stripePromise}>
                         <PaymentStep

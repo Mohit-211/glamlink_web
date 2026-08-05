@@ -1,4 +1,6 @@
 /* ================= SHARED TYPES ================= */
+/** Keyed by validateData's field keys (see GlamCardForm.tsx) — value is the message to show under that field when it fails validation. */
+export type FieldErrors = Partial<Record<string, string>>;
 export type BusinessHour = {
   note: string;
 };

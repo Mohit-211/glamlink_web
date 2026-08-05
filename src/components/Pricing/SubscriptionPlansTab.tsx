@@ -13,15 +13,15 @@ const UPGRADE_PLANS = PLANS.filter((p) => p.id !== "free");
 
 const PLAN_REQUIREMENTS: Record<PlanId, { subscription: boolean; nfc: boolean }> = {
   free: { subscription: false, nfc: false },
-  pro: { subscription: true, nfc: false },
-  freeKeychain: { subscription: false, nfc: true },
-  proKeychain: { subscription: true, nfc: true },
+  subscription_only: { subscription: true, nfc: false },
+  nfc_only: { subscription: false, nfc: true },
+  nfc_with_subscription: { subscription: true, nfc: true },
 };
 
 const PLAN_TO_TYPE: Partial<Record<PlanId, string>> = {
-  pro: "subscription_only",
-  freeKeychain: "nfc_only",
-  proKeychain: "nfc_with_subscription",
+  subscription_only: "subscription_only",
+  nfc_only: "nfc_only",
+  nfc_with_subscription: "nfc_with_subscription",
 };
 
 const SUBSCRIPTION_PLAN_TYPES = new Set(["subscription_only", "nfc_with_subscription"]);
@@ -33,11 +33,13 @@ function cardHasSubscription(card: any): boolean {
 const NFC_PURCHASED_STATUSES = new Set(["purchased", "paid"]);
 
 function cardHasNfc(card: any): boolean {
-  // "nfc_with_subscription" bundles both, so treat it as NFC being present
-  // too — even if nfc_status hasn't been (or wasn't) separately marked as
-  // purchased. Otherwise a card sitting in this combined state could end
-  // up with some plans still enabled instead of everything being disabled.
-  if ((card?.plan_type || "").toLowerCase() === "nfc_with_subscription") return true;
+  // "nfc_only" / "nfc_with_subscription" both already bundle NFC, so treat
+  // either as NFC being present — even if nfc_status hasn't been (or
+  // wasn't) separately marked as purchased. Otherwise a card already on
+  // the "nfc_only" plan would still show its own Keychain plan as
+  // selectable instead of disabled.
+  const planType = (card?.plan_type || "").toLowerCase();
+  if (planType === "nfc_only" || planType === "nfc_with_subscription") return true;
   // Real API responses use "paid" (not "purchased") for nfc_status.
   return NFC_PURCHASED_STATUSES.has((card?.nfc_status || "").toLowerCase());
 }
@@ -71,21 +73,14 @@ function getEffectivePlanType(planId: PlanId, card: any): string | undefined {
   return PLAN_TO_TYPE[planId];
 }
 
-/**
- * Expands a set of "directly" disabled plan ids to include everything that
- * depends on them. proKeychain bundles both the Pro subscription and the
- * NFC keychain, so it must be disabled whenever either `pro` or
- * `freeKeychain` is disabled — regardless of *why* those were disabled
- * (explicit prop vs. already-included-on-the-card). Runs as a fixed-point
- * loop so it can never again depend on evaluation order.
- */
+
 function expandWithDependencies(baseDisabled: Set<PlanId>): Set<PlanId> {
   const result = new Set(baseDisabled);
   let changed = true;
   while (changed) {
     changed = false;
-    if ((result.has("pro") || result.has("freeKeychain")) && !result.has("proKeychain")) {
-      result.add("proKeychain");
+    if ((result.has("subscription_only") || result.has("nfc_only")) && !result.has("nfc_with_subscription")) {
+      result.add("nfc_with_subscription");
       changed = true;
     }
   }
@@ -96,7 +91,10 @@ interface SubscriptionPlansTabProps {
   selectedPlan: PlanId | null;
   onSelectPlan: (id: PlanId | null) => void;
   canContinue: boolean;
-  onContinue: () => void;
+  // Now receives the resolved backend plan_type (the same value that was
+  // just persisted via SelectPlanAPI below) so the caller doesn't have to
+  // re-derive it — and can't derive it incorrectly — from `selectedPlan`.
+  onContinue: (effectivePlanType: string) => void;
   businessCard?: any;
   businessCardId?: string | number;
   disabledPlanIds?: PlanId[];
@@ -165,7 +163,10 @@ export default function SubscriptionPlansTab({
       setSubmitting(false);
     }
 
-    onContinue();
+    // Pass the resolved plan type (same value just sent to SelectPlanAPI)
+    // up to the caller so it can map to the correct PurchaseType instead
+    // of re-deriving it from `selectedPlan`.
+    onContinue(planType ?? selectedPlan);
   };
 
   return (

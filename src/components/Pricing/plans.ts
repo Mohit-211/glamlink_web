@@ -1,5 +1,6 @@
-export type PlanId = "free" | "freeKeychain" | "pro" | "proKeychain";
+export type PlanId = "free" | "nfc_only" | "subscription_only" | "nfc_with_subscription";
 export type ProFeature = string | { text: string; soon: true };
+
 
 export type BackendPlanType =
   | "free"
@@ -52,7 +53,7 @@ export const PLANS: PlanDef[] = [
     planType: "free",
   },
   {
-    id: "freeKeychain",
+    id: "nfc_only",
     name: "Keychain",
     hasKeychain: true,
     isPro: false,
@@ -62,7 +63,7 @@ export const PLANS: PlanDef[] = [
     planType: "nfc_only",
   },
   {
-    id: "pro",
+    id: "subscription_only",
     name: "Access Pro",
     hasKeychain: false,
     isPro: true,
@@ -72,7 +73,7 @@ export const PLANS: PlanDef[] = [
     planType: "subscription_only",
   },
   {
-    id: "proKeychain",
+    id: "nfc_with_subscription",
     name: "Pro + keychain",
     hasKeychain: true,
     isPro: true,

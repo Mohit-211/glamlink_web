@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import { BOOKING_METHODS, BookingMethod, GlamCardFormData } from "./types";
+﻿import React, { useState } from "react";
+import { BOOKING_METHODS, BookingMethod, FieldErrors, GlamCardFormData } from "./types";
 
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
+  errors?: FieldErrors;
+  clearError?: (key: string) => void;
 }
 
 const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
@@ -12,6 +14,7 @@ const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm " +
   "text-gray-900 placeholder-gray-400 transition " +
   "focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200";
+const errorInputClass = "border-red-500 focus:border-red-500 focus:ring-red-200";
 
 const INSTAGRAM_KEYS = ["instagram", "instagram1", "instagram2"] as const;
 type InstagramKey = (typeof INSTAGRAM_KEYS)[number];
@@ -31,7 +34,12 @@ const parseOtherLinks = (value: any): { title: string; url: string }[] => {
   return [];
 };
 
-const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
+const ServicesAndBookingForm: React.FC<Props> = ({
+  data,
+  setData,
+  errors,
+  clearError,
+}) => {
   const [specialtyInput, setSpecialtyInput] = useState("");
   const [infoInput, setInfoInput] = useState("");
   const [showInfo, setShowInfo] = useState(false);
@@ -47,6 +55,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
       specialties: [...prev.specialties, specialtyInput.trim()],
     }));
     setSpecialtyInput("");
+    clearError?.("specialties");
   };
 
   const removeSpecialty = (index: number) => {
@@ -114,7 +123,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
       i++;
     }
 
-    // Next key: instagram → instagram1 → instagram2 → instagram3...
     const nextKey = count === 0 ? "instagram" : `instagram${count}`;
 
     setData((prev) => ({
@@ -129,6 +137,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
       ...prev,
       social_media: { ...prev.social_media, [key]: formatInstagram(value) },
     }));
+    if (idx === 0) clearError?.("instagram");
   };
 
   const removeInstagramHandle = (idx: number) => {
@@ -200,11 +209,13 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
       </div> */}
 
       {/* Additional Specialties */}
-      <div className="space-y-3">
-        <label className={labelClass}>Additional Specialties</label>
+      <div id="field-specialties" className="space-y-3">
+        <label className={labelClass}>
+          Additional Specialties <span className="text-red-500">*</span>
+        </label>
         <div className="flex gap-2">
           <input
-            className={inputClass}
+            className={`${inputClass} ${errors?.specialties ? errorInputClass : ""}`}
             placeholder="e.g. Balayage, Keratin Treatments, Bridal Makeup"
             value={specialtyInput}
             onChange={(e) => setSpecialtyInput(e.target.value)}
@@ -215,19 +226,23 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             disabled={data.specialties.length >= 5 || !specialtyInput.trim()}
             className={`rounded-lg px-5 text-sm font-medium transition ${data.specialties.length >= 5 || !specialtyInput.trim()
               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-teal-600 text-white hover:bg-teal-700"
+              : "bg-[#24bbcb] text-white hover:bg-[#24bbcb]"
               }`}
           >
             + Add
           </button>
         </div>
-        <p className="text-xs text-gray-500">Max 5 specialties</p>
+        {errors?.specialties ? (
+          <p className="text-sm text-red-500">{errors.specialties}</p>
+        ) : (
+          <p className="text-xs text-gray-500">Max 5 specialties</p>
+        )}
         {data.specialties.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {data.specialties.map((item, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#24bbcb] px-3 py-1 text-xs font-medium text-black"
               >
                 {item}
                 <button
@@ -235,7 +250,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                   onClick={() => removeSpecialty(i)}
                   className="ml-1 text-teal-800 hover:text-red-600"
                 >
-                  ×
+                ×
                 </button>
               </span>
             ))}
@@ -271,19 +286,18 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             <label className={labelClass}>Website</label>
             <input
               type="url"
-              className={inputClass}
+              className={`${inputClass} ${errors?.booking_link ? errorInputClass : ""}`}
               placeholder="https://yourwebsite.com"
               value={data.website || ""}
-              onChange={(e) =>
-                setData((prev) => ({ ...prev, website: e.target.value }))
-              }
+              onChange={(e) => {
+                setData((prev) => ({ ...prev, website: e.target.value }));
+                clearError?.("booking_link");
+              }}
             />
           </div>
 
-          {/* Instagram — 3 fixed slots */}
 
-          {/* Instagram — dynamic */}
-          <div className="md:col-span-2">
+          <div id="field-instagram" className="md:col-span-2">
             <div className="flex items-center justify-between mb-2">
               <div>
                 <label className={labelClass}>Instagram</label>
@@ -304,7 +318,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                     {idx === 0 ? "Instagram" : `Instagram ${idx}`}
                   </span>
                   <input
-                    className={`${inputClass} flex-1`}
+                    className={`${inputClass} flex-1 ${idx === 0 && errors?.instagram ? errorInputClass : ""}`}
                     placeholder="@yourusername or full URL"
                     value={value}
                     required={
@@ -321,12 +335,15 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                       onClick={() => removeInstagramHandle(idx)}
                       className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 hover:bg-red-100"
                     >
-                      ×
+                      Ã—
                     </button>
                   )}
                 </div>
               ))}
             </div>
+            {errors?.instagram && (
+              <p className="mt-1 text-sm text-red-500">{errors.instagram}</p>
+            )}
           </div>
 
 
@@ -463,13 +480,13 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
         </div>
       </div>
 
-      <div>
+      <div id="field-preferred_booking_methods">
         <div className="flex items-center gap-2 relative">
           <label className={labelClass}>Ways To Connects</label>
         </div>
 
         <div
-          className="mt-3"
+          className={`mt-3 rounded-lg p-1 ${errors?.preferred_booking_methods ? "ring-1 ring-red-500" : ""}`}
           style={{ display: "flex", gap: "8px" }}
         >
           {[
@@ -493,6 +510,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                         (m) => m !== method
                       ),
                   }));
+                  clearError?.("preferred_booking_methods");
                 }}
               />
 
@@ -504,24 +522,33 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             </label>
           ))}
         </div>
+        {errors?.preferred_booking_methods && (
+          <p className="mt-1 text-sm text-red-500">
+            {errors.preferred_booking_methods}
+          </p>
+        )}
 
         {data.preferred_booking_methods?.includes(BOOKING_METHODS.LINK) && (
-          <div className="mt-4">
+          <div id="field-booking_link" className="mt-4">
             <label className={`${labelClass} m-0`}>
               Booking Link
             </label>
            <input
   type="url"
-  className={inputClass}
+  className={`${inputClass} ${errors?.booking_link ? errorInputClass : ""}`}
   placeholder="https://yourwebsite.com"
   value={data.booking_link || data.website || ""}
-  onChange={(e) =>
+  onChange={(e) => {
     setData((prev) => ({
       ...prev,
       booking_link: e.target.value,
-    }))
-  }
+    }));
+    clearError?.("booking_link");
+  }}
 />
+            {errors?.booking_link && (
+              <p className="mt-1 text-sm text-red-500">{errors.booking_link}</p>
+            )}
           </div>
         )}
       </div>
