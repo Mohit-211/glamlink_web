@@ -165,6 +165,7 @@ const [addressId, setAddressId] = useState<number | null>(null);
   // server first (this is the source of truth for plan_type / payment_required),
   // then branch the UI based on what comes back.
   async function handlePrimaryContinue() {
+    console.log(plan.planType,"plan.planType")
     if (!businessCardId) {
       message.error("Missing business card reference. Please try again.");
       return;

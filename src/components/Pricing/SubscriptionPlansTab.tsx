@@ -142,10 +142,11 @@ export default function SubscriptionPlansTab({
 
   const handleContinue = async () => {
     if (!selectedPlan || !effectiveCanContinue) return;
-
-    const planType = getEffectivePlanType(selectedPlan, businessCard);
+console.log(selectedPlan,"selectedPlan")
+    // const planType = getEffectivePlanType(selectedPlan, businessCard);
+    const planType =selectedPlan;
     const cardId = businessCardId ?? businessCard?.id;
-
+console.log(planType,"planType")
     if (planType && cardId) {
       try {
         setSubmitting(true);
