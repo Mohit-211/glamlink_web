@@ -1,11 +1,37 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Script from "next/script";
 import { Eye, EyeOff, Sparkles } from "lucide-react";
 import { registerUser, sendOtp } from "@/api/Api";
 import { useRouter } from "next/navigation";
 import { message } from "antd";
 import { getFormDataFromSession } from "../glamcard/GlamCardForm/Formdatasessionstorage";
+
+// Site key comes from the Cloudflare Turnstile dashboard.
+// Set NEXT_PUBLIC_TURNSTILE_SITE_KEY in your .env.local / deployment env.
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        container: string | HTMLElement,
+        options: {
+          sitekey: string;
+          action?: string;
+          size?: "normal" | "compact" | "invisible";
+          callback?: (token: string) => void;
+          "error-callback"?: () => void;
+          "expired-callback"?: () => void;
+        }
+      ) => string;
+      execute: (widgetIdOrContainer: string | HTMLElement) => void;
+      reset: (widgetId?: string) => void;
+      remove: (widgetId: string) => void;
+    };
+  }
+}
 
 interface RegisterProps {
   /** If provided, called after a successful registration with the
@@ -27,6 +53,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [turnstileScriptLoaded, setTurnstileScriptLoaded] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -35,6 +62,12 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
     confirm_password: "",
   });
   const [errors, setErrors] = useState<FieldErrors>({});
+
+  // Invisible Turnstile still needs a container element to render into
+  // (even though nothing visible appears there), and we track the
+  // widget id so we can execute/reset the same widget on submit.
+  const turnstileContainerRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
 
   // Prefill name/email/mobile from sessionStorage (if saved earlier in this
   // session — e.g. when GlamCardForm stored its submit payload).
@@ -58,6 +91,29 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
           : prev.mobile,
     }));
   }, []);
+
+  // Render the invisible widget once the script has loaded. We render it
+  // up front (rather than on submit) so execute() has a widget ready to go.
+  useEffect(() => {
+    if (
+      !turnstileScriptLoaded ||
+      !TURNSTILE_SITE_KEY ||
+      !window.turnstile ||
+      !turnstileContainerRef.current ||
+      widgetIdRef.current
+    ) {
+      return;
+    }
+
+    widgetIdRef.current = window.turnstile.render(
+      turnstileContainerRef.current,
+      {
+        sitekey: TURNSTILE_SITE_KEY,
+        action: "register",
+        size: "invisible",
+      }
+    );
+  }, [turnstileScriptLoaded]);
 
   const passwordStrength = (() => {
     const p = form.password;
@@ -127,6 +183,51 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
     return next;
   };
 
+  // Runs the invisible Turnstile challenge and resolves with a fresh token.
+  // Tokens are single-use, so this runs right before submit rather than
+  // being cached from page load.
+  const getTurnstileToken = async (): Promise<string | null> => {
+    if (!TURNSTILE_SITE_KEY) {
+      // No site key configured — skip silently in local/dev environments
+      // rather than blocking registration entirely.
+      console.warn(
+        "NEXT_PUBLIC_TURNSTILE_SITE_KEY is not set; skipping captcha token."
+      );
+      return null;
+    }
+
+    if (!window.turnstile || !turnstileContainerRef.current) {
+      message.error("Captcha failed to load. Please refresh and try again.");
+      return null;
+    }
+
+    try {
+      const token = await new Promise<string>((resolve, reject) => {
+        // Re-render bound to this submit's callback so we get the token
+        // from this specific execute() call rather than a stale render.
+        const widgetId = window.turnstile!.render(
+          turnstileContainerRef.current as HTMLElement,
+          {
+            sitekey: TURNSTILE_SITE_KEY,
+            action: "register",
+            size: "invisible",
+            callback: (t) => resolve(t),
+            "error-callback": () =>
+              reject(new Error("Turnstile challenge failed")),
+            "expired-callback": () =>
+              reject(new Error("Turnstile token expired")),
+          }
+        );
+        window.turnstile!.execute(widgetId);
+      });
+      return token;
+    } catch (err) {
+      console.error("Turnstile execute failed:", err);
+      message.error("Captcha verification failed. Please try again.");
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -143,12 +244,24 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
 
     try {
       setLoading(true);
+
+      // Fetch a fresh, single-use token right before hitting the API.
+      let turnstileToken: string | null = null;
+      if (TURNSTILE_SITE_KEY) {
+        turnstileToken = await getTurnstileToken();
+        if (!turnstileToken) {
+          // getTurnstileToken already surfaced an error toast.
+          return;
+        }
+      }
+
       const response = await registerUser({
         name: `${form.name}`,
         email: form.email,
         mobile: form.mobile,
         password: form.password,
         confirm_password: form.confirm_password,
+        ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
       });
       console.log("Register Response:", response);
 
@@ -194,6 +307,11 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
       message.error(errorMessage);
     } finally {
       setLoading(false);
+      // Reset the widget so the next submit attempt gets a fresh token
+      // instead of reusing a consumed/expired one.
+      if (window.turnstile && widgetIdRef.current) {
+        window.turnstile.reset(widgetIdRef.current);
+      }
     }
   };
 
@@ -225,6 +343,17 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
 
   return (
     <div className="page-soft min-h-screen flex items-center justify-center mt-10">
+      {/* Cloudflare Turnstile script — invisible mode, no checkbox UI */}
+      {TURNSTILE_SITE_KEY && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          strategy="afterInteractive"
+          onLoad={() => setTurnstileScriptLoaded(true)}
+        />
+      )}
+      {/* Container Turnstile renders into — stays empty/invisible in "invisible" size */}
+      <div ref={turnstileContainerRef} />
+
       {/* Background Effects */}
       <div
         aria-hidden
@@ -250,9 +379,8 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                   value={form.name}
                   onChange={(e) => updateField("name", e.target.value)}
                   aria-invalid={!!errors.name}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${
-                    errors.name ? "border-red-500" : "border-input"
-                  }`}
+                  className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.name ? "border-red-500" : "border-input"
+                    }`}
                 />
                 {errors.name && (
                   <p className="text-xs text-red-500">{errors.name}</p>
@@ -268,9 +396,8 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                 value={form.email}
                 onChange={(e) => updateField("email", e.target.value)}
                 aria-invalid={!!errors.email}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${
-                  errors.email ? "border-red-500" : "border-input"
-                }`}
+                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.email ? "border-red-500" : "border-input"
+                  }`}
               />
               {errors.email && (
                 <p className="text-xs text-red-500">{errors.email}</p>
@@ -288,9 +415,8 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                   updateField("mobile", e.target.value.replace(/\D/g, ""))
                 }
                 aria-invalid={!!errors.mobile}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${
-                  errors.mobile ? "border-red-500" : "border-input"
-                }`}
+                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.mobile ? "border-red-500" : "border-input"
+                  }`}
               />
               {errors.mobile && (
                 <p className="text-xs text-red-500">{errors.mobile}</p>
@@ -307,9 +433,8 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                   value={form.password}
                   onChange={(e) => updateField("password", e.target.value)}
                   aria-invalid={!!passwordError}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm ${
-                    passwordError ? "border-red-500" : "border-input"
-                  }`}
+                  className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm ${passwordError ? "border-red-500" : "border-input"
+                    }`}
                 />
                 <button
                   type="button"
@@ -328,9 +453,8 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                     {[1, 2, 3, 4].map((i) => (
                       <div
                         key={i}
-                        className={`h-1 flex-1 rounded-full ${
-                          i <= passwordStrength ? strengthColor : "bg-border"
-                        }`}
+                        className={`h-1 flex-1 rounded-full ${i <= passwordStrength ? strengthColor : "bg-border"
+                          }`}
                       />
                     ))}
                   </div>
@@ -352,9 +476,8 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                 value={form.confirm_password}
                 onChange={(e) => updateField("confirm_password", e.target.value)}
                 aria-invalid={!!confirmPasswordError}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${
-                  confirmPasswordError ? "border-red-500" : "border-input"
-                }`}
+                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${confirmPasswordError ? "border-red-500" : "border-input"
+                  }`}
               />
               {confirmPasswordError && (
                 <p className="text-xs text-red-500">{confirmPasswordError}</p>
@@ -368,6 +491,29 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
             >
               {loading ? "Creating Access Account..." : "Create Access Account"}
             </button>
+            {TURNSTILE_SITE_KEY && (
+              <p className="text-[11px] text-muted-foreground text-center">
+                This site is protected by Cloudflare Turnstile and its{" "}
+                <a
+                  href="https://www.cloudflare.com/privacypolicy/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  Privacy Policy
+                </a>{" "}
+                and{" "}
+                <a
+                  href="https://www.cloudflare.com/website-terms/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  Terms of Service
+                </a>{" "}
+                apply.
+              </p>
+            )}
           </form>
         </div>
       </div>

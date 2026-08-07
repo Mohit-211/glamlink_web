@@ -380,7 +380,8 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
             });
             const res = await addShippingAddress({
                 business_card_id: String(businessCardId),
-                // purchase_type: purchaseType,
+                plan_type: purchaseType?.toLowerCase(),
+                
             });
             setShipping(res.data);
             setStatus('ready');
@@ -698,7 +699,7 @@ function PaymentStep({
             }
             const response = await CreateSubscription({
                 business_card_id: Number(businessCardId),
-                // purchase_type: allowedPurchaseType,
+                plan_type: allowedPurchaseType?.toLowerCase(),
             });
             const clientSecret =
                 response?.data?.clientSecret ||

@@ -79,8 +79,8 @@ export default function PaymentHistory({
       setErrorId(payment.id);
       setErrorMsg(
         err?.response?.data?.message ||
-          err?.message ||
-          'Failed to cancel subscription. Please try again.'
+        err?.message ||
+        'Failed to cancel subscription. Please try again.'
       );
     } finally {
       setCancellingId(null);
@@ -275,7 +275,7 @@ export default function PaymentHistory({
                         </a>
                       )}
 
-                      {canCancel && !isConfirming && (
+                      {payment.payment_status !== "CANCELLED" && canCancel && !isConfirming && (
                         <button
                           onClick={() => setConfirmingId(payment.id)}
                           className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
