@@ -463,7 +463,7 @@ console.log(data,"datata")
             boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
           }}
         >
-          <div className="rounded-2xl bg-[#F4F9FF] p-4 sm:p-6 shadow-sm">
+          <div className="rounded-2xl bg-[#FFFFFF] p-4 sm:p-6 shadow-sm">
             {/* ===== LOGO (desktop / non-view) ===== */}
             <div
               className={`mb-5 text-center ${mode === "view" ? "hidden lg:flex justify-center" : "flex justify-center"}`}

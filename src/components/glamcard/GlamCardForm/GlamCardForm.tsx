@@ -133,15 +133,15 @@ const GlamCardForm: React.FC<Props> = ({
     // Phone is only required when it's set to show on the card — matches
     // the conditional "Phone number is required." hint under the field in
     // BasicInformationSection (and the "Show phone number on card" toggle).
-    if ((data.is_phone_visible ?? true) && !data.phone?.trim()) {
-      fail("phone", "Please enter your Phone Number");
-    } else if (
-      (data.is_phone_visible ?? true) &&
-      data.phone?.trim() &&
-      !isValidPhone(data.phone.trim())
-    ) {
-      fail("phone", "Phone Number must contain digits only (7-15 digits)");
-    }
+   if ((data.is_phone_visible ?? true) && !data.phone?.trim()) {
+  fail("phone", "Please enter your Phone Number");
+} else if (
+  (data.is_phone_visible ?? true) &&
+  data.phone?.trim() &&
+  !/^\d{10}$/.test(data.phone.trim())
+) {
+  fail("phone", "Phone Number must contain exactly 10 digits");
+}
     if (!data.business_name?.trim())
       fail("business_name", "Please enter your Business Name");
     if (!data.bio?.trim()) fail("bio", "Please enter your Bio");

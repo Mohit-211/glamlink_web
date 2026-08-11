@@ -214,11 +214,22 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           Additional Specialties <span className="text-red-500">*</span>
         </label>
         <div className="flex gap-2">
-          <input
+        <input
             className={`${inputClass} ${errors?.specialties ? errorInputClass : ""}`}
             placeholder="e.g. Balayage, Keratin Treatments, Bridal Makeup"
             value={specialtyInput}
             onChange={(e) => setSpecialtyInput(e.target.value)}
+            onKeyDown={(e) => {
+              // ★ NEW — Enter adds the specialty instead of submitting the
+              // form. Guarded the same way the button already is (max 5,
+              // non-empty trimmed value) so Enter can't bypass those rules.
+              if (e.key === "Enter") {
+                e.preventDefault();
+                if (data.specialties.length < 5 && specialtyInput.trim()) {
+                  addSpecialty();
+                }
+              }
+            }}
           />
           <button
             type="button"

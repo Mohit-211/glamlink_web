@@ -48,8 +48,8 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     name: "John Doe",
     professional_title: "Your Profession",
     email: "example@email.com",
-    phone: "000-000-0000",
-    booking_phone: "000-000-0000",
+    phone: "1234567890",
+    booking_phone: "1234567890",
     bio: `
     <p>Enter your bio here.</p>
    
@@ -91,7 +91,7 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
         city: "Sample City",
         state: "Sample State",
         area: "Sample Area",
-        phone: "000-000-0000",
+        phone: "1234567890",
         description: "Replace with your business address.",
         isPrimary: true,
         isOpen: true,
