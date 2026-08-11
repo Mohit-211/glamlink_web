@@ -389,11 +389,15 @@ const GlamCardForm: React.FC<Props> = ({
         body: formData,
       });
       console.log(res, "res====");
-      if (!res.ok) {
-        throw new Error(
-          isEdit ? "Failed to update GlamCard" : "Failed to create GlamCard"
-        );
-      }
+    if (!res.ok) {
+  const errorData = await res.json().catch(() => null);
+
+  throw new Error(
+    errorData?.message ||
+      errorData?.error ||
+      (isEdit ? "Failed to update GlamCard" : "Failed to create GlamCard")
+  );
+}
       const result = await res.json();
       if (isEdit) {
         message.success(result?.message || "GlamCard updated successfully!");
@@ -412,9 +416,10 @@ const GlamCardForm: React.FC<Props> = ({
       }
     } catch (error) {
       console.error("ERROR 👉", error);
-      message.error(
-        isEdit ? "Failed to update Business Card" : "Failed to create Business Card"
-      );
+      // message.error(
+      //   isEdit ? "Failed to update Business Card" : "Failed to create Business Card"
+      // );
+      message.error(error instanceof Error ? error.message : "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,6 @@
-﻿import React, { useState } from "react";
+﻿import React, { useState, useEffect, useRef, useCallback } from "react";
 import { BOOKING_METHODS, BookingMethod, FieldErrors, GlamCardFormData } from "./types";
+import { userSpecialtiesApi } from "@/api/Api";
 
 interface Props {
   data: GlamCardFormData;
@@ -17,7 +18,6 @@ const inputClass =
 const errorInputClass = "border-red-500 focus:border-red-500 focus:ring-red-200";
 
 const INSTAGRAM_KEYS = ["instagram", "instagram1", "instagram2"] as const;
-type InstagramKey = (typeof INSTAGRAM_KEYS)[number];
 
 /* ================= HELPERS ================= */
 const parseOtherLinks = (value: any): { title: string; url: string }[] => {
@@ -44,17 +44,77 @@ const ServicesAndBookingForm: React.FC<Props> = ({
   const [infoInput, setInfoInput] = useState("");
   const [showInfo, setShowInfo] = useState(false);
 
+
+  const [specialtyOptions, setSpecialtyOptions] = useState<string[]>([]);
+  const [loadingSpecialties, setLoadingSpecialties] = useState(true);
+  const [specialtyDropdownOpen, setSpecialtyDropdownOpen] = useState(false);
+  const specialtyWrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await userSpecialtiesApi();
+        const names: string[] = (res?.data?.rows ?? [])
+          .map((item: any) => item?.name ?? item?.title ?? item)
+          .filter(Boolean);
+        if (mounted) setSpecialtyOptions(names);
+      } catch (err) {
+        console.error("Failed to load specialties:", err);
+      } finally {
+        if (mounted) setLoadingSpecialties(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        specialtyWrapperRef.current &&
+        !specialtyWrapperRef.current.contains(e.target as Node)
+      ) {
+        setSpecialtyDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        specialtyWrapperRef.current &&
+        !specialtyWrapperRef.current.contains(e.target as Node)
+      ) {
+        setSpecialtyDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   if (!data) return null;
 
   /* ================= SPECIALTIES ================= */
-  const addSpecialty = () => {
-    if (!specialtyInput.trim()) return;
+  const isSpecialtyAdded = (val: string) =>
+    data.specialties.some(
+      (s) => s.toLowerCase() === val.trim().toLowerCase()
+    );
+
+  const addSpecialty = (value?: string) => {
+    const val = (value ?? specialtyInput).trim();
+    if (!val) return;
     if (data.specialties.length >= 5) return;
+    if (isSpecialtyAdded(val)) return;
     setData((prev) => ({
       ...prev,
-      specialties: [...prev.specialties, specialtyInput.trim()],
+      specialties: [...prev.specialties, val],
     }));
     setSpecialtyInput("");
+    setSpecialtyDropdownOpen(false);
     clearError?.("specialties");
   };
 
@@ -64,6 +124,22 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       specialties: prev.specialties.filter((_, i) => i !== index),
     }));
   };
+
+  const filteredSpecialtyOptions = specialtyOptions.filter(
+    (opt) =>
+      opt.toLowerCase().includes(specialtyInput.trim().toLowerCase()) &&
+      !isSpecialtyAdded(opt)
+  );
+
+  const specialtyExactMatch = specialtyOptions.some(
+    (opt) => opt.toLowerCase() === specialtyInput.trim().toLowerCase()
+  );
+
+  const canAddCustomSpecialty =
+    specialtyInput.trim().length > 0 &&
+    !specialtyExactMatch &&
+    !isSpecialtyAdded(specialtyInput) &&
+    data.specialties.length < 5;
 
   /* ================= IMPORTANT INFO ================= */
   const addInfo = () => {
@@ -194,55 +270,100 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         </p>
       </header>
 
-      {/* Primary Specialty */}
-      {/* <div>
-        <label className={labelClass}>Primary Specialty *</label>
-        <input
-          className={inputClass}
-          placeholder="e.g. Hair Styling, Nails, Makeup..."
-          value={data.primary_specialty || ""}
-          onChange={(e) =>
-            setData((prev) => ({ ...prev, primary_specialty: e.target.value }))
-          }
-          required
-        />
-      </div> */}
-
       {/* Additional Specialties */}
       <div id="field-specialties" className="space-y-3">
         <label className={labelClass}>
           Additional Specialties <span className="text-red-500">*</span>
         </label>
-        <div className="flex gap-2">
-        <input
-            className={`${inputClass} ${errors?.specialties ? errorInputClass : ""}`}
-            placeholder="e.g. Balayage, Keratin Treatments, Bridal Makeup"
-            value={specialtyInput}
-            onChange={(e) => setSpecialtyInput(e.target.value)}
-            onKeyDown={(e) => {
-              // ★ NEW — Enter adds the specialty instead of submitting the
-              // form. Guarded the same way the button already is (max 5,
-              // non-empty trimmed value) so Enter can't bypass those rules.
-              if (e.key === "Enter") {
-                e.preventDefault();
-                if (data.specialties.length < 5 && specialtyInput.trim()) {
-                  addSpecialty();
-                }
-              }
-            }}
-          />
+
+        <div className="relative flex gap-2" ref={specialtyWrapperRef}>
+      <div className="relative flex-1">
+  <input
+    className={`${inputClass} ${errors?.specialties ? errorInputClass : ""}`}
+    placeholder="e.g. Balayage, Keratin Treatments, Bridal Makeup"
+    value={specialtyInput}
+    onChange={(e) => {
+      setSpecialtyInput(e.target.value);
+      setSpecialtyDropdownOpen(true);
+    }}
+    onFocus={() => setSpecialtyDropdownOpen(true)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (specialtyExactMatch) {
+          addSpecialty(specialtyInput.trim());
+        } else if (canAddCustomSpecialty) {
+          addSpecialty();
+        }
+      }
+    }}
+  />
+
+  {specialtyDropdownOpen && (
+    <div className="absolute z-10 mt-1 w-full max-h-56 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+      {loadingSpecialties ? (
+        <div className="px-4 py-2 text-sm text-gray-400">Loading…</div>
+      ) : (
+        <>
+          {filteredSpecialtyOptions.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => addSpecialty(opt)}
+              disabled={data.specialties.length >= 5}
+              className="block w-full text-left px-4 py-2 text-sm hover:bg-[#24bbcb]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {opt}
+            </button>
+          ))}
+
+          {canAddCustomSpecialty && (
+            <button
+              type="button"
+              onClick={() => addSpecialty()}
+              className="block w-full text-left px-4 py-2 text-sm font-medium text-[#24bbcb] hover:bg-[#24bbcb]/10 border-t border-gray-100"
+            >
+              + Add "{specialtyInput.trim()}"
+            </button>
+          )}
+
+          {!filteredSpecialtyOptions.length && !canAddCustomSpecialty && (
+            <div className="px-4 py-2 text-sm text-gray-400">
+              {specialtyOptions.length === 0 ? "No specialties available" : "No matches"}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )}
+</div>
+
           <button
             type="button"
-            onClick={addSpecialty}
-            disabled={data.specialties.length >= 5 || !specialtyInput.trim()}
-            className={`rounded-lg px-5 text-sm font-medium transition ${data.specialties.length >= 5 || !specialtyInput.trim()
-              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-[#24bbcb] text-white hover:bg-[#24bbcb]"
-              }`}
+            onClick={() => {
+              if (specialtyExactMatch) {
+                addSpecialty(specialtyInput.trim());
+              } else {
+                addSpecialty();
+              }
+            }}
+            disabled={
+              data.specialties.length >= 5 ||
+              !specialtyInput.trim() ||
+              isSpecialtyAdded(specialtyInput)
+            }
+            className={`rounded-lg px-5 text-sm font-medium transition ${
+              data.specialties.length >= 5 ||
+              !specialtyInput.trim() ||
+              isSpecialtyAdded(specialtyInput)
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-[#24bbcb] text-white hover:bg-[#24bbcb]"
+            }`}
           >
             + Add
           </button>
         </div>
+
         {errors?.specialties ? (
           <p className="text-sm text-red-500">{errors.specialties}</p>
         ) : (
@@ -261,26 +382,13 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                   onClick={() => removeSpecialty(i)}
                   className="ml-1 text-teal-800 hover:text-red-600"
                 >
-                ×
+                  ×
                 </button>
               </span>
             ))}
           </div>
         )}
       </div>
-
-      {/* Custom Handle */}
-      {/* <div>
-        <label className={labelClass}>Claim Your Custom Handle</label>
-        <input
-          className={inputClass}
-          placeholder="Used for your Glamlink profile URL"
-          value={data.custom_handle || ""}
-          onChange={(e) =>
-            setData((prev) => ({ ...prev, custom_handle: e.target.value }))
-          }
-        />
-      </div> */}
 
       {/* Socials & Website */}
       <div className="space-y-4">
@@ -306,7 +414,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               }}
             />
           </div>
-
 
           <div id="field-instagram" className="md:col-span-2">
             <div className="flex items-center justify-between mb-2">
@@ -346,7 +453,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                       onClick={() => removeInstagramHandle(idx)}
                       className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 hover:bg-red-100"
                     >
-                      Ã—
+                      ×
                     </button>
                   )}
                 </div>
@@ -356,7 +463,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               <p className="mt-1 text-sm text-red-500">{errors.instagram}</p>
             )}
           </div>
-
 
           {/* TikTok */}
           <div>
@@ -544,19 +650,19 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             <label className={`${labelClass} m-0`}>
               Booking Link
             </label>
-           <input
-  type="url"
-  className={`${inputClass} ${errors?.booking_link ? errorInputClass : ""}`}
-  placeholder="https://yourwebsite.com"
-  value={data.booking_link || data.website || ""}
-  onChange={(e) => {
-    setData((prev) => ({
-      ...prev,
-      booking_link: e.target.value,
-    }));
-    clearError?.("booking_link");
-  }}
-/>
+            <input
+              type="url"
+              className={`${inputClass} ${errors?.booking_link ? errorInputClass : ""}`}
+              placeholder="https://yourwebsite.com"
+              value={data.booking_link || data.website || ""}
+              onChange={(e) => {
+                setData((prev) => ({
+                  ...prev,
+                  booking_link: e.target.value,
+                }));
+                clearError?.("booking_link");
+              }}
+            />
             {errors?.booking_link && (
               <p className="mt-1 text-sm text-red-500">{errors.booking_link}</p>
             )}
