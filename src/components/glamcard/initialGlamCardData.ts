@@ -1,18 +1,17 @@
 import { BOOKING_METHODS, GlamCardFormData } from "./GlamCardForm/types";
-import profileImg from "../../../public/fashion/pexels-decembrenell-3317434.jpg";
-import galleryImg1 from "../../../public/fashion/pexels-element5-973403.jpg";
-import galleryImg2 from "../../../public/fashion/pexels-pixabay-38554.jpg";
-import galleryImg3 from "../../../public/fashion/pexels-pixabay-159780.jpg";
+
+const profileImgUrl =
+  "https://node.glamlink.net/images/profile_image-1786443475610.jpg";
+const galleryImg1Url =
+  "https://node.glamlink.net/images/images-1786443475619.jpg";
+const galleryImg2Url =
+  "https://node.glamlink.net/images/images-1786443475614.jpg";
 /* ================= HELPER ================= */
 async function urlToFile(
   url: string,
   filename: string
 ): Promise<File> {
-  const fullUrl =
-    typeof window !== "undefined"
-      ? window.location.origin + url
-      : url;
-  const res = await fetch(fullUrl);
+  const res = await fetch(url);
   const blob = await res.blob();
   return new File([blob], filename, {
     type: blob.type,
@@ -24,23 +23,19 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
   if (typeof window === "undefined") {
     return {} as GlamCardFormData;
   }
-  const [profile_image, img1, img2, img3] =
+  const [profile_image, img1, img2] =
     await Promise.all([
       urlToFile(
-        profileImg.src,
-        "pexels-decembrenell-3317434.jpg"
+        profileImgUrl,
+        "profile_image-1786443475610.jpg"
       ),
       urlToFile(
-        galleryImg1.src,
-        "pexels-element5-973403.jpg"
+        galleryImg1Url,
+        "images-1786443475619.jpg"
       ),
       urlToFile(
-        galleryImg2.src,
-        "pexels-pixabay-38554.jpg"
-      ),
-      urlToFile(
-        galleryImg3.src,
-        "pexels-pixabay-159780.jpg"
+        galleryImg2Url,
+        "images-1786443475614.jpg"
       ),
     ]);
   return {
@@ -99,7 +94,7 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     ],
     /* ================= IMAGES ================= */
     profile_image,
-    images: [img1, img2, img3],
+    images: [img1, img2],
     gallery_meta: [
       {
         id: "1",
@@ -112,12 +107,6 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
         caption: "Sample Image 2",
         is_thumbnail: false,
         sort_order: 1,
-      },
-      {
-        id: "3",
-        caption: "Sample Image 3",
-        is_thumbnail: false,
-        sort_order: 2,
       },
     ],
     /* ================= MARKETING ================= */

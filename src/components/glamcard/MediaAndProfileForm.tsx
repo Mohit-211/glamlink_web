@@ -19,6 +19,8 @@ const labelClass = "text-sm font-medium text-gray-700";
 
 const MAX_MEDIA_TOTAL = 5; // shared cap across photos + videos combined
 const MAX_VIDEO_SECONDS = 60;
+const MAX_VIDEO_MB = 21;
+const MAX_VIDEO_BYTES = MAX_VIDEO_MB * 1024 * 1024;
 
 /* ================= HELPERS =================
    data.images can hold a mix of shapes:
@@ -415,10 +417,14 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
         setMediaError("Only .mp4 videos are supported.");
         continue;
       }
+      if (file.size > MAX_VIDEO_BYTES) {
+        setMediaError(`Videos must be under ${MAX_VIDEO_SECONDS} seconds and under ${MAX_VIDEO_MB}MB.`);
+        continue;
+      }
       try {
         const duration = await getVideoDuration(file);
         if (duration > MAX_VIDEO_SECONDS) {
-          setMediaError("Videos must be under 60 seconds.");
+          setMediaError(`Videos must be under ${MAX_VIDEO_SECONDS} seconds and under ${MAX_VIDEO_MB}MB.`);
           continue;
         }
       } catch {
@@ -695,7 +701,9 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
         <div className="flex justify-between items-center pt-4">
           <div>
             <label className={labelClass}>Videos ({videoCount})</label>
-            <p className="text-xs text-gray-400">Must be .mp4 and under 60 seconds</p>
+            <p className="text-xs text-gray-400">
+              Must be .mp4, under 60 seconds, and under {MAX_VIDEO_MB}MB
+            </p>
             {mediaError && (
               <p className="mt-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                 {mediaError}
