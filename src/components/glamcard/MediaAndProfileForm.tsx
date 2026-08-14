@@ -289,7 +289,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
   const totalMediaCount = photoCount + videoCount;
 
   useEffect(() => {
-   
+
     const urls = images.map((item) => getImageUrl(item));
     setGalleryPreview(urls);
     return () => {
@@ -563,9 +563,8 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
         <div className="flex items-center gap-5">
           <div className="relative w-32 h-32">
             <div
-              className={`w-32 h-32 rounded-full border overflow-hidden bg-gray-50 flex items-center justify-center ${
-                errors?.profile_image ? "border-2 border-red-500" : ""
-              }`}
+              className={`w-32 h-32 rounded-full border overflow-hidden bg-gray-50 flex items-center justify-center ${errors?.profile_image ? "border-2 border-red-500" : ""
+                }`}
             >
               {profilePreview ? (
                 <img src={profilePreview} className="w-full h-full object-cover" />
@@ -577,9 +576,15 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
                 </span>
               )}
             </div>
-            <label className="absolute bottom-0 right-0 cursor-pointer bg-[#24bbcb] text-white p-2 rounded-full shadow hover:bg-[#24bbcb]">
-              ✎
-              <input type="file" hidden accept="image/*" onChange={handleProfileUpload} />
+            <label className="absolute bottom-1 right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-[#24bbcb] text-white shadow-md transition hover:bg-[#1faebe]">
+              <span className="text-sm leading-none">✎</span>
+
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleProfileUpload}
+              />
             </label>
           </div>
           <p className="text-sm text-gray-500">
@@ -614,9 +619,8 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
 
       <div id="field-images">
         <p
-          className={`text-xs pt-2 ${
-            errors?.images ? "text-red-500 font-medium" : "text-gray-500"
-          }`}
+          className={`text-xs pt-2 ${errors?.images ? "text-red-500 font-medium" : "text-gray-500"
+            }`}
         >
           Gallery media: {totalMediaCount}/{MAX_MEDIA_TOTAL} used (photos + videos combined)
         </p>
@@ -624,71 +628,65 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
           <p className="mt-1 text-sm text-red-500">{errors.images}</p>
         )}
 
-        {mediaError && (
-          <p className="mt-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-            {mediaError}
-          </p>
-        )}
+
 
         {/* PHOTOS SECTION */}
         <div
-          className={`space-y-4 pt-2 border-t ${
-            errors?.images ? "border-red-300" : "border-gray-100"
-          }`}
-        >
-        <div className="flex justify-between items-center pt-4">
-          <label className={labelClass}>Photos ({photoCount})</label>
-          <label
-            className={`rounded-lg px-4 py-2 text-white ${
-              totalMediaCount >= MAX_MEDIA_TOTAL
-                ? "bg-gray-300 cursor-not-allowed"
-                : "cursor-pointer bg-[#24bbcb] hover:bg-[#24bbcb]"
+          className={`space-y-4 pt-2 border-t ${errors?.images ? "border-red-300" : "border-gray-100"
             }`}
-          >
-            + Upload Photos
-            <input
-              type="file"
-              hidden
-              multiple
-              accept="image/*"
-              disabled={totalMediaCount >= MAX_MEDIA_TOTAL}
-              onChange={handlePhotoUpload}
-            />
-          </label>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            type="url"
-            className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
-            placeholder="Or paste an image URL"
-            value={galleryUrlInput}
-            onChange={(e) => setGalleryUrlInput(e.target.value)}
-            disabled={totalMediaCount >= MAX_MEDIA_TOTAL}
-          />
-          <button
-            type="button"
-            onClick={handleGalleryUrlAdd}
-            disabled={
-              !galleryUrlInput.trim() ||
-              galleryUrlLoading ||
-              totalMediaCount >= MAX_MEDIA_TOTAL
-            }
-            className="rounded-lg bg-[#24bbcb] px-4 py-2 text-xs font-medium text-white hover:bg-[#24bbcb] disabled:bg-gray-300 disabled:cursor-not-allowed"
-          >
-            {galleryUrlLoading ? "Loading..." : "+ Add URL"}
-          </button>
-        </div>
-
-        {photoCount ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {gallery_meta.map((item, index) =>
-              !isVideoItem(images[index]) ? renderMediaCard(item, index, false) : null
-            )}
+        >
+          <div className="flex justify-between items-center pt-4">
+            <label className={labelClass}>Photos ({photoCount})</label>
+            <label
+              className={`rounded-lg px-4 py-2 text-white ${totalMediaCount >= MAX_MEDIA_TOTAL
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "cursor-pointer bg-[#24bbcb] hover:bg-[#24bbcb]"
+                }`}
+            >
+              + Upload Photos
+              <input
+                type="file"
+                hidden
+                multiple
+                accept="image/*"
+                disabled={totalMediaCount >= MAX_MEDIA_TOTAL}
+                onChange={handlePhotoUpload}
+              />
+            </label>
           </div>
-        ) : (
-          <p className="text-gray-400 text-sm">No photos uploaded</p>
-        )}
+
+          <div className="flex items-center gap-2">
+            <input
+              type="url"
+              className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+              placeholder="Or paste an image URL"
+              value={galleryUrlInput}
+              onChange={(e) => setGalleryUrlInput(e.target.value)}
+              disabled={totalMediaCount >= MAX_MEDIA_TOTAL}
+            />
+            <button
+              type="button"
+              onClick={handleGalleryUrlAdd}
+              disabled={
+                !galleryUrlInput.trim() ||
+                galleryUrlLoading ||
+                totalMediaCount >= MAX_MEDIA_TOTAL
+              }
+              className="rounded-lg bg-[#24bbcb] px-4 py-2 text-xs font-medium text-white hover:bg-[#24bbcb] disabled:bg-gray-300 disabled:cursor-not-allowed"
+            >
+              {galleryUrlLoading ? "Loading..." : "+ Add URL"}
+            </button>
+          </div>
+
+          {photoCount ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {gallery_meta.map((item, index) =>
+                !isVideoItem(images[index]) ? renderMediaCard(item, index, false) : null
+              )}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-sm">No photos uploaded</p>
+          )}
         </div>
       </div>
 
@@ -698,13 +696,17 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
           <div>
             <label className={labelClass}>Videos ({videoCount})</label>
             <p className="text-xs text-gray-400">Must be .mp4 and under 60 seconds</p>
+            {mediaError && (
+              <p className="mt-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                {mediaError}
+              </p>
+            )}
           </div>
           <label
-            className={`rounded-lg px-4 py-2 text-white ${
-              totalMediaCount >= MAX_MEDIA_TOTAL
+            className={`rounded-lg px-4 py-2 text-white ${totalMediaCount >= MAX_MEDIA_TOTAL
                 ? "bg-gray-300 cursor-not-allowed"
                 : "cursor-pointer bg-[#24bbcb] hover:bg-[#24bbcb]"
-            }`}
+              }`}
           >
             + Upload Videos
             <input

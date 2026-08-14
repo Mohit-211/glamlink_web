@@ -404,11 +404,11 @@ const GlamCardForm: React.FC<Props> = ({
         onSuccess?.(result?.data ?? result);
       } else {
         // New user -> straight to plan selection with the new card's id.
-        if (result?.data?.user_exists === false) {
-          const businessCardId = result?.data?.business_card_id;
-          router.push(`/pricing?businessCardId=${businessCardId}`);
-          return;
-        }
+        const businessCardId = result?.data?.business_card_id;
+        router.push(`/pricing?businessCardId=${businessCardId}`);
+        return;
+        // if (result?.data?.user_exists === false) {
+        // }
         // Existing user -> normal success popup -> dashboard.
         setPostSuccessAction("dashboard");
         setShowSuccess(true);
