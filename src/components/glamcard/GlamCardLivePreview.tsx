@@ -179,6 +179,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   const specialtiesArray = parseArray(data.specialties);
   console.log(specialtiesArray, "specialtiesArray");
   const importantInfoArray = parseArray(data.important_info);
+  console.log(importantInfoArray,"importantInfoArray")
   /* ================= PROFILE IMAGE ================= */
   const profileImageUrl = useMemo(() => {
     if (!data?.profile_image) return "";
@@ -757,11 +758,11 @@ const GlamCardLivePreview: React.FC<Props> = ({
                                   📞 {data.phone || data.phone}
                                 </p>
                               )}
-                            {selectedLocation.description && (
+                            {/* {selectedLocation.description && (
                               <p className="text-xs text-gray-500 italic">
                                 {selectedLocation.description}
                               </p>
-                            )}
+                            )} */}
                           </div>
                         )}
                         {mapSrc && (
@@ -855,12 +856,13 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   </div>
                 </div>
                 {/* SPECIALTIES desktop */}
+                   {specialtiesArray.length > 0 && 
                 <SectionBox title="Specialties" titleAlign="center">
                   <DotList
                     items={specialtiesArray}
                     placeholder="Your specialties will appear here"
                   />
-                </SectionBox>
+                </SectionBox>}
               </div>
             </div>
             {/* ===== MOBILE: STACKED SECTIONS ===== */}
@@ -1100,6 +1102,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
               )}
             </div>
             {/* ===== IMPORTANT INFO (shared) ===== */}
+            {importantInfoArray.length !==0 &&
             <div
               className="rounded-2xl p-[2px] mt-3"
               style={{
@@ -1130,6 +1133,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </div>
               </div>
             </div>
+            }
             {/* ===== PRESS & FEATURES ===== */}
             {otherLinks.filter((l: any) => l?.url).length > 0 && (
               <div
