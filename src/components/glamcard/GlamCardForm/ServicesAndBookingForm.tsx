@@ -158,6 +158,15 @@ const ServicesAndBookingForm: React.FC<Props> = ({
     }));
   };
 
+  const updateInfo = (index: number, value: string) => {
+    setData((prev) => ({
+      ...prev,
+      important_info: prev.important_info?.map((item, i) =>
+        i === index ? value : item
+      ),
+    }));
+  };
+
   /* ================= FORMATTERS ================= */
   const formatInstagram = (value: string) => {
     if (!value.trim()) return "";
@@ -166,12 +175,17 @@ const ServicesAndBookingForm: React.FC<Props> = ({
     return `https://www.instagram.com/${clean}`;
   };
 
-  const formatTikTok = (value: string) => {
+  const formatSocialLink = (value: string, domain: string) => {
     if (!value.trim()) return "";
     if (value.startsWith("http")) return value.trim();
     const clean = value.replace(/^@/, "").trim();
-    return `https://www.tiktok.com/@${clean}`;
+    return `https://${domain}/${clean}`;
   };
+
+  const formatTikTok = (value: string) => formatSocialLink(value, "www.tiktok.com");
+  const formatLinkedIn = (value: string) => formatSocialLink(value, "linkedin.com/in");
+  const formatYouTube = (value: string) => formatSocialLink(value, "youtube.com");
+  const formatFacebook = (value: string) => formatSocialLink(value, "facebook.com");
 
   /* ================= INSTAGRAM HANDLES ================= */
   const getHandles = (): string[] => {
@@ -207,14 +221,15 @@ const ServicesAndBookingForm: React.FC<Props> = ({
     }));
   };
 
- const updateInstagramHandle = (idx: number, value: string) => {
-  const key = idx === 0 ? "instagram" : `instagram${idx}`;
-  setData((prev) => ({
-    ...prev,
-    social_media: { ...prev.social_media, [key]: value },
-  }));
-  if (idx === 0) clearError?.("instagram");
-};
+  const updateInstagramHandle = (idx: number, value: string) => {
+    const key = idx === 0 ? "instagram" : `instagram${idx}`;
+    setData((prev) => ({
+      ...prev,
+      social_media: { ...prev.social_media, [key]: formatInstagram(value) },
+    }));
+    if (idx === 0) clearError?.("instagram");
+  };
+
   const removeInstagramHandle = (idx: number) => {
     setData((prev) => {
       const sm = { ...(prev.social_media as any) };
@@ -429,106 +444,115 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               </button>
             </div>
             <div className="space-y-2">
-          {getHandles().map((value, idx) => (
-  <div key={idx} className="flex items-center gap-2">
-    <span className="text-xs text-gray-400 w-24 shrink-0">
-      {idx === 0 ? "Instagram" : `Instagram ${idx}`}
-    </span>
-    <input
-      className={`${inputClass} flex-1 ${idx === 0 && errors?.instagram ? errorInputClass : ""}`}
-      placeholder="Enter URL"
-      value={value}
-      required={
-        idx === 0 &&
-        !!data.preferred_booking_methods?.includes(
-          BOOKING_METHODS.INSTAGRAM
-        )
-      }
-      onChange={(e) => updateInstagramHandle(idx, e.target.value)}
-    />
-    {getHandles().length > 1 && (
-      <button
-        type="button"
-        onClick={() => removeInstagramHandle(idx)}
-        className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 hover:bg-red-100"
-      >
-        ×
-      </button>
-    )}
-  </div>
-))}
+              {getHandles().map((value, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400 w-24 shrink-0">
+                    {idx === 0 ? "Instagram" : `Instagram ${idx}`}
+                  </span>
+                  <input
+                    className={`${inputClass} flex-1 ${idx === 0 && errors?.instagram ? errorInputClass : ""}`}
+                    placeholder="@yourusername or full URL"
+                    value={value}
+                    required={
+                      idx === 0 &&
+                      !!data.preferred_booking_methods?.includes(
+                        BOOKING_METHODS.INSTAGRAM
+                      )
+                    }
+                    onChange={(e) => updateInstagramHandle(idx, e.target.value)}
+                  />
+                  {getHandles().length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeInstagramHandle(idx)}
+                      className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 hover:bg-red-100"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
             {errors?.instagram && (
               <p className="mt-1 text-sm text-red-500">{errors.instagram}</p>
             )}
           </div>
-{/* TikTok */}
-<div>
-  <label className={labelClass}>TikTok</label>
-  <input
-    type="url"
-    className={inputClass}
-    placeholder="Enter URL"
-    value={data.social_media?.tiktok || ""}
-    onChange={(e) =>
-      setData((prev) => ({
-        ...prev,
-        social_media: { ...prev.social_media, tiktok: e.target.value },
-      }))
-    }
-  />
-</div>
 
-{/* LinkedIn */}
-<div>
-  <label className={labelClass}>LinkedIn</label>
-  <input
-    type="url"
-    className={inputClass}
-    placeholder="Enter URL"
-    value={data.social_media?.linkedin || ""}
-    onChange={(e) =>
-      setData((prev) => ({
-        ...prev,
-        social_media: { ...prev.social_media, linkedin: e.target.value },
-      }))
-    }
-  />
-</div>
+          {/* TikTok */}
+          <div>
+            <label className={labelClass}>TikTok</label>
+            <input
+              className={inputClass}
+              placeholder="@yourusername or full URL"
+              value={data.social_media?.tiktok || ""}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  social_media: {
+                    ...prev.social_media,
+                    tiktok: formatTikTok(e.target.value),
+                  },
+                }))
+              }
+            />
+          </div>
 
-{/* YouTube */}
-<div>
-  <label className={labelClass}>YouTube</label>
-  <input
-    type="url"
-    className={inputClass}
-    placeholder="Enter URL"
-    value={data.social_media?.youtube || ""}
-    onChange={(e) =>
-      setData((prev) => ({
-        ...prev,
-        social_media: { ...prev.social_media, youtube: e.target.value },
-      }))
-    }
-  />
-</div>
+          {/* LinkedIn */}
+          <div>
+            <label className={labelClass}>LinkedIn</label>
+            <input
+              className={inputClass}
+              placeholder="@yourprofile or full URL"
+              value={data.social_media?.linkedin || ""}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  social_media: {
+                    ...prev.social_media,
+                    linkedin: formatLinkedIn(e.target.value),
+                  },
+                }))
+              }
+            />
+          </div>
 
-{/* Facebook */}
-<div>
-  <label className={labelClass}>Facebook</label>
-  <input
-    type="url"
-    className={inputClass}
-    placeholder="Enter URL"
-    value={data.social_media?.facebook || ""}
-    onChange={(e) =>
-      setData((prev) => ({
-        ...prev,
-        social_media: { ...prev.social_media, facebook: e.target.value },
-      }))
-    }
-  />
-</div>
+          {/* YouTube */}
+          <div>
+            <label className={labelClass}>YouTube</label>
+            <input
+              className={inputClass}
+              placeholder="@yourchannel or full URL"
+              value={data.social_media?.youtube || ""}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  social_media: {
+                    ...prev.social_media,
+                    youtube: formatYouTube(e.target.value),
+                  },
+                }))
+              }
+            />
+          </div>
+
+          {/* Facebook */}
+          <div>
+            <label className={labelClass}>Facebook</label>
+            <input
+              className={inputClass}
+              placeholder="@yourpage or full URL"
+              value={data.social_media?.facebook || ""}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  social_media: {
+                    ...prev.social_media,
+                    facebook: formatFacebook(e.target.value),
+                  },
+                }))
+              }
+            />
+          </div>
         </div>
 
         {/* Press / Articles / Other Links */}
@@ -676,9 +700,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             {data.important_info?.map((item, i) => (
               <div key={i} className="flex items-center gap-2">
                 <input
-                  className={`${inputClass} bg-gray-50`}
+                  className={inputClass}
                   value={item}
-                  disabled
+                  onChange={(e) => updateInfo(i, e.target.value)}
                 />
                 <button
                   type="button"
@@ -697,6 +721,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             placeholder="e.g. By appointment only • Cash/Card accepted"
             value={infoInput}
             onChange={(e) => setInfoInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addInfo();
+              }
+            }}
           />
           <button
             type="button"

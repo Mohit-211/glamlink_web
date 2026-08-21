@@ -72,7 +72,7 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     preferred_booking_methods: [],
     booking_link: "",
     important_info: [
-      "Add your important information here.",
+      
     ],
     /* ================= BUSINESS HOURS ================= */
     business_hour: [],

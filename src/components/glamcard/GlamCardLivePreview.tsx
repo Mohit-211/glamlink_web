@@ -20,7 +20,6 @@ import {
   Clock,
 } from "lucide-react";
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
-
 /* ================= VCF GENERATOR ================= */
 export function generateVCF(data: GlamCardFormData) {
   return [
@@ -49,7 +48,6 @@ function downloadVCF(data: GlamCardFormData) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-
 /* ================= TYPES ================= */
 interface Props {
   data: GlamCardFormData;
@@ -59,7 +57,6 @@ interface Props {
   onDownload?: () => void;
   onCopyLink?: () => void;
 }
-
 /* ================= REUSABLE SECTION BOX ================= */
 const SectionBox: React.FC<{
   title: string;
@@ -77,7 +74,6 @@ const SectionBox: React.FC<{
         background: "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
         boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
       }}
-
     >
       {titleAlign === "center" ? (
         <div className="flex items-center gap-2 mb-3">
@@ -100,12 +96,10 @@ const SectionBox: React.FC<{
       )}
       <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm" style={{
         boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
       }}>{children}</div>
     </div>
   </div>
 );
-
 /* ================= HELPERS ================= */
 const formatTime = (time: string) => {
   if (!time) return "";
@@ -115,7 +109,6 @@ const formatTime = (time: string) => {
   const formattedHour = hour % 12 || 12;
   return `${formattedHour}:${m} ${ampm}`;
 };
-
 const parseArray = (value: string | string[] | undefined): string[] => {
   if (!value) return [];
   if (Array.isArray(value)) return value;
@@ -127,9 +120,7 @@ const parseArray = (value: string | string[] | undefined): string[] => {
   }
   return [];
 };
-
 const isFile = (v: any): v is File => v instanceof File;
-
 /* ================= TEAL DOT BULLET LIST ================= */
 const DotList: React.FC<{ items: any[]; placeholder: string }> = ({
   items,
@@ -150,7 +141,22 @@ const DotList: React.FC<{ items: any[]; placeholder: string }> = ({
     )}
   </ul>
 );
-
+/* ================= BLACK PILL TAG LIST ================= */
+const TagList: React.FC<{ items: any[] }> = ({ items }) => {
+  const display = items.length ? items : [""];
+  return (
+    <div className="flex flex-wrap gap-2">
+      {display.map((item, i) => (
+        <span
+          key={i}
+          className="rounded-full px-3 py-1.5 text-xs font-medium text-black min-w-[2.5rem] min-h-[1.5rem]"
+        >
+          {typeof item === "string" ? item : item?.note || item?.text || ""}
+        </span>
+      ))}
+    </div>
+  );
+};
 /* ================= COMPONENT ================= */
 const GlamCardLivePreview: React.FC<Props> = ({
   data,
@@ -161,7 +167,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   onCopyLink,
 }) => {
   if (!data) return null;
-console.log(data,"datata")
+  console.log(data, "datata")
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(0);
@@ -170,11 +176,9 @@ console.log(data,"datata")
   );
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-
   const specialtiesArray = parseArray(data.specialties);
   console.log(specialtiesArray, "specialtiesArray");
   const importantInfoArray = parseArray(data.important_info);
-
   /* ================= PROFILE IMAGE ================= */
   const profileImageUrl = useMemo(() => {
     if (!data?.profile_image) return "";
@@ -183,14 +187,12 @@ console.log(data,"datata")
     if (typeof data.profile_image === "string") return data.profile_image;
     return "";
   }, [data?.profile_image, mode]);
-
   useEffect(() => {
     return () => {
       if (profileImageUrl?.startsWith("blob:"))
         URL.revokeObjectURL(profileImageUrl);
     };
   }, [profileImageUrl]);
-
   /* ================= IMAGE NORMALIZATION ================= */
   const normalizedImages = useMemo(() => {
     const rawImages = data?.images || [];
@@ -221,7 +223,6 @@ console.log(data,"datata")
       };
     });
   }, [data?.images]);
-
   /* ================= DEDUPLICATE ================= */
   const deduplicatedImages = useMemo(() => {
     const properVideoUrls = new Set(
@@ -238,9 +239,7 @@ console.log(data,"datata")
         ),
     );
   }, [normalizedImages]);
-
   const galleryMeta = data?.gallery_meta || [];
-
   /* ================= GALLERY PREVIEWS ================= */
   const galleryPreviews = useMemo(
     () =>
@@ -252,7 +251,6 @@ console.log(data,"datata")
         : normalizedImages?.map((item) => item.url),
     [mode, normalizedImages, data?.images],
   );
-
   /* ================= THUMBNAIL PREVIEWS ================= */
   const thumbnailPreviews = useMemo(
     () =>
@@ -267,7 +265,6 @@ console.log(data,"datata")
       }),
     [normalizedImages, galleryMeta, galleryPreviews],
   );
-
   useEffect(() => {
     if (mode !== "live") return;
     return () => {
@@ -279,7 +276,6 @@ console.log(data,"datata")
       });
     };
   }, [galleryPreviews, thumbnailPreviews, mode]);
-
   /* ================= THUMBNAIL INDEX ================= */
   useEffect(() => {
     if (!normalizedImages.length) {
@@ -291,23 +287,19 @@ console.log(data,"datata")
       setThumbnailIndex(metaIndex !== -1 ? metaIndex : 0);
     }
   }, [normalizedImages, galleryMeta, thumbnailIndex]);
-
   const otherIndexes = useMemo(
     () => normalizedImages?.map((_, i) => i),
     [normalizedImages],
   );
-
   /* ================= LOCATION ================= */
   const primaryLocation = useMemo(
     () => data.locations?.find((l: any) => l.is_primary) || data.locations?.[0],
     [data.locations],
   );
-
   useEffect(() => {
     if (!selectedLocationId && primaryLocation?.id)
       setSelectedLocationId(String(primaryLocation.id));
   }, [primaryLocation?.id, selectedLocationId]);
-
   const selectedLocation = useMemo(() => {
     if (!data.locations?.length) return null;
     return (
@@ -315,7 +307,6 @@ console.log(data,"datata")
       primaryLocation
     );
   }, [data.locations, selectedLocationId, primaryLocation]);
-
   /* ================= MAP SRC ================= */
   const mapQuery = useMemo(() => {
     if (!selectedLocation) return "";
@@ -331,12 +322,10 @@ console.log(data,"datata")
         .join(", ") || ""
     );
   }, [selectedLocation]);
-
   const mapZoom = selectedLocation?.location_type === "exact_address" ? 15 : 12;
   const mapSrc = mapQuery
     ? `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=${mapZoom}&output=embed`
     : "";
-
   /* ================= SOCIAL MEDIA ================= */
   const socialMedia = useMemo(() => {
     if (!data?.social_media) return {};
@@ -349,7 +338,6 @@ console.log(data,"datata")
     }
     return data.social_media;
   }, [data.social_media]);
-
   /* ================= ALL INSTAGRAM HANDLES ================= */
   const allInstagramHandles = useMemo(() => {
     const handles: { key: string; url: string }[] = [];
@@ -362,7 +350,6 @@ console.log(data,"datata")
     }
     return handles;
   }, [socialMedia]);
-
   /* ================= OTHER LINKS ================= */
   const otherLinks = useMemo(() => {
     if (!data?.other_links) return [];
@@ -375,7 +362,6 @@ console.log(data,"datata")
     }
     return Array.isArray(data.other_links) ? data.other_links : [];
   }, [data.other_links]);
-
   /* ================= PREFERRED BOOKING METHODS ================= */
   const preferredBookingMethods = useMemo(() => {
     const val = (data as any)?.preferred_booking_method;
@@ -392,7 +378,6 @@ console.log(data,"datata")
     }
     return [];
   }, [(data as any)?.preferred_booking_method]);
-
   const handleCopyLink = async () => {
     const link = data?.business_card_qr;
     try {
@@ -403,7 +388,6 @@ console.log(data,"datata")
       console.error("Failed to copy link:", error);
     }
   };
-
   const handleShare = async () => {
     const link = data?.business_card_link;
     if (!link) return;
@@ -420,7 +404,6 @@ console.log(data,"datata")
       handleCopyLink();
     }
   };
-
   /* ================= SOCIAL ICONS LIST ================= */
   const hasSocials =
     data?.website ||
@@ -429,7 +412,6 @@ console.log(data,"datata")
     socialMedia?.linkedin ||
     socialMedia?.youtube ||
     socialMedia?.tiktok;
-
   /* ================= RENDER ================= */
   const socialIconStyle = {
     boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
@@ -472,7 +454,6 @@ console.log(data,"datata")
           </div>
         </div>
       )}
-
       <div className="px-3 py-4 sm:px-5 sm:py-6 lg:p-6 flex flex-col items-center">
         <div
           className="w-full max-w-lg lg:max-w-3xl p-[2px] rounded-2xl"
@@ -488,7 +469,6 @@ console.log(data,"datata")
             >
               <Image src={Logo} alt="access image" width={160} height={160} />
             </div>
-
             {/* ===== DESKTOP TOP ACTIONS ===== */}
             {mode === "view" && (
               <div className="hidden lg:flex justify-end gap-2 mb-3">
@@ -519,7 +499,6 @@ console.log(data,"datata")
                 </button>
               </div>
             )}
-
             {/* ===== MOBILE HERO: PROFILE CARD ===== */}
             <div className="lg:hidden mb-4">
               <div
@@ -534,7 +513,6 @@ console.log(data,"datata")
                   <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white translate-x-8 -translate-y-8" />
                   <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white -translate-x-6 translate-y-6" />
                 </div>
-
                 <div className="flex items-center gap-4 p-4">
                   {/* avatar */}
                   <div className="w-28 h-28 rounded-full overflow-hidden bg-white/20 border-2 border-white shadow-lg flex-shrink-0">
@@ -571,7 +549,6 @@ console.log(data,"datata")
                 </div>
               </div>
             </div>
-
             {/* ===== DESKTOP / TABLET TWO-COL ===== */}
             <div className="hidden lg:grid lg:grid-cols-2 gap-5">
               {/* ---- LEFT COLUMN ---- */}
@@ -613,11 +590,10 @@ console.log(data,"datata")
                     />
                   )}
                 </SectionBox>
-
-       <SectionBox title="Gallery" titleAlign="center">
+                <SectionBox title="Gallery" titleAlign="center">
                   {normalizedImages.length > 0 && thumbnailIndex !== null ? (
                     <>
-                  <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
+                      <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
                         {normalizedImages[thumbnailIndex]?.file_type ===
                           "video" ? (
                           <video
@@ -643,12 +619,10 @@ console.log(data,"datata")
                             }
                             className="h-full w-full object-cover transition hover:scale-105 duration-300" style={{
                               boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
                             }}
                             alt="Featured work"
                           />
                         )}
-
                         {normalizedImages.length > 1 && (
                           <>
                             <button
@@ -689,7 +663,6 @@ console.log(data,"datata")
                               onClick={() => setThumbnailIndex(index)}
                               className={`h-12 w-16 aspect-[4/3] cursor-pointer overflow-hidden rounded-lg border shadow-sm flex-shrink-0 ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}`} style={{
                                 boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
                               }}
                             >
                               <img
@@ -709,9 +682,8 @@ console.log(data,"datata")
                   )}
                 </SectionBox>
               </div>
-
               {/* ---- RIGHT COLUMN ---- */}
-             <div className="flex flex-col gap-5">
+              <div className="flex flex-col gap-5">
                 {/* LOCATION + HOURS desktop */}
                 <div
                   className="rounded-2xl p-[2px]"
@@ -725,7 +697,6 @@ console.log(data,"datata")
                       background:
                         "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
                       boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
                     }}
                   >
                     {data.locations?.length ? (
@@ -749,7 +720,7 @@ console.log(data,"datata")
                           <div className="text-sm mb-3 space-y-1">
                             {data.locations.length === 1 &&
                               selectedLocation.label && (
-                                     <p className="font-semibold text-gray-800">
+                                <p className="font-semibold text-gray-800">
                                   {selectedLocation.label}
                                 </p>
                               )}
@@ -758,28 +729,28 @@ console.log(data,"datata")
                                 {selectedLocation.business_name}
                               </p>
                             )} */}
-                        {(selectedLocation.location_type === "exact_address"
-  ? selectedLocation.address?.trim()
-  : [
-      selectedLocation.city?.trim(),
-      selectedLocation.state?.trim(),
-      selectedLocation.area?.trim(),
-    ]
-      .filter(Boolean)
-      .join(", ")
-) && (
-  <p className="text-gray-600 leading-relaxed">
-    {selectedLocation.location_type === "exact_address"
-      ? selectedLocation.address?.trim()
-      : [
-          selectedLocation.city?.trim(),
-          selectedLocation.state?.trim(),
-          selectedLocation.area?.trim(),
-        ]
-          .filter(Boolean)
-          .join(", ")}
-  </p>
-)}
+                            {(selectedLocation.location_type === "exact_address"
+                              ? selectedLocation.address?.trim()
+                              : [
+                                selectedLocation.city?.trim(),
+                                selectedLocation.state?.trim(),
+                                selectedLocation.area?.trim(),
+                              ]
+                                .filter(Boolean)
+                                .join(", ")
+                            ) && (
+                                <p className="text-gray-600 leading-relaxed">
+                                  {selectedLocation.location_type === "exact_address"
+                                    ? selectedLocation.address?.trim()
+                                    : [
+                                      selectedLocation.city?.trim(),
+                                      selectedLocation.state?.trim(),
+                                      selectedLocation.area?.trim(),
+                                    ]
+                                      .filter(Boolean)
+                                      .join(", ")}
+                                </p>
+                              )}
                             {(data.phone) &&
                               data.is_phone_visible && (
                                 <p className="text-gray-600">
@@ -793,43 +764,42 @@ console.log(data,"datata")
                             )}
                           </div>
                         )}
-                       {mapSrc && (
-  <div className="relative rounded-xl overflow-hidden shadow-sm" style={{
-    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-  }}>
-    <iframe
-      title="Business Location Map"
-      className="w-full h-48 sm:h-52"
-      style={{ border: 0, display: "block" }}
-      loading="lazy"
-      allowFullScreen
-      referrerPolicy="no-referrer-when-downgrade"
-      src={mapSrc}
-    />
-    <a
-      href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 text-sm whitespace-nowrap" style={{boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)"}}
-    >
-      <svg
-        className="w-4 h-4"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-      >
-        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-      </svg>
-      Get Directions
-    </a>
-  </div>
-)}
+                        {mapSrc && (
+                          <div className="relative rounded-xl overflow-hidden shadow-sm" style={{
+                            boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                          }}>
+                            <iframe
+                              title="Business Location Map"
+                              className="w-full h-48 sm:h-52"
+                              style={{ border: 0, display: "block" }}
+                              loading="lazy"
+                              allowFullScreen
+                              referrerPolicy="no-referrer-when-downgrade"
+                              src={mapSrc}
+                            />
+                            <a
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 text-sm whitespace-nowrap" style={{ boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)" }}
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                              >
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                              </svg>
+                              Get Directions
+                            </a>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <p className="text-xs text-gray-400 italic">
                         Location details will appear here once set
                       </p>
                     )}
-
                     {/* BUSINESS HOURS desktop */}
                     <div>
                       <div className="flex items-center gap-2 mb-3 mt-3">
@@ -841,7 +811,6 @@ console.log(data,"datata")
                       </div>
                       <div className="rounded-xl bg-white p-4 shadow-sm" style={{
                         boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
                       }}>
                         {data.business_hour.length !== 0 ? (
                           <ul className="space-y-1.5 text-sm">
@@ -885,7 +854,6 @@ console.log(data,"datata")
                     </div>
                   </div>
                 </div>
-
                 {/* SPECIALTIES desktop */}
                 <SectionBox title="Specialties" titleAlign="center">
                   <DotList
@@ -895,7 +863,6 @@ console.log(data,"datata")
                 </SectionBox>
               </div>
             </div>
-
             {/* ===== MOBILE: STACKED SECTIONS ===== */}
             <div className="lg:hidden flex flex-col gap-3">
               {/* BIO */}
@@ -910,7 +877,6 @@ console.log(data,"datata")
                   />
                 </SectionBox>
               )}
-
               {normalizedImages.length > 0 && thumbnailIndex !== null && (
                 <SectionBox title="Gallery" titleAlign="center">
                   <div className=" aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 shadow-sm">
@@ -940,7 +906,6 @@ console.log(data,"datata")
                         alt="Featured work"
                       />
                     )}
-
                     {/* prev / next arrows */}
                     {normalizedImages.length > 1 && (
                       <>
@@ -980,7 +945,6 @@ console.log(data,"datata")
                       </>
                     )}
                   </div>
-
                   {/* thumbnail strip */}
                   {normalizedImages.length > 1 && (
                     <div className="mt-2 flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory scrollbar-none">
@@ -1001,7 +965,6 @@ console.log(data,"datata")
                   )}
                 </SectionBox>
               )}
-
               {/* LOCATION */}
               {data.locations?.length > 0 && (
                 <SectionBox
@@ -1083,7 +1046,6 @@ console.log(data,"datata")
                   )}
                 </SectionBox>
               )}
-
               {/* BUSINESS HOURS mobile */}
               <SectionBox
                 title="Business Hours"
@@ -1127,7 +1089,6 @@ console.log(data,"datata")
                   </ul>
                 )}
               </SectionBox>
-
               {/* SPECIALTIES mobile */}
               {specialtiesArray.length > 0 && (
                 <SectionBox title="Specialties" titleAlign="center">
@@ -1138,43 +1099,37 @@ console.log(data,"datata")
                 </SectionBox>
               )}
             </div>
-
             {/* ===== IMPORTANT INFO (shared) ===== */}
-            {importantInfoArray.length > 0 && (
+            <div
+              className="rounded-2xl p-[2px] mt-3"
+              style={{
+                background: "linear-gradient(135deg, #23B9CD33, #a8edea55)",
+              }}
+            >
               <div
-                className="rounded-2xl p-[2px] mt-3"
+                className="rounded-2xl p-3 sm:p-4"
                 style={{
-                  background: "linear-gradient(135deg, #23B9CD33, #a8edea55)",
-
+                  background:
+                    "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
+                  boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
                 }}
               >
-                <div
-                  className="rounded-2xl p-3 sm:p-4"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
-                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-                  }}
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="flex-1 h-px bg-gray-400/60" />
-                    <p className="text-xs font-bold tracking-wider text-gray-700 uppercase whitespace-nowrap">
-                      Important Info
-                    </p>
-                    <span className="flex-1 h-px bg-gray-400/60" />
-                  </div>
-                  <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm" style={{
-                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-                  }}>
-                    <DotList
-                      items={importantInfoArray}
-                      placeholder="Important information will appear here"
-                    />
-                  </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="flex-1 h-px bg-gray-400/60" />
+                  <p className="text-xs font-bold tracking-wider text-gray-700 uppercase whitespace-nowrap">
+                    Important Info
+                  </p>
+                  <span className="flex-1 h-px bg-gray-400/60" />
+                </div>
+                <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm" style={{
+                  boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                }}>
+                  <DotList items={importantInfoArray}
+                    placeholder=""
+                  />
                 </div>
               </div>
-            )}
-
+            </div>
             {/* ===== PRESS & FEATURES ===== */}
             {otherLinks.filter((l: any) => l?.url).length > 0 && (
               <div
@@ -1200,7 +1155,6 @@ console.log(data,"datata")
                   </div>
                   <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm space-y-2" style={{
                     boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
                   }}>
                     {otherLinks
                       .filter((link: any) => link?.url)
@@ -1227,7 +1181,6 @@ console.log(data,"datata")
                 </div>
               </div>
             )}
-
             {/* ===== CONNECT BUTTON ===== */}
             <div className="flex items-center gap-3 mt-5">
               <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent to-teal-400" />
@@ -1255,11 +1208,8 @@ console.log(data,"datata")
               </button>
               <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent to-teal-400" />
             </div>
-
             {/* ===== SOCIAL ICONS ===== */}
             <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
-
-
               <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
                 {data?.website && (
                   <a
@@ -1273,7 +1223,6 @@ console.log(data,"datata")
                     <Globe className="w-5 h-5 text-gray-500 hover:text-teal-600 transition-colors duration-300" />
                   </a>
                 )}
-
                 {allInstagramHandles.map(({ key, url }) => (
                   <a
                     key={key}
@@ -1287,7 +1236,6 @@ console.log(data,"datata")
                     <Instagram className="w-5 h-5 text-gray-500 hover:text-pink-600 transition-colors duration-300" />
                   </a>
                 ))}
-
                 {socialMedia?.facebook && (
                   <a
                     href={socialMedia.facebook}
@@ -1300,7 +1248,6 @@ console.log(data,"datata")
                     <Facebook className="w-5 h-5 text-gray-500 hover:text-blue-600 transition-colors duration-300" />
                   </a>
                 )}
-
                 {socialMedia?.linkedin && (
                   <a
                     href={socialMedia.linkedin}
@@ -1313,7 +1260,6 @@ console.log(data,"datata")
                     <Linkedin className="w-5 h-5 text-gray-500 hover:text-blue-700 transition-colors duration-300" />
                   </a>
                 )}
-
                 {socialMedia?.youtube && (
                   <a
                     href={socialMedia.youtube}
@@ -1326,7 +1272,6 @@ console.log(data,"datata")
                     <Youtube className="w-5 h-5 text-gray-500 hover:text-red-600 transition-colors duration-300" />
                   </a>
                 )}
-
                 {socialMedia?.tiktok && (
                   <a
                     href={socialMedia.tiktok}
@@ -1339,13 +1284,11 @@ console.log(data,"datata")
                     <Music2 className="w-5 h-5 text-gray-500 hover:text-black transition-colors duration-300" />
                   </a>
                 )}
-
               </div>
             </div>
           </div>
         </div>
       </div>
-
       {/* ===== BOOKING MODAL ===== */}
       {isBookingModalOpen && (
         <div
@@ -1383,7 +1326,7 @@ console.log(data,"datata")
                   className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.booking_link ? "border-gray-200 hover:bg-gray-50" : "border-gray-200 opacity-50 cursor-not-allowed"}`}
                 >
                   <div className="w-10 h-10 rounded-full bg-[#24bbcb] flex items-center justify-center flex-shrink-0 text-lg">
-                   🔗
+                    🔗
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-800">
@@ -1433,7 +1376,7 @@ console.log(data,"datata")
                       className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors active:scale-[0.98]"
                     >
                       <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0 text-lg">
-                    📸
+                        📸
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-gray-800">
@@ -1463,14 +1406,12 @@ console.log(data,"datata")
           </div>
         </div>
       )}
-
       {/* ===== DOWNLOAD MODAL ===== */}
       <GlamCardDownloadModal
         isOpen={isDownloadModalOpen}
         onClose={() => setIsDownloadModalOpen(false)}
         datadownload={data}
       />
-
       {/* ===== QR CODE MODAL ===== */}
       {isQrModalOpen && (
         <div
@@ -1537,5 +1478,4 @@ console.log(data,"datata")
     </div>
   );
 };
-
 export default GlamCardLivePreview;
