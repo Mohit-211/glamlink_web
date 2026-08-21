@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import GuestModal from "./GuestModal";
 import NotifySection from "./Notifysection";
 import UpcomingSchedule from "./UpcomingSchedule";
@@ -27,6 +28,27 @@ const PLACEHOLDER_PALETTE = [
   { bg: "linear-gradient(135deg,#faf0ee 0%,#f0dbd7 100%)", text: "#c47a6e" },
   { bg: "linear-gradient(135deg,#eef5e8 0%,#d8eccc 100%)", text: "#6da855" },
 ];
+
+// ─── Slug helpers ─────────────────────────────────────────────────────────────
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/** Builds a readable, unique URL slug: title-based text + the YouTube video ID. */
+function getVideoSlug(video: Video): string {
+  const base = slugify(video.title);
+  return base ? `${base}` : video.id;
+}
+
+/** Pulls the trailing YouTube video ID (11 chars) back out of a slug, as a fallback. */
+function extractIdFromSlug(slug: string): string {
+  const match = slug.match(/([a-zA-Z0-9_-]{11})$/);
+  return match ? match[1] : slug;
+}
 
 const YouTubeIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: "16px", height: "16px" }}>
@@ -97,7 +119,7 @@ function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        style={{ position: "relative", width: "100%", maxWidth: "900px" }}
+        style={{ position: "relative", width: "100%", maxWidth: "1030px" ,marginTop:"20px"}}
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -278,12 +300,6 @@ function EpisodeCard({
 
 // ─── Listen On Card ───────────────────────────────────────────────────────────
 function ListenOnCard() {
-  const platforms = [
-    { href: YOUTUBE_PLAYLIST_URL, label: "YouTube", icon: <YouTubeIcon />, color: "#ff0000", bg: "#fff1f1" },
-    { href: SPOTIFY_URL, label: "Spotify", icon: <SpotifyIcon />, color: "#1DB954", bg: "#f0faf4" },
-    { href: APPLE_PODCASTS_URL, label: "Apple Podcasts", icon: <ApplePodcastsIcon />, color: "#9B59B6", bg: "#f7f0fc" },
-  ];
-
   return (
     <div style={{ borderRadius: "16px", overflow: "hidden", background: "white", border: "1px solid hsl(204 14% 88%)", boxShadow: "0 2px 12px -4px rgba(0,0,0,0.06)" }}>
       <div style={{ padding: "20px" }}>
@@ -291,32 +307,6 @@ function ListenOnCard() {
           Listen On
         </p>
         <p style={{ fontSize: "12px", marginBottom: "16px", color: "hsl(210 12% 55%)" }}>Available on all major platforms</p>
-        {/* <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {platforms.map(({ href, label, icon, color, bg }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "flex", alignItems: "center", gap: "12px",
-                padding: "10px 14px", borderRadius: "12px", fontSize: "13px", fontWeight: 500,
-                color: "hsl(210 30% 10%)", border: "1px solid hsl(204 14% 90%)",
-                background: "hsl(204 18% 98%)", textDecoration: "none", transition: "all 0.2s",
-              }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = bg; el.style.borderColor = color + "40"; el.style.transform = "translateY(-1px)"; }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = "hsl(204 18% 98%)"; el.style.borderColor = "hsl(204 14% 90%)"; el.style.transform = "none"; }}
-            >
-              <span style={{ width: "32px", height: "32px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, background: bg, color }}>
-                {icon}
-              </span>
-              {label}
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: "12px", height: "12px", marginLeft: "auto", opacity: 0.25 }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-              </svg>
-            </a>
-          ))}
-        </div> */}
       </div>
     </div>
   );
@@ -349,7 +339,9 @@ function StatsBar({ episodeCount }: { episodeCount: number }) {
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
-export default function PodcastMain() {
+export default function PodcastMain({ initialSlug }: { initialSlug?: string } = {}) {
+  console.log(initialSlug, "initialSlug")
+  const router = useRouter();
   const [videos, setVideos] = useState<Video[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -366,6 +358,28 @@ export default function PodcastMain() {
   const finalVideos = videos.length > 0 ? videos : FALLBACK_EPISODES;
   const episodeCount = totalCount > 0 ? totalCount : FALLBACK_EPISODES.length;
   const displayedVideos = filter === "recent" ? finalVideos.slice(0, 6) : finalVideos;
+
+  // Open the modal for a video passed via the /podcast/{slug} URL once episodes are loaded.
+  useEffect(() => {
+    if (!initialSlug || loading) return;
+    const match = finalVideos.find((v) => getVideoSlug(v) === initialSlug);
+    if (match) {
+      setActiveVideo(match);
+    } else {
+      // Fallback: slug didn't match any known video (e.g. deep link to a video
+      // not in the current playlist window) — try to recover the raw YouTube ID.
+      setActiveVideo({ id: extractIdFromSlug(initialSlug), title: "", thumbnail: "", publishedAt: "" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSlug, loading]);
+
+  const playVideo = (video: Video) => {
+    router.push(`/podcast/${getVideoSlug(video)}`);
+  };
+
+  const closeVideo = () => {
+    router.push("/podcast");
+  };
 
   return (
     <main style={{ minHeight: "100vh", color: "hsl(210 30% 10%)", background: "hsl(204 20% 96%)", fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif" }}>
@@ -505,7 +519,7 @@ export default function PodcastMain() {
                     index={i}
                     episodeNumber={episodeCount - i}
                     placeholderStyle={PLACEHOLDER_PALETTE[i % PLACEHOLDER_PALETTE.length]}
-                    onPlay={setActiveVideo}
+                    onPlay={playVideo}
                   />
                 ))}
               </div>
@@ -601,7 +615,7 @@ export default function PodcastMain() {
       </section>
 
       {/* Modals */}
-      {activeVideo && <VideoModal video={activeVideo} onClose={() => setActiveVideo(null)} />}
+      {activeVideo && <VideoModal video={activeVideo} onClose={closeVideo} />}
       {guestModalOpen && <GuestModal open={guestModalOpen} onClose={() => setGuestModalOpen(false)} />}
     </main>
   );

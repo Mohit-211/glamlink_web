@@ -6,7 +6,7 @@ import PodcastMain from "@/components/Podcast/PodcastPage";
 const PodcastPage = () => {
   return (
     <div>
-    <PodcastMain/>
+      <PodcastMain />
       <ConditionalGetFeatured />
     </div>
   );
