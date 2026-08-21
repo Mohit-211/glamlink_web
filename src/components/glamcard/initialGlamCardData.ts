@@ -78,19 +78,7 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     business_hour: [],
     /* ================= LOCATION ================= */
     locations: [
-      {
-        id: "location-1",
-        label: "Main Office",
-        location_type: "exact_address",
-        address: "123 Sample Street",
-        city: "Sample City",
-        state: "Sample State",
-        area: "Sample Area",
-        phone: "1234567890",
-        description: "Replace with your business address.",
-        isPrimary: true,
-        isOpen: true,
-      },
+    
     ],
     /* ================= IMAGES ================= */
     profile_image,

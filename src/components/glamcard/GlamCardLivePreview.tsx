@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Download,
   QrCode,
+  Share2,
   ChevronLeft,
   ChevronRight,
   Phone,
@@ -403,6 +404,23 @@ console.log(data,"datata")
     }
   };
 
+  const handleShare = async () => {
+    const link = data?.business_card_link;
+    if (!link) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: data?.name || "Business Card",
+          url: link,
+        });
+      } catch (error) {
+        // user cancelled share or share failed silently
+      }
+    } else {
+      handleCopyLink();
+    }
+  };
+
   /* ================= SOCIAL ICONS LIST ================= */
   const hasSocials =
     data?.website ||
@@ -494,10 +512,10 @@ console.log(data,"datata")
                   Save Contact
                 </button>
                 <button
-                  onClick={() => setIsQrModalOpen(true)}
+                  onClick={handleShare}
                   className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200" style={socialIconStyle}
                 >
-                  <QrCode size={18} strokeWidth={2.5} />
+                  <Share2 size={18} strokeWidth={2.5} />
                 </button>
               </div>
             )}
@@ -740,19 +758,28 @@ console.log(data,"datata")
                                 {selectedLocation.business_name}
                               </p>
                             )} */}
-                            <p className="text-gray-600 leading-relaxed">
-                              {selectedLocation.location_type ===
-                                "exact_address"
-                                ? selectedLocation.address?.trim() ||
-                                "Address not provided"
-                                : [
-                                  selectedLocation.city?.trim(),
-                                  selectedLocation.state?.trim(),
-                                  selectedLocation.area?.trim(),
-                                ]
-                                  .filter(Boolean)
-                                  .join(", ") || "Location not fully set"}
-                            </p>
+                        {(selectedLocation.location_type === "exact_address"
+  ? selectedLocation.address?.trim()
+  : [
+      selectedLocation.city?.trim(),
+      selectedLocation.state?.trim(),
+      selectedLocation.area?.trim(),
+    ]
+      .filter(Boolean)
+      .join(", ")
+) && (
+  <p className="text-gray-600 leading-relaxed">
+    {selectedLocation.location_type === "exact_address"
+      ? selectedLocation.address?.trim()
+      : [
+          selectedLocation.city?.trim(),
+          selectedLocation.state?.trim(),
+          selectedLocation.area?.trim(),
+        ]
+          .filter(Boolean)
+          .join(", ")}
+  </p>
+)}
                             {(data.phone) &&
                               data.is_phone_visible && (
                                 <p className="text-gray-600">
@@ -766,41 +793,36 @@ console.log(data,"datata")
                             )}
                           </div>
                         )}
-                        {mapSrc ? (
-                          <div className="relative rounded-xl overflow-hidden shadow-sm" style={{
-                            boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
-                          }}>
-                            <iframe
-                              title="Business Location Map"
-                              className="w-full h-48 sm:h-52"
-                              style={{ border: 0, display: "block" }}
-                              loading="lazy"
-                              allowFullScreen
-                              referrerPolicy="no-referrer-when-downgrade"
-                              src={mapSrc}
-                            />
-                            <a
-                              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 text-sm whitespace-nowrap" style={{boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)"}}
-                            >
-                              <svg
-                                className="w-4 h-4"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                              >
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                              </svg>
-                              Get Directions
-                            </a>
-                          </div>
-                        ) : (
-                          <p className="text-xs text-gray-400 italic">
-                            Map will appear here once location is set
-                          </p>
-                        )}
+                       {mapSrc && (
+  <div className="relative rounded-xl overflow-hidden shadow-sm" style={{
+    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+  }}>
+    <iframe
+      title="Business Location Map"
+      className="w-full h-48 sm:h-52"
+      style={{ border: 0, display: "block" }}
+      loading="lazy"
+      allowFullScreen
+      referrerPolicy="no-referrer-when-downgrade"
+      src={mapSrc}
+    />
+    <a
+      href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 text-sm whitespace-nowrap" style={{boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)"}}
+    >
+      <svg
+        className="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+      </svg>
+      Get Directions
+    </a>
+  </div>
+)}
                       </>
                     ) : (
                       <p className="text-xs text-gray-400 italic">
