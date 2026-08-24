@@ -1,9 +1,82 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import GlamCardLivePreview from "../GlamCardLivePreview";
 import { initialGlamCardData } from "../initialGlamCardData";
 import GlamCardForm from "./GlamCardForm";
 import { GlamCardFormData } from "./types";
 import { getFormDataFromSession } from "./Formdatasessionstorage";
+
+/**
+ * The real, blank starting point for the form/submission. initialGlamCardData()
+ * returns sample/demo content (e.g. "John Doe", a sample bio, sample images) that
+ * is meant to make the live preview look populated — it must never be assigned
+ * to the actual form state, or it would get submitted as real user data if the
+ * user leaves a field untouched.
+ */
+const emptyGlamCardData: GlamCardFormData = {
+  name: "",
+  business_name: "",
+  professional_title: "",
+  email: "",
+  phone: "",
+  booking_phone: "",
+  bio: "",
+  is_phone_visible: true,
+  custom_handle: "",
+  instagram_handle: "",
+  website: "",
+  primary_specialty: "",
+  specialties: [],
+  social_media: {
+    instagram: "",
+    facebook: "",
+    linkedin: "",
+    youtube: "",
+    tiktok: "",
+  },
+  other_links: [],
+  preferred_booking_methods: [],
+  booking_link: "",
+  important_info: [],
+  business_hour: [],
+  locations: [],
+  profile_image: undefined as any,
+  images: [],
+  gallery_meta: [],
+  elite_setup: false,
+  offer_promotion: undefined,
+  promotion_details: "",
+  excites_about_glamlink: [],
+  biggest_pain_points: [],
+};
+
+const isEmptyValue = (value: any): boolean => {
+  if (value === undefined || value === null || value === "") return true;
+  if (Array.isArray(value)) return value.length === 0;
+  if (typeof value === "object" && !(value instanceof File)) {
+    return Object.values(value).every(isEmptyValue);
+  }
+  return false;
+};
+
+/**
+ * Fills only the blank fields of the real form data with sample/demo values,
+ * purely so the live preview has something to show. The real `data` state
+ * (bound to the form inputs and submitted on save) is never touched by this —
+ * as soon as the user types a real value, it takes precedence here too.
+ */
+const mergeForPreview = (
+  data: GlamCardFormData,
+  demoData: GlamCardFormData | null
+): GlamCardFormData => {
+  if (!demoData) return data;
+  const merged: any = { ...data };
+  (Object.keys(demoData) as (keyof GlamCardFormData)[]).forEach((key) => {
+    if (isEmptyValue(merged[key])) {
+      merged[key] = demoData[key];
+    }
+  });
+  return merged;
+};
 
 /**
  * Rebuilds a GlamCardFormData-shaped object from the raw payload saved to
@@ -60,7 +133,8 @@ const hydrateFromSessionPayload = (
 };
 
 const GlamCardApplication: React.FC = () => {
-  const [data, setData] = useState<GlamCardFormData>({} as GlamCardFormData);
+  const [data, setData] = useState<GlamCardFormData>(emptyGlamCardData);
+  const [demoData, setDemoData] = useState<GlamCardFormData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -68,18 +142,23 @@ const GlamCardApplication: React.FC = () => {
 
     if (storedPayload) {
       // A saved payload already exists in this session — prefill from it
-      // instead of loading the default/demo data.
+      // instead of starting blank.
       const hydrated = hydrateFromSessionPayload(storedPayload);
       setData((prev) => ({ ...prev, ...hydrated } as GlamCardFormData));
-      setLoading(false);
-      return;
     }
 
+    // Demo/sample content used only to make the live preview look populated —
+    // it never touches the real `data` state above.
     initialGlamCardData().then((result) => {
-      setData(result);
+      setDemoData(result);
       setLoading(false);
     });
   }, []);
+
+  const previewData = useMemo(
+    () => mergeForPreview(data, demoData),
+    [data, demoData]
+  );
 
   if (loading) return <div>Loading...</div>;
 
@@ -94,7 +173,7 @@ const GlamCardApplication: React.FC = () => {
 
       {/* RIGHT — preview, natural height, scrolls with page */}
       <div className="w-1/2">
-        <GlamCardLivePreview data={data} mode="live" />
+        <GlamCardLivePreview data={previewData} mode="live" />
                      {/* <BusinessCardPage slug={data?.business_card_link.split('/').pop()} mode="view" /> */}
 
       </div>

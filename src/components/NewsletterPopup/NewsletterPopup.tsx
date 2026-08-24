@@ -7,6 +7,21 @@ interface NewsletterPopupProps {
   openDelay?: number; // milliseconds
 }
 
+const NEWSLETTER_COOKIE = "newsletter_popup_seen";
+const NEWSLETTER_COOKIE_DAYS = 365;
+
+function getCookie(name: string): string | undefined {
+  return document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${name}=`))
+    ?.split("=")[1];
+}
+
+function setCookie(name: string, value: string, days: number) {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
 export default function NewsletterPopup({
   openDelay = 30000, // 30 seconds
 }: NewsletterPopupProps) {
@@ -19,16 +34,17 @@ export default function NewsletterPopup({
     email: "",
   });
 
- useEffect(() => {
-  if (sessionStorage.getItem("newsletter_popup_seen")) return;
+  useEffect(() => {
+    if (getCookie(NEWSLETTER_COOKIE)) return;
 
-  const timer = setTimeout(() => {
-    setIsOpen(true);
-    sessionStorage.setItem("newsletter_popup_seen", "true");
-  }, openDelay);
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+      setCookie(NEWSLETTER_COOKIE, "true", NEWSLETTER_COOKIE_DAYS);
+    }, openDelay);
 
-  return () => clearTimeout(timer);
-}, [openDelay]);
+    return () => clearTimeout(timer);
+  }, [openDelay]);
+
   const handleClose = () => {
     setIsOpen(false);
   };
