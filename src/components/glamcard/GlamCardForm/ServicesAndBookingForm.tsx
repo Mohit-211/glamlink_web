@@ -701,6 +701,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               <div key={i} className="flex items-center gap-2">
                 <input
                   className={inputClass}
+                  placeholder="e.g. By appointment only • Cash/Card accepted"
                   value={item}
                   onChange={(e) => updateInfo(i, e.target.value)}
                 />

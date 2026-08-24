@@ -73,6 +73,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
           </label>
           <input
             className={`${inputClass} ${errors?.name ? errorInputClass : ""}`}
+            placeholder="e.g. Jane Smith"
             value={data.name || ""}
             onChange={(e) => {
               setData((p) => ({
@@ -94,6 +95,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
           </label>
           <input
             className={`${inputClass} ${errors?.professional_title ? errorInputClass : ""}`}
+            placeholder="e.g. Hair Stylist, Nail Technician"
             value={data.professional_title || ""}
             onChange={(e) => {
               setData((p) => ({
@@ -118,6 +120,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
           <input
             type="email"
             className={`${inputClass} ${errors?.email ? errorInputClass : ""}`}
+            placeholder="you@example.com"
             value={data.email || ""}
             onChange={(e) => {
               setData((p) => ({
@@ -160,6 +163,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
     inputMode="numeric"
     maxLength={15}
     className={`${inputClass} ${errors?.phone ? errorInputClass : ""}`}
+    placeholder="e.g. 5551234567"
     value={data.phone || ""}
     required={data.is_phone_visible}
     onChange={(e) => {
@@ -226,6 +230,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         <label className={labelClass}>Business Name</label>
         <input
           className={`${inputClass} w-full ${errors?.business_name ? errorInputClass : ""}`}
+          placeholder="e.g. Glow Beauty Studio"
           value={data.business_name || ""}
           onChange={(e) => {
             setData((p) => ({

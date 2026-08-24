@@ -211,6 +211,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
         <label className={labelClass}>Display Label</label>
         <input
           className={inputClass}
+          placeholder="e.g. Downtown Studio"
           value={location.label ?? ""}
           onChange={(e) => onUpdate({ label: e.target.value })}
         />
