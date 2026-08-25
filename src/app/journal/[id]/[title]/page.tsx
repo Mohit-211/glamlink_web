@@ -6,6 +6,7 @@ import { getBlogsById } from "@/api/Api";
 import ArticleContent from "@/components/blogs/ArticleContent";
 import RelatedArticles from "@/components/blogs/RelatedArticles";
 import DownloadButton from "@/components/Downloadbutton";
+import JournalShopCard from "@/components/blogs/JournalShopCard";
 
 interface DownloadItem {
   id: number;
@@ -17,6 +18,7 @@ interface DownloadItem {
 }
 
 interface BlogData {
+  shops: any[] | undefined;
   journal_category: any;
   journal_author: any;
   category_id: any;
@@ -28,6 +30,7 @@ interface BlogData {
   publish_date: string;
   slug?: string;
   downloads?: DownloadItem[];
+  shop?: any[];
 }
 
 /* --------------------------------
@@ -62,7 +65,7 @@ export async function generateMetadata({
   const articleUrl = `https://glamlink.net/journal/${id}/${title}`;
   const imageUrl =
     article.cover_image || "https://glamlink.net/default-blog.jpg";
-
+console.log(article,"article")
   return {
     title: article.title,
     description: article.short_description,
@@ -300,7 +303,15 @@ const formattedDate = article?.publish_date
               "
             >
               <ArticleContent content={article.content ?? ""} />
+
             </div>
+          </section>
+
+          {/* ── SHOP THE JOURNAL ── */}
+          <div className="border-t border-gray-100 my-14" />
+
+          <section>
+            <JournalShopCard shop={article.shops} heading="no" />
           </section>
 
           {/* ── DOWNLOADS ── */}
