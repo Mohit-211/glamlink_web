@@ -74,15 +74,17 @@ const [activeIndex, setActiveIndex] = useState<number | null>(null);
     );
   }, [professionals]);
 
-  // Set center to first location, or undefined if none
+  // Default center (used until location data arrives), then recenter on first location
+  const defaultCenter = { lat: 39.8283, lng: -98.5795 }; // geographic center of the US
   const center =
     allLocations.length > 0
       ? { lat: allLocations[0].lat, lng: allLocations[0].lng }
-      : undefined;
+      : defaultCenter;
 
-  if (!isLoaded) return <p className="text-center">Loading map...</p>;
-  if (!center) return <p className="text-center">No locations available</p>;
-
+  if (!isLoaded)
+    return (
+      <div className="w-full h-full animate-pulse rounded-md bg-gray-200" />
+    );
 
   return (
     <div className="w-full h-full flex">
@@ -91,7 +93,7 @@ const [activeIndex, setActiveIndex] = useState<number | null>(null);
         <GoogleMap
           mapContainerStyle={{ width: "100%", height: "100%" }}
           center={center}
-          zoom={11}
+          zoom={allLocations.length > 0 ? 11 : 4}
           onClick={() => setActiveIndex(null)} // close on map click
         >
           {allLocations.map((loc, index) => (

@@ -113,7 +113,6 @@ const hydrateFromSessionPayload = (
     website: payload.website ?? "",
     promotion_details: payload.promotion_details ?? "",
     is_phone_visible: payload.is_phone_visible !== "false",
-
     business_hour: parseJson(payload.business_hour) ?? [],
     other_links: parseJson(payload.other_links) ?? [],
     important_info: parseJson(payload.important_info) ?? [],
@@ -135,7 +134,6 @@ const hydrateFromSessionPayload = (
 const GlamCardApplication: React.FC = () => {
   const [data, setData] = useState<GlamCardFormData>(emptyGlamCardData);
   const [demoData, setDemoData] = useState<GlamCardFormData | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedPayload = getFormDataFromSession();
@@ -151,7 +149,6 @@ const GlamCardApplication: React.FC = () => {
     // it never touches the real `data` state above.
     initialGlamCardData().then((result) => {
       setDemoData(result);
-      setLoading(false);
     });
   }, []);
 
@@ -159,8 +156,6 @@ const GlamCardApplication: React.FC = () => {
     () => mergeForPreview(data, demoData),
     [data, demoData]
   );
-
-  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="flex gap-8 items-start">
@@ -174,7 +169,7 @@ const GlamCardApplication: React.FC = () => {
       {/* RIGHT — preview, natural height, scrolls with page */}
       <div className="w-1/2">
         <GlamCardLivePreview data={previewData} mode="live" />
-                     {/* <BusinessCardPage slug={data?.business_card_link.split('/').pop()} mode="view" /> */}
+        {/* <BusinessCardPage slug={data?.business_card_link.split('/').pop()} mode="view" /> */}
 
       </div>
     </div>
