@@ -512,6 +512,19 @@ export const SelectPlanAPI = async (payload: SelectPlanPayload) => {
   );
   return data;
 };
+/* ============================= */
+/* 📌 Contact Us */
+/* ============================= */
+export const contactUs = async (payload: {
+  name: string;
+  subject: string;
+  email: string;
+  message: string;
+  mobile: string;
+}) => {
+  const { data } = await api.post("contactUs", payload);
+  return data;
+};
 export const ShippingRateWithoutTokenApi = async (payload: any) => {
   const { data } = await api.post(
     "businessCard/shipping-rate-public",

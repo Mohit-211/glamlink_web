@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CheckCircle2, Send } from "lucide-react";
+import { contactUs } from "@/api/Api";
 
 /* -------------------------
    Types & options
@@ -11,9 +12,9 @@ import { CheckCircle2, Send } from "lucide-react";
 type ContactFormValues = {
   name: string;
   email: string;
-  phone?: string;
-  purpose: string;
-  description: string;
+  mobile?: string;
+  subject: string;
+  message: string;
 };
 
 const PURPOSE_OPTIONS = [
@@ -44,23 +45,22 @@ export default function ContactPage() {
     defaultValues: {
       name: "",
       email: "",
-      phone: "",
-      purpose: "",
-      description: "",
+      mobile: "",
+      subject: "",
+      message: "",
     },
   });
 
   const onSubmit = async (values: ContactFormValues) => {
     setSubmitError(null);
     try {
-      // TODO: point this at your real endpoint (API route, Firebase function, etc.)
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+      await contactUs({
+        name: values.name,
+        email: values.email,
+        mobile: values.mobile || "",
+        subject: values.subject,
+        message: values.message,
       });
-
-      if (!res.ok) throw new Error("Request failed");
 
       setSubmitted(true);
       reset();
@@ -150,33 +150,33 @@ export default function ContactPage() {
                   )}
                 </div>
 
-                {/* Phone (optional) */}
+                {/* Mobile (optional) */}
                 <div>
-                  <label htmlFor="phone" className="text-sm font-medium">
+                  <label htmlFor="mobile" className="text-sm font-medium">
                     Phone{" "}
                     <span className="text-muted-foreground font-normal">
                       (optional)
                     </span>
                   </label>
                   <input
-                    id="phone"
+                    id="mobile"
                     type="tel"
                     placeholder="For faster follow-up, if you'd like a call"
                     className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    {...register("phone")}
+                    {...register("mobile")}
                   />
                 </div>
 
-                {/* Purpose */}
+                {/* Subject */}
                 <div>
-                  <label htmlFor="purpose" className="text-sm font-medium">
+                  <label htmlFor="subject" className="text-sm font-medium">
                     What's this about?
                   </label>
                   <select
-                    id="purpose"
+                    id="subject"
                     defaultValue=""
                     className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    {...register("purpose", {
+                    {...register("subject", {
                       required: "Please choose a reason",
                     })}
                   >
@@ -186,24 +186,24 @@ export default function ContactPage() {
                       </option>
                     ))}
                   </select>
-                  {errors.purpose && (
+                  {errors.subject && (
                     <p className="mt-1.5 text-sm text-destructive">
-                      {errors.purpose.message}
+                      {errors.subject.message}
                     </p>
                   )}
                 </div>
 
-                {/* Description */}
+                {/* Message */}
                 <div>
-                  <label htmlFor="description" className="text-sm font-medium">
+                  <label htmlFor="message" className="text-sm font-medium">
                     Tell us more
                   </label>
                   <textarea
-                    id="description"
+                    id="message"
                     rows={5}
                     placeholder="Share as much detail as you can, so our team can help quickly."
                     className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring resize-none"
-                    {...register("description", {
+                    {...register("message", {
                       required: "Please add a short description",
                       minLength: {
                         value: 10,
@@ -211,9 +211,9 @@ export default function ContactPage() {
                       },
                     })}
                   />
-                  {errors.description && (
+                  {errors.message && (
                     <p className="mt-1.5 text-sm text-destructive">
-                      {errors.description.message}
+                      {errors.message.message}
                     </p>
                   )}
                 </div>
