@@ -25,6 +25,15 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 
 type CardKey = string | number;
 
+const formatUtcDateTime = (dateStr?: string): string | null => {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return null;
+    const date = d.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+    const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    return `${date}`;
+};
+
 const getCardKey = (card: AccessCardData, index: number): CardKey =>
     (card as any)?.id ?? index;
 
@@ -342,6 +351,49 @@ console.log(selectedPlan,"selectedPlan")
                                         </div>
                                     </div>
                                 </div>
+                                {(card?.access_orders?.length ?? 0) > 0 && (
+                                    <div className="space-y-2">
+                                        {card.access_orders!.map((order) => (
+                                            <div
+                                                key={order.id}
+                                                className="flex flex-col gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-[12px] sm:flex-row sm:items-center sm:justify-between sm:px-6"
+                                            >
+                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                                                    <span className="text-muted-foreground">
+                                                        <span className="font-semibold text-foreground">Ordered:</span>{' '}
+                                                        {formatUtcDateTime(order.created_at)}
+                                                    </span>
+                                                    <span className="text-muted-foreground">
+                                                        <span className="font-semibold text-foreground">Order #:</span>{' '}
+                                                        {order.order_number}
+                                                    </span>
+                                                    {order.fulfillment_status && (
+                                                        <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[10px] font-semibold capitalize text-muted-foreground">
+                                                            {order.fulfillment_status}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {order.tracking_number && (
+                                                    <div className="text-muted-foreground">
+                                                        <span className="font-semibold text-foreground">Tracking:</span>{' '}
+                                                        {order.tracking_link ? (
+                                                            <a
+                                                                href={order.tracking_link}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-primary hover:underline"
+                                                            >
+                                                                {order.tracking_number}
+                                                            </a>
+                                                        ) : (
+                                                            order.tracking_number
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     );
