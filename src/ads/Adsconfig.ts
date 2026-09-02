@@ -23,6 +23,7 @@ const adsConfig = {
       "link_url": "https://client-b.com",
       "alt_text": "Client B Skincare Line",
       "size": { "width": 160, "height": 600 },
+      "mobile_size": null,
       "behaviour": "sticky",
       "device": "desktop",
       "pages": ["journal-listing", "journal-article"],
@@ -38,6 +39,7 @@ const adsConfig = {
       "link_url": "https://client-c.com",
       "alt_text": "Client C Salon Booking",
       "size": { "width": 160, "height": 600 },
+      "mobile_size": null,
       "behaviour": "sticky",
       "device": "desktop",
       "pages": ["journal-listing", "journal-article"],
@@ -53,6 +55,7 @@ const adsConfig = {
       "link_url": "https://client-d.com",
       "alt_text": "Client D App Download",
       "size": { "width": 320, "height": 50 },
+      "mobile_size": null,
       "behaviour": "fixed-overlay",
       "device": "mobile",
       "pages": ["journal-listing", "journal-article"],
@@ -68,6 +71,7 @@ const adsConfig = {
       "link_url": "https://client-e.com",
       "alt_text": "Client E Hair Tools",
       "size": { "width": 728, "height": 90 },
+      "mobile_size": null,
       "behaviour": "static",
       "device": "both",
       "pages": ["journal-article"],
@@ -83,6 +87,7 @@ const adsConfig = {
       "link_url": "https://client-f.com",
       "alt_text": "Client F Booking App",
       "size": { "width": 728, "height": 90 },
+      "mobile_size": null,
       "behaviour": "static",
       "device": "both",
       "pages": ["journal-article"],
@@ -98,6 +103,7 @@ const adsConfig = {
       "link_url": "https://client-g.com",
       "alt_text": "Client G Nail Care Kit",
       "size": { "width": 300, "height": 250 },
+      "mobile_size": null,
       "behaviour": "static",
       "device": "both",
       "pages": ["journal-article"],
@@ -113,6 +119,7 @@ const adsConfig = {
       "link_url": "https://client-h.com",
       "alt_text": "Client H Lash Serum",
       "size": { "width": 250, "height": 250 },
+      "mobile_size": null,
       "behaviour": "static",
       "device": "both",
       "pages": ["journal-article"],
@@ -128,6 +135,7 @@ const adsConfig = {
       "link_url": "https://client-i.com",
       "alt_text": "Client I Featured Promo",
       "size": { "width": 728, "height": 90 },
+      "mobile_size": null,
       "behaviour": "static",
       "device": "both",
       "pages": ["journal-listing"],
@@ -143,6 +151,7 @@ const adsConfig = {
       "link_url": "https://client-j.com",
       "alt_text": "Client J Seasonal Offer",
       "size": { "width": 300, "height": 250 },
+      "mobile_size": null,
       "behaviour": "static",
       "device": "both",
       "pages": ["journal-listing"],
@@ -152,12 +161,13 @@ const adsConfig = {
       "status": "active"
     },
     {
-      "id": "ad_003",
+      "id": "ad_011",
       "slot_id": "journal-bottom",
       "image_url": "https://placehold.co/500x300/cccccc/666666/png?text=Bottom+Banner+%7C+500x300",
       "link_url": "https://client-c.com",
       "alt_text": "Client C Salon Booking",
       "size": { "width": 500, "height": 300 },
+      "mobile_size": null,
       "behaviour": "sticky",
       "device": "desktop",
       "pages": ["journal-listing", "journal-article"],
@@ -165,8 +175,8 @@ const adsConfig = {
       "end_date": "2026-09-15T23:59:59Z",
       "priority": 1,
       "status": "active"
-    },
+    }
   ]
-}
+};
 
 export default adsConfig;

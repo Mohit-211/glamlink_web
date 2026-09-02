@@ -2,14 +2,19 @@
 import { useMemo } from "react";
 import adsConfig from "./Adsconfig";
 
-export interface Ad {
+export interface AdSize {
+  width: number;
+  height: number;
+}
+
+export interface AdSource {
   id: string;
   slot_id: string;
   image_url: string;
   link_url: string;
   alt_text?: string;
-  size: { width: number; height: number };
-  mobile_size?: { width: number; height: number };
+  size: AdSize;
+  mobile_size: AdSize | null;
   behaviour: "static" | "sticky" | "fixed-overlay";
   device: "desktop" | "mobile" | "both";
   pages: string[];
@@ -19,58 +24,64 @@ export interface Ad {
   status: "active" | "inactive" | string;
 }
 
+export interface Ad {
+  id: string;
+  slot_id: string;
+  image_url: string;
+  link_url: string;
+  alt_text?: string;
+  size: AdSize;
+  mobile_size: AdSize | null;
+  behaviour: "static" | "sticky" | "fixed-overlay";
+}
+
 interface UseAdsParams {
   page: string;
   device: "desktop" | "mobile";
 }
 
-/**
- * useAds
- * Reads ad definitions from the local Adsconfig.ts (until a real ads
- * backend exists) and returns ONE ad per slot_id, filtered by
- * page/device/date/status, picked via a weighted-random rotation when
- * a slot has multiple eligible ads.
- *
- * Usage:
- *   const ads = useAds({ page: "journal-listing", device: "desktop" });
- *   ads["journal-top-banner"] // -> single ad object or undefined
- */
-export function useAds({ page, device }: UseAdsParams): Record<string, Ad> {
-  return useMemo(() => {
-    const now = new Date();
-    const valid = (adsConfig.ads as Ad[]).filter((ad) => {
-      const isActive = ad.status === "active";
-      const inDateRange =
-        new Date(ad.start_date) <= now && now <= new Date(ad.end_date);
-      const matchesDevice = ad.device === "both" || ad.device === device;
-      const matchesPage = ad.pages?.includes(page);
-      return isActive && inDateRange && matchesDevice && matchesPage;
-    });
+export function selectAds(
+  ads: AdSource[],
+  { page, device }: UseAdsParams,
+  now: Date = new Date()
+): Record<string, Ad> {
+  const valid = ads.filter((ad) => {
+    const isActive = ad.status === "active";
+    const inDateRange =
+      new Date(ad.start_date) <= now && now <= new Date(ad.end_date);
+    const matchesDevice = ad.device === "both" || ad.device === device;
+    const matchesPage = ad.pages?.includes(page);
+    return isActive && inDateRange && matchesDevice && matchesPage;
+  });
 
-    // Group by slot_id
-    const grouped: Record<string, Ad[]> = {};
-    valid.forEach((ad) => {
-      if (!grouped[ad.slot_id]) grouped[ad.slot_id] = [];
-      grouped[ad.slot_id].push(ad);
-    });
+  const winners: Record<string, AdSource> = {};
+  valid.forEach((ad) => {
+    const current = winners[ad.slot_id];
+    if (!current || ad.priority > current.priority) {
+      winners[ad.slot_id] = ad;
+    }
+  });
 
-    // Pick one winner per slot using priority as weight
-    const picked: Record<string, Ad> = {};
-    Object.keys(grouped).forEach((slotId) => {
-      picked[slotId] = pickWeighted(grouped[slotId]);
-    });
+  const picked: Record<string, Ad> = {};
+  Object.values(winners).forEach((ad) => {
+    picked[ad.slot_id] = {
+      id: ad.id,
+      slot_id: ad.slot_id,
+      image_url: ad.image_url,
+      link_url: ad.link_url,
+      alt_text: ad.alt_text,
+      size: ad.size,
+      mobile_size: ad.mobile_size,
+      behaviour: ad.behaviour,
+    };
+  });
 
-    return picked;
-  }, [page, device]);
+  return picked;
 }
 
-// Higher "priority" number = shown more often.
-function pickWeighted(ads: Ad[]): Ad {
-  const totalWeight = ads.reduce((sum, ad) => sum + (ad.priority || 1), 0);
-  let rand = Math.random() * totalWeight;
-  for (const ad of ads) {
-    rand -= ad.priority || 1;
-    if (rand <= 0) return ad;
-  }
-  return ads[0];
+export function useAds({ page, device }: UseAdsParams): Record<string, Ad> {
+  return useMemo(
+    () => selectAds(adsConfig.ads as AdSource[], { page, device }),
+    [page, device]
+  );
 }

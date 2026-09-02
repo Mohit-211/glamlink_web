@@ -437,7 +437,6 @@ const JournalClient = ({ path }: { path: string }) => {
               <AdSlot
                 slotId="journal-top-banner"
                 ad={ads["journal-top-banner"]}
-                size={{ width: 728, height: 90 }}
               />
             </div>
           )}
@@ -471,7 +470,6 @@ const JournalClient = ({ path }: { path: string }) => {
                     <AdSlot
                       slotId="journal-sidebar-left"
                       ad={ads["journal-sidebar-left"]}
-                      size={{ width: 160, height: 600 }}
                     />
                   </div>
                 </aside>
@@ -488,7 +486,6 @@ const JournalClient = ({ path }: { path: string }) => {
                     <AdSlot
                       slotId="journal-sidebar-right"
                       ad={ads["journal-sidebar-right"]}
-                      size={{ width: 160, height: 600 }}
                     />
                   </div>
                 </aside>
@@ -499,7 +496,6 @@ const JournalClient = ({ path }: { path: string }) => {
                 <AdSlot
                   slotId="journal-mobile-bottom"
                   ad={ads["journal-mobile-bottom"]}
-                  size={{ width: 320, height: 50 }}
                 />
               </div>
 
@@ -513,11 +509,10 @@ const JournalClient = ({ path }: { path: string }) => {
             <div className="max-w-4xl mx-auto">{renderMainContent()}</div>
           )}
         </div>
-         <AdSlot
-                      slotId="journal-bottom"
-                      ad={ads["journal-bottom"]}
-                      size={{ width: 500, height: 300 }}
-                    />
+        <AdSlot
+          slotId="journal-bottom"
+          ad={ads["journal-bottom"]}
+        />
       </div>
     </>
   );

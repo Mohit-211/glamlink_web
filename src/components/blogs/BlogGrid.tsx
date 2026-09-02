@@ -194,7 +194,6 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
                   <AdSlot
                     slotId="journal-listing-in-feed"
                     ad={ads["journal-listing-in-feed"]}
-                    size={{ width: 728, height: 90 }}
                   />
                 </div>
               )}
@@ -205,7 +204,6 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
                   <AdSlot
                     slotId="journal-listing-in-feed-2"
                     ad={ads["journal-listing-in-feed-2"]}
-                    size={{ width: 300, height: 250 }}
                   />
                 </div>
               )}

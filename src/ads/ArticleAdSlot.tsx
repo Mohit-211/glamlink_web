@@ -6,16 +6,14 @@ import AdSlot from "@/ads/Adslot";
 
 interface ArticleAdSlotProps {
   slotId: string;
-  size: { width: number; height: number };
 }
-
-export default function ArticleAdSlot({ slotId, size }: ArticleAdSlotProps) {
+export default function ArticleAdSlot({ slotId }: ArticleAdSlotProps) {
   const device = useDeviceType();
   const ads = useAds({ page: "journal-article", device });
 
   return (
     <div className="flex justify-center my-8">
-      <AdSlot slotId={slotId} ad={ads[slotId]} size={size} />
+      <AdSlot slotId={slotId} ad={ads[slotId]} />
     </div>
   );
 }

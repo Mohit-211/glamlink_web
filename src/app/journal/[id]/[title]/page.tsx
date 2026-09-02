@@ -199,11 +199,11 @@ const formattedDate = article?.publish_date
              once the screen is wide enough to have real blank space beside
              the article ── */}
         <div className=" min-[1600px]:block fixed left-6 top-1/2 -translate-y-1/2 z-10">
-          <ArticleAdSlot slotId="journal-sidebar-left" size={{ width: 160, height: 600 }} />
+          <ArticleAdSlot slotId="journal-sidebar-left" />
         </div>
         <div className=" min-[1600px]:flex flex-col gap-6 fixed right-6 top-1/2 -translate-y-1/2 z-10">
-          <ArticleAdSlot slotId="journal-sidebar-right" size={{ width: 160, height: 600 }} />
-          <ArticleAdSlot slotId="journal-article-mid-square" size={{ width: 250, height: 250 }} />
+          <ArticleAdSlot slotId="journal-sidebar-right" />
+          <ArticleAdSlot slotId="journal-article-mid-square" />
         </div>
 
         <article className="max-w-[900px] mx-auto px-5 pb-20 pt-20">
@@ -282,7 +282,7 @@ const formattedDate = article?.publish_date
           <div className="border-t border-gray-100 my-12" />
 
           {/* ── IN-ARTICLE AD (top of body) ── */}
-          <ArticleAdSlot slotId="journal-article-top" size={{ width: 728, height: 90 }} />
+          <ArticleAdSlot slotId="journal-article-top" />
 
           {/* ── BODY CONTENT ── */}
           <section className="mx-auto">
@@ -322,7 +322,7 @@ const formattedDate = article?.publish_date
           </section>
 
           {/* ── IN-ARTICLE AD (mid-content rectangle) ── */}
-          <ArticleAdSlot slotId="journal-article-mid-rectangle" size={{ width: 300, height: 250 }} />
+          <ArticleAdSlot slotId="journal-article-mid-rectangle" />
 
           {/* ── SHOP THE JOURNAL ── */}
           <div className="border-t border-gray-100 my-14" />
@@ -391,7 +391,7 @@ const formattedDate = article?.publish_date
           <div className="border-t border-gray-100 my-14 mx-auto" />
 
           {/* ── IN-ARTICLE AD (before related articles) ── */}
-          <ArticleAdSlot slotId="journal-article-bottom" size={{ width: 728, height: 90 }} />
+          <ArticleAdSlot slotId="journal-article-bottom" />
 
           {/* ── RELATED ARTICLES ── */}
           <section style={{ justifyItems: "center" }}>
@@ -411,7 +411,7 @@ const formattedDate = article?.publish_date
 
         {/* ── Mobile-only fixed bottom ad bar ── */}
         <div className="lg:hidden">
-          <ArticleAdSlot slotId="journal-mobile-bottom" size={{ width: 320, height: 50 }} />
+          <ArticleAdSlot slotId="journal-mobile-bottom" />
           <div className="h-16" />
         </div>
       </main>
