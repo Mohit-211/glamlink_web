@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Script from "next/script";
 
 import JournalClient from "@/components/blogs/JournalClient";
@@ -27,7 +28,9 @@ export default function JournalPage() {
 
       <main className="flex-1">
         {/* 👇 Everything handled inside client now */}
-        <JournalClient path="journal" />
+        <Suspense fallback={null}>
+          <JournalClient path="journal" />
+        </Suspense>
         <ConditionalGetFeatured />
       </main>
     </div>

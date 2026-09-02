@@ -106,11 +106,11 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
         : allBlogs;
 
     if (!activeCategory || activeCategory === "All") return withoutFeatured;
-    return withoutFeatured.filter((blog) =>
-      blog?.journal_category?.title
-        ?.toLowerCase()
-        .trim()
-        .includes(activeCategory.toLowerCase().trim())
+    return withoutFeatured.filter(
+      (blog) =>
+        blog?.journal_category?.title &&
+        slugify(blog.journal_category.title, { lower: true, strict: true }) ===
+          activeCategory
     );
   }, [activeCategory, allBlogs, featuredId]);
 

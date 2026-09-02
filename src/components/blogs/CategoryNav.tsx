@@ -2,6 +2,7 @@
 import { getCategories } from "@/api/Api";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import slugify from "slugify";
 interface Category {
   id: number;
   title: string;
@@ -12,13 +13,14 @@ interface Props {
   vertical?: boolean;
   path?: string;
 }
+const categorySlug = (title: string) =>
+  slugify(title, { lower: true, strict: true });
 const CategoryNav = ({
   activeCategory,
   setActiveCategory,
   vertical = false,
   path,
 }: Props) => {
-  console.log(path, 'pathpath')
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -48,7 +50,7 @@ const CategoryNav = ({
       router.push("/journal/shop");
     }
     else {
-      setActiveCategory(title);
+      setActiveCategory(categorySlug(title));
     }
   };
   /* ───────────────────────────────────────────── */
@@ -79,7 +81,7 @@ const CategoryNav = ({
                 key={category.id}
                 onClick={() => handleCategoryClick(category.title)}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm transition
-                  ${activeCategory === category.title
+                  ${activeCategory === categorySlug(category.title)
                     ? "bg-primary/10 text-primary font-medium"
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   }`}
@@ -94,7 +96,6 @@ const CategoryNav = ({
   /* ───────────────────────────────────────────── */
   /* MOBILE HORIZONTAL SCROLL                      */
   /* ───────────────────────────────────────────── */
-  console.log(path, "path")
   return (
     <nav className="lg:hidden sticky top-[60px] z-50 bg-white border-b border-gray-200">
       <div className="w-full px-4 mt-5">
@@ -115,9 +116,9 @@ const CategoryNav = ({
             categories.map((category) => (
               <button
                 key={category.id}
-                onClick={() => setActiveCategory(category.title)}
+                onClick={() => handleCategoryClick(category.title)}
                 className={`px-4 py-2 rounded-full text-sm font-medium flex-shrink-0 transition
-                  ${activeCategory === category.title
+                  ${activeCategory === categorySlug(category.title)
                     ? "bg-black text-white"
                     : "bg-gray-100 text-gray-700"
                   }`}

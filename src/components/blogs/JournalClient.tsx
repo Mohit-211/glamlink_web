@@ -1,12 +1,12 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Download, X, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CategoryNav from "./CategoryNav";
 import BlogGrid from "./BlogGrid";
 import HeroSection from "./HeroSection";
 import { issues2025, issues2026, Issue } from "@/data/issues";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
 import JournalEducation from "./JournalEducation";
 import JournalEvent from "./JournalEvent";
@@ -368,8 +368,34 @@ const MagazineSidebar = ({
    only their centered main content.
 ───────────────────────────────────────────────────────────── */
 const JournalClient = ({ path }: { path: string }) => {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
+  const [activeCategory, setActiveCategoryState] = useState(
+    categoryParam || "All"
+  );
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+
+  // Keep local state in sync when the URL's ?category= changes externally
+  // (back/forward navigation, direct link)
+  useEffect(() => {
+    setActiveCategoryState(categoryParam || "All");
+  }, [categoryParam]);
+
+  // Updates both the active category and the URL, so the category is
+  // reflected in the address bar and shareable/bookmarkable
+  const setActiveCategory = (category: string) => {
+    setActiveCategoryState(category);
+    const params = new URLSearchParams(searchParams.toString());
+    if (!category || category === "All") {
+      params.delete("category");
+    } else {
+      params.set("category", category);
+    }
+    const query = params.toString();
+    router.replace(`/journal${query ? `?${query}` : ""}`, { scroll: false });
+  };
+
   const handleIssueClick = (issue: Issue) => {
     setSelectedIssue((prev) => (prev?.slug === issue.slug ? null : issue));
   };
