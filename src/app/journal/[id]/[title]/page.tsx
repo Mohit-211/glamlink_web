@@ -7,6 +7,7 @@ import ArticleContent from "@/components/blogs/ArticleContent";
 import RelatedArticles from "@/components/blogs/RelatedArticles";
 import DownloadButton from "@/components/Downloadbutton";
 import JournalShopCard from "@/components/blogs/JournalShopCard";
+import ArticleAdSlot from "@/ads/ArticleAdSlot";
 
 interface DownloadItem {
   id: number;
@@ -194,9 +195,19 @@ const formattedDate = article?.publish_date
       />
 
       <main className="flex-1">
+        {/* ── Left/right rail ads — fixed to the viewport edges, only shown
+             once the screen is wide enough to have real blank space beside
+             the article ── */}
+        <div className=" min-[1600px]:block fixed left-6 top-1/2 -translate-y-1/2 z-10">
+          <ArticleAdSlot slotId="journal-sidebar-left" size={{ width: 160, height: 600 }} />
+        </div>
+        <div className=" min-[1600px]:flex flex-col gap-6 fixed right-6 top-1/2 -translate-y-1/2 z-10">
+          <ArticleAdSlot slotId="journal-sidebar-right" size={{ width: 160, height: 600 }} />
+          <ArticleAdSlot slotId="journal-article-mid-square" size={{ width: 250, height: 250 }} />
+        </div>
+
         <article className="max-w-[900px] mx-auto px-5 pb-20 pt-20">
 
-          {/* ── HERO ── */}
           {/* ── HERO ── */}
           <section>
 
@@ -270,6 +281,9 @@ const formattedDate = article?.publish_date
           {/* ── DIVIDER ── */}
           <div className="border-t border-gray-100 my-12" />
 
+          {/* ── IN-ARTICLE AD (top of body) ── */}
+          <ArticleAdSlot slotId="journal-article-top" size={{ width: 728, height: 90 }} />
+
           {/* ── BODY CONTENT ── */}
           <section className="mx-auto">
             <div
@@ -306,6 +320,9 @@ const formattedDate = article?.publish_date
 
             </div>
           </section>
+
+          {/* ── IN-ARTICLE AD (mid-content rectangle) ── */}
+          <ArticleAdSlot slotId="journal-article-mid-rectangle" size={{ width: 300, height: 250 }} />
 
           {/* ── SHOP THE JOURNAL ── */}
           <div className="border-t border-gray-100 my-14" />
@@ -373,6 +390,9 @@ const formattedDate = article?.publish_date
           {/* ── DIVIDER ── */}
           <div className="border-t border-gray-100 my-14 mx-auto" />
 
+          {/* ── IN-ARTICLE AD (before related articles) ── */}
+          <ArticleAdSlot slotId="journal-article-bottom" size={{ width: 728, height: 90 }} />
+
           {/* ── RELATED ARTICLES ── */}
           <section style={{ justifyItems: "center" }}>
             <div className="text-center mb-8 mx-auto max-w-2xl">
@@ -388,6 +408,12 @@ const formattedDate = article?.publish_date
           </section>
 
         </article>
+
+        {/* ── Mobile-only fixed bottom ad bar ── */}
+        <div className="lg:hidden">
+          <ArticleAdSlot slotId="journal-mobile-bottom" size={{ width: 320, height: 50 }} />
+          <div className="h-16" />
+        </div>
       </main>
     </div>
   );

@@ -11,6 +11,11 @@ import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
 import JournalEducation from "./JournalEducation";
 import JournalEvent from "./JournalEvent";
 import JournalShop from "./JournalShop";
+import { useDeviceType } from "@/ads/Usedevicetype";
+import { useAds } from "@/ads/Useads";
+import AdSlot from "@/ads/Adslot";
+
+
 /* ─────────────────────────────────────────────────────────────
    Constants
 ───────────────────────────────────────────────────────────── */
@@ -370,6 +375,11 @@ const MagazineSidebar = ({
 const JournalClient = ({ path }: { path: string }) => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+
+  // ── Ads: device detection + fetch ads for this page/device ──
+  const device = useDeviceType();
+  const ads = useAds({ page: "journal-listing", device });
+
   const handleIssueClick = (issue: Issue) => {
     setSelectedIssue((prev) => (prev?.slug === issue.slug ? null : issue));
   };
@@ -421,6 +431,17 @@ const JournalClient = ({ path }: { path: string }) => {
           {/* ── Top tab navigation (Journal / Education / Events / Shop) ── */}
           <TopTabs path={path} />
 
+          {/* ── Top banner ad — shows on the journal listing page only ── */}
+          {fullLayout && (
+            <div className="flex justify-center py-4">
+              <AdSlot
+                slotId="journal-top-banner"
+                ad={ads["journal-top-banner"]}
+                size={{ width: 728, height: 90 }}
+              />
+            </div>
+          )}
+
           {fullLayout ? (
             <>
               {/* ── Mobile layout (Journal only) ── */}
@@ -431,17 +452,26 @@ const JournalClient = ({ path }: { path: string }) => {
                 />
                 <MobileMagazineCarousel onIssueClick={handleIssueClick} />
                 {renderMainContent()}
+
+                {/* Bottom padding so the fixed-overlay ad bar doesn't cover content */}
+                <div className="h-16" />
               </div>
 
               {/* ── Desktop 3-column layout (Journal only) ── */}
               <div className="hidden lg:grid grid-cols-[200px_1fr_300px] xl:grid-cols-[220px_1fr_300px] 2xl:grid-cols-[240px_1fr_320px] gap-10 xl:gap-14">
                 <aside>
-                  <div className="sticky top-28 pr-4">
+                  <div className="sticky top-28 space-y-6 pr-4">
                     <CategoryNav
                       activeCategory={activeCategory}
                       setActiveCategory={setActiveCategory}
                       vertical
                       path={path}
+                    />
+                    {/* Left sidebar ad */}
+                    <AdSlot
+                      slotId="journal-sidebar-left"
+                      ad={ads["journal-sidebar-left"]}
+                      size={{ width: 160, height: 600 }}
                     />
                   </div>
                 </aside>
@@ -454,11 +484,23 @@ const JournalClient = ({ path }: { path: string }) => {
                       activeIssue={selectedIssue}
                       onIssueClick={handleIssueClick}
                     />
-                    <div className="border border-border/40 rounded-xl p-6 text-center text-sm text-muted-foreground">
-                      Ad Space
-                    </div>
+                    {/* Right sidebar ad */}
+                    <AdSlot
+                      slotId="journal-sidebar-right"
+                      ad={ads["journal-sidebar-right"]}
+                      size={{ width: 160, height: 600 }}
+                    />
                   </div>
                 </aside>
+              </div>
+
+              {/* ── Mobile-only fixed bottom ad bar ── */}
+              <div className="lg:hidden">
+                <AdSlot
+                  slotId="journal-mobile-bottom"
+                  ad={ads["journal-mobile-bottom"]}
+                  size={{ width: 320, height: 50 }}
+                />
               </div>
 
               <FlipbookPanel
@@ -471,6 +513,11 @@ const JournalClient = ({ path }: { path: string }) => {
             <div className="max-w-4xl mx-auto">{renderMainContent()}</div>
           )}
         </div>
+         <AdSlot
+                      slotId="journal-bottom"
+                      ad={ads["journal-bottom"]}
+                      size={{ width: 500, height: 300 }}
+                    />
       </div>
     </>
   );
