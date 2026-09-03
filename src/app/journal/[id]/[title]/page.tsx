@@ -293,13 +293,6 @@ const formattedDate = article?.publish_date
                 [&_blockquote_p]:font-serif [&_blockquote_p]:italic
                 [&_blockquote_p]:text-gray-800 [&_blockquote_p]:text-xl
                 [&_blockquote_p]:leading-snug
-                [&_p:first-of-type::first-letter]:float-left
-                [&_p:first-of-type::first-letter]:font-serif
-                [&_p:first-of-type::first-letter]:text-[72px]
-                [&_p:first-of-type::first-letter]:leading-[0.85]
-                [&_p:first-of-type::first-letter]:mr-3
-                [&_p:first-of-type::first-letter]:mt-1.5
-                [&_p:first-of-type::first-letter]:text-[#23AEB8]
               "
             >
               <ArticleContent content={article.content ?? ""} />

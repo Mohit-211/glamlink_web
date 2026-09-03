@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import CategoryNav from "./CategoryNav";
 import BlogGrid from "./BlogGrid";
 import HeroSection from "./HeroSection";
+import JournalSearchBar from "./JournalSearchBar";
 import { issues2025, issues2026, Issue } from "@/data/issues";
 import { useRouter, useSearchParams } from "next/navigation";
 import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
@@ -16,6 +17,7 @@ import JournalShop from "./JournalShop";
 ───────────────────────────────────────────────────────────── */
 const MOBILE_ISSUES_PER_PAGE = 4;
 const SIDEBAR_ISSUES_PER_PAGE = 3;
+const SEARCH_DEBOUNCE_MS = 300;
 
 const TOP_TABS = [
   { label: "Journal", path: "journal", href: "/journal" },
@@ -376,6 +378,20 @@ const JournalClient = ({ path }: { path: string }) => {
   );
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
+  // ── Journal article search (title, category, author, content) ──
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    setIsSearching(true);
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput.trim());
+      setIsSearching(false);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
   // Keep local state in sync when the URL's ?category= changes externally
   // (back/forward navigation, direct link)
   useEffect(() => {
@@ -408,7 +424,12 @@ const JournalClient = ({ path }: { path: string }) => {
         return (
           <main className="space-y-6 min-w-0">
             <HeroSection />
-            <BlogGrid activeCategory={activeCategory} />
+            <BlogGrid
+              activeCategory={activeCategory}
+              searchQuery={searchQuery}
+              onResetCategory={() => setActiveCategory("All")}
+              onClearSearch={() => setSearchInput("")}
+            />
           </main>
         );
       case "education":
@@ -433,7 +454,12 @@ const JournalClient = ({ path }: { path: string }) => {
         return (
           <main className="space-y-6 min-w-0">
             <HeroSection />
-            <BlogGrid activeCategory={activeCategory} />
+            <BlogGrid
+              activeCategory={activeCategory}
+              searchQuery={searchQuery}
+              onResetCategory={() => setActiveCategory("All")}
+              onClearSearch={() => setSearchInput("")}
+            />
           </main>
         );
     }
@@ -446,6 +472,17 @@ const JournalClient = ({ path }: { path: string }) => {
         <div className="max-w-[1700px] mx-auto px-4 sm:px-6 xl:px-14 mt-[120px] pb-8 lg:pb-14">
           {/* ── Top tab navigation (Journal / Education / Events / Shop) ── */}
           <TopTabs path={path} />
+
+          {/* ── Journal article search (title, category, author, content) ── */}
+          {fullLayout && (
+            <div className="w-full max-w-2xl mx-auto mb-6 lg:mb-8">
+              <JournalSearchBar
+                value={searchInput}
+                onChange={setSearchInput}
+                isSearching={isSearching}
+              />
+            </div>
+          )}
 
           {fullLayout ? (
             <>
