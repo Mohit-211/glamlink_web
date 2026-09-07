@@ -10,6 +10,7 @@ import GamAdSlot from "@/ads/GamAdSlot";
 const TEST_AD_UNIT = "/6355419/Travel/Europe/France/Paris";
 const TEST_AD_SIZE: [number, number] = [300, 250];
 
+
 export default function AdTestPage() {
   const device = useDeviceType();
   const ads = useAds({ page: "journal-article", device });

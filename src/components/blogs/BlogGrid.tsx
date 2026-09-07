@@ -10,6 +10,7 @@ import { useDeviceType } from "@/ads/Usedevicetype";
 import { useAds } from "@/ads/Useads";
 import AdSlot from "@/ads/Adslot";
 
+
 /* ─────────────────────────────────────────────────────────────
    Types
 ───────────────────────────────────────────────────────────── */

@@ -48,6 +48,7 @@ function fetchAds(): Promise<AdSource[]> {
       .finally(() => {
         adsPromise = null;
       });
+      
   }
   return adsPromise;
 }
