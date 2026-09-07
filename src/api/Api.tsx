@@ -537,3 +537,10 @@ export const ShippingRateWithoutTokenApi = async (payload: any) => {
   );
   return data;
 };
+/* ============================= */
+/* 📌 Ads */
+/* ============================= */
+export const getAds = async () => {
+  const { data } = await api.get("ads");
+  return data;
+};

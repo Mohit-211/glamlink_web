@@ -12,6 +12,11 @@ import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
 import JournalEducation from "./JournalEducation";
 import JournalEvent from "./JournalEvent";
 import JournalShop from "./JournalShop";
+import { useDeviceType } from "@/ads/Usedevicetype";
+import { useAds } from "@/ads/Useads";
+import AdSlot from "@/ads/Adslot";
+
+
 /* ─────────────────────────────────────────────────────────────
    Constants
 ───────────────────────────────────────────────────────────── */
@@ -494,17 +499,25 @@ const JournalClient = ({ path }: { path: string }) => {
                 />
                 <MobileMagazineCarousel onIssueClick={handleIssueClick} />
                 {renderMainContent()}
+
+                {/* Bottom padding so the fixed-overlay ad bar doesn't cover content */}
+                <div className="h-16" />
               </div>
 
               {/* ── Desktop 3-column layout (Journal only) ── */}
               <div className="hidden lg:grid grid-cols-[200px_1fr_300px] xl:grid-cols-[220px_1fr_300px] 2xl:grid-cols-[240px_1fr_320px] gap-10 xl:gap-14">
                 <aside>
-                  <div className="sticky top-28 pr-4">
+                  <div className="sticky top-28 space-y-6 pr-4">
                     <CategoryNav
                       activeCategory={activeCategory}
                       setActiveCategory={setActiveCategory}
                       vertical
                       path={path}
+                    />
+                    {/* Left sidebar ad */}
+                    <AdSlot
+                      slotId="journal-sidebar-left"
+                      // ad={ads["journal-sidebar-left"]}
                     />
                   </div>
                 </aside>
@@ -517,11 +530,21 @@ const JournalClient = ({ path }: { path: string }) => {
                       activeIssue={selectedIssue}
                       onIssueClick={handleIssueClick}
                     />
-                    <div className="border border-border/40 rounded-xl p-6 text-center text-sm text-muted-foreground">
-                      Ad Space
-                    </div>
+                    {/* Right sidebar ad */}
+                    <AdSlot
+                      slotId="journal-sidebar-right"
+                      // ad={ads["journal-sidebar-right"]}
+                    />
                   </div>
                 </aside>
+              </div>
+
+              {/* ── Mobile-only fixed bottom ad bar ── */}
+              <div className="lg:hidden">
+                <AdSlot
+                  slotId="journal-mobile-bottom"
+                  // ad={ads["journal-mobile-bottom"]}
+                />
               </div>
 
               <FlipbookPanel
@@ -534,6 +557,10 @@ const JournalClient = ({ path }: { path: string }) => {
             <div className="max-w-4xl mx-auto">{renderMainContent()}</div>
           )}
         </div>
+        <AdSlot
+          slotId="journal-bottom"
+          // ad={ads["journal-bottom"]}
+        />
       </div>
     </>
   );

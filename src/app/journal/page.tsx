@@ -26,6 +26,15 @@ export default function JournalPage() {
         }}
       />
 
+      {/* Google AdSense */}
+      <Script
+        id="google-adsense"
+        async
+        strategy="afterInteractive"
+        crossOrigin="anonymous"
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2781788508074958"
+      />
+
       <main className="flex-1">
         {/* 👇 Everything handled inside client now */}
         <Suspense fallback={null}>

@@ -255,6 +255,10 @@
     animation: fadeUp 0.8s ease-out forwards;
   }
 
+  .animate-banner-in {
+    animation: bannerIn 600ms ease-out forwards;
+  }
+
   .animate-pulse-slow {
     animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
@@ -277,6 +281,25 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes bannerIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-banner-in {
+      animation: none;
+      opacity: 1;
+      transform: none;
     }
   }
 

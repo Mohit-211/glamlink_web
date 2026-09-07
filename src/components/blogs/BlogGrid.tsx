@@ -6,6 +6,7 @@ import BlogCard from "./BlogCard";
 import { getAllBlogs } from "@/api/Api";
 import slugify from "slugify";
 import { ChevronLeft, ChevronRight, SearchX } from "lucide-react";
+import AdSlot from "@/ads/Adslot";
 
 /* ─────────────────────────────────────────────────────────────
    Types
@@ -244,24 +245,45 @@ const BlogGrid: React.FC<Props> = ({
  
 });
           return (
-            <Link
-              key={item.id}
-              href={`/journal/${item.id}/${slugify(title, {
-                lower: true,
-                strict: true,
-              })}`}
-              className="block group animate-fade-up"
-              style={{ animationDelay: `${0.06 * index}s` }}
-            >
-              <BlogCard
-                image={image}
-                category={category}
-                title={title}
-                excerpt={excerpt}
-                author={author}
-                date={date}
-              />
-            </Link>
+            <React.Fragment key={item.id}>
+              <Link
+                href={`/journal/${item.id}/${slugify(title, {
+                  lower: true,
+                  strict: true,
+                })}`}
+                className="block group animate-fade-up"
+                style={{ animationDelay: `${0.06 * index}s` }}
+              >
+                <BlogCard
+                  image={image}
+                  category={category}
+                  title={title}
+                  excerpt={excerpt}
+                  author={author}
+                  date={date}
+                />
+              </Link>
+
+              {/* ── In-feed ad — after the 1st row ── */}
+              {index === 1 && (
+                <div className="md:col-span-2 flex justify-center">
+                  <AdSlot
+                    slotId="journal-listing-in-feed"
+                    // ad={ads["journal-listing-in-feed"]}
+                  />
+                </div>
+              )}
+
+              {/* ── In-feed ad — after the 2nd row ── */}
+              {index === 3 && (
+                <div className="md:col-span-2 flex justify-center">
+                  <AdSlot
+                    slotId="journal-listing-in-feed-2"
+                    // ad={ads["journal-listing-in-feed-2"]}
+                  />
+                </div>
+              )}
+            </React.Fragment>
           );
         })}
       </div>
