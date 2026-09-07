@@ -10,11 +10,13 @@ interface ArticleAdSlotProps {
 export default function ArticleAdSlot({ slotId }: ArticleAdSlotProps) {
   const device = useDeviceType();
   const ads = useAds({ page: "journal-article", device });
+  const ad = ads[slotId];
 
-  
+  if (!ad) return null;
+
   return (
     <div className="flex justify-center my-8">
-      <AdSlot slotId={slotId} ad={ads[slotId]} />
+      <AdSlot slotId={slotId} ad={ad} />
     </div>
   );
 }

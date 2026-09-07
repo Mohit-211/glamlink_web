@@ -50,57 +50,58 @@ export default function AdSlot({ slotId, ad, hideOnMobile = false }: AdSlotProps
     }).catch((err) => console.error("AdSlot: click tracking failed", err));
   }
 
+  if (!ad) return null;
+
   const baseClasses =
     "overflow-hidden flex items-center justify-self-center justify-center rounded bg-gray-100";
   const responsiveClasses = hideOnMobile ? "hidden lg:flex" : "flex";
-
-  if (!ad) {
-    return (
-      <div
-        className={`${baseClasses} ${responsiveClasses} border border-dashed border-gray-300 text-gray-400 text-sm`}
-        style={{ width: size.width, height: size.height }}
-      >
-        Ad Space
-      </div>
-    );
-  }
-
   const behaviourClass = BEHAVIOUR_CLASSES[ad.behaviour] || BEHAVIOUR_CLASSES.static;
 
   return (
-    <div
-      ref={ref}
-      data-slot-id={slotId}
-      data-ad-id={ad.id}
-      className={`${baseClasses} ${responsiveClasses} ${behaviourClass}`}
-      style={{ width: size?.width, height: size?.height }}
-    >
-      <a
-        href={ad.link_url}
-        target="_blank"
-        rel="noopener noreferrer sponsored"
-        onClick={handleClick}
-        className="block w-full h-full"
+    <>
+      <div
+        ref={ref}
+        data-slot-id={slotId}
+        data-ad-id={ad.id}
+        className={`${baseClasses} ${responsiveClasses} ${behaviourClass}`}
+        style={{ width: size?.width, height: size?.height }}
       >
-        {ad.media_type === "video" ? (
-          <video
-            src={ad.image_url}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <img
-            src={ad.image_url}
-            alt={ad.alt_text || "Advertisement"}
-            width={size.width}
-            height={size.height}
-            className="w-full h-full object-cover"
-          />
-        )}
-      </a>
-    </div>
+        <a
+          href={ad.link_url}
+          target="_blank"
+          rel="noopener noreferrer sponsored"
+          onClick={handleClick}
+          className="block w-full h-full"
+        >
+          {ad.media_type === "video" ? (
+            <video
+              src={ad.image_url}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <img
+              src={ad.image_url}
+              alt={ad.alt_text || "Advertisement"}
+              width={size.width}
+              height={size.height}
+              className="w-full h-full object-cover"
+            />
+          )}
+        </a>
+      </div>
+      {/* Fixed-overlay ads are removed from flow, so reserve their height
+          here rather than relying on callers to add a static spacer. */}
+      {ad.behaviour === "fixed-overlay" && (
+        <div
+          aria-hidden="true"
+          style={{ height: size.height }}
+          className={hideOnMobile ? "hidden lg:block" : undefined}
+        />
+      )}
+    </>
   );
 }

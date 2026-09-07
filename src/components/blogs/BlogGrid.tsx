@@ -7,6 +7,8 @@ import { getAllBlogs } from "@/api/Api";
 import slugify from "slugify";
 import { ChevronLeft, ChevronRight, SearchX } from "lucide-react";
 import AdSlot from "@/ads/Adslot";
+import { useAds } from "@/ads/Useads";
+import { useDeviceType } from "@/ads/Usedevicetype";
 
 
 /* ─────────────────────────────────────────────────────────────
@@ -71,6 +73,9 @@ const BlogGrid: React.FC<Props> = ({
   const [allBlogs, setAllBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+
+  const device = useDeviceType();
+  const ads = useAds({ page: "journal-listing", device });
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
@@ -266,21 +271,21 @@ const BlogGrid: React.FC<Props> = ({
               </Link>
 
               {/* ── In-feed ad — after the 1st row ── */}
-              {index === 1 && (
+              {index === 1 && ads["journal-listing-in-feed"] && (
                 <div className="md:col-span-2 flex justify-center">
                   <AdSlot
                     slotId="journal-listing-in-feed"
-                    // ad={ads["journal-listing-in-feed"]}
+                    ad={ads["journal-listing-in-feed"]}
                   />
                 </div>
               )}
 
               {/* ── In-feed ad — after the 2nd row ── */}
-              {index === 3 && (
+              {index === 3 && ads["journal-listing-in-feed-2"] && (
                 <div className="md:col-span-2 flex justify-center">
                   <AdSlot
                     slotId="journal-listing-in-feed-2"
-                    // ad={ads["journal-listing-in-feed-2"]}
+                    ad={ads["journal-listing-in-feed-2"]}
                   />
                 </div>
               )}

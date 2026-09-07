@@ -384,6 +384,9 @@ const JournalClient = ({ path }: { path: string }) => {
   );
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
+  const device = useDeviceType();
+  const ads = useAds({ page: "journal-listing", device });
+
   // ── Journal article search (title, category, author, content) ──
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -423,7 +426,7 @@ const JournalClient = ({ path }: { path: string }) => {
   };
 
   const fullLayout = isFullLayout(path);
-
+  console.log(fullLayout, "fullLayout")
   const renderMainContent = () => {
     switch (path) {
       case "journal":
@@ -478,7 +481,14 @@ const JournalClient = ({ path }: { path: string }) => {
         <div className="max-w-[1700px] mx-auto px-4 sm:px-6 xl:px-14 mt-[120px] pb-8 lg:pb-14">
           {/* ── Top tab navigation (Journal / Education / Events / Shop) ── */}
           <TopTabs path={path} />
-
+          {fullLayout && (
+            <div className="flex justify-center py-4">
+              <AdSlot
+                slotId="journal-top-banner"
+                ad={ads["journal-top-banner"]}
+              />
+            </div>
+          )}
           {/* ── Journal article search (title, category, author, content) ── */}
           {fullLayout && (
             <div className="w-full max-w-2xl mx-auto mb-6 lg:mb-8">
@@ -500,9 +510,6 @@ const JournalClient = ({ path }: { path: string }) => {
                 />
                 <MobileMagazineCarousel onIssueClick={handleIssueClick} />
                 {renderMainContent()}
-
-                {/* Bottom padding so the fixed-overlay ad bar doesn't cover content */}
-                <div className="h-16" />
               </div>
 
               {/* ── Desktop 3-column layout (Journal only) ── */}
@@ -518,7 +525,7 @@ const JournalClient = ({ path }: { path: string }) => {
                     {/* Left sidebar ad */}
                     <AdSlot
                       slotId="journal-sidebar-left"
-                      // ad={ads["journal-sidebar-left"]}
+                      ad={ads["journal-sidebar-left"]}
                     />
                   </div>
                 </aside>
@@ -534,7 +541,7 @@ const JournalClient = ({ path }: { path: string }) => {
                     {/* Right sidebar ad */}
                     <AdSlot
                       slotId="journal-sidebar-right"
-                      // ad={ads["journal-sidebar-right"]}
+                      ad={ads["journal-sidebar-right"]}
                     />
                   </div>
                 </aside>
@@ -544,7 +551,7 @@ const JournalClient = ({ path }: { path: string }) => {
               <div className="lg:hidden">
                 <AdSlot
                   slotId="journal-mobile-bottom"
-                  // ad={ads["journal-mobile-bottom"]}
+                  ad={ads["journal-mobile-bottom"]}
                 />
               </div>
 
@@ -558,10 +565,7 @@ const JournalClient = ({ path }: { path: string }) => {
             <div className="max-w-4xl mx-auto">{renderMainContent()}</div>
           )}
         </div>
-        <AdSlot
-          slotId="journal-bottom"
-          // ad={ads["journal-bottom"]}
-        />
+        <AdSlot slotId="journal-bottom" ad={ads["journal-bottom"]} />
       </div>
     </>
   );

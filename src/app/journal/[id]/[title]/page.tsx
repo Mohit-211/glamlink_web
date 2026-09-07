@@ -194,6 +194,15 @@ const formattedDate = article?.publish_date
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
+      {/* Google AdSense */}
+      <Script
+        id="google-adsense"
+        async
+        strategy="afterInteractive"
+        crossOrigin="anonymous"
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2781788508074958"
+      />
+
       <main className="flex-1">
         {/* ── Left/right rail ads — fixed to the viewport edges, only shown
              once the screen is wide enough to have real blank space beside
@@ -405,7 +414,6 @@ const formattedDate = article?.publish_date
         {/* ── Mobile-only fixed bottom ad bar ── */}
         <div className="lg:hidden">
           <ArticleAdSlot slotId="journal-mobile-bottom" />
-          <div className="h-16" />
         </div>
       </main>
     </div>
