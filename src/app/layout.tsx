@@ -6,6 +6,7 @@ import Script from "next/script";
 import Providers from "./providers";
 import ScrollToTop from "@/components/ScrollToTop";
 import LayoutWrapper from "@/components/LayoutWrapper";
+import GamScript from "@/ads/GamScript";
 
 import "../styles/globals.css"
 
@@ -117,6 +118,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Google AdSense */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2781788508074958"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+
         {/* Google Tag Manager */}
         <Script
           id="gtm-script"
@@ -158,6 +167,9 @@ export default function RootLayout({
       </head>
 
       <body className="min-h-screen bg-background" suppressHydrationWarning>
+        {/* Google Ad Manager (GPT) */}
+        <GamScript />
+
         {/* Google Tag Manager (noscript fallback) */}
         <noscript>
           <iframe

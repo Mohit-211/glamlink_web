@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { Ad } from "./Useads";
-import { useDeviceType } from "./Usedevicetype";
 
 interface AdSlotProps {
   slotId: string;
@@ -16,9 +15,8 @@ const BEHAVIOUR_CLASSES: Record<string, string> = {
     "fixed left-1/2 bottom-0 -translate-x-1/2 z-[999] shadow-[0_-2px_8px_rgba(0,0,0,0.15)]",
 };
 export default function AdSlot({ slotId, ad, hideOnMobile = false }: AdSlotProps) {
-  const device = useDeviceType();
   const ref = useRef<HTMLDivElement>(null);
-  const size = ad ? (device === "mobile" && ad.mobile_size ? ad.mobile_size : ad.size) : DEFAULT_SIZE;
+  const size = ad ? { width: ad.width, height: ad.height } : DEFAULT_SIZE;
   useEffect(() => {
     if (!ad || !ref.current) return;
 
@@ -83,13 +81,24 @@ export default function AdSlot({ slotId, ad, hideOnMobile = false }: AdSlotProps
         onClick={handleClick}
         className="block w-full h-full"
       >
-        <img
-          src={ad.image_url}
-          alt={ad.alt_text || "Advertisement"}
-          width={size.width}
-          height={size.height}
-          className="w-full h-full object-cover"
-        />
+        {ad.media_type === "video" ? (
+          <video
+            src={ad.image_url}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <img
+            src={ad.image_url}
+            alt={ad.alt_text || "Advertisement"}
+            width={size.width}
+            height={size.height}
+            className="w-full h-full object-cover"
+          />
+        )}
       </a>
     </div>
   );
