@@ -6,6 +6,7 @@ interface AdSlotProps {
   slotId: string;
   ad?: Ad;
   hideOnMobile?: boolean;
+  
 }
 const DEFAULT_SIZE = { width: 300, height: 250 };
 const BEHAVIOUR_CLASSES: Record<string, string> = {

@@ -8,6 +8,7 @@ import slugify from "slugify";
 import { ChevronLeft, ChevronRight, SearchX } from "lucide-react";
 import AdSlot from "@/ads/Adslot";
 
+
 /* ─────────────────────────────────────────────────────────────
    Types
 ───────────────────────────────────────────────────────────── */
