@@ -451,9 +451,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
             </button>
              <button
                   onClick={handleShare}
-                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200" style={socialIconStyle}
+                  className="w-6 h-6 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200" style={socialIconStyle}
                 >
-                  <Share2 size={18} strokeWidth={2.5} />
+                  <Share2 size={12} strokeWidth={2.5} />
                 </button>
             {/* <button
               onClick={() => setIsQrModalOpen(true)}
