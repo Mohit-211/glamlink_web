@@ -22,11 +22,14 @@ import {
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 /* ================= VCF GENERATOR ================= */
 export function generateVCF(data: GlamCardFormData) {
+  const fullName = (data.name || "").trim();
+  const [firstName, ...rest] = fullName.split(/\s+/).filter(Boolean);
+  const lastName = rest.join(" ");
   return [
     "BEGIN:VCARD",
     "VERSION:3.0",
-    `N:${data.name || ""};;;;`,
-    `FN:${data.name || ""}`,
+    `N:${lastName};${firstName || ""};;;`,
+    `FN:${fullName}`,
     `ORG:${data.business_name || ""}`,
     `TITLE:${data.professional_title || ""}`,
     `TEL;TYPE=CELL:${data.phone || ""}`,
@@ -446,12 +449,18 @@ const GlamCardLivePreview: React.FC<Props> = ({
               </svg>
               Save
             </button>
-            <button
+             <button
+                  onClick={handleShare}
+                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200" style={socialIconStyle}
+                >
+                  <Share2 size={18} strokeWidth={2.5} />
+                </button>
+            {/* <button
               onClick={() => setIsQrModalOpen(true)}
               className="h-8 w-8 flex items-center justify-center rounded-full bg-[#23B9CD]/10 text-[#23B9CD] transition active:scale-95"
             >
               <QrCode size={15} strokeWidth={2.5} />
-            </button>
+            </button> */}
           </div>
         </div>
       )}
@@ -904,7 +913,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           normalizedImages[thumbnailIndex]?.thumbnail_uri ||
                           galleryPreviews[thumbnailIndex]
                         }
-                        className="h-full w-full object-cove r"
+                        className="h-full w-full object-cover"
                         alt="Featured work"
                       />
                     )}
@@ -989,11 +998,12 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   )}
                   {selectedLocation && (
                     <div className="mb-3 space-y-1">
-                      {/* {selectedLocation.business_name && (
-                        <p className="font-semibold text-gray-800 text-sm">
-                          {selectedLocation.business_name}
-                        </p>
-                      )} */}
+                     {data.locations.length === 1 &&
+                              selectedLocation.label && (
+                                <p className="font-semibold text-gray-800">
+                                  {selectedLocation.label}
+                                </p>
+                              )}
                       <p className="text-gray-600 text-sm leading-relaxed">
                         {selectedLocation.location_type === "exact_address"
                           ? selectedLocation.address?.trim() ||
