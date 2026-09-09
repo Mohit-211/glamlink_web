@@ -109,9 +109,24 @@ const generateVideoThumbnail = (file: File): Promise<File> => {
     videoEl.preload = "metadata";
     videoEl.muted = true;
     videoEl.playsInline = true;
+    videoEl.setAttribute("playsinline", "true");
+    // Safari/WebKit never fires `seeked` on a video element that isn't
+    // attached to the document, so the frame capture below would hang
+    // forever on Mac/iOS. Keep it in the DOM (visually hidden) for the
+    // duration of the capture.
+    videoEl.style.position = "fixed";
+    videoEl.style.top = "-9999px";
+    videoEl.style.width = "1px";
+    videoEl.style.height = "1px";
+    videoEl.style.opacity = "0";
+    videoEl.style.pointerEvents = "none";
+    document.body.appendChild(videoEl);
     videoEl.src = url;
 
-    const cleanup = () => URL.revokeObjectURL(url);
+    const cleanup = () => {
+      URL.revokeObjectURL(url);
+      videoEl.remove();
+    };
 
     videoEl.onloadedmetadata = () => {
       // Grab a frame ~1s in (or the midpoint for very short clips) so we

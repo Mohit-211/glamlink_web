@@ -512,7 +512,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
             {/* ===== MOBILE HERO: PROFILE CARD ===== */}
             <div className="lg:hidden mb-4">
               <div
-                className="rounded-2xl overflow-hidden shadow-md"
+                className="relative rounded-2xl overflow-hidden shadow-md"
                 style={{
                   background:
                     "linear-gradient(135deg, #23B9CD 0%, #0e8fa0 100%)",
@@ -603,7 +603,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <SectionBox title="Gallery" titleAlign="center">
                   {normalizedImages.length > 0 && thumbnailIndex !== null ? (
                     <>
-                      <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
+                      <div className="relative aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
                         {normalizedImages[thumbnailIndex]?.file_type ===
                           "video" ? (
                           <video
@@ -890,7 +890,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
               )}
               {normalizedImages.length > 0 && thumbnailIndex !== null && (
                 <SectionBox title="Gallery" titleAlign="center">
-                  <div className=" aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 shadow-sm">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 shadow-sm">
                     {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
                       <video
                         key={galleryPreviews[thumbnailIndex]}
