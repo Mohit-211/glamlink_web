@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import { GlamCardFormData } from "./GlamCardForm/types";
 import Logo from "../../../public/assets/ACCESS-3.png";
 import Image from "next/image";
@@ -18,8 +18,87 @@ import {
   Phone,
   MapPin,
   Clock,
+  Play,
 } from "lucide-react";
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
+/* ================= VIDEO THUMBNAIL GENERATOR ================= */
+/**
+ * Generates a JPEG data URL from a video's first safely-seekable frame.
+ * Needed because Safari (macOS/iOS) does not reliably render a preview
+ * frame for <video> without an explicit poster.
+ */
+function generateVideoThumbnail(
+  videoUrl: string,
+  seekTime: number = 0.1,
+): Promise<string | null> {
+  return new Promise((resolve) => {
+    if (!videoUrl || typeof document === "undefined") {
+      resolve(null);
+      return;
+    }
+    try {
+      const video = document.createElement("video");
+      if (!videoUrl.startsWith("blob:") && !videoUrl.startsWith("data:")) {
+        video.crossOrigin = "anonymous";
+      }
+      video.preload = "metadata";
+      video.muted = true;
+      video.playsInline = true;
+      (video as any).webkitPlaysInline = true;
+      video.src = videoUrl;
+
+      let settled = false;
+      const finish = (result: string | null) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeoutId);
+        video.removeAttribute("src");
+        video.load();
+        resolve(result);
+      };
+
+      const captureFrame = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = video.videoWidth || 320;
+          canvas.height = video.videoHeight || 240;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            finish(null);
+            return;
+          }
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+          finish(dataUrl);
+        } catch {
+          // Tainted canvas (CORS) or other draw failure — fall back gracefully.
+          finish(null);
+        }
+      };
+
+      video.addEventListener("loadedmetadata", () => {
+        const duration = video.duration;
+        const target =
+          isFinite(duration) && duration > 0 && duration < seekTime
+            ? Math.max(duration / 2, 0.01)
+            : seekTime;
+        try {
+          video.currentTime = target;
+        } catch {
+          captureFrame();
+        }
+      });
+      video.addEventListener("seeked", captureFrame);
+      video.addEventListener("error", () => finish(null));
+
+      const timeoutId = window.setTimeout(() => finish(null), 5000);
+
+      video.load();
+    } catch {
+      resolve(null);
+    }
+  });
+}
 /* ================= VCF GENERATOR ================= */
 export function generateVCF(data: GlamCardFormData) {
   const fullName = (data.name || "").trim();
@@ -295,6 +374,63 @@ const GlamCardLivePreview: React.FC<Props> = ({
     () => normalizedImages?.map((_, i) => i),
     [normalizedImages],
   );
+  /* ================= VIDEO THUMBNAIL CACHE ================= */
+  const [videoThumbCache, setVideoThumbCache] = useState<Record<string, string>>(
+    {},
+  );
+  const attemptedVideoUrlsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    let cancelled = false;
+    normalizedImages.forEach((item, idx) => {
+      if (item.file_type !== "video" || item.thumbnail_uri) return;
+      const videoUrl = galleryPreviews[idx];
+      if (!videoUrl || attemptedVideoUrlsRef.current.has(videoUrl)) return;
+      attemptedVideoUrlsRef.current.add(videoUrl);
+      generateVideoThumbnail(videoUrl).then((thumb) => {
+        if (cancelled || !thumb) return;
+        setVideoThumbCache((prev) => ({ ...prev, [videoUrl]: thumb }));
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [normalizedImages, galleryPreviews]);
+  /** First preference: backend thumbnail_uri, second: cached/generated thumbnail. */
+  const getVideoThumbSrc = (index: number): string | null => {
+    const item = normalizedImages[index];
+    if (!item) return null;
+    if (item.thumbnail_uri) return item.thumbnail_uri;
+    const videoUrl = galleryPreviews[index];
+    if (videoUrl && videoThumbCache[videoUrl]) return videoThumbCache[videoUrl];
+    return null;
+  };
+  const renderThumbImage = (index: number, altPrefix: string) => {
+    const item = normalizedImages[index];
+    if (item?.file_type === "video") {
+      const thumbSrc = getVideoThumbSrc(index);
+      return (
+        <div className="relative h-full w-full bg-gray-700">
+          {thumbSrc ? (
+            <img
+              src={thumbSrc}
+              className="h-full w-full object-cover"
+              alt={`${altPrefix} ${index + 1}`}
+            />
+          ) : null}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/25">
+            <Play size={14} className="text-white fill-white" />
+          </div>
+        </div>
+      );
+    }
+    return (
+      <img
+        src={thumbnailPreviews[index]}
+        className="h-full w-full object-cover"
+        alt={`${altPrefix} ${index + 1}`}
+      />
+    );
+  };
   /* ================= LOCATION ================= */
   const primaryLocation = useMemo(
     () => data.locations?.find((l: any) => l.is_primary) || data.locations?.[0],
@@ -613,6 +749,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             preload="metadata"
                             webkit-playsinline="true"
                             controlsList="nodownload"
+                            poster={getVideoThumbSrc(thumbnailIndex) || undefined}
                             className="h-full w-full object-cover"
                           >
                             <source
@@ -675,11 +812,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                                 boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
                               }}
                             >
-                              <img
-                                src={thumbnailPreviews[index]}
-                                className="h-full w-full object-cover"
-                                alt={`Thumbnail ${index + 1}`}
-                              />
+                              {renderThumbImage(index, "Thumbnail")}
                             </button>
                           ))}
                         </div>
@@ -899,6 +1032,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         preload="metadata"
                         webkit-playsinline="true"
                         controlsList="nodownload"
+                        poster={getVideoThumbSrc(thumbnailIndex) || undefined}
                         className="h-full w-full object-cover"
                       >
                         <source
@@ -965,11 +1099,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           onClick={() => setThumbnailIndex(index)}
                           className={` h-12 w-12 overflow-hidden rounded-lg border flex-shrink-0 snap-start transition-all ${thumbnailIndex === index ? "ring-2 ring-[#23B9CD] border-[#23B9CD]" : "border-gray-200"}`}
                         >
-                          <img
-                            src={thumbnailPreviews[index]}
-                            className="h-full w-full object-cover"
-                            alt={`Thumb ${index + 1}`}
-                          />
+                          {renderThumbImage(index, "Thumb")}
                         </button>
                       ))}
                     </div>
