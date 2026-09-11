@@ -1,14 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   Pagination,
   PaginationContent,
@@ -17,6 +12,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { encodeId } from "@/lib/idCodec";
 
 const PRODUCTS_PER_PAGE = 3;
 
@@ -26,7 +22,6 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, onSelect }: ProductCardProps) => {
-console.log(product,"products")
   return (
     <div
       onClick={() => onSelect(product)}
@@ -84,9 +79,8 @@ interface JournalShopCardProps {
 }
 
 const JournalShopCard = ({ shop,heading }: JournalShopCardProps) => {
-  console.log(shop,"shop")
+  const router = useRouter();
   const products = shop ?? [];
-  const [activeProduct, setActiveProduct] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   if (products.length === 0) {
@@ -102,6 +96,10 @@ const JournalShopCard = ({ shop,heading }: JournalShopCardProps) => {
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
+  };
+
+  const goToProductDetails = (product: any) => {
+    router.push(`/journal/shop/${encodeId(product.id)}`);
   };
 
   return (
@@ -129,7 +127,7 @@ const JournalShopCard = ({ shop,heading }: JournalShopCardProps) => {
           <ProductCard
             key={product.id}
             product={product}
-            onSelect={setActiveProduct}
+            onSelect={goToProductDetails}
           />
         ))}
       </div>
@@ -185,85 +183,6 @@ const JournalShopCard = ({ shop,heading }: JournalShopCardProps) => {
           </PaginationContent>
         </Pagination>
       )}
-
-      {/* Product Modal */}
-      <Dialog
-        open={!!activeProduct}
-        onOpenChange={(open) => !open && setActiveProduct(null)}
-      >
-        <DialogContent className="sm:max-w-2xl p-0 gap-0 overflow-hidden rounded-2xl border-none shadow-[var(--shadow-large)]">
-          {activeProduct && (
-            <>
-              {/* Accessible title (visually replaced by custom header below) */}
-              <DialogHeader className="sr-only">
-                <DialogTitle>
-                  {activeProduct.title || activeProduct.name}
-                </DialogTitle>
-              </DialogHeader>
-
-              <div className="grid sm:grid-cols-2">
-                {/* Image side */}
-                <div className="relative aspect-square sm:aspect-auto bg-muted/30 overflow-hidden">
-                  <img
-                    src={activeProduct.cover_image}
-                    alt={activeProduct.title}
-                    className="w-full h-full object-cover"
-                  />
-
-                  {/* Subtle gradient for legibility on small screens */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent sm:hidden" />
-
-                  {activeProduct.category && (
-                    <span className="badge-soft absolute top-4 left-4 !bg-white/90 !border-white/60 !text-foreground backdrop-blur-sm shadow-sm">
-                      {activeProduct.category}
-                    </span>
-                  )}
-                </div>
-
-                {/* Details side */}
-                <div className="flex flex-col p-6 sm:p-8 bg-card">
-                  <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">
-                    {activeProduct.brand}
-                  </p>
-
-                  <h2 className="font-display text-2xl leading-snug mt-1.5 text-foreground">
-                    {activeProduct.title || activeProduct.name}
-                  </h2>
-
-                  {(activeProduct.description || activeProduct.short_description) && (
-                    <p className="text-sm text-muted-foreground leading-relaxed mt-4">
-                      {activeProduct.description || activeProduct.short_description}
-                    </p>
-                  )}
-
-                  <div className="mt-auto pt-8 space-y-4">
-                    <div className="h-px bg-border/60" />
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-semibold text-foreground">
-                        {activeProduct.price
-                          ? `$${activeProduct.price}`
-                          : "View Product"}
-                      </span>
-
-                      <Button
-                        onClick={() =>
-                          activeProduct.link &&
-                          window.open(activeProduct.link, "_blank")
-                        }
-                        className="btn-primary cursor-pointer"
-                      >
-                        <ShoppingBag className="h-4 w-4" />
-                        Shop Now
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
     </section>
   );
 };

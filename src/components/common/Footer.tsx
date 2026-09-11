@@ -8,7 +8,7 @@ import { Instagram, Twitter, Facebook, Linkedin, Youtube } from "lucide-react";
 const footerLinks = {
   navigation: [
 
-    { label: "Directory", href: "/directory" },
+    // { label: "Directory", href: "/directory" },
     { label: "Magazine", href: "/magazine" },
     { label: "Journal", href: "/journal" },
     { label: "Media-kit", href: "/media-kit" },

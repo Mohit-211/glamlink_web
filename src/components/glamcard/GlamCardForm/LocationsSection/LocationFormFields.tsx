@@ -44,14 +44,30 @@ const findStateId = (stateValue: string | undefined, statesArray: any[]): string
   return found ? String(found.id) : undefined;
 };
 
+// Helper: pull latitude/longitude off a city record if the API already provides them
+const extractCityCoords = (cityObj: any): { latitude: number; longitude: number } | null => {
+  if (!cityObj) return null;
+  const latitude = cityObj.latitude ?? cityObj.lat ?? cityObj.Latitude;
+  const longitude = cityObj.longitude ?? cityObj.lng ?? cityObj.Longitude;
+  if (latitude === undefined || latitude === null || longitude === undefined || longitude === null) return null;
+  const latitudeNum = Number(latitude);
+  const longitudeNum = Number(longitude);
+  if (Number.isNaN(latitudeNum) || Number.isNaN(longitudeNum)) return null;
+  return { latitude: latitudeNum, longitude: longitudeNum };
+};
+
 const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
   const addressInputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
 
   const [states, setStates] = useState<any[]>([]);
   const [cities, setCities] = useState<any[]>([]);
   const [statesLoading, setStatesLoading] = useState(false);
   const [citiesLoading, setCitiesLoading] = useState(false);
+
+  const [cityCoords, setCityCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [cityCoordsLoading, setCityCoordsLoading] = useState(false);
 
   /* Load States */
   useEffect(() => {
@@ -101,6 +117,64 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
     fetchCities();
   }, [location.state, states]);
 
+  /* Resolve latitude/longitude for the selected city:
+     1) use coords already present on the city record from the API
+     2) otherwise geocode "City, State" with Google Maps Geocoder */
+  useEffect(() => {
+    if (location.location_type !== "city_only" || !location.city || !cities.length) {
+      setCityCoords(null);
+      return;
+    }
+
+    const cityObj = cities.find((c: any) => String(c?.id) === String(location.city));
+    if (!cityObj) {
+      setCityCoords(null);
+      return;
+    }
+
+    const directCoords = extractCityCoords(cityObj);
+    if (directCoords) {
+      setCityCoords(directCoords);
+      return;
+    }
+
+    if (!(window as any).google?.maps?.Geocoder) {
+      setCityCoords(null);
+      return;
+    }
+
+    if (!geocoderRef.current) {
+      geocoderRef.current = new google.maps.Geocoder();
+    }
+
+    const stateObj = states.find((s: any) => String(s.id) === String(location.state));
+    const query = [cityObj?.name, stateObj?.name].filter(Boolean).join(", ");
+    if (!query) {
+      setCityCoords(null);
+      return;
+    }
+
+    let cancelled = false;
+    setCityCoordsLoading(true);
+
+    geocoderRef.current.geocode({ address: query }, (results, status) => {
+      if (cancelled) return;
+      setCityCoordsLoading(false);
+
+      if (status === "OK" && results?.[0]?.geometry?.location) {
+        const loc = results[0].geometry.location;
+        setCityCoords({ latitude: loc.lat(), longitude: loc.lng() });
+      } else {
+        console.error("City geocode failed:", status);
+        setCityCoords(null);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [location.city, location.state, cities, states, location.location_type]);
+
   /* Google Places Autocomplete Setup */
   useEffect(() => {
     if (location.location_type !== "exact_address") return;
@@ -147,7 +221,11 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
     location.location_type === "exact_address" && !!location.address?.trim();
 
   const canSetCity =
-    location.location_type === "city_only" && !!location.city && !!location.state;
+    location.location_type === "city_only" &&
+    !!location.city &&
+    !!location.state &&
+    !!cityCoords &&
+    !cityCoordsLoading;
 
   const handleConfirmExact = () => {
     if (!canConfirmExact) return;
@@ -164,8 +242,12 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
   };
 
   const handleSetCity = () => {
-    if (!canSetCity) return;
-    onUpdate({ isSet: true });
+    if (!canSetCity || !cityCoords) return;
+    onUpdate({
+      isSet: true,
+      latitude: cityCoords.latitude,
+      longitude: cityCoords.longitude,
+    });
   };
 
   const handleTypeChange = (newType: "exact_address" | "city_only") => {
@@ -179,6 +261,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       isSet: false,
     });
     setCities([]);
+    setCityCoords(null);
   };
 
   return (
@@ -268,21 +351,29 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                   </option>
                 ))}
               </select>
+              {location.city && cityCoordsLoading && (
+                <p className="mt-1 text-xs text-gray-400">Resolving coordinates…</p>
+              )}
+              {location.city && !cityCoordsLoading && !cityCoords && (
+                <p className="mt-1 text-xs text-red-500">
+                  Couldn&apos;t resolve coordinates for this city.
+                </p>
+              )}
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               type="button"
-              disabled={!canSetCity || citiesLoading}
+              disabled={!canSetCity}
               className={`w-full ${
-                canSetCity && !citiesLoading
+                canSetCity
                   ? "bg-[#23AEB8] text-white hover:bg-[#1f9ba3]"
                   : "cursor-not-allowed bg-gray-300 text-white"
               } ${buttonClass}`}
               onClick={handleSetCity}
             >
-              Set Location
+              {citiesLoading || cityCoordsLoading ? "Loading..." : "Set Location"}
             </button>
             {location.isSet && (
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">

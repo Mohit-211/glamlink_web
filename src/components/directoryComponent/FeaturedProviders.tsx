@@ -18,7 +18,7 @@ export default function FeaturedProviders({ data }: Props) {
     <section className="py-16">
       <h2 className="text-4xl font-semibold mb-10">Featured Providers</h2>
 
-      <div className="grid md:grid-cols-4 gap-10">
+      <div className="grid md:grid-cols-3 gap-10">
         {data.map((item, index) => (
           <ProviderCard
             key={item.place_id || item.name || index}

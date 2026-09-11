@@ -62,7 +62,7 @@ const websiteSchema = {
   url: "https://glamlink.net",
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://glamlink.net/directory?search={search_term_string}",
+    target: "https://glamlink.net/journal/directory?search={search_term_string}",
     "query-input": "required name=search_term_string",
   },
 };

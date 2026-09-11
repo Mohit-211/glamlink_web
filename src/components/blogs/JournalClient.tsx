@@ -12,6 +12,7 @@ import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
 import JournalEducation from "./JournalEducation";
 import JournalEvent from "./JournalEvent";
 import JournalShop from "./JournalShop";
+import DirectoryPage from "@/components/directoryComponent/DirectoryPage";
 import { useDeviceType } from "@/ads/Usedevicetype";
 import { useAds } from "@/ads/Useads";
 import AdSlot from "@/ads/Adslot";
@@ -30,6 +31,7 @@ const TOP_TABS = [
   { label: "Education", path: "education", href: "/journal/education" },
   { label: "Events", path: "event", href: "/journal/events" },
   { label: "Shop", path: "shop", href: "/journal/shop" },
+  { label: "Directory", path: "directory", href: "/journal/directory" },
 ];
 
 // Only the "journal" tab shows Category nav + Magazine sidebar
@@ -457,6 +459,12 @@ const JournalClient = ({ path }: { path: string }) => {
         return (
           <main className="space-y-6 min-w-0">
             <JournalShop />
+          </main>
+        );
+      case "directory":
+        return (
+          <main className="space-y-6 min-w-0">
+            <DirectoryPage />
           </main>
         );
       default:

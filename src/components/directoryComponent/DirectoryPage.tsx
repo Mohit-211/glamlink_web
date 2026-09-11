@@ -28,7 +28,6 @@ export default function DirectoryPage() {
   const [professionals, setProfessionals] = useState<Provider[]>([]);
   const [services, setServices] = useState<any[]>([]);
 
-  const [loading, setLoading] = useState(true);
   const [activeService, setActiveService] = useState(serviceParam || "All");
 
   /* =====================
@@ -104,8 +103,6 @@ export default function DirectoryPage() {
       setProviders(providersWithDetails);
     } catch (error) {
       console.log("API error:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -117,10 +114,10 @@ export default function DirectoryPage() {
     setActiveService(service.title);
 
     if (service.title === "All") {
-      router.push("/directory");
+      router.push("/journal/directory");
       fetchProfessionals();
     } else {
-      router.push(`/directory?service=${service.title}`);
+      router.push(`/journal/directory?service=${service.title}`);
 
       try {
         const res = await GetProfilesByDirectory(service.id);
@@ -132,43 +129,6 @@ export default function DirectoryPage() {
   };
 
   /* =====================
-     LOADING UI
-  ====================== */
-
-  if (loading) {
-    return (
-      <div className="container-glamlink section-glamlink">
-        <div className="animate-pulse space-y-16">
-          {/* Tabs Skeleton */}
-          <div className="flex justify-center gap-3 flex-wrap">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-10 w-28 rounded-full bg-muted" />
-            ))}
-          </div>
-
-          {/* Hero Skeleton */}
-          <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className="space-y-4">
-              <div className="h-10 w-64 bg-muted rounded" />
-              <div className="h-6 w-80 bg-muted rounded" />
-              <div className="h-10 w-40 bg-muted rounded-full" />
-            </div>
-
-            <div className="h-64 rounded-xl bg-muted" />
-          </div>
-
-          {/* Cards Skeleton */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-64 rounded-xl bg-muted" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  /* =====================
      FIND ACTIVE CATEGORY
   ====================== */
 
@@ -178,8 +138,7 @@ export default function DirectoryPage() {
 
   return (
     <div className="page-soft">
-      <div className="container-glamlink section-glamlink">
-        {/* SERVICE TABS */}
+  
 
         <div className="flex flex-wrap gap-3 mb-14 mt-4 justify-center">
           <button
@@ -241,6 +200,6 @@ export default function DirectoryPage() {
           <CTASection />
         </div>
       </div>
-    </div>
+
   );
 }
