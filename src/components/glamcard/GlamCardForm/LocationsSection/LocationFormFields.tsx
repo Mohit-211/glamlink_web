@@ -143,7 +143,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       return;
     }
 
-    const cityObj = cities.find((c: any) => String(c?.id) === String(location.city));
+    const cityObj = cities.find((c: any) => c?.name === location.city);
     if (!cityObj) {
       setCityCoords(null);
       return;
@@ -168,8 +168,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       geocoderRef.current = new google.maps.Geocoder();
     }
 
-    const stateObj = states.find((s: any) => String(s.id) === String(location.state));
-    const query = [cityObj?.name, stateObj?.name].filter(Boolean).join(", ");
+    const query = [cityObj?.name, location.state].filter(Boolean).join(", ");
     if (!query) {
       setCityCoords(null);
       return;
@@ -345,7 +344,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                   {statesLoading ? "Loading states..." : "Select state"}
                 </option>
                 {states.map((state: any) => (
-                  <option key={state.id} value={String(state.id)}>
+                  <option key={state.id} value={state.name}>
                     {state.name}
                   </option>
                 ))}
@@ -369,7 +368,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                     : "Select city"}
                 </option>
                 {cities?.map((city: any) => (
-                  <option key={city?.id} value={String(city?.id)}>
+                  <option key={city?.id} value={city?.name}>
                     {city?.name}
                   </option>
                 ))}

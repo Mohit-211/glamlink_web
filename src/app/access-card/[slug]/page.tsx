@@ -1,22 +1,23 @@
 // pages/access-card/[slug]/page.tsx
 import type { Metadata } from "next";
+import { getBusinessCardBySlug } from "@/api/Api";
 import BusinessCardPageClient from "./BusinessCardPageClient";
 
 const DEFAULT_OG_IMAGE = "https://glamlink.net/oglayout.png";
 
 async function getProDataForMetadata(slug: string) {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}businessCard/getBusinessCard/${slug}`,
-      { next: { revalidate: 300 } },
-    );
-    if (!res.ok) return null;
-    const json = await res.json();
-    if (json?.success === false) return null;
-    return json?.data || null;
+    const res = await getBusinessCardBySlug(slug);
+    if (res?.success === false) return null;
+    return res?.data || null;
   } catch {
     return null;
   }
+}
+
+function toAbsoluteImageUrl(image: unknown): string {
+  if (typeof image !== "string" || !image.trim()) return DEFAULT_OG_IMAGE;
+  return /^https?:\/\//i.test(image) ? image : DEFAULT_OG_IMAGE;
 }
 
 function buildLocationLabel(pro: any): string {
@@ -40,7 +41,9 @@ function buildDescription(pro: any): string {
   const parts = [specialty, business, location].filter(Boolean);
   if (parts.length) return parts.join(" · ");
 
-  return "View this beauty & wellness professional's Access profile on Glamlink.";
+  return pro?.name
+    ? `Connect with ${pro.name} on Glamlink Access`
+    : "Connect with this beauty & wellness professional on Glamlink Access.";
 }
 
 type PageProps = {
@@ -57,11 +60,14 @@ export async function generateMetadata({
     ? `${pro.name} | Access by Glamlink`
     : "Access by Glamlink";
   const description = buildDescription(pro);
-  const image =
-    typeof pro?.profile_image === "string" && pro.profile_image
-      ? pro.profile_image
-      : DEFAULT_OG_IMAGE;
+  const image = toAbsoluteImageUrl(pro?.profile_image);
   const url = `https://glamlink.net/access-card/${slug}`;
+
+  console.log("[access-card metadata]", {
+    slug,
+    pro,
+    resolved: { title, description, image, url },
+  });
 
   return {
     title,
