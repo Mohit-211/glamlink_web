@@ -1,5 +1,7 @@
 ﻿import React, { useState, useEffect, useRef, useCallback } from "react";
-import { BOOKING_METHODS, BookingMethod, FieldErrors, GlamCardFormData } from "./types";
+import { nanoid } from "nanoid";
+import { GripVertical, ImagePlus, X } from "lucide-react";
+import { BOOKING_METHODS, BookingMethod, FeaturedLink, FieldErrors, GlamCardFormData } from "./types";
 import { userSpecialtiesApi } from "@/api/Api";
 
 interface Props {
@@ -7,6 +9,9 @@ interface Props {
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
   errors?: FieldErrors;
   clearError?: (key: string) => void;
+  /** Needed to persist a Featured Links reorder immediately via its own endpoint (edit mode only). */
+  mode?: "create" | "edit";
+  cardId?: string | number;
 }
 
 const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
@@ -34,11 +39,27 @@ const parseOtherLinks = (value: any): { title: string; url: string }[] => {
   return [];
 };
 
+const parseFeaturedLinks = (value: any): FeaturedLink[] => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
 const ServicesAndBookingForm: React.FC<Props> = ({
   data,
   setData,
   errors,
   clearError,
+  mode,
+  cardId,
 }) => {
   const [specialtyInput, setSpecialtyInput] = useState("");
   const [infoInput, setInfoInput] = useState("");
@@ -271,6 +292,152 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       const updated = [...parseOtherLinks(prev.other_links)];
       updated[index] = { ...updated[index], [field]: value };
       return { ...prev, other_links: updated };
+    });
+  };
+
+  /* ================= FEATURED LINKS ================= */
+  // Object-URL previews for pending (not-yet-uploaded) thumbnail files, keyed
+  // by link id. Regenerated/revoked whenever the featured_links array changes
+  // so blob URLs don't leak as thumbnails are added, replaced, or removed.
+  const [featuredLinkPreviews, setFeaturedLinkPreviews] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const links = parseFeaturedLinks(data.featured_links);
+    const next: Record<string, string> = {};
+    links.forEach((link) => {
+      if (link.thumbnail_file instanceof File) {
+        next[link.id] = URL.createObjectURL(link.thumbnail_file);
+      }
+    });
+    setFeaturedLinkPreviews(next);
+    return () => {
+      Object.values(next).forEach((url) => URL.revokeObjectURL(url));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.featured_links]);
+
+  const [draggedFeaturedLinkIndex, setDraggedFeaturedLinkIndex] = useState<number | null>(null);
+
+  const addFeaturedLink = () => {
+    setData((prev) => {
+      const links = parseFeaturedLinks(prev.featured_links);
+      return {
+        ...prev,
+        featured_links: [
+          ...links,
+          { id: nanoid(), title: "", url: "", sort_order: links.length },
+        ],
+      };
+    });
+  };
+
+  const removeFeaturedLink = (index: number) => {
+    setData((prev) => ({
+      ...prev,
+      featured_links: parseFeaturedLinks(prev.featured_links)
+        .filter((_, i) => i !== index)
+        .map((link, i) => ({ ...link, sort_order: i })),
+    }));
+  };
+
+  const updateFeaturedLink = (index: number, field: "title" | "url", value: string) => {
+    setData((prev) => {
+      const updated = [...parseFeaturedLinks(prev.featured_links)];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, featured_links: updated };
+    });
+  };
+
+  const setFeaturedLinkThumbnail = (index: number, file: File) => {
+    setData((prev) => {
+      const updated = [...parseFeaturedLinks(prev.featured_links)];
+      updated[index] = { ...updated[index], thumbnail_file: file };
+      return { ...prev, featured_links: updated };
+    });
+  };
+
+  const removeFeaturedLinkThumbnail = (index: number) => {
+    setData((prev) => {
+      const updated = [...parseFeaturedLinks(prev.featured_links)];
+      updated[index] = {
+        ...updated[index],
+        thumbnail_file: undefined,
+        image: undefined,
+        thumbnail_url: undefined,
+        image_url: undefined,
+      };
+      return { ...prev, featured_links: updated };
+    });
+  };
+
+  // Only one link can be featured-first at a time — setting it clears the flag
+  // on every other link; clicking the active one again un-sets it.
+  const toggleFeaturedLinkFeatured = (index: number) => {
+    setData((prev) => {
+      const links = parseFeaturedLinks(prev.featured_links);
+      const nextValue = !links[index]?.is_featured;
+      return {
+        ...prev,
+        featured_links: links.map((link, i) => ({
+          ...link,
+          is_featured: i === index ? nextValue : false,
+        })),
+      };
+    });
+  };
+
+  // Persists a new order immediately via the dedicated reorder endpoint —
+  // only meaningful in edit mode, once the card already exists server-side.
+  // In create mode there's nothing to reorder yet; the final order still
+  // goes out with the rest of the data on submit via buildFormData.
+  const persistFeaturedLinksOrder = async (links: FeaturedLink[]) => {
+    if (mode !== "edit" || !cardId) return;
+    try {
+      const token = localStorage.getItem("GlamlinkaccessToken");
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      // This endpoint only accepts PUT + a real JSON body — it does not
+      // parse a multipart "featured_links" field as JSON the way the main
+      // create/update endpoint does, and it has no way to accept new image
+      // files at all (confirmed directly against the API). So a pending,
+      // not-yet-uploaded thumbnail_file is irrelevant here — always send
+      // whatever image URL is already live on the server for that link;
+      // the new file only goes out — via featured_link_images — on the
+      // next full "Save Changes" submit (see buildFormData in
+      // GlamCardForm.tsx).
+      await fetch(`${API_URL}businessCard/${cardId}/featured-links/reorder`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": token || "",
+        },
+        body: JSON.stringify({
+          featured_links: links
+            .filter((link) => link?.url?.trim())
+            .map((link, index) => ({
+              title: link?.title?.trim() || "",
+              url: link.url.trim(),
+              image: link?.image ?? link?.thumbnail_url ?? link?.image_url ?? null,
+              is_featured: link?.is_featured === true,
+              sort_order: index + 1,
+            })),
+        }),
+      });
+    } catch (err) {
+      // Non-fatal — the order still saves with the rest of the form on
+      // submit, so a transient failure here just means it isn't
+      // reflected on the live card until then.
+      console.error("Failed to persist featured links order:", err);
+    }
+  };
+
+  const reorderFeaturedLinks = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    setData((prev) => {
+      const links = [...parseFeaturedLinks(prev.featured_links)];
+      const [moved] = links.splice(fromIndex, 1);
+      links.splice(toIndex, 0, moved);
+      const reordered = links.map((link, i) => ({ ...link, sort_order: i }));
+      persistFeaturedLinksOrder(reordered);
+      return { ...prev, featured_links: reordered };
     });
   };
 
@@ -614,6 +781,128 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Featured Links */}
+      <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <label className="text-sm font-semibold text-gray-800">Featured Links</label>
+            <p className="mt-1 text-xs text-gray-500">
+              Shop your favorites, promote a package, or share anything else you want
+              clients to find fast — shown as clickable cards on your Access page.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={addFeaturedLink}
+            className="flex-none rounded-lg bg-[#23AEB8] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3]"
+          >
+            + Add Featured Link
+          </button>
+        </div>
+        <div className="space-y-3">
+          {parseFeaturedLinks(data?.featured_links).map((link, index) => {
+            const previewSrc =
+              featuredLinkPreviews[link.id] || link.image || link.thumbnail_url || link.image_url;
+            return (
+              <div
+                key={link.id}
+                draggable
+                onDragStart={() => setDraggedFeaturedLinkIndex(index)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => {
+                  if (draggedFeaturedLinkIndex !== null) {
+                    reorderFeaturedLinks(draggedFeaturedLinkIndex, index);
+                  }
+                  setDraggedFeaturedLinkIndex(null);
+                }}
+                onDragEnd={() => setDraggedFeaturedLinkIndex(null)}
+                className={`flex flex-col gap-2 rounded-lg border bg-white p-3 ${
+                  link.is_featured ? "border-[#23AEB8] ring-1 ring-[#23AEB8]/30" : "border-gray-200"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span
+                    className="cursor-grab text-gray-400 hover:text-gray-600 active:cursor-grabbing"
+                    title="Drag to reorder"
+                  >
+                    <GripVertical className="h-4 w-4" />
+                  </span>
+
+                  <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                    {previewSrc ? (
+                      <img src={previewSrc} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-gray-300">
+                        <ImagePlus className="h-5 w-5" />
+                      </div>
+                    )}
+                    <label className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/0 opacity-0 transition hover:bg-black/40 hover:opacity-100">
+                      <ImagePlus className="h-4 w-4 text-white" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setFeaturedLinkThumbnail(index, file);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {previewSrc && (
+                      <button
+                        type="button"
+                        onClick={() => removeFeaturedLinkThumbnail(index)}
+                        title="Remove thumbnail"
+                        className="absolute -right-1 -top-1 rounded-full bg-white p-0.5 text-gray-500 shadow hover:text-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+
+                  <input
+                    type="text"
+                    className={`${inputClass} flex-1`}
+                    placeholder="Title (e.g. Shop My Skincare Favorites)"
+                    value={link.title}
+                    onChange={(e) => updateFeaturedLink(index, "title", e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeFeaturedLink(index)}
+                    className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+                  >
+                    Delete
+                  </button>
+                </div>
+                <input
+                  type="url"
+                  className={`${inputClass} ml-6`}
+                  placeholder="https://example.com/shop"
+                  value={link.url}
+                  onChange={(e) => updateFeaturedLink(index, "url", e.target.value)}
+                />
+                <label className="ml-6 flex w-fit cursor-pointer items-center gap-1.5 text-xs font-medium text-gray-600 select-none">
+                  <input
+                    type="checkbox"
+                    checked={!!link.is_featured}
+                    onChange={() => toggleFeaturedLinkFeatured(index)}
+                    className="h-3.5 w-3.5 rounded border-gray-300 text-[#23AEB8] focus:ring-[#23AEB8]"
+                  />
+                  Feature this link first
+                </label>
+              </div>
+            );
+          })}
+          {parseFeaturedLinks(data?.featured_links).length === 0 && (
+            <div className="rounded-lg border border-gray-200 bg-white p-4 text-center text-sm text-gray-500">
+              No featured links yet. Click "Add Featured Link" to get started.
+            </div>
+          )}
         </div>
       </div>
 

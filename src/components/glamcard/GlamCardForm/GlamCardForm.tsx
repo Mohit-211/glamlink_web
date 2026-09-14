@@ -260,6 +260,41 @@ const GlamCardForm: React.FC<Props> = ({
     if (data.social_media) {
       formData.append("social_media", JSON.stringify(data.social_media));
     }
+    // Featured Links — new thumbnail Files go in "featured_link_images" (in
+    // order), and "featured_links" carries a matching JSON array where
+    // image_index points a link at its file's position in that array (null
+    // when the link has no new image attached). For a link that already had
+    // an image and isn't getting a new one (the common "edit" case — just
+    // touching the title/url/order of an existing link), its persisted
+    // image URL is carried forward via "image" so it doesn't get lost —
+    // without this, an edit-and-save with no new upload would strip the
+    // image from every existing link.
+    const featuredLinksRaw: any[] = Array.isArray(data.featured_links)
+      ? data.featured_links
+      : [];
+    const featuredLinksFiltered = featuredLinksRaw.filter((link) => link?.url?.trim());
+    const featuredLinksPayload = featuredLinksFiltered.map((link, index) => ({
+      title: link?.title?.trim() || "",
+      url: link.url.trim(),
+      image_index: null as number | null,
+      image:
+        link?.thumbnail_file instanceof File
+          ? null
+          : link?.image ?? link?.thumbnail_url ?? link?.image_url ?? null,
+      sort_order: index + 1,
+      is_featured: link?.is_featured === true,
+    }));
+    let featuredImageIndex = 0;
+    featuredLinksFiltered.forEach((link, index) => {
+      if (link?.thumbnail_file instanceof File) {
+        formData.append("featured_link_images", link.thumbnail_file);
+        featuredLinksPayload[index].image_index = featuredImageIndex;
+        featuredImageIndex++;
+      }
+    });
+    if (data.featured_links !== undefined) {
+      formData.append("featured_links", JSON.stringify(featuredLinksPayload));
+    }
     const jsonFields = [
       "business_hour",
       "other_links",
@@ -469,6 +504,8 @@ const GlamCardForm: React.FC<Props> = ({
               setData={setData}
               errors={errors}
               clearError={clearError}
+              mode={mode}
+              cardId={cardId}
             />
             {/* <GlamlinkIntegrationForm data={data} setData={setData} /> */}
             <div className="mt-10 flex gap-3">

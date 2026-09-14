@@ -39,6 +39,17 @@ export interface AccessOrder {
   tracking_number: string | null;
 }
 
+export interface FeaturedLinkData {
+  id: string;
+  title: string;
+  url: string;
+  /** The key the API actually returns; the others are kept as fallbacks. */
+  image?: string;
+  thumbnail_url?: string;
+  sort_order: number;
+  is_featured?: boolean;
+}
+
 export interface AccessCardData {
   status: string;
   id: number;
@@ -61,5 +72,6 @@ export interface AccessCardData {
   payment_status: 'pending' | 'completed' | 'failed';
   subscription_status: 'active' | 'inactive' | 'cancelled';
   access_orders?: AccessOrder[];
+  featured_links?: FeaturedLinkData[];
 }
 

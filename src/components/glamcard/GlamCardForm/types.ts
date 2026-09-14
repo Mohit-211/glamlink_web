@@ -29,6 +29,24 @@ export interface GalleryMetaItem {
   sort_order: number;
   thumbnail_file?: File;
 }
+/* ================= FEATURED LINKS ================= */
+export interface FeaturedLink {
+  /** Client-side only — used as a React key/local reference, never sent to the server. */
+  id: string;
+  title: string;
+  url: string;
+  /** Persisted image URL — the actual key the GET response returns. */
+  image?: string;
+  /** Alternate keys seen/expected for the same thing; kept for safety. */
+  thumbnail_url?: string;
+  image_url?: string;
+  /** Newly selected image pending upload — cleared once saved. */
+  thumbnail_file?: File;
+  /** Display order (1-based on the wire); index in the array doubles as this. */
+  sort_order: number;
+  /** The one link a professional has chosen to show first/pinned. */
+  is_featured?: boolean;
+}
 /* ================= MAIN FORM ================= */
 export interface GlamCardFormData {
   [x: string]: any;
@@ -69,6 +87,7 @@ export interface GlamCardFormData {
   preferred_booking_methods: BookingMethod[];
   booking_link?: string;
   important_info: string[];
+  featured_links?: FeaturedLink[];
   /* MARKETING */
   offer_promotion?: boolean;
   promotion_details?: string;

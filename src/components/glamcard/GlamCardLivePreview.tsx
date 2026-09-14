@@ -19,6 +19,8 @@ import {
   MapPin,
   Clock,
   Play,
+  Send,
+  Link2,
 } from "lucide-react";
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 /* ================= VIDEO THUMBNAIL GENERATOR ================= */
@@ -502,6 +504,54 @@ const GlamCardLivePreview: React.FC<Props> = ({
     }
     return Array.isArray(data.other_links) ? data.other_links : [];
   }, [data.other_links]);
+  /* ================= FEATURED LINKS ================= */
+  const featuredLinks = useMemo(() => {
+    let value = data?.featured_links;
+    if (typeof value === "string") {
+      try {
+        value = JSON.parse(value);
+      } catch {
+        value = [];
+      }
+    }
+    if (!Array.isArray(value)) return [];
+    const filtered = value.filter((link: any) => link?.url);
+    // Position always follows the server's sort_order (falling back to
+    // array position for a link that doesn't have one yet, e.g. brand-new
+    // and not yet saved/reordered through the API) — is_featured no longer
+    // forces it to the top, it's shown as a "Featured" tag on the card
+    // instead, wherever it falls in that order.
+    return [...filtered].sort((a: any, b: any) => {
+      const aOrder = a?.sort_order ?? filtered.indexOf(a);
+      const bOrder = b?.sort_order ?? filtered.indexOf(b);
+      return aOrder - bOrder;
+    });
+  }, [data.featured_links]);
+  /* Resolves a thumbnail for both a persisted URL and a pending File (this
+     component doubles as the live preview during editing, where a newly
+     selected thumbnail is still a raw File). Object URLs are created once
+     per featuredLinks change and revoked together, same pattern as the
+     gallery preview cache above. */
+  const featuredLinkThumbSrcs = useMemo(() => {
+    const map = new Map<any, string>();
+    featuredLinks.forEach((link: any) => {
+      if (link?.thumbnail_file instanceof File) {
+        map.set(link, URL.createObjectURL(link.thumbnail_file));
+      }
+    });
+    return map;
+  }, [featuredLinks]);
+  useEffect(() => {
+    return () => {
+      featuredLinkThumbSrcs.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [featuredLinkThumbSrcs]);
+  const getFeaturedLinkThumbnailSrc = (link: any): string | undefined =>
+    featuredLinkThumbSrcs.get(link) ||
+    link?.image ||
+    link?.thumbnail_url ||
+    link?.image_url ||
+    undefined;
   /* ================= PREFERRED BOOKING METHODS ================= */
   const preferredBookingMethods = useMemo(() => {
     const val = (data as any)?.preferred_booking_method;
@@ -555,6 +605,11 @@ const GlamCardLivePreview: React.FC<Props> = ({
   /* ================= RENDER ================= */
   const socialIconStyle = {
     boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+  };
+  /* Raised, premium button look for the Connect section icons only. */
+  const connectIconStyle = {
+    boxShadow:
+      "0 6px 14px rgba(15, 23, 42, 0.12), 0 2px 4px rgba(15, 23, 42, 0.08)",
   };
   return (
     <div
@@ -1325,6 +1380,70 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </div>
               </div>
             )}
+            {/* ===== FEATURED LINKS ===== */}
+            {featuredLinks.length > 0 && (
+              <div
+                className="rounded-2xl p-[2px] mt-3"
+                style={{
+                  background: "linear-gradient(135deg, #23B9CD33, #a8edea55)",
+                }}
+              >
+                <div
+                  className="rounded-2xl p-3 sm:p-4"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
+                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="flex-1 h-px bg-gray-400/60" />
+                    <p className="text-xs font-bold tracking-wider text-gray-700 uppercase whitespace-nowrap">
+                      Featured Links
+                    </p>
+                    <span className="flex-1 h-px bg-gray-400/60" />
+                  </div>
+                  <div className="space-y-2">
+                    {featuredLinks.map((link: any, index: number) => {
+                      const thumbSrc = getFeaturedLinkThumbnailSrc(link);
+                      return (
+                        <a
+                          key={link?.id ?? index}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 rounded-xl bg-white p-2.5 sm:p-3 shadow-sm transition hover:border-teal-300 active:scale-[0.98] border border-gray-200"
+                          style={{ boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)" }}
+                        >
+                          <div className="w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                            {thumbSrc ? (
+                              <img
+                                src={thumbSrc}
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <Link2 className="w-5 h-5 text-gray-400" />
+                            )}
+                          </div>
+                          <span className="flex-1 min-w-0 flex items-center gap-2">
+                            <span className="truncate text-sm font-semibold text-gray-800">
+                              {link.title}
+                            </span>
+                            {link?.is_featured && (
+                              <span className="flex-shrink-0 rounded-full bg-[#23B9CD] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                                Featured
+                              </span>
+                            )}
+                          </span>
+                          <ChevronRight className="w-4 h-4 text-teal-600 flex-shrink-0" />
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
             {/* ===== CONNECT BUTTON ===== */}
             <div className="flex items-center gap-3 mt-5">
               <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent to-teal-400" />
@@ -1334,101 +1453,105 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
                 }}
               >
-                <svg
-                  className="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
+                <Send className="w-4 h-4" strokeWidth={2.5} />
                 CONNECT
               </button>
               <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent to-teal-400" />
             </div>
             {/* ===== SOCIAL ICONS ===== */}
-            <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
-              <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
-                {data?.website && (
+            <div className="flex justify-center lg:justify-end flex-wrap gap-4 sm:gap-5 mt-4">
+              {data?.website && (
+                <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={data.website}
                     target="_blank"
                     rel="noopener noreferrer"
                     title={data.website}
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Globe className="w-5 h-5 text-gray-500 hover:text-teal-600 transition-colors duration-300" />
+                    <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-[#23B9CD] hover:text-[#1ea8b5] transition-colors duration-300" />
                   </a>
-                )}
-                {allInstagramHandles.map(({ key, url }) => (
+                  <span className="text-[11px] font-medium text-gray-500">Website</span>
+                </div>
+              )}
+              {allInstagramHandles.map(({ key, url }, idx) => (
+                <div key={key} className="flex flex-col items-center gap-1.5">
                   <a
-                    key={key}
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
                     title={url}
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Instagram className="w-5 h-5 text-gray-500 hover:text-pink-600 transition-colors duration-300" />
+                    <Instagram className="w-5 h-5 sm:w-6 sm:h-6 text-[#23B9CD] hover:text-[#1ea8b5] transition-colors duration-300" />
                   </a>
-                ))}
-                {socialMedia?.facebook && (
+                  <span className="text-[11px] font-medium text-gray-500">
+                    {idx > 0 ? `Instagram ${idx + 1}` : "Instagram"}
+                  </span>
+                </div>
+              ))}
+              {socialMedia?.facebook && (
+                <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Facebook"
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Facebook className="w-5 h-5 text-gray-500 hover:text-blue-600 transition-colors duration-300" />
+                    <Facebook className="w-5 h-5 sm:w-6 sm:h-6 text-[#23B9CD] hover:text-[#1ea8b5] transition-colors duration-300" />
                   </a>
-                )}
-                {socialMedia?.linkedin && (
+                  <span className="text-[11px] font-medium text-gray-500">Facebook</span>
+                </div>
+              )}
+              {socialMedia?.linkedin && (
+                <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="LinkedIn"
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Linkedin className="w-5 h-5 text-gray-500 hover:text-blue-700 transition-colors duration-300" />
+                    <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-[#23B9CD] hover:text-[#1ea8b5] transition-colors duration-300" />
                   </a>
-                )}
-                {socialMedia?.youtube && (
+                  <span className="text-[11px] font-medium text-gray-500">LinkedIn</span>
+                </div>
+              )}
+              {socialMedia?.youtube && (
+                <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.youtube}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="YouTube"
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Youtube className="w-5 h-5 text-gray-500 hover:text-red-600 transition-colors duration-300" />
+                    <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-[#23B9CD] hover:text-[#1ea8b5] transition-colors duration-300" />
                   </a>
-                )}
-                {socialMedia?.tiktok && (
+                  <span className="text-[11px] font-medium text-gray-500">YouTube</span>
+                </div>
+              )}
+              {socialMedia?.tiktok && (
+                <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.tiktok}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="TikTok"
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Music2 className="w-5 h-5 text-gray-500 hover:text-black transition-colors duration-300" />
+                    <Music2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#23B9CD] hover:text-[#1ea8b5] transition-colors duration-300" />
                   </a>
-                )}
-              </div>
+                  <span className="text-[11px] font-medium text-gray-500">TikTok</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

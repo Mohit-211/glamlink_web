@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { nanoid } from 'nanoid';
 import GlamCardForm from '../glamcard/GlamCardForm/GlamCardForm';
 import { AccessCardData } from './types';
 import { GlamCardFormData } from '../glamcard/GlamCardForm/types';
@@ -92,6 +93,23 @@ const normalize = (raw: AccessCardData | null | undefined): GlamCardFormData => 
   }
   if (!Array.isArray(other_links)) other_links = [];
 
+  let featured_links = base.featured_links;
+  if (typeof featured_links === 'string') {
+    try {
+      featured_links = JSON.parse(featured_links);
+    } catch {
+      featured_links = [];
+    }
+  }
+  if (!Array.isArray(featured_links)) featured_links = [];
+  // The API doesn't return an id per link (it's positional on the wire) —
+  // back one in for React keys / local editing, without touching any link
+  // that already has one.
+  featured_links = featured_links.map((link: any) => ({
+    ...link,
+    id: link?.id ?? nanoid(),
+  }));
+
   // preferred_booking_method(s) can also come back from the API as a JSON
   // string (e.g. '["GO_TO_BOOKING_LINK"]') rather than an actual array —
   // parse it the same way as specialties/social_media/other_links above,
@@ -123,6 +141,7 @@ const normalize = (raw: AccessCardData | null | undefined): GlamCardFormData => 
     specialties,
     social_media,
     other_links,
+    featured_links,
     locations: Array.isArray(base.locations) ? base.locations : [],
     images: rawImages,
     gallery_meta,

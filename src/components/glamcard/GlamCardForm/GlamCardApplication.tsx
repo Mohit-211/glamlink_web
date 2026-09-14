@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { nanoid } from "nanoid";
 import GlamCardLivePreview from "../GlamCardLivePreview";
 import { initialGlamCardData } from "../initialGlamCardData";
 import GlamCardForm from "./GlamCardForm";
@@ -34,6 +35,7 @@ const emptyGlamCardData: GlamCardFormData = {
     tiktok: "",
   },
   other_links: [],
+  featured_links: [],
   preferred_booking_methods: [],
   booking_link: "",
   important_info: [],
@@ -115,6 +117,13 @@ const hydrateFromSessionPayload = (
     is_phone_visible: payload.is_phone_visible !== "false",
     business_hour: parseJson(payload.business_hour) ?? [],
     other_links: parseJson(payload.other_links) ?? [],
+    // Thumbnails were Files, so those can't come back (same as profile_image/
+    // images below) — title/url/order/is_featured survive; backfill an id
+    // for React keys since the wire payload never had one.
+    featured_links: (parseJson(payload.featured_links) ?? []).map((link: any) => ({
+      ...link,
+      id: nanoid(),
+    })),
     important_info: parseJson(payload.important_info) ?? [],
     excites_about_glamlink: parseJson(payload.excites_about_glamlink) ?? [],
     biggest_pain_points: parseJson(payload.biggest_pain_points) ?? [],

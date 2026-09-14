@@ -2,6 +2,12 @@
 
 import { getAllStates, getCitiesByState } from "@/api/Api";
 import React, { useEffect, useRef, useState } from "react";
+import { useJsApiLoader } from "@react-google-maps/api";
+
+// Stable reference (module scope) — @react-google-maps/api reloads/warns if
+// this array is recreated on every render. Matches the "places" library
+// AddressLookup.tsx already loads elsewhere in this form.
+const GOOGLE_MAPS_LIBRARIES: "places"[] = ["places"];
 
 interface Location {
   location_type: "exact_address" | "city_only";
@@ -68,6 +74,17 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
 
   const [cityCoords, setCityCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [cityCoordsLoading, setCityCoordsLoading] = useState(false);
+
+  // Loads the Google Maps JS script (shared singleton across every
+  // useJsApiLoader/useLoadScript call in the app, so this doesn't add a
+  // second <script> tag if AddressLookup/ProfessionalsMap are also mounted).
+  // Without this, window.google never exists here and both the city
+  // geocoder below and the address Autocomplete further down silently do
+  // nothing.
+  const { isLoaded: isGoogleMapsLoaded } = useJsApiLoader({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+    libraries: GOOGLE_MAPS_LIBRARIES,
+  });
 
   /* Load States */
   useEffect(() => {
@@ -138,7 +155,11 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       return;
     }
 
-    if (!(window as any).google?.maps?.Geocoder) {
+    // Google's script loads asynchronously — bail for now, but this effect
+    // re-runs once isGoogleMapsLoaded flips true (it's a dependency below),
+    // so the geocode still fires as soon as the script is ready instead of
+    // silently never resolving.
+    if (!isGoogleMapsLoaded || !(window as any).google?.maps?.Geocoder) {
       setCityCoords(null);
       return;
     }
@@ -173,13 +194,15 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
     return () => {
       cancelled = true;
     };
-  }, [location.city, location.state, cities, states, location.location_type]);
+  }, [location.city, location.state, cities, states, location.location_type, isGoogleMapsLoaded]);
 
   /* Google Places Autocomplete Setup */
   useEffect(() => {
     if (location.location_type !== "exact_address") return;
     if (!addressInputRef.current) return;
-    if (!(window as any).google?.maps?.places) return;
+    // Same async-load issue as the geocoder above — re-runs once
+    // isGoogleMapsLoaded flips true instead of only checking once at mount.
+    if (!isGoogleMapsLoaded || !(window as any).google?.maps?.places) return;
 
     // Destroy existing instance if switching types
     if (autocompleteRef.current) {
@@ -215,7 +238,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
         google.maps.event.clearInstanceListeners(autocompleteRef.current);
       }
     };
-  }, [location.location_type, onUpdate]);
+  }, [location.location_type, onUpdate, isGoogleMapsLoaded]);
 
   const canConfirmExact =
     location.location_type === "exact_address" && !!location.address?.trim();
