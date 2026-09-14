@@ -18,6 +18,20 @@ interface DownloadItem {
   sort_order?: number;
 }
 
+interface FaqItem {
+  id: number;
+  question: string;
+  answer: string;
+  JournalFaqMapping?: { sort_order?: number };
+}
+
+interface TopicItem {
+  id: number;
+  name: string;
+  slug: string;
+  JournalTopicMapping?: { sort_order?: number };
+}
+
 interface BlogData {
   shops: any[] | undefined;
   journal_category: any;
@@ -32,6 +46,10 @@ interface BlogData {
   slug?: string;
   downloads?: DownloadItem[];
   shop?: any[];
+  seo_title?: string;
+  meta_description?: string;
+  faqs?: FaqItem[];
+  topics?: TopicItem[];
 }
 
 /* --------------------------------
@@ -56,7 +74,6 @@ export async function generateMetadata({
   const { id, title } = await params;
 
   const response = await getBlogsById(id);
-  console.log(response, "response")
   const article: BlogData = response?.data;
 
   if (!article) {
@@ -66,16 +83,19 @@ export async function generateMetadata({
   const articleUrl = `https://glamlink.net/journal/${id}/${title}`;
   const imageUrl =
     article.cover_image || "https://glamlink.net/default-blog.jpg";
-console.log(article,"article")
+
+  const seoTitle = article.seo_title || article.title;
+  const seoDescription = article.meta_description || article.short_description;
+
   return {
-    title: article.title,
-    description: article.short_description,
+    title: seoTitle,
+    description: seoDescription,
     alternates: {
       canonical: articleUrl,
     },
     openGraph: {
-      title: article.title,
-      description: article.short_description,
+      title: seoTitle,
+      description: seoDescription,
       url: articleUrl,
       type: "article",
       images: [
@@ -89,8 +109,8 @@ console.log(article,"article")
     },
     twitter: {
       card: "summary_large_image",
-      title: article.title,
-      description: article.short_description,
+      title: seoTitle,
+      description: seoDescription,
       images: [imageUrl],
     },
   };
@@ -108,7 +128,6 @@ export default async function Article({
   const { id, title } = await params;
 
   const response = await getBlogsById(id);
-  console.log(response,"response")
   const article: BlogData = response?.data;
 
   if (!article) {
@@ -132,6 +151,38 @@ const formattedDate = article?.publish_date
         (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
       )
     : [];
+
+  const topics = Array.isArray(article?.topics)
+    ? [...article.topics].sort(
+        (a, b) =>
+          (a.JournalTopicMapping?.sort_order ?? 0) -
+          (b.JournalTopicMapping?.sort_order ?? 0)
+      )
+    : [];
+
+  const faqs = Array.isArray(article?.faqs)
+    ? [...article.faqs].sort(
+        (a, b) =>
+          (a.JournalFaqMapping?.sort_order ?? 0) -
+          (b.JournalFaqMapping?.sort_order ?? 0)
+      )
+    : [];
+
+  const faqSchema =
+    faqs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((faq) => ({
+            "@type": "Question",
+            name: faq.question,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: faq.answer,
+            },
+          })),
+        }
+      : null;
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -193,6 +244,13 @@ const formattedDate = article?.publish_date
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      {faqSchema && (
+        <Script
+          id="faq-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
 
       {/* Google AdSense */}
       <Script
@@ -285,6 +343,20 @@ const formattedDate = article?.publish_date
               </div>
 
             </div>
+
+            {/* Topics */}
+            {topics.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 mt-6">
+                {topics.map((topic) => (
+                  <span
+                    key={topic.id}
+                    className="text-xs font-medium text-gray-500 px-3 py-1 rounded-full border border-gray-200 hover:border-[#23AEB8]/40 hover:text-[#23AEB8] transition-colors duration-200"
+                  >
+                    {topic.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </section>
 
           {/* ── DIVIDER ── */}
@@ -383,6 +455,44 @@ const formattedDate = article?.publish_date
                         className="mt-5 inline-flex items-center justify-center gap-2 text-sm font-medium text-white px-4 py-2.5 rounded-full bg-[#23AEB8] hover:bg-[#1d9aa3] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                       />
                     </div>
+                  ))}
+                </div>
+              </section>
+            </>
+          )}
+
+          {/* ── FAQ ── */}
+          {faqs.length > 0 && (
+            <>
+              <div className="border-t border-gray-100 my-14" />
+
+              <section>
+                <div className="mb-8">
+                  <p className="text-[10px] tracking-[.15em] uppercase text-gray-400 mb-2">
+                    Questions
+                  </p>
+                  <h2 className="font-serif text-3xl text-gray-900">
+                    Frequently asked questions
+                  </h2>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  {faqs.map((faq) => (
+                    <details
+                      key={faq.id}
+                      className="group rounded-2xl border border-gray-100 px-6 py-5 open:border-[#23AEB8]/40"
+                      style={{ background: "rgba(35,174,184,0.03)" }}
+                    >
+                      <summary className="flex items-center justify-between gap-4 cursor-pointer list-none font-serif text-lg text-gray-900">
+                        {faq.question}
+                        <span className="flex-shrink-0 text-[#23AEB8] text-xl leading-none transition-transform duration-200 group-open:rotate-45">
+                          +
+                        </span>
+                      </summary>
+                      <p className="mt-3 text-sm text-gray-500 font-light leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </details>
                   ))}
                 </div>
               </section>
