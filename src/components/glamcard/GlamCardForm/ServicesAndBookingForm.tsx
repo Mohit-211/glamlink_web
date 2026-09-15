@@ -458,66 +458,66 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         </label>
 
         <div className="relative flex gap-2" ref={specialtyWrapperRef}>
-      <div className="relative flex-1">
-  <input
-    className={`${inputClass} ${errors?.specialties ? errorInputClass : ""}`}
-    placeholder="e.g. Balayage, Keratin Treatments, Bridal Makeup"
-    value={specialtyInput}
-    onChange={(e) => {
-      setSpecialtyInput(e.target.value);
-      setSpecialtyDropdownOpen(true);
-    }}
-    onFocus={() => setSpecialtyDropdownOpen(true)}
-    onKeyDown={(e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        if (specialtyExactMatch) {
-          addSpecialty(specialtyInput.trim());
-        } else if (canAddCustomSpecialty) {
-          addSpecialty();
-        }
-      }
-    }}
-  />
+          <div className="relative flex-1">
+            <input
+              className={`${inputClass} ${errors?.specialties ? errorInputClass : ""}`}
+              placeholder="e.g. Balayage, Keratin Treatments, Bridal Makeup"
+              value={specialtyInput}
+              onChange={(e) => {
+                setSpecialtyInput(e.target.value);
+                setSpecialtyDropdownOpen(true);
+              }}
+              onFocus={() => setSpecialtyDropdownOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (specialtyExactMatch) {
+                    addSpecialty(specialtyInput.trim());
+                  } else if (canAddCustomSpecialty) {
+                    addSpecialty();
+                  }
+                }
+              }}
+            />
 
-  {specialtyDropdownOpen && (
-    <div className="absolute z-10 mt-1 w-full max-h-56 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">
-      {loadingSpecialties ? (
-        <div className="px-4 py-2 text-sm text-gray-400">Loading…</div>
-      ) : (
-        <>
-          {filteredSpecialtyOptions.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => addSpecialty(opt)}
-              disabled={data.specialties.length >= 5}
-              className="block w-full text-left px-4 py-2 text-sm hover:bg-[#24bbcb]/10 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {opt}
-            </button>
-          ))}
+            {specialtyDropdownOpen && (
+              <div className="absolute z-10 mt-1 w-full max-h-56 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+                {loadingSpecialties ? (
+                  <div className="px-4 py-2 text-sm text-gray-400">Loading…</div>
+                ) : (
+                  <>
+                    {filteredSpecialtyOptions.map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => addSpecialty(opt)}
+                        disabled={data.specialties.length >= 5}
+                        className="block w-full text-left px-4 py-2 text-sm hover:bg-[#24bbcb]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {opt}
+                      </button>
+                    ))}
 
-          {canAddCustomSpecialty && (
-            <button
-              type="button"
-              onClick={() => addSpecialty()}
-              className="block w-full text-left px-4 py-2 text-sm font-medium text-[#24bbcb] hover:bg-[#24bbcb]/10 border-t border-gray-100"
-            >
-              + Add "{specialtyInput.trim()}"
-            </button>
-          )}
+                    {canAddCustomSpecialty && (
+                      <button
+                        type="button"
+                        onClick={() => addSpecialty()}
+                        className="block w-full text-left px-4 py-2 text-sm font-medium text-[#24bbcb] hover:bg-[#24bbcb]/10 border-t border-gray-100"
+                      >
+                        + Add "{specialtyInput.trim()}"
+                      </button>
+                    )}
 
-          {!filteredSpecialtyOptions.length && !canAddCustomSpecialty && (
-            <div className="px-4 py-2 text-sm text-gray-400">
-              {specialtyOptions.length === 0 ? "No specialties available" : "No matches"}
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  )}
-</div>
+                    {!filteredSpecialtyOptions.length && !canAddCustomSpecialty && (
+                      <div className="px-4 py-2 text-sm text-gray-400">
+                        {specialtyOptions.length === 0 ? "No specialties available" : "No matches"}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
 
           <button
             type="button"
@@ -533,13 +533,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               !specialtyInput.trim() ||
               isSpecialtyAdded(specialtyInput)
             }
-            className={`rounded-lg px-5 text-sm font-medium transition ${
-              data.specialties.length >= 5 ||
-              !specialtyInput.trim() ||
-              isSpecialtyAdded(specialtyInput)
+            className={`rounded-lg px-5 text-sm font-medium transition ${data.specialties.length >= 5 ||
+                !specialtyInput.trim() ||
+                isSpecialtyAdded(specialtyInput)
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                 : "bg-[#24bbcb] text-white hover:bg-[#24bbcb]"
-            }`}
+              }`}
           >
             + Add
           </button>
@@ -819,13 +818,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                   setDraggedFeaturedLinkIndex(null);
                 }}
                 onDragEnd={() => setDraggedFeaturedLinkIndex(null)}
-                className={`flex flex-col gap-2 rounded-lg border bg-white p-3 ${
-                  link.is_featured ? "border-[#23AEB8] ring-1 ring-[#23AEB8]/30" : "border-gray-200"
-                }`}
+                className={`flex flex-col gap-2 rounded-lg border bg-white p-3 ${link.is_featured ? "border-[#23AEB8] ring-1 ring-[#23AEB8]/30" : "border-gray-200"
+                  }`}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-start gap-2">
                   <span
-                    className="cursor-grab text-gray-400 hover:text-gray-600 active:cursor-grabbing"
+                    className="mt-3 cursor-grab text-gray-400 hover:text-gray-600 active:cursor-grabbing"
                     title="Drag to reorder"
                   >
                     <GripVertical className="h-4 w-4" />
@@ -864,37 +862,44 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                     )}
                   </div>
 
-                  <input
-                    type="text"
-                    className={`${inputClass} flex-1`}
-                    placeholder="Title (e.g. Shop My Skincare Favorites)"
-                    value={link.title}
-                    onChange={(e) => updateFeaturedLink(index, "title", e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeFeaturedLink(index)}
-                    className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
-                  >
-                    Delete
-                  </button>
+                  {/* Everything to the right of the drag handle/thumbnail lives in
+                      one column, so the URL field and checkbox line up with the
+                      title input above them instead of needing a guessed margin. */}
+                  <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        className={`${inputClass} flex-1 min-w-0`}
+                        placeholder="Title (e.g. Shop My Skincare Favorites)"
+                        value={link.title}
+                        onChange={(e) => updateFeaturedLink(index, "title", e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeFeaturedLink(index)}
+                        className="flex-none rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                    <input
+                      type="url"
+                      className={inputClass}
+                      placeholder="https://example.com/shop"
+                      value={link.url}
+                      onChange={(e) => updateFeaturedLink(index, "url", e.target.value)}
+                    />
+                    <label className="flex w-fit cursor-pointer items-center gap-1.5 text-xs font-medium text-gray-600 select-none">
+                      <input
+                        type="checkbox"
+                        checked={!!link.is_featured}
+                        onChange={() => toggleFeaturedLinkFeatured(index)}
+                        className="h-3.5 w-3.5 rounded border-gray-300 text-[#23AEB8] focus:ring-[#23AEB8]"
+                      />
+                      Feature this link first
+                    </label>
+                  </div>
                 </div>
-                <input
-                  type="url"
-                  className={`${inputClass} ml-6`}
-                  placeholder="https://example.com/shop"
-                  value={link.url}
-                  onChange={(e) => updateFeaturedLink(index, "url", e.target.value)}
-                />
-                <label className="ml-6 flex w-fit cursor-pointer items-center gap-1.5 text-xs font-medium text-gray-600 select-none">
-                  <input
-                    type="checkbox"
-                    checked={!!link.is_featured}
-                    onChange={() => toggleFeaturedLinkFeatured(index)}
-                    className="h-3.5 w-3.5 rounded border-gray-300 text-[#23AEB8] focus:ring-[#23AEB8]"
-                  />
-                  Feature this link first
-                </label>
               </div>
             );
           })}

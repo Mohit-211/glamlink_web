@@ -794,7 +794,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <SectionBox title="Gallery" titleAlign="center">
                   {normalizedImages.length > 0 && thumbnailIndex !== null ? (
                     <>
-                      <div className="relative aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
+                      <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
                         {normalizedImages[thumbnailIndex]?.file_type ===
                           "video" ? (
                           <video

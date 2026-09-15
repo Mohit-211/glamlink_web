@@ -3,11 +3,7 @@
 import { getAllStates, getCitiesByState } from "@/api/Api";
 import React, { useEffect, useRef, useState } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
-
-// Stable reference (module scope) — @react-google-maps/api reloads/warns if
-// this array is recreated on every render. Matches the "places" library
-// AddressLookup.tsx already loads elsewhere in this form.
-const GOOGLE_MAPS_LIBRARIES: "places"[] = ["places"];
+import { GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_ID } from "@/lib/googleMapsLoader";
 
 interface Location {
   location_type: "exact_address" | "city_only";
@@ -82,6 +78,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
   // geocoder below and the address Autocomplete further down silently do
   // nothing.
   const { isLoaded: isGoogleMapsLoaded } = useJsApiLoader({
+    id: GOOGLE_MAPS_LOADER_ID,
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
     libraries: GOOGLE_MAPS_LIBRARIES,
   });

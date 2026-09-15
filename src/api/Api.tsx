@@ -57,6 +57,21 @@ export const getBlogsByCategoryId = async (
   return data;
 };
 /* ============================= */
+/* 📌 Topics */
+/* ============================= */
+export const getAllTopics = async () => {
+  const { data } = await api.get("journal/topic");
+  return data;
+};
+export const getTopicById = async (id: string | number) => {
+  const { data } = await api.get(`journal/topic/${id}`);
+  return data;
+};
+export const getTopicParagraphs = async (id: string | number) => {
+  const { data } = await api.get(`journal/topic/${id}/paragraphs`);
+  return data;
+};
+/* ============================= */
 /* 📌 Podcast */
 /* ============================= */
 export const getAllPodcast = async () => {

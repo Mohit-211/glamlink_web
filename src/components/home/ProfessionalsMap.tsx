@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
+import { GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_ID } from "@/lib/googleMapsLoader";
 
 interface LocationType {
   latitude?: number | string;
@@ -41,7 +42,9 @@ const ProfessionalsMap: React.FC<ProfessionalsMapProps> = ({
   selectedLocationIndex = 0,
 }) => {
   const { isLoaded } = useJsApiLoader({
+    id: GOOGLE_MAPS_LOADER_ID,
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
 const mapRef = useRef<google.maps.Map | null>(null);
