@@ -21,6 +21,7 @@ import {
   Play,
   Send,
   Link2,
+  ArrowUpRight,
 } from "lucide-react";
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 /* ================= VIDEO THUMBNAIL GENERATOR ================= */
@@ -372,10 +373,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
       setThumbnailIndex(metaIndex !== -1 ? metaIndex : 0);
     }
   }, [normalizedImages, galleryMeta, thumbnailIndex]);
-  const otherIndexes = useMemo(
-    () => normalizedImages?.map((_, i) => i),
-    [normalizedImages],
-  );
   /* ================= VIDEO THUMBNAIL CACHE ================= */
   const [videoThumbCache, setVideoThumbCache] = useState<Record<string, string>>(
     {},
@@ -657,7 +654,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
       )}
       <div className="px-3 py-4 sm:px-5 sm:py-6 lg:p-6 flex flex-col items-center">
         <div
-          className="w-full max-w-lg lg:max-w-3xl p-[2px] rounded-2xl"
+          className="w-full max-w-lg lg:max-w-2xl p-[2px] rounded-2xl"
           style={{
             background: "linear-gradient(135deg, #23B9CD, #a8edea 50%, #23B9CD)",
             boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
@@ -700,8 +697,8 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </button>
               </div>
             )}
-            {/* ===== MOBILE HERO: PROFILE CARD ===== */}
-            <div className="lg:hidden mb-4">
+            {/* ===== HERO: PROFILE CARD ===== */}
+            <div className="mb-4">
               <div
                 className="relative rounded-2xl overflow-hidden shadow-md"
                 style={{
@@ -750,320 +747,8 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </div>
               </div>
             </div>
-            {/* ===== DESKTOP / TABLET TWO-COL ===== */}
-            <div className="hidden lg:grid lg:grid-cols-2 gap-5">
-              {/* ---- LEFT COLUMN ---- */}
-              <div className="flex flex-col gap-5">
-                {/* ABOUT */}
-                <SectionBox title={`About ${data.name || "Your Name"}`}>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="h-28 w-28 overflow-hidden rounded-full bg-gray-200 ring-2 ring-white shadow flex items-center justify-center">
-                      {data?.profile_image && (
-                        <img
-                          src={
-                            mode === "live" && isFile(data.profile_image)
-                              ? URL.createObjectURL(data.profile_image)
-                              : typeof data.profile_image === "string"
-                                ? data.profile_image
-                                : ""
-                          }
-                          className="h-full w-full object-cover"
-                          alt="Profile"
-                        />
-                      )}
-                    </div>
-                    <div className="mt-3">
-                      <p className="font-bold text-gray-800">
-                        {data.name || "Your Name"}
-                      </p>
-                      <p className="text-sm text-[#24bbcb] font-medium">
-                        {data.professional_title || "Professional Title"}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {data.business_name || "Business Name"}
-                      </p>
-                    </div>
-                  </div>
-                  {data.bio && (
-                    <div
-                      className="prose prose-sm mt-4 text-gray-700"
-                      dangerouslySetInnerHTML={{ __html: data.bio }}
-                    />
-                  )}
-                </SectionBox>
-                <SectionBox title="Gallery" titleAlign="center">
-                  {normalizedImages.length > 0 && thumbnailIndex !== null ? (
-                    <>
-                      <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
-                        {normalizedImages[thumbnailIndex]?.file_type ===
-                          "video" ? (
-                          <video
-                            key={galleryPreviews[thumbnailIndex]}
-                            controls
-                            playsInline
-                            preload="metadata"
-                            webkit-playsinline="true"
-                            controlsList="nodownload"
-                            poster={getVideoThumbSrc(thumbnailIndex) || undefined}
-                            className="h-full w-full object-cover"
-                          >
-                            <source
-                              src={galleryPreviews[thumbnailIndex]}
-                              type="video/mp4"
-                            />
-                            {/* Your browser does not support video. */}
-                          </video>
-                        ) : (
-                          <img
-                            src={
-                              normalizedImages[thumbnailIndex]?.thumbnail_uri ||
-                              galleryPreviews[thumbnailIndex]
-                            }
-                            className="h-full w-full object-cover transition hover:scale-105 duration-300" style={{
-                              boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-                            }}
-                            alt="Featured work"
-                          />
-                        )}
-                        {normalizedImages.length > 1 && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setThumbnailIndex(
-                                  (prev) =>
-                                    ((prev ?? 0) - 1 + normalizedImages.length) %
-                                    normalizedImages.length,
-                                )
-                              }
-                              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity active:scale-90"
-                              aria-label="Previous image"
-                            >
-                              <ChevronLeft size={18} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setThumbnailIndex(
-                                  (prev) =>
-                                    ((prev ?? 0) + 1) % normalizedImages.length,
-                                )
-                              }
-                              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity active:scale-90"
-                              aria-label="Next image"
-                            >
-                              <ChevronRight size={18} />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                      {otherIndexes.length > 0 && (
-                        <div className="mt-3 flex gap-2 overflow-x-auto p-1">
-                          {otherIndexes?.map((index) => (
-                            <button
-                              key={index}
-                              onClick={() => setThumbnailIndex(index)}
-                              className={`h-12 w-16 aspect-[4/3] cursor-pointer overflow-hidden rounded-lg border shadow-sm flex-shrink-0 ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}`} style={{
-                                boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-                              }}
-                            >
-                              {renderThumbImage(index, "Thumbnail")}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="flex aspect-[4/3] items-center justify-center text-xs text-gray-400">
-                      Featured work will appear here
-                    </div>
-                  )}
-                </SectionBox>
-              </div>
-              {/* ---- RIGHT COLUMN ---- */}
-              <div className="flex flex-col gap-5">
-                {/* LOCATION + HOURS desktop */}
-                <div
-                  className="rounded-2xl p-[2px]"
-                  style={{
-                    background: "linear-gradient(135deg, #23B9CD33, #a8edea55)",
-                  }}
-                >
-                  <div
-                    className="rounded-2xl p-4 h-full"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
-                      boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-                    }}
-                  >
-                    {data.locations?.length ? (
-                      <>
-                        {data.locations.length > 1 && (
-                          <select
-                            className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-200"
-                            value={selectedLocationId || ""}
-                            onChange={(e) =>
-                              setSelectedLocationId(e.target.value)
-                            }
-                          >
-                            {data.locations.map((loc: any) => (
-                              <option key={loc.id} value={loc.id}>
-                                {loc.label || `Location ${loc.id}`}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                        {selectedLocation && (
-                          <div className="text-sm mb-3 space-y-1">
-                            {data.locations.length === 1 &&
-                              selectedLocation.label && (
-                                <p className="font-semibold text-gray-800">
-                                  {selectedLocation.label}
-                                </p>
-                              )}
-                            {/* {selectedLocation.business_name && (
-                              <p className="font-semibold text-gray-800">
-                                {selectedLocation.business_name}
-                              </p>
-                            )} */}
-                            {(selectedLocation.location_type === "exact_address"
-                              ? selectedLocation.address?.trim()
-                              : [
-                                selectedLocation.city?.trim(),
-                                selectedLocation.state?.trim(),
-                                selectedLocation.area?.trim(),
-                              ]
-                                .filter(Boolean)
-                                .join(", ")
-                            ) && (
-                                <p className="text-gray-600 leading-relaxed">
-                                  {selectedLocation.location_type === "exact_address"
-                                    ? selectedLocation.address?.trim()
-                                    : [
-                                      selectedLocation.city?.trim(),
-                                      selectedLocation.state?.trim(),
-                                      selectedLocation.area?.trim(),
-                                    ]
-                                      .filter(Boolean)
-                                      .join(", ")}
-                                </p>
-                              )}
-                            {(data.phone) &&
-                              data.is_phone_visible && (
-                                <p className="text-gray-600">
-                                  📞 {data.phone || data.phone}
-                                </p>
-                              )}
-                            {/* {selectedLocation.description && (
-                              <p className="text-xs text-gray-500 italic">
-                                {selectedLocation.description}
-                              </p>
-                            )} */}
-                          </div>
-                        )}
-                        {mapSrc && (
-                          <div className="relative rounded-xl overflow-hidden shadow-sm" style={{
-                            boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-                          }}>
-                            <iframe
-                              title="Business Location Map"
-                              className="w-full h-48 sm:h-52"
-                              style={{ border: 0, display: "block" }}
-                              loading="lazy"
-                              allowFullScreen
-                              referrerPolicy="no-referrer-when-downgrade"
-                              src={mapSrc}
-                            />
-                            <a
-                              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 text-sm whitespace-nowrap" style={{ boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)" }}
-                            >
-                              <svg
-                                className="w-4 h-4"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                              >
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                              </svg>
-                              Get Directions
-                            </a>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <p className="text-xs text-gray-400 italic">
-                        Location details will appear here once set
-                      </p>
-                    )}
-                    {/* BUSINESS HOURS desktop */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-3 mt-3">
-                        <span className="flex-1 h-px bg-gray-400/60" />
-                        <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
-                          Business Hours
-                        </p>
-                        <span className="flex-1 h-px bg-gray-400/60" />
-                      </div>
-                      <div className="rounded-xl bg-white p-4 shadow-sm" style={{
-                        boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-                      }}>
-                        {data.business_hour.length !== 0 ? (
-                          <ul className="space-y-1.5 text-sm">
-                            {data.business_hour.map(
-                              (hour: any, index: number) => {
-                                const open = hour.open_time
-                                  ? formatTime(hour.open_time)
-                                  : "Closed";
-                                const close = hour.close_time
-                                  ? formatTime(hour.close_time)
-                                  : "";
-                                const timeText =
-                                  open && close && open !== "Closed"
-                                    ? `${open} - ${close}`
-                                    : open;
-                                return (
-                                  <li
-                                    key={hour.id ?? index}
-                                    className="flex items-start gap-2"
-                                  >
-                                    <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-[#24bbcb] flex-shrink-0" />
-                                    <span className="text-gray-700">
-                                      {hour.note ? hour.note : timeText}
-                                    </span>
-                                  </li>
-                                );
-                              },
-                            )}
-                          </ul>
-                        ) : (
-                          <ul className="space-y-1.5 text-sm">
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-[#24bbcb] flex-shrink-0" />
-                              <span className="text-gray-700">
-                                Appointment on request
-                              </span>
-                            </li>
-                          </ul>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* SPECIALTIES desktop */}
-                   {specialtiesArray.length > 0 && 
-                <SectionBox title="Specialties" titleAlign="center">
-                  <DotList
-                    items={specialtiesArray}
-                    placeholder="Your specialties will appear here"
-                  />
-                </SectionBox>}
-              </div>
-            </div>
-            {/* ===== MOBILE: STACKED SECTIONS ===== */}
-            <div className="lg:hidden flex flex-col gap-3">
+            {/* ===== STACKED SECTIONS ===== */}
+            <div className="flex flex-col gap-3">
               {/* BIO */}
               {data.bio && (
                 <SectionBox
@@ -1403,40 +1088,65 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     </p>
                     <span className="flex-1 h-px bg-gray-400/60" />
                   </div>
-                  <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {featuredLinks.map((link: any, index: number) => {
                       const thumbSrc = getFeaturedLinkThumbnailSrc(link);
+                      const description: string = link?.description || "";
+                      let hostname = "";
+                      try {
+                        hostname = new URL(link.url).hostname.replace(
+                          /^www\./,
+                          "",
+                        );
+                      } catch {
+                        hostname = "";
+                      }
+                      const subtext = description || hostname;
                       return (
                         <a
                           key={link?.id ?? index}
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-3 rounded-xl bg-white p-2.5 sm:p-3 shadow-sm transition hover:border-teal-300 active:scale-[0.98] border border-gray-200"
-                          style={{ boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)" }}
+                          className="group relative flex items-center gap-3 sm:gap-4 rounded-2xl bg-white p-3.5 sm:p-4 border border-gray-200/70 transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[#23B9CD]/40 active:scale-[0.98] active:translate-y-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_1px_rgba(15,23,42,0.04),0_8px_16px_-4px_rgba(15,23,42,0.12),0_20px_40px_-14px_rgba(15,23,42,0.18)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_2px_2px_rgba(15,23,42,0.05),0_14px_24px_-4px_rgba(15,23,42,0.16),0_28px_56px_-14px_rgba(15,23,42,0.24)]"
                         >
-                          <div className="w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-                            {thumbSrc ? (
-                              <img
-                                src={thumbSrc}
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <Link2 className="w-5 h-5 text-gray-400" />
-                            )}
-                          </div>
-                          <span className="flex-1 min-w-0 flex items-center gap-2">
-                            <span className="truncate text-sm font-semibold text-gray-800">
-                              {link.title}
-                            </span>
+                          {/* thumbnail */}
+                          <div className="relative flex-shrink-0">
+                            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-gradient-to-br from-[#e6edf5] to-[#d6e0eb] ring-1 ring-black/5 flex items-center justify-center">
+                              {thumbSrc ? (
+                                <img
+                                  src={thumbSrc}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <Link2 className="w-5 h-5 text-[#23B9CD]" />
+                              )}
+                            </div>
                             {link?.is_featured && (
-                              <span className="flex-shrink-0 rounded-full bg-[#23B9CD] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                              <span className="absolute -top-1.5 -left-1.5 rounded-full bg-[#23B9CD] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-sm ring-2 ring-white whitespace-nowrap">
                                 Featured
                               </span>
                             )}
-                          </span>
-                          <ChevronRight className="w-4 h-4 text-teal-600 flex-shrink-0" />
+                          </div>
+                          {/* title + description */}
+                          <div className="flex-1 min-w-0">
+                            <p className="truncate text-sm sm:text-base font-semibold text-gray-900 leading-snug">
+                              {link.title}
+                            </p>
+                            {subtext && (
+                              <p className="text-xs sm:text-[13px] text-gray-500 leading-snug mt-1 line-clamp-2">
+                                {subtext}
+                              </p>
+                            )}
+                          </div>
+                          {/* action */}
+                          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center transition-colors duration-200 group-hover:bg-[#23B9CD]">
+                            <ArrowUpRight
+                              className="w-4 h-4 text-gray-400 transition-colors duration-200 group-hover:text-white"
+                              strokeWidth={2.25}
+                            />
+                          </div>
                         </a>
                       );
                     })}
@@ -1459,7 +1169,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
               <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent to-teal-400" />
             </div>
             {/* ===== SOCIAL ICONS ===== */}
-            <div className="flex justify-center lg:justify-end flex-wrap gap-4 sm:gap-5 mt-4">
+            <div className="flex justify-center flex-wrap gap-4 sm:gap-5 mt-4">
               {data?.website && (
                 <div className="flex flex-col items-center gap-1.5">
                   <a

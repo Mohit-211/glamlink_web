@@ -490,11 +490,10 @@ const JournalClient = ({ path }: { path: string }) => {
           {/* ── Top tab navigation (Journal / Education / Events / Shop) ── */}
           <TopTabs path={path} />
           {fullLayout && (
-            <div className="flex justify-center py-4">
-              <AdSlot
-                slotId="journal-top-banner"
-                ad={ads["journal-top-banner"]}
-              />
+            <div className="flex flex-wrap justify-center gap-4 py-4">
+              {(ads["journal-top-banner"] ?? []).map((ad) => (
+                <AdSlot key={ad.id} slotId="journal-top-banner" ad={ad} />
+              ))}
             </div>
           )}
           {/* ── Journal article search (title, category, author, content) ── */}
@@ -530,11 +529,10 @@ const JournalClient = ({ path }: { path: string }) => {
                       vertical
                       path={path}
                     />
-                    {/* Left sidebar ad */}
-                    <AdSlot
-                      slotId="journal-sidebar-left"
-                      ad={ads["journal-sidebar-left"]}
-                    />
+                    {/* Left sidebar ad(s) */}
+                    {(ads["journal-sidebar-left"] ?? []).map((ad) => (
+                      <AdSlot key={ad.id} slotId="journal-sidebar-left" ad={ad} />
+                    ))}
                   </div>
                 </aside>
 
@@ -546,21 +544,19 @@ const JournalClient = ({ path }: { path: string }) => {
                       activeIssue={selectedIssue}
                       onIssueClick={handleIssueClick}
                     />
-                    {/* Right sidebar ad */}
-                    <AdSlot
-                      slotId="journal-sidebar-right"
-                      ad={ads["journal-sidebar-right"]}
-                    />
+                    {/* Right sidebar ad(s) */}
+                    {(ads["journal-sidebar-right"] ?? []).map((ad) => (
+                      <AdSlot key={ad.id} slotId="journal-sidebar-right" ad={ad} />
+                    ))}
                   </div>
                 </aside>
               </div>
 
               {/* ── Mobile-only fixed bottom ad bar ── */}
               <div className="lg:hidden">
-                <AdSlot
-                  slotId="journal-mobile-bottom"
-                  ad={ads["journal-mobile-bottom"]}
-                />
+                {(ads["journal-mobile-bottom"] ?? []).map((ad) => (
+                  <AdSlot key={ad.id} slotId="journal-mobile-bottom" ad={ad} />
+                ))}
               </div>
 
               <FlipbookPanel
@@ -573,7 +569,11 @@ const JournalClient = ({ path }: { path: string }) => {
             <div className="max-w-4xl mx-auto">{renderMainContent()}</div>
           )}
         </div>
-        <AdSlot slotId="journal-bottom" ad={ads["journal-bottom"]} />
+        <div className="flex flex-wrap justify-center gap-4">
+          {(ads["journal-bottom"] ?? []).map((ad) => (
+            <AdSlot key={ad.id} slotId="journal-bottom" ad={ad} />
+          ))}
+        </div>
       </div>
     </>
   );

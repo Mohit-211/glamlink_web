@@ -14,7 +14,7 @@ const TEST_AD_SIZE: [number, number] = [300, 250];
 export default function AdTestPage() {
   const device = useDeviceType();
   const ads = useAds({ page: "journal-article", device });
-  const manualAd = Object.values(ads)[0];
+  const manualAd = Object.values(ads)[0]?.[0];
 
   useEffect(() => {
     console.log(

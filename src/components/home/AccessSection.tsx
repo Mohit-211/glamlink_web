@@ -49,7 +49,7 @@ const AccessSection: React.FC = () => {
             </div>
 
             <button
-              onClick={() => router.push("/apply/digital-card")}
+              onClick={() => router.push("/access")}
               className="group relative inline-flex items-center gap-3 px-8 py-4.5 bg-gradient-to-r from-[#24bbcb] via-[#1ea8b5] to-[#24bbcb] 
                          text-white font-semibold text-base rounded-full shadow-lg shadow-[#24bbcb]/25 
                          hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 

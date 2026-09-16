@@ -167,19 +167,17 @@ const GlamCardApplication: React.FC = () => {
   );
 
   return (
-    <div className="flex gap-8 items-start">
-      {/* LEFT — form, sticky, scrollable, height matches preview */}
-      <div className="w-1/2 sticky top-0 h-screen overflow-hidden">
-        <div className="h-full rounded-xl border bg-white p-6 shadow overflow-y-auto">
+    <div className="flex flex-col lg:flex-row gap-8 items-start">
+      {/* FORM — stacked full-width on mobile; sticky side column from lg up */}
+      <div className="w-full lg:w-1/2 lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">
+        <div className="rounded-xl border bg-white p-6 shadow lg:h-full lg:overflow-y-auto">
           <GlamCardForm data={data} setData={setData} />
         </div>
       </div>
 
-      {/* RIGHT — preview, natural height, scrolls with page */}
-      <div className="w-1/2">
+      {/* PREVIEW — natural height, scrolls with page */}
+      <div className="w-full lg:w-1/2">
         <GlamCardLivePreview data={previewData} mode="live" />
-        {/* <BusinessCardPage slug={data?.business_card_link.split('/').pop()} mode="view" /> */}
-
       </div>
     </div>
   );

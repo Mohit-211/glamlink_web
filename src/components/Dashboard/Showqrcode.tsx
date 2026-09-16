@@ -50,7 +50,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
           You need to create a business card before generating a QR code.
         </p>
         <button
-          onClick={() => (window.location.href = '/apply/digital-card')}
+          onClick={() => (window.location.href = '/access')}
           className="mt-6 rounded-xl bg-primary px-6 py-3 text-white font-medium cursor-pointer"
         >
           Create business card

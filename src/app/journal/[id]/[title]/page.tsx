@@ -8,6 +8,7 @@ import RelatedArticles from "@/components/blogs/RelatedArticles";
 import DownloadButton from "@/components/Downloadbutton";
 import JournalShopCard from "@/components/blogs/JournalShopCard";
 import ArticleAdSlot from "@/ads/ArticleAdSlot";
+import ShareProductButton from "@/components/blogs/ShareProductButton";
 
 interface DownloadItem {
   id: number;
@@ -340,6 +341,11 @@ const formattedDate = article?.publish_date
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5">{formattedDate}</p>
                 </div>
+              </div>
+
+              {/* Share */}
+              <div className="flex items-center md:pl-6 md:border-l md:border-gray-100 flex-shrink-0">
+                <ShareProductButton url={articleUrl} title={article.title} />
               </div>
 
             </div>

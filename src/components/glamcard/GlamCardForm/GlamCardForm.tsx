@@ -92,7 +92,7 @@ const GlamCardForm: React.FC<Props> = ({
   useEffect(() => {
     if (isEdit) return;
     const cameFromLoginRedirect =
-      localStorage.getItem("postLoginRedirect") === "/apply/digital-card";
+      localStorage.getItem("postLoginRedirect") === "/access";
     const storedData = localStorage.getItem(FORM_STORAGE_KEY);
     if (cameFromLoginRedirect && storedData) {
       try {
@@ -389,7 +389,7 @@ const GlamCardForm: React.FC<Props> = ({
   };
   const handleLogin = () => {
     localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(data));
-    localStorage.setItem("postLoginRedirect", "/apply/digital-card");
+    localStorage.setItem("postLoginRedirect", "/access");
     window.location.href = "/login";
   };
   const handleSubmit = async (formData: FormData) => {
@@ -435,7 +435,7 @@ const GlamCardForm: React.FC<Props> = ({
 }
       const result = await res.json();
       if (isEdit) {
-        message.success(result?.message || "GlamCard updated successfully!");
+        message.success(result?.message || "Access Successfully Updated!");
         onSuccess?.(result?.data ?? result);
       } else {
         // New user -> straight to plan selection with the new card's id.

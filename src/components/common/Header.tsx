@@ -15,7 +15,7 @@ const navLinks = [
   { label: "Podcast", href: "/podcast", id: "podcast" },
   { label: "Journal", href: "/journal", id: "journal" },
   // { label: "Topics", href: "/topics", id: "topics" },
-  { label: "Access", href: "/apply/digital-card", id: "access" },
+  { label: "Access", href: "/access", id: "access" },
 
 ];
 

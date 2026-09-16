@@ -57,7 +57,7 @@ export function selectAds(
   ads: AdSource[],
   { page }: UseAdsParams,
   now: Date = new Date()
-): Record<string, Ad> {
+): Record<string, Ad[]> {
   const valid = ads.filter((ad) => {
     const isActive = ad.is_active && ad.status === "active";
     const afterStart = !ad.start_date || new Date(ad.start_date) <= now;
@@ -66,33 +66,34 @@ export function selectAds(
     return isActive && afterStart && beforeEnd && matchesPage;
   });
 
-  const winners: Record<string, AdSource> = {};
+  // A placement (slot_id) can have more than one eligible ad; all of them
+  // are shown together at that placement, ordered by sort_order.
+  const bySlot: Record<string, AdSource[]> = {};
   valid.forEach((ad) => {
-    const current = winners[ad.slot_id];
-    if (!current || ad.sort_order < current.sort_order) {
-      winners[ad.slot_id] = ad;
-    }
+    (bySlot[ad.slot_id] ??= []).push(ad);
   });
 
-  const picked: Record<string, Ad> = {};
-  Object.values(winners).forEach((ad) => {
-    picked[ad.slot_id] = {
-      id: ad.id,
-      slot_id: ad.slot_id,
-      image_url: ad.image_url,
-      link_url: ad.link_url,
-      alt_text: ad.alt_text,
-      width: ad.width,
-      height: ad.height,
-      behaviour: ad.behaviour,
-      media_type: ad.media_type,
-    };
+  const picked: Record<string, Ad[]> = {};
+  Object.entries(bySlot).forEach(([slotId, slotAds]) => {
+    picked[slotId] = slotAds
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((ad) => ({
+        id: ad.id,
+        slot_id: ad.slot_id,
+        image_url: ad.image_url,
+        link_url: ad.link_url,
+        alt_text: ad.alt_text,
+        width: ad.width,
+        height: ad.height,
+        behaviour: ad.behaviour,
+        media_type: ad.media_type,
+      }));
   });
 
   return picked;
 }
 
-export function useAds({ page, device }: UseAdsParams): Record<string, Ad> {
+export function useAds({ page, device }: UseAdsParams): Record<string, Ad[]> {
   const [ads, setAds] = useState<AdSource[]>(adsCache ?? []);
 
   useEffect(() => {

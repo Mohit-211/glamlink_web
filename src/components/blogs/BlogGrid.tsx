@@ -270,23 +270,21 @@ const BlogGrid: React.FC<Props> = ({
                 />
               </Link>
 
-              {/* ── In-feed ad — after the 1st row ── */}
-              {index === 1 && ads["journal-listing-in-feed"] && (
-                <div className="md:col-span-2 flex justify-center">
-                  <AdSlot
-                    slotId="journal-listing-in-feed"
-                    ad={ads["journal-listing-in-feed"]}
-                  />
+              {/* ── In-feed ad(s) — after the 1st row ── */}
+              {index === 1 && !!ads["journal-listing-in-feed"]?.length && (
+                <div className="md:col-span-2 flex flex-wrap justify-center gap-4">
+                  {ads["journal-listing-in-feed"].map((ad) => (
+                    <AdSlot key={ad.id} slotId="journal-listing-in-feed" ad={ad} />
+                  ))}
                 </div>
               )}
 
-              {/* ── In-feed ad — after the 2nd row ── */}
-              {index === 3 && ads["journal-listing-in-feed-2"] && (
-                <div className="md:col-span-2 flex justify-center">
-                  <AdSlot
-                    slotId="journal-listing-in-feed-2"
-                    ad={ads["journal-listing-in-feed-2"]}
-                  />
+              {/* ── In-feed ad(s) — after the 2nd row ── */}
+              {index === 3 && !!ads["journal-listing-in-feed-2"]?.length && (
+                <div className="md:col-span-2 flex flex-wrap justify-center gap-4">
+                  {ads["journal-listing-in-feed-2"].map((ad) => (
+                    <AdSlot key={ad.id} slotId="journal-listing-in-feed-2" ad={ad} />
+                  ))}
                 </div>
               )}
             </React.Fragment>
