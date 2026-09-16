@@ -88,6 +88,8 @@ export interface GlamCardFormData {
   booking_link?: string;
   important_info: string[];
   featured_links?: FeaturedLink[];
+  /** Hex color (e.g. "#3BBDD4") the professional picked to theme their Access Card — drives the Featured Links accent. */
+  color_code?: string;
   /* MARKETING */
   offer_promotion?: boolean;
   promotion_details?: string;

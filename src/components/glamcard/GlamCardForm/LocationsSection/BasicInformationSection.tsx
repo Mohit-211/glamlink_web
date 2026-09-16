@@ -244,6 +244,40 @@ const BasicInformationSection: React.FC<SectionProps> = ({
           <p className="mt-1 text-sm text-red-500">{errors.business_name}</p>
         )}
       </div>
+
+      {/* CARD COLOR */}
+      <div id="field-color_code">
+        <label className={labelClass}>Card Color</label>
+        <p className="mt-1 text-xs text-gray-500">
+          Pick an accent color for your Access Card — it themes the Featured
+          Links cards, icons, and highlights across your page.
+        </p>
+        <div className="mt-2 flex items-center gap-3">
+          <input
+            type="color"
+            value={
+              /^#[0-9a-fA-F]{6}$/.test(data.color_code || "")
+                ? (data.color_code as string)
+                : "#23b9cd"
+            }
+            onChange={(e) =>
+              setData((p) => ({ ...p, color_code: e.target.value }))
+            }
+            className="h-10 w-14 flex-none cursor-pointer rounded-lg border border-gray-300 bg-white p-1"
+            title="Pick a color"
+          />
+          <input
+            type="text"
+            className={`${inputClass} max-w-[140px]`}
+            placeholder="#23B9CD"
+            value={data.color_code || ""}
+            onChange={(e) =>
+              setData((p) => ({ ...p, color_code: e.target.value }))
+            }
+            maxLength={7}
+          />
+        </div>
+      </div>
     </section>
   );
 };

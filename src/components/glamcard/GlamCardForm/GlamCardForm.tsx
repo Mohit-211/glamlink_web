@@ -330,6 +330,7 @@ const GlamCardForm: React.FC<Props> = ({
       "custom_handle",
       "website",
       "promotion_details",
+      "color_code",
     ] as const;
     primitiveFields.forEach((field) => {
       const value = data[field];
