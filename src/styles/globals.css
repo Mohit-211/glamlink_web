@@ -511,3 +511,14 @@
   visibility: hidden !important;
   opacity: 0 !important;
 }
+
+/* Hide scrollbar for horizontally scrollable rows (mobile tab bars, carousels) */
+.no-scrollbar,
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

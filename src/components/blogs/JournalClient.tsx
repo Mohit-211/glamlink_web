@@ -95,10 +95,10 @@ const PaginationControls = ({
 const TopTabs = ({ path }: { path: string }) => {
   const router = useRouter();
   return (
-    <div className="w-full flex justify-center mb-4 lg:mb-6">
+    <div className="w-full overflow-x-auto no-scrollbar mb-4 lg:mb-6">
       <div
         role="tablist"
-        className="inline-flex items-center gap-1 p-1 rounded-full
+        className="flex w-max mx-auto items-center gap-1 p-1 rounded-full
           bg-muted/40 border border-border/40"
       >
         {TOP_TABS.map((tab) => {
@@ -109,8 +109,8 @@ const TopTabs = ({ path }: { path: string }) => {
               role="tab"
               aria-selected={isActive}
               onClick={() => router.push(tab.href)}
-              className={`cursor-pointer px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold uppercase tracking-wide
-                rounded-full whitespace-nowrap transition-all duration-200
+              className={`cursor-pointer px-3 sm:px-6 py-2 text-[11px] sm:text-sm font-semibold uppercase tracking-wide
+                rounded-full whitespace-nowrap transition-all duration-200 shrink-0
                 ${isActive
                   ? "bg-background text-[#24bbcb] shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
