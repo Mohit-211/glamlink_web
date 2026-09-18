@@ -17,7 +17,6 @@ import AreaSection from "@/components/directoryComponent/AreaSection";
 import CTASection from "@/components/directoryComponent/CTASection";
 import FeaturedProviders from "@/components/directoryComponent/FeaturedProviders";
 import HeroSection from "@/components/directoryComponent/HeroSection";
-import DirectoryPageClient from "../directory/DirectoryPageClient";
 
 export default function DirectoryPage() {
   const router = useRouter();
@@ -66,13 +65,10 @@ export default function DirectoryPage() {
 
   const fetchProfessionals = async () => {
     try {
-      setProfessionalsLoading(true);
       const res = await getBusinessProfile();
       setProfessionals(res?.data || []);
     } catch (error) {
       console.log("API error:", error);
-    } finally {
-      setProfessionalsLoading(false);
     }
   };
 
@@ -82,7 +78,6 @@ export default function DirectoryPage() {
 
   const fetchProviders = async () => {
     try {
-      setProvidersLoading(true);
       const res = await GetBeauticianListApi();
       const providerList = res?.data || [];
 
@@ -125,13 +120,10 @@ export default function DirectoryPage() {
       router.push(`/journal/directory?service=${service.title}`);
 
       try {
-        setProfessionalsLoading(true);
         const res = await GetProfilesByDirectory(service.id);
         setProfessionals(res?.data || []);
       } catch (error) {
         console.log("Directory API error:", error);
-      } finally {
-        setProfessionalsLoading(false);
       }
     }
   };
@@ -148,64 +140,65 @@ export default function DirectoryPage() {
     <div className="page-soft">
   
 
-
-      <div className="flex flex-wrap gap-3 mb-14 mt-4 justify-center">
-        <button
-          onClick={() => handleTabClick({ title: "All" })}
-          className={`px-5 py-2 rounded-full text-sm font-medium transition-all border
-            ${activeService === "All"
-              ? "bg-primary text-white border-primary shadow-md shadow-primary/30"
-              : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-primary"
-            }`}
-        >
-          All
-        </button>
-
-        {services.map((service: any) => (
+        <div className="flex flex-wrap gap-3 mb-14 mt-4 justify-center">
           <button
-            key={service.id}
-            onClick={() => handleTabClick(service)}
+            onClick={() => handleTabClick({ title: "All" })}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-all border
-              ${activeService === service.title
+            ${
+              activeService === "All"
                 ? "bg-primary text-white border-primary shadow-md shadow-primary/30"
                 : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-primary"
-              }`}
+            }`}
           >
-            {service.title}
+            All
           </button>
-        ))}
-      </div>
 
-      {/* HERO */}
+          {services.map((service: any) => (
+            <button
+              key={service.id}
+              onClick={() => handleTabClick(service)}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all border
+              ${
+                activeService === service.title
+                  ? "bg-primary text-white border-primary shadow-md shadow-primary/30"
+                  : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-primary"
+              }`}
+            >
+              {service.title}
+            </button>
+          ))}
+        </div>
 
-      <HeroSection
-        service={activeService}
-        description={activeCategory?.description || ""}
-      />
+        {/* HERO */}
 
-      {/* FEATURED PROVIDERS */}
+        <HeroSection
+          service={activeService}
+          description={activeCategory?.description || ""}
+        />
 
-      <div className="mt-24">
-        <FeaturedProviders data={professionals} loading={professionalsLoading} />
-      </div>
+        {/* FEATURED PROVIDERS */}
 
-      {/* AREA TITLE */}
+        <div className="mt-24">
+          <FeaturedProviders data={professionals} />
+        </div>
 
-      <div className="mt-28">
-        <h2 className="section-title">Las Vegas Providers</h2>
-      </div>
+        {/* AREA TITLE */}
 
-      {/* PROVIDERS */}
+        <div className="mt-28">
+          <h2 className="section-title">Las Vegas Providers</h2>
+        </div>
 
-      <div className="mt-12">
-        <AreaSection title="Southwest" data={providers} loading={providersLoading} />
-      </div>
+        {/* PROVIDERS */}
 
-      {/* CTA */}
-      {/* <DirectoryPageClient /> */}
+        <div className="mt-12">
+          <AreaSection title="Southwest" data={providers} />
+        </div>
 
-      <div className="mt-28">
-        <CTASection />
+        {/* CTA */}
+
+        <div className="mt-28">
+          <CTASection />
+        </div>
       </div>
 
   );
