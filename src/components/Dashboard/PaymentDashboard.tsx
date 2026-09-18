@@ -134,9 +134,8 @@ export default function DashboardPage() {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [editCardId, setEditCardId] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
-  console.log(selectedPlan,"selectedPlan")
   const [payModalPurchaseType, setPayModalPurchaseType] = useState<PurchaseType>(
-  
+
   );
   useEffect(() => {
     const token = localStorage.getItem('GlamlinkaccessToken');
@@ -216,8 +215,6 @@ export default function DashboardPage() {
     setPayModalPurchaseType(type);
     setPayOpen(true);
   };
-  console.log(showSuccess)
-  console.log(businessCard, "--")
   const PLAN_TYPE_LABELS: Record<string, string> = {
     free: "Free",
     pro: "Pro",
@@ -229,40 +226,42 @@ export default function DashboardPage() {
     if (!planType) return "Free";
     return PLAN_TYPE_LABELS[planType.toLowerCase()] || "Free";
   }
-  console.log(cardsArray[0]?.plan_type, "cardarayyy")
   return (
-    <div className="min-h-screen bg-background page-soft mt-18">
-      <div className="container-glamlink py-8 md:py-12">
-        <div className="mb-8 flex items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-accent px-3 py-1 text-[11px] font-medium text-accent-foreground">
-                <LayoutDashboard className="h-3 w-3" />
-                Dashboard
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Manage your access card, orders, and account settings
-            </p>
+    <div className="min-h-screen bg-background page-soft mt-16 sm:mt-18">
+      <div className="container-glamlink py-6 sm:py-8 md:py-12">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-accent px-3 py-1 text-[11px] font-medium text-accent-foreground">
+              <LayoutDashboard className="h-3 w-3" />
+              Dashboard
+            </span>
           </div>
+          <p className="text-sm text-muted-foreground">
+            Manage your access card, orders, and account settings
+          </p>
         </div>
-        <div className="flex flex-col md:flex-row gap-6 items-start">
-          <aside className="w-full md:w-64 flex-shrink-0">
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Sidebar becomes a full-width nav above the content until `lg`
+              (1024px) — at `md` there wasn't enough room for a 256px rail
+              next to the card, so it now stacks through tablet widths too. */}
+          <aside className="w-full lg:w-64 flex-shrink-0">
             <nav className="rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden">
-              <div className="px-5 py-4 border-b border-border bg-secondary/30">
+              <div className="px-4 py-4 border-b border-border bg-secondary/30 sm:px-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground ring-2 ring-primary/20">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground ring-2 ring-primary/20">
                     {userdata?.name?.slice(0, 2)?.toUpperCase() || 'GL'}
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">{userdata?.name || 'User'}</p>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-foreground">{userdata?.name || 'User'}</p>
                     <span className="inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground mt-0.5">
                       {getActivePlanLabel(cardsArray[0]?.plan_type)} Plan
                     </span>
                   </div>
                 </div>
               </div>
-              <div className="p-2">
+              {/* Nav items: horizontally scrollable row on mobile/tablet
+                  (no wrapping, no squashed labels), vertical stack from `lg` up. */}
+              <div className="flex gap-1 overflow-x-auto p-2 lg:block lg:overflow-visible">
                 {NAV_ITEMS.map((item) => {
                   const isEditCard = item.id === 'edit-card';
                   const isDisabled = isEditCard && !editCardEnabled;
@@ -279,7 +278,7 @@ export default function DashboardPage() {
                         }
                         setActiveTab(item.id);
                       }}
-                      className={`w-full flex items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-150 ${isDisabled
+                      className={`flex flex-shrink-0 items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-150 lg:w-full ${isDisabled
                         ? 'opacity-50 cursor-not-allowed text-muted-foreground'
                         : activeTab === item.id
                           ? 'bg-primary text-primary-foreground'
@@ -287,14 +286,14 @@ export default function DashboardPage() {
                         }`}
                     >
                       {item.icon}
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{item.label}</p>
-                        <p className="text-[11px] opacity-70">{item.description}</p>
+                      <div className="min-w-[110px] flex-1 lg:min-w-0">
+                        <p className="whitespace-nowrap text-sm font-medium lg:whitespace-normal">{item.label}</p>
+                        <p className="hidden text-[11px] opacity-70 lg:block">{item.description}</p>
                       </div>
                       {isDisabled ? (
-                        <Lock className="h-4 w-4" />
+                        <Lock className="hidden h-4 w-4 lg:block" />
                       ) : (
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="hidden h-4 w-4 lg:block" />
                       )}
                     </button>
                   );
@@ -317,16 +316,16 @@ export default function DashboardPage() {
               </div>
             </nav>
           </aside>
-          <main className="flex-1 min-w-0">
-            <div className="mb-4 flex items-center gap-2 text-xs text-muted-foreground">
-              <span>Dashboard</span>
-              <ChevronRight className="h-3 w-3" />
-              <span className="font-medium text-foreground">{activeItem.label}</span>
+          <main className="w-full flex-1 min-w-0">
+            <div className="mb-4 flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+              <span className="flex-shrink-0">Dashboard</span>
+              <ChevronRight className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate font-medium text-foreground">{activeItem.label}</span>
             </div>
             {showSuccess && (
-              <div className="mb-4 flex items-center justify-between gap-4 rounded-xl border border-primary/30 bg-accent px-4 py-3">
+              <div className="mb-4 flex flex-col gap-3 rounded-xl border border-primary/30 bg-accent px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-accent-foreground">
-                  <CheckCircle className="h-4 w-4" />
+                  <CheckCircle className="h-4 w-4 flex-shrink-0" />
                   Business card created successfully! Complete payment to activate it.
                 </div>
                 <button
@@ -336,30 +335,34 @@ export default function DashboardPage() {
                     setPayOpen(true);
                   }}
                   disabled={!hasValidPaymentCardId}
-                  className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex-shrink-0 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
                 >
                   Pay Now
                 </button>
               </div>
             )}
-            <div className="card-glamlink min-h-[100dvh]">
+            {/* Content card: min-height scales with viewport instead of
+                pinning to 100dvh on every breakpoint from `md` up, which
+                added a full extra screen of empty space below short tabs
+                (e.g. Change Password) on tablet/desktop. */}
+            <div className="card-glamlink min-h-[50vh] sm:min-h-[55vh] lg:min-h-[65vh]">
               <TabErrorBoundary onReset={() => fetchDashboardData()}>
                 {activeTab === 'my-card' && (
                   <MyAccessCard
                     cardData={businessCard}
                     user={userdata}
                     error={error}
-                  onPayNow={(card: any, plan?: PlanId | null) => {
-                    setSelectedCardId(String(card?.id ?? ''));
-                    setPayModalPurchaseType(
-                      plan === 'nfc_with_subscription'
-                        ? 'NFC_WITH_SUBSCRIPTION'
-                        : plan === 'nfc_only'
-                        ? 'NFC_ONLY'
-                        : 'SUBSCRIPTION_ONLY'
-                    );
-                    setPayOpen(true);
-                  }}
+                    onPayNow={(card: any, plan?: PlanId | null) => {
+                      setSelectedCardId(String(card?.id ?? ''));
+                      setPayModalPurchaseType(
+                        plan === 'nfc_with_subscription'
+                          ? 'NFC_WITH_SUBSCRIPTION'
+                          : plan === 'nfc_only'
+                            ? 'NFC_ONLY'
+                            : 'SUBSCRIPTION_ONLY'
+                      );
+                      setPayOpen(true);
+                    }}
                     onEdit={(card: any) => {
                       setEditCardId(String(card?.id ?? ''));
                       setActiveTab('edit-card');

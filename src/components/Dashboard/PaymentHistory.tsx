@@ -130,14 +130,14 @@ export default function PaymentHistory({
                 key={payment.id}
                 className="rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden"
               >
-                <div className="flex items-center gap-4 px-5 py-4">
+                <div className="flex items-center gap-3 px-3 py-3 sm:gap-4 sm:px-5 sm:py-4">
                   <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-accent">
                     <Receipt className="h-5 w-5 text-accent-foreground" />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold text-foreground">
+                      <p className="break-words text-sm font-semibold text-foreground">
                         {payment.description}
                       </p>
 
@@ -167,7 +167,7 @@ export default function PaymentHistory({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="flex items-center gap-2 flex-shrink-0 sm:gap-3">
                     <p className="text-base font-bold text-primary">
                       ${Number(payment.amount).toFixed(2)}
                     </p>

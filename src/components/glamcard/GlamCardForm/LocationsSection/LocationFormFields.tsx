@@ -288,7 +288,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       {/* Location Type */}
       <div>
         <span className={labelClass}>Location Type</span>
-        <div className="mt-2 flex gap-8">
+        <div className="mt-2 flex flex-wrap gap-4 sm:gap-8">
           <label className="flex cursor-pointer items-center gap-2 text-sm">
             <input
               type="radio"
@@ -407,31 +407,35 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       {location.location_type === "exact_address" && (
         <div>
           <label className={labelClass}>Address</label>
-          <div className="flex items-center gap-3">
-            <input
-              ref={addressInputRef}
-              className={inputClass}
-              value={location.address ?? ""}
-              onChange={(e) => onUpdate({ address: e.target.value })}
-              placeholder="Start typing an address..."
-            />
-            <button
-              type="button"
-              disabled={!canConfirmExact}
-              className={`${buttonClass} ${
-                canConfirmExact
-                  ? "bg-[#23AEB8] hover:bg-[#1F9CA5]"
-                  : "cursor-not-allowed bg-gray-300"
-              }`}
-              onClick={handleConfirmExact}
-            >
-              Confirm
-            </button>
-            {location.isSet && (
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
-                ✓
-              </span>
-            )}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="min-w-0 flex-1">
+              <input
+                ref={addressInputRef}
+                className={inputClass}
+                value={location.address ?? ""}
+                onChange={(e) => onUpdate({ address: e.target.value })}
+                placeholder="Start typing an address..."
+              />
+            </div>
+            <div className="flex flex-shrink-0 items-center gap-3">
+              <button
+                type="button"
+                disabled={!canConfirmExact}
+                className={`flex-1 sm:flex-none ${buttonClass} ${
+                  canConfirmExact
+                    ? "bg-[#23AEB8] hover:bg-[#1F9CA5]"
+                    : "cursor-not-allowed bg-gray-300"
+                }`}
+                onClick={handleConfirmExact}
+              >
+                Confirm
+              </button>
+              {location.isSet && (
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+                  ✓
+                </span>
+              )}
+            </div>
           </div>
         </div>
       )}

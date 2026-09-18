@@ -23,6 +23,7 @@ export default function HeroSection({ onGuestClick }: HeroSectionProps) {
       style={{
         background: "#fff",
         borderBottom: "0.5px solid #d0e8ea",
+        padding: "clamp(2rem, 5vw, 3.5rem) clamp(1rem, 4vw, 1.5rem) clamp(1.5rem, 4vw, 3rem)",
       }}
     >
       <div

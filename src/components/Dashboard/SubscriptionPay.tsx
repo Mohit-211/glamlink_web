@@ -940,7 +940,7 @@ export function SubscriptionPaymentModal({
             onClick={onClose}
         >
             <div
-                className="card-glamlink w-full max-w-md"
+                className="card-glamlink w-full max-w-md max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}

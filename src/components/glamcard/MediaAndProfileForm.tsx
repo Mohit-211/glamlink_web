@@ -14,7 +14,7 @@ interface Props {
 }
 
 const sectionClass =
-  "space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm";
+  "space-y-6 rounded-2xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm";
 const labelClass = "text-sm font-medium text-gray-700";
 
 const MAX_MEDIA_TOTAL = 5; // shared cap across photos + videos combined
@@ -619,7 +619,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
         <div className="flex items-center gap-2">
           <input
             type="url"
-            className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+            className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
             placeholder="Or paste an image URL"
             value={profileUrlInput}
             onChange={(e) => setProfileUrlInput(e.target.value)}
@@ -656,7 +656,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
           className={`space-y-4 pt-2 border-t ${errors?.images ? "border-red-300" : "border-gray-100"
             }`}
         >
-          <div className="flex justify-between items-center pt-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
             <label className={labelClass}>Photos ({photoCount})</label>
             <label
               className={`rounded-lg px-4 py-2 text-white ${totalMediaCount >= MAX_MEDIA_TOTAL
@@ -679,7 +679,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
           <div className="flex items-center gap-2">
             <input
               type="url"
-              className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
+              className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
               placeholder="Or paste an image URL"
               value={galleryUrlInput}
               onChange={(e) => setGalleryUrlInput(e.target.value)}
@@ -713,7 +713,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
 
       {/* VIDEOS SECTION */}
       <div className="space-y-4 pt-2 border-t border-gray-100">
-        <div className="flex justify-between items-center pt-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
           <div>
             <label className={labelClass}>Videos ({videoCount})</label>
             <p className="text-xs text-gray-400">

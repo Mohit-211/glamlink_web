@@ -14,7 +14,7 @@ interface Props {
   cardId?: string | number;
 }
 
-const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
+const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-4 sm:p-6";
 const labelClass = "text-sm font-medium text-gray-700";
 const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm " +
@@ -458,7 +458,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         </label>
 
         <div className="relative flex gap-2" ref={specialtyWrapperRef}>
-          <div className="relative flex-1">
+          <div className="relative min-w-0 flex-1">
             <input
               className={`${inputClass} ${errors?.specialties ? errorInputClass : ""}`}
               placeholder="e.g. Balayage, Keratin Treatments, Bridal Makeup"
@@ -611,12 +611,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             </div>
             <div className="space-y-2">
               {getHandles().map((value, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400 w-24 shrink-0">
+                <div key={idx} className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+                  <span className="text-xs text-gray-400 w-full sm:w-24 sm:shrink-0">
                     {idx === 0 ? "Instagram" : `Instagram ${idx}`}
                   </span>
                   <input
-                    className={`${inputClass} flex-1 ${idx === 0 && errors?.instagram ? errorInputClass : ""}`}
+                    className={`${inputClass} min-w-0 flex-1 ${idx === 0 && errors?.instagram ? errorInputClass : ""}`}
                     placeholder="@yourusername or full URL"
                     value={value}
                     required={
@@ -751,7 +751,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      className={`${inputClass} flex-1`}
+                      className={`${inputClass} min-w-0 flex-1`}
                       placeholder="Title (e.g. Vogue Feature)"
                       value={link.title}
                       onChange={(e) => updateOtherLink(index, "title", e.target.value)}
@@ -920,7 +920,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
 
         <div
           className={`mt-3 rounded-lg p-1 ${errors?.preferred_booking_methods ? "ring-1 ring-red-500" : ""}`}
-          style={{ display: "flex", gap: "8px" }}
+          style={{ display: "flex", flexWrap: "wrap", gap: "8px 20px" }}
         >
           {[
             BOOKING_METHODS.LINK,

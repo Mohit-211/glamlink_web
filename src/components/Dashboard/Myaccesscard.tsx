@@ -86,7 +86,7 @@ export default function MyAccessCard({
     const [subscriptionPromptKey, setSubscriptionPromptKey] = useState<CardKey | null>(null);
     const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
     const [nfcPromptKey, setNfcPromptKey] = useState<CardKey | null>(null);
-console.log(selectedPlan,"selectedPlan")
+
     const cards: AccessCardData[] = Array.isArray(cardData)
         ? cardData
         : cardData
@@ -95,16 +95,16 @@ console.log(selectedPlan,"selectedPlan")
 
     if (error === "Business card not found." || cards.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-16">
-                <h2 className="text-2xl font-semibold text-gray-900">
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center sm:py-16">
+                <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
                     Create Your Business Card
                 </h2>
-                <p className="mt-2 text-sm text-gray-500 text-center max-w-md">
+                <p className="mt-2 text-sm text-gray-500 max-w-md">
                     You haven't created a business card yet.
                 </p>
                 <button
                     onClick={() => (window.location.href = "/access")}
-                    className="mt-6 rounded-xl bg-primary px-6 py-3 text-white font-medium"
+                    className="mt-6 w-full max-w-xs rounded-xl bg-primary px-6 py-3 text-white font-medium sm:w-auto"
                 >
                     Create Business Card
                 </button>
@@ -187,11 +187,11 @@ console.log(selectedPlan,"selectedPlan")
                             key={key}
                             className="space-y-3 rounded-3xl border border-border/60 bg-secondary/10 p-3 sm:p-4"
                         >
-                            <div className="flex items-center justify-between gap-2 px-1">
-                                <p className="text-xs font-semibold text-muted-foreground">
+                            <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+                                <p className="min-w-0 flex-1 truncate text-xs font-semibold text-muted-foreground">
                                     {card?.business_name || card?.name || ''}
                                 </p>
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
                                     {cardIsSubscribed && showIncludeNfcButton && (
                                         <button
                                             onClick={() => setNfcPromptKey(key)}
@@ -215,10 +215,13 @@ console.log(selectedPlan,"selectedPlan")
                                 </div>
                             </div>
                             <div className="space-y-4">
+                                {/* Card switches to a 3-up row at lg (1024px) instead of sm (640px) —
+                                    at sm/tablet widths, three fixed-min-width columns side by side
+                                    overflowed and forced horizontal scroll. */}
                                 <div className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-[var(--shadow-medium)]">
-                                    <div className="flex flex-col sm:flex-row min-h-[200px]">
-                                        <div className="h-1.5 w-full sm:h-auto sm:w-1.5 flex-shrink-0 bg-primary" />
-                                        <div className="flex flex-col items-center justify-center gap-3 border-b border-border sm:border-b-0 sm:border-r px-6 py-6 sm:min-w-[160px] sm:px-8">
+                                    <div className="flex flex-col lg:flex-row min-h-[200px]">
+                                        <div className="h-1.5 w-full lg:h-auto lg:w-1.5 flex-shrink-0 bg-primary" />
+                                        <div className="flex flex-col items-center justify-center gap-3 border-b border-border px-6 py-6 lg:w-[180px] lg:flex-shrink-0 lg:border-b-0 lg:border-r lg:px-8">
                                             {card?.profile_image ? (
                                                 <img
                                                     src={card?.profile_image}
@@ -238,23 +241,23 @@ console.log(selectedPlan,"selectedPlan")
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="flex flex-1 flex-col justify-center gap-4 border-b border-border sm:border-b-0 sm:border-r px-6 py-6 sm:px-7">
+                                        <div className="flex flex-1 flex-col justify-center gap-4 border-b border-border px-6 py-6 lg:min-w-0 lg:border-b-0 lg:border-r lg:px-7">
                                             <div>
                                                 <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">About</p>
                                                 <div
-                                                    className="text-[13px] leading-relaxed text-foreground/80"
+                                                    className="text-[13px] leading-relaxed text-foreground/80 break-words"
                                                     dangerouslySetInnerHTML={{ __html: bioSummary || "" }}
                                                 />
                                             </div>
                                         </div>
-                                        <div className="flex flex-col justify-center gap-4 px-6 py-6 sm:min-w-[200px] sm:px-7">
+                                        <div className="flex flex-col justify-center gap-4 px-6 py-6 lg:w-[220px] lg:flex-shrink-0 lg:px-7">
                                             {card?.website && (
-                                                <div>
+                                                <div className="min-w-0">
                                                     <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Website</p>
                                                     <a href={card?.website} target="_blank" rel="noopener noreferrer"
-                                                        className="flex items-center gap-1.5 text-[13px] font-medium text-primary hover:underline">
+                                                        className="flex min-w-0 items-center gap-1.5 text-[13px] font-medium text-primary hover:underline">
                                                         <Globe className="h-3.5 w-3.5 flex-shrink-0" />
-                                                        {card?.website.replace(/https?:\/\/(www\.)?/, '')}
+                                                        <span className="truncate">{card?.website.replace(/https?:\/\/(www\.)?/, '')}</span>
                                                     </a>
                                                 </div>
                                             )}
@@ -268,7 +271,9 @@ console.log(selectedPlan,"selectedPlan")
                                                     </a>
                                                 </div>
                                             )}
-                                            <div className="h-px w-full bg-border" />
+                                            {(card?.website || card?.booking_link) && Object.keys(socialMedia).length > 0 && (
+                                                <div className="h-px w-full bg-border" />
+                                            )}
                                             {Object.keys(socialMedia).length > 0 && (
                                                 <div>
                                                     <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
@@ -300,25 +305,24 @@ console.log(selectedPlan,"selectedPlan")
                                             )}
                                         </div>
                                     </div>
-                                    <div className="flex flex-col gap-3 border-t border-border bg-secondary/40 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                                        <div className="flex flex-1 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
-                                            <span className="flex-1 truncate font-mono text-[12px] text-muted-foreground">
-                                                {isRejected ? "••••••••••••••••••••••" : card?.business_card_link}
-                                            </span>
-                                            {isRejected && (
-                                                <>
-                                                    <AlertCircle className="mt-0.5 h-5 w-5 text-red-600" />
-                                                    <div>
-                                                        <p className="text-sm font-semibold text-red-700">
-                                                            Your access card has been rejected.
-                                                        </p>
-                                                        <p className="mt-1 text-xs text-red-600">
-                                                            Please update your details and submit your access card again. It will remain unavailable until it is approved.
-                                                        </p>
-                                                    </div>
-                                                </>
-                                            )}
-                                            {!isRejected && (
+                                    <div className="flex flex-col gap-3 border-t border-border bg-secondary/40 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                                        {isRejected ? (
+                                            <div className="flex flex-1 items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5">
+                                                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-semibold text-red-700">
+                                                        Your access card has been rejected.
+                                                    </p>
+                                                    <p className="mt-1 text-xs text-red-600">
+                                                        Please update your details and submit your access card again. It will remain unavailable until it is approved.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
+                                                <span className="min-w-0 flex-1 truncate font-mono text-[12px] text-muted-foreground">
+                                                    {card?.business_card_link}
+                                                </span>
                                                 <button
                                                     onClick={() => handleCopy(card, key)}
                                                     className="flex-shrink-0 rounded-lg p-1 hover:bg-accent transition-colors"
@@ -330,16 +334,16 @@ console.log(selectedPlan,"selectedPlan")
                                                         <Copy className="h-3.5 w-3.5 text-muted-foreground" />
                                                     )}
                                                 </button>
-                                            )}
-                                        </div>
+                                            </div>
+                                        )}
 
-                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                        <div className="flex flex-shrink-0 items-center gap-2">
                                             <a
                                                 href={isRejected ? undefined : card?.business_card_link}
                                                 target={isRejected ? undefined : "_blank"}
                                                 rel={isRejected ? undefined : "noopener noreferrer"}
                                                 onClick={(e) => isRejected && e.preventDefault()}
-                                                className={`btn-primary !px-4 !py-2 !text-xs !rounded-xl flex items-center gap-1.5 ${isRejected
+                                                className={`btn-primary w-full !px-4 !py-2 !text-xs !rounded-xl flex items-center justify-center gap-1.5 sm:w-auto ${isRejected
                                                     ? "pointer-events-none opacity-50 cursor-not-allowed"
                                                     : ""
                                                     }`}
@@ -374,7 +378,7 @@ console.log(selectedPlan,"selectedPlan")
                                                     )}
                                                 </div>
                                                 {order.tracking_number && (
-                                                    <div className="text-muted-foreground">
+                                                    <div className="min-w-0 truncate text-muted-foreground">
                                                         <span className="font-semibold text-foreground">Tracking:</span>{' '}
                                                         {order.tracking_link ? (
                                                             <a
@@ -429,8 +433,8 @@ console.log(selectedPlan,"selectedPlan")
                             <p className="text-sm font-semibold text-foreground">{qrCard?.name}</p>
                             <p className="text-[11px] text-muted-foreground">{qrCard?.professional_title}</p>
                         </div>
-                        <div className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2">
-                            <span className="flex-1 truncate font-mono text-[11px] text-muted-foreground">{qrCard?.business_card_link}</span>
+                        <div className="mt-4 flex min-w-0 items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2">
+                            <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-muted-foreground">{qrCard?.business_card_link}</span>
                             <button
                                 onClick={() => handleCopy(qrCard, qrKey as CardKey)}
                                 className="flex-shrink-0 rounded-md p-1 hover:bg-accent transition-colors"
@@ -451,18 +455,20 @@ console.log(selectedPlan,"selectedPlan")
                 </div>
             )}
 
-            {/* Subscribe Prompt Modal */}
+            {/* Subscribe Prompt Modal — capped width + safe viewport margins so it
+                doesn't stretch edge-to-edge on tablet/desktop or get clipped on
+                short mobile screens. */}
             {subscriptionPromptCard && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4"
                     onClick={() => setSubscriptionPromptKey(null)}
                 >
                     <div
-                        className="card-glamlink w-full max-h-[90vh] overflow-y-auto"
+                        className="card-glamlink w-full max-w-lg max-h-[85vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="mb-2 flex items-start justify-between">
-                            <div>
+                        <div className="mb-2 flex items-start justify-between gap-3">
+                            <div className="min-w-0">
                                 <h3 className="text-sm font-semibold text-foreground">Subscribe to edit this card</h3>
                                 <p className="text-[11px] text-muted-foreground mt-0.5">
                                     {(subscriptionPromptCard?.business_name || subscriptionPromptCard?.name || 'This card')}'s
@@ -497,18 +503,18 @@ console.log(selectedPlan,"selectedPlan")
                 </div>
             )}
 
-            {/* Include NFC Modal — independent of the subscribe-prompt modal */}
+            {/* Include NFC Modal — same width cap as the subscribe modal */}
             {nfcPromptCard && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4"
                     onClick={() => setNfcPromptKey(null)}
                 >
                     <div
-                        className="card-glamlink w-full max-h-[90vh] overflow-y-auto"
+                        className="card-glamlink w-full max-w-lg max-h-[85vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="mb-2 flex items-start justify-between">
-                            <div>
+                        <div className="mb-2 flex items-start justify-between gap-3">
+                            <div className="min-w-0">
                                 <h3 className="text-sm font-semibold text-foreground">Add an NFC keychain</h3>
                                 <p className="text-[11px] text-muted-foreground mt-0.5">
                                     Add a physical NFC keychain to {(nfcPromptCard?.business_name || nfcPromptCard?.name || 'this card')}.

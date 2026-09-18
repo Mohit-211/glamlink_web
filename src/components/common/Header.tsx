@@ -13,7 +13,7 @@ const navLinks = [
   { label: "Home", href: "/", id: "home" },
   { label: "Magazine", href: "/magazine", id: "magazine" },
   { label: "Podcast", href: "/podcast", id: "podcast" },
-  { label: "Journal", href: "/journal", id: "journal" },
+  // { label: "Journal", href: "/journal", id: "journal" },
   // { label: "Topics", href: "/topics", id: "topics" },
   { label: "Access", href: "/access", id: "access" },
 
@@ -77,12 +77,14 @@ export default function Header({ activeRoute }: any) {
       window.dispatchEvent(new Event("auth-change"));
 
       setProfileDropdownOpen(false);
+      setMobileMenuOpen(false);
       router.push("/login");
     }
   };
 
   const handleDashboard = () => {
     setProfileDropdownOpen(false);
+    setMobileMenuOpen(false);
     router.push("/dashboard");
   };
 
@@ -226,7 +228,11 @@ export default function Header({ activeRoute }: any) {
                     </Button>
                   </div>
                 ) : (
-                  <Link href="/login" className="w-full">
+                  <Link
+                    href="/login"
+                    className="w-full"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
                     <Button className="btn-primary w-full rounded-full py-6">
                       Login
                     </Button>

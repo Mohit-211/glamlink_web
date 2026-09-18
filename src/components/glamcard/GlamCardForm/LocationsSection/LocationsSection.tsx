@@ -10,7 +10,7 @@ interface SectionProps {
   clearError?: (key: string) => void;
 }
 
-const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
+const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-4 sm:p-6";
 
 const createEmptyLocation = (index: number): Location => ({
   id: nanoid(),

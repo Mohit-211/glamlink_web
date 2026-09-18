@@ -7,7 +7,7 @@ interface SectionProps {
 }
 
 const sectionClass =
-  "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
+  "space-y-6 rounded-xl border border-gray-200 bg-white p-4 sm:p-6";
 
 const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
