@@ -30,7 +30,11 @@ const inputClass =
 const labelClass = "text-sm font-medium text-gray-700 block mb-1.5";
 
 const buttonClass =
+<<<<<<< HEAD
   "min-w-[120px] rounded-lg bg-[#24bbcb] px-5 py-2.5 text-sm font-medium text-white transition";
+=======
+  "min-w-[120px] rounded-lg bg-[#23AEB8] px-5 py-2.5 text-sm font-medium text-white transition";
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
 
 // Helper: Convert state name/abbreviation to numeric ID
 const findStateId = (stateValue: string | undefined, statesArray: any[]): string | undefined => {
@@ -387,7 +391,11 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
               disabled={!canSetCity}
               className={`w-full ${
                 canSetCity
+<<<<<<< HEAD
                   ? "bg-[#24bbcb] text-white hover:bg-[#1f9ba3]"
+=======
+                  ? "bg-[#23AEB8] text-white hover:bg-[#1f9ba3]"
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                   : "cursor-not-allowed bg-gray-300 text-white"
               } ${buttonClass}`}
               onClick={handleSetCity}
@@ -423,7 +431,11 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                 disabled={!canConfirmExact}
                 className={`flex-1 sm:flex-none ${buttonClass} ${
                   canConfirmExact
+<<<<<<< HEAD
                     ? "bg-[#24bbcb] hover:bg-[#1F9CA5]"
+=======
+                    ? "bg-[#23AEB8] hover:bg-[#1F9CA5]"
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                     : "cursor-not-allowed bg-gray-300"
                 }`}
                 onClick={handleConfirmExact}

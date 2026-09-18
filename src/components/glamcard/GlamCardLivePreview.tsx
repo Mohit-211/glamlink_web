@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useEffect, useMemo, useRef, useState } from "react";
+=======
+﻿import React, { useEffect, useMemo, useRef, useState } from "react";
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
 import { GlamCardFormData } from "./GlamCardForm/types";
 import Logo from "../../../public/assets/ACCESS-3.png";
 import Image from "next/image";
@@ -207,7 +211,11 @@ const parseArray = (value: string | string[] | undefined): string[] => {
 };
 const isFile = (v: any): v is File => v instanceof File;
 /** Default Glamlink accent — used whenever the Access Card has no valid color_code. */
+<<<<<<< HEAD
 const DEFAULT_ACCENT_COLOR = "#24bbcb";
+=======
+const DEFAULT_ACCENT_COLOR = "#23B9CD";
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
 const isValidHexColor = (value: unknown): value is string =>
   typeof value === "string" &&
   /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value.trim());
@@ -772,7 +780,11 @@ const GlamCardLivePreview: React.FC<Props> = ({
               <div
                 className="relative rounded-2xl overflow-hidden shadow-md"
                 style={{
+<<<<<<< HEAD
                   background: "#24bbcb",
+=======
+                  background: `linear-gradient(135deg, ${cardColor} 0%, ${shadeColor(cardColor, -25)} 100%)`,
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                 }}
               >
                 {/* bg pattern */}

@@ -122,7 +122,7 @@ export default function TermsOfUsePage() {
               {/* Introduction */}
               <div className="prose prose-lg max-w-none mb-12">
                 <p className="text-gray-700 leading-relaxed mb-6">
-                  Estheticians 4 You LLC, a Nevada limited liability company ("Glamlink") provides the Glamlink and Glamlink Pro app, the glamlink.net site, and related goods and services, including any and all mobile applications, online software, and other services (collectively, the "Glamlink
+                  Glamlink Inc, a Nevada limited liability company ("Glamlink") provides the Glamlink and Glamlink Pro app, the glamlink.net site, and related goods and services, including any and all mobile applications, online software, and other services (collectively, the "Glamlink
                   Service") subject to your compliance with the terms and conditions set forth below. Your use of the Glamlink Service signifies your acknowledgement of and agreement to these Terms of Use.
                 </p>
                 <p className="text-gray-700 leading-relaxed">
@@ -654,7 +654,7 @@ export default function TermsOfUsePage() {
                   </ul>
                   <p className="text-gray-700 leading-relaxed mb-6 mt-4">Glamlink's designated Copyright Agent to receive notifications of claimed infringement is:</p>
                   <div className="bg-gray-50 p-4 rounded-lg mb-6">
-                    <strong>Estheticians 4 You LLC</strong>
+                    <strong>Glamlink Inc</strong>
                     <br />
                     Attn: Copyright Agent
                     <br />
@@ -662,8 +662,8 @@ export default function TermsOfUsePage() {
                     <br />
                     Las Vegas, NV 89113
                     <br />
-                    <a href="mailto:email-support@glamlink.net" className="text-glamlink-teal underline italic">
-                      email-support@glamlink.net
+                    <a href="mailto:support@glamlink.net" className="text-glamlink-teal underline italic">
+                      support@glamlink.net
                     </a>
                     <br />
                   </div>
@@ -812,8 +812,8 @@ export default function TermsOfUsePage() {
                   <svg className="w-5 h-5 text-glamlink-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <a href="mailto:email-support@glamlink.net" className="text-glamlink-teal underline">
-                    email-support@glamlink.net
+                  <a href="mailto:support@glamlink.net" className="text-glamlink-teal underline">
+                    support@glamlink.net
                   </a>
                 </div>
                 <div className="flex items-center justify-center space-x-2">

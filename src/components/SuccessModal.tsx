@@ -15,9 +15,8 @@ const SuccessModal: React.FC<Props> = ({
   title = "Success",
   message = (
     <>
-      Your business card was created successfully.
-      <br />
-      <strong>Please check your email.</strong>
+     Your Access Card has been created successfully.
+    
     </>
   ),
 }) => {
@@ -30,7 +29,7 @@ const SuccessModal: React.FC<Props> = ({
           ✅ {title}
         </h2>
 
-        <p className="mt-3 text-gray-600">{message}</p>
+        {/* <p className="mt-3 text-gray-600">{message}</p> */}
 
         <div className="mt-6 flex gap-3">
           <button

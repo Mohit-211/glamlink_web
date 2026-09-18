@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 
-import Hero from "@/components/home/Hero";
-import AccessSection from "@/components/home/AccessSection";
-import WhyGlamlinkSection from "@/components/home/WhyGlamlinkSection";
-import FounderBadge from "@/components/home/FounderBadge";
-import ProfessionalsMarketplace from "@/components/professionals/ProfessionalsMarketplace";
-import DirectoryApplySection from "@/components/home/DirectoryApplySection";
-import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
-import AccessByGlamlink from "@/components/AccessByGlamlink/AccessByGlamlink";
+import JournalLandingPage from "@/components/blogs/JournalLandingPage";
 
 /* --------------------------------
    Page Metadata
@@ -17,28 +10,19 @@ import AccessByGlamlink from "@/components/AccessByGlamlink/AccessByGlamlink";
 export const metadata: Metadata = {
   metadataBase: new URL("https://glamlink.net"),
 
-  title: "Discover Beauty Professionals Near You",
+  title: "Beauty Industry Journal & Insights",
 
   description:
-    "Find trusted beauty and wellness professionals near you with Glamlink. Discover salons, skincare specialists, makeup artists, and book services easily.",
-
-  keywords: [
-    "beauty professionals near me",
-    "find makeup artist",
-    "beauty services near me",
-    "salons near me",
-    "skincare specialists",
-    "glamlink directory",
-  ],
+    "Explore beauty industry insights, trends, tips, and expert articles.",
 
   alternates: {
     canonical: "/",
   },
 
   openGraph: {
-    title: "Discover Beauty Professionals Near You | Glamlink",
+    title: "Beauty Industry Journal & Insights | Glamlink",
     description:
-      "Explore verified beauty professionals, book services, and discover beauty insights on Glamlink.",
+      "Explore beauty industry insights, trends, tips, and expert articles.",
     url: "https://glamlink.net",
     images: [
       {
@@ -62,7 +46,7 @@ const websiteSchema = {
   url: "https://glamlink.net",
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://glamlink.net/directory?search={search_term_string}",
+    target: "https://glamlink.net/journal/directory?search={search_term_string}",
     "query-input": "required name=search_term_string",
   },
 };
@@ -83,16 +67,7 @@ export default function HomePage() {
         }}
       />
 
-      <Hero />
-      <AccessSection />
-      <AccessByGlamlink/>
-      {/* <DirectoryApplySection /> */}
-      {/* <ProfessionalsMarketplace /> */}
-      {/* <WhyGlamlinkSection /> */}
-      {/* <FounderBadge /> */}
-      <ConditionalGetFeatured />
+      <JournalLandingPage />
     </>
   );
 }
-// import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
-// <ConditionalGetFeatured />

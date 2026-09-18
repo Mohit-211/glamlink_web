@@ -463,7 +463,11 @@ const JournalClient = ({ path }: { path: string }) => {
         );
       case "directory":
         return (
+<<<<<<< HEAD
           <main className="space-y-6 min-w-0 mt-20">
+=======
+          <main className="space-y-6 min-w-0">
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
             <DirectoryPage />
           </main>
         );

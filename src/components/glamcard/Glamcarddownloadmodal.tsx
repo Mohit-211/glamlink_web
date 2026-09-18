@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import { Download, X, Loader2 } from "lucide-react";
@@ -68,9 +68,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
     return () => clearTimeout(timer);
   }, [isOpen]);
 
-  // When modal opens, screenshot each iframe while it's still live.
-  // This is the ONLY reliable way to capture Google Maps — we grab it before
-  // html-to-image runs, then swap it in during download.
+
   useEffect(() => {
     if (!isOpen) return;
     const timer = setTimeout(async () => {
@@ -90,17 +88,17 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
        const dataUrl = await toPng(parent, {
   cacheBust: true,
   pixelRatio: 2,
-  skipFonts: true,          // ← skips cross-origin stylesheet iteration (kills the SecurityError)
+  skipFonts: true,         
   fetchRequestInit: { mode: "cors" as RequestMode },
 });
           screenshots.set(iframe, dataUrl);
           iframe.style.pointerEvents = originalPointerEvents;
         } catch {
-          // iframe screenshot failed (cross-origin) — will use canvas fallback
+          
         }
       }));
       setIframeScreenshots(screenshots);
-    }, 1500); // wait 1.5s for Google Maps iframe to fully load its tiles
+    }, 1500); 
     return () => clearTimeout(timer);
   }, [isOpen]);
 
@@ -271,7 +269,6 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         let placeholder: HTMLElement;
 
         if (lat !== null && lng !== null) {
-          // Use maps.geoapify.com static map — supports CORS, no API key needed for basic use
           const mapUrl = `https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=${w * 2}&height=${h * 2}&center=lonlat:${lng},${lat}&zoom=15&marker=lonlat:${lng},${lat};color:%23e53e3e;size:medium&apiKey=YOUR_GEOAPIFY_KEY`;
 
           // Try fetching the static map as base64
@@ -285,13 +282,11 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             mapImg.style.cssText = `width:${w}px;height:${h}px;object-fit:cover;border-radius:${radius};display:block;`;
             placeholder = mapImg;
           } else {
-            // All tile sources failed — draw a clean styled map placeholder on canvas
             const mapCanvas = document.createElement("canvas");
             mapCanvas.width = w;
             mapCanvas.height = h;
             const ctx = mapCanvas.getContext("2d")!;
 
-            // Background — light map color
             ctx.fillStyle = "#f2efe9";
             ctx.roundRect(0, 0, w, h, 0);
             ctx.fill();
@@ -327,7 +322,6 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             placeholder = mapImg;
           }
         } else {
-          // No coords — plain grey placeholder
           const mapCanvas = document.createElement("canvas");
           mapCanvas.width = w; mapCanvas.height = h;
           const ctx = mapCanvas.getContext("2d")!;
@@ -343,7 +337,6 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
           placeholder = mapImg;
         }
 
-        // ✅ Priority: use the pre-captured screenshot taken when modal opened
         const savedScreenshot = iframeScreenshots.get(iframe);
         if (savedScreenshot) {
           const screenshotImg = document.createElement("img");
@@ -356,11 +349,6 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         iframe.parentNode!.replaceChild(placeholder, iframe);
       }));
 
-      // Step 5: Replace <video> elements.
-      // Strategy: the carousel already has thumbnail <img> elements next to each video.
-      // Find those existing thumbnails and use them — much more reliable than frame extraction.
-      // For videos with a poster attribute, convert poster to base64.
-      // For videos with no poster and no nearby thumbnail, use a canvas placeholder.
       const videos = Array.from(element.querySelectorAll<HTMLVideoElement>("video"));
 
       await Promise.all(
@@ -468,8 +456,6 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         })
       );
 
-      // Step 7: Strip srcset — Next.js <Image> uses srcset, which html-to-image
-      // re-fetches internally, bypassing our base64 src swap and hitting CORS again.
       const allImgs = Array.from(element.querySelectorAll<HTMLImageElement>("img"));
       await Promise.all(
         allImgs.map(async (img) => {
@@ -610,7 +596,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             <button
               onClick={handleDownload}
               disabled={isDownloading}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold whitespace-nowrap disabled:opacity-70"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#24bbcb] hover:bg-[#24bbcb] text-white text-sm font-semibold whitespace-nowrap disabled:opacity-70"
             >
               {isDownloading ? (
                 <>

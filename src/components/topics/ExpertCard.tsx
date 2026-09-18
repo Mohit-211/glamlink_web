@@ -34,7 +34,11 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
       .toUpperCase() || "P";
 
   const content = (
+<<<<<<< HEAD
     <div className="group relative flex flex-col h-full bg-white rounded-2xl border border-gray-100 p-6 hover:border-[#24bbcb]/40 hover:shadow-lg transition-all duration-300">
+=======
+    <div className="group relative flex flex-col h-full bg-white rounded-2xl border border-gray-100 p-6 hover:border-[#23AEB8]/40 hover:shadow-lg transition-all duration-300">
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
       {expert.business_card_qr && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -52,7 +56,11 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
             className="w-11 h-11 rounded-full object-cover flex-shrink-0"
           />
         ) : (
+<<<<<<< HEAD
           <div className="w-11 h-11 rounded-full bg-[#24bbcb]/10 text-[#24bbcb] flex items-center justify-center text-sm font-semibold flex-shrink-0">
+=======
+          <div className="w-11 h-11 rounded-full bg-[#23AEB8]/10 text-[#23AEB8] flex items-center justify-center text-sm font-semibold flex-shrink-0">
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
             {initials}
           </div>
         )}
@@ -79,10 +87,17 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
           {specialties.map((item, i) => (
             <span
               key={i}
+<<<<<<< HEAD
               className="text-[10px] font-medium text-[#24bbcb] px-2.5 py-1 rounded-full"
               style={{
                 background: "rgba(36,187,203,0.08)",
                 border: "1px solid rgba(36,187,203,0.2)",
+=======
+              className="text-[10px] font-medium text-[#23AEB8] px-2.5 py-1 rounded-full"
+              style={{
+                background: "rgba(35,174,184,0.08)",
+                border: "1px solid rgba(35,174,184,0.2)",
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
               }}
             >
               {item}
@@ -101,7 +116,11 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
           <span />
         )}
         {expert.business_card_link && (
+<<<<<<< HEAD
           <span className="flex items-center gap-1 text-[11px] font-medium text-[#24bbcb] group-hover:gap-1.5 transition-all duration-200">
+=======
+          <span className="flex items-center gap-1 text-[11px] font-medium text-[#23AEB8] group-hover:gap-1.5 transition-all duration-200">
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
             View profile
             <ArrowUpRight className="h-3 w-3" />
           </span>

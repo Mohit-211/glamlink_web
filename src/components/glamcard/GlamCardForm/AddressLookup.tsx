@@ -6,8 +6,7 @@ import {
   StandaloneSearchBox,
   useLoadScript,
 } from "@react-google-maps/api";
-
-const libraries: "places"[] = ["places"];
+import { GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_ID } from "@/lib/googleMapsLoader";
 
 const mapContainerStyle = {
   height: "300px",
@@ -28,8 +27,9 @@ const AddressLookup: React.FC<AddressLookupProps> = ({
   onAddressChange,
 }) => {
   const { isLoaded } = useLoadScript({
+    id: GOOGLE_MAPS_LOADER_ID,
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
-    libraries,
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
   const searchBoxRef = useRef<google.maps.places.SearchBox | null>(null);

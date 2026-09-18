@@ -1,14 +1,16 @@
 import React from "react";
 import { nanoid } from "nanoid";
-import { GlamCardFormData, Location } from "../types";
+import { FieldErrors, GlamCardFormData, Location } from "../types";
 import LocationCard from "./LocationCard";
 
 interface SectionProps {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
+  errors?: FieldErrors;
+  clearError?: (key: string) => void;
 }
 
-const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
+const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-4 sm:p-6";
 
 const createEmptyLocation = (index: number): Location => ({
   id: nanoid(),
@@ -21,20 +23,24 @@ const createEmptyLocation = (index: number): Location => ({
 
   latitude: undefined,     // ✅ UPDATED
   longitude: undefined,    // ✅ UPDATED
-
-  business_name: "",
   phone: "",
   description: "",
   isPrimary: index === 0,
   isOpen: true,
 });
 
-const LocationsSection: React.FC<SectionProps> = ({ data, setData }) => {
+const LocationsSection: React.FC<SectionProps> = ({
+  data,
+  setData,
+  errors,
+  clearError,
+}) => {
   const addLocation = () => {
     setData((prev) => ({
       ...prev,
       locations: [...prev?.locations, createEmptyLocation(prev.locations?.length)],
     }));
+    clearError?.("locations");
   };
 
   const updateLocation = (id: string, updates: Partial<Location>) => {
@@ -68,8 +74,16 @@ const LocationsSection: React.FC<SectionProps> = ({ data, setData }) => {
   };
 
   return (
-    <section className={sectionClass}>
-      <h3 className="text-lg font-semibold">Business Locations *</h3>
+    <section
+      id="field-locations"
+      className={`${sectionClass} ${errors?.locations ? "border-red-500" : ""}`}
+    >
+      <h3 className="text-lg font-semibold">
+        Business Locations <span className="text-red-500">*</span>
+      </h3>
+      {errors?.locations && (
+        <p className="text-sm text-red-500">{errors.locations}</p>
+      )}
       <div className="space-y-5">
         {data.locations?.map((loc) => (
           <LocationCard

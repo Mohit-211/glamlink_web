@@ -106,7 +106,7 @@ export default function PrivacyPolicyPage() {
             <div className="bg-white rounded-lg shadow-sm border p-8 md:p-12">
               {/* Introduction */}
               <div className="prose prose-lg max-w-none mb-12">
-                <p className="text-gray-700 leading-relaxed mb-6">Estheticians 4 You LLC, a Nevada limited liability company ("Glamlink" "us" or "we") are dedicated to protecting your privacy and handling any personally identifiable information we obtain from you with care and respect.</p>
+                <p className="text-gray-700 leading-relaxed mb-6">Glamlink Inc, a Nevada limited liability company ("Glamlink" "us" or "we") are dedicated to protecting your privacy and handling any personally identifiable information we obtain from you with care and respect.</p>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   This Privacy Policy sets forth our policy with respect to information, including personally identifiable information that is collected from users of and/or visitors to glamlink.net, as well as any other websites, online software, or mobile applications operated by Glamlink
                   (collectively, the "Glamlink Service").
@@ -569,13 +569,13 @@ export default function PrivacyPolicyPage() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">18. Contact Information</h3>
                 <p className="text-gray-700 leading-relaxed mb-6">If you have any questions about this Privacy Policy, our policies and practices concerning the Glamlink Service, your rights under this statement, and your dealings with Glamlink, please contact us.</p>
                 <p className="text-gray-700 leading-relaxed">
-                  Estheticians 4 You LLC <br />
+                  Glamlink Inc <br />
                   Attn: Privacy Agent <br />
                   8090 S. Durango Dr Ste 102 #1033 <br />
                   Las Vegas, NV 89113 <br />
                   Email:{" "}
-                  <a href="mailto:email-support@glamlink.net" className="text-glamlink-teal underline">
-                    email-support@glamlink.net
+                  <a href="mailto:support@glamlink.net" className="text-glamlink-teal underline">
+                    support@glamlink.net
                   </a>
                 </p>
               </div>

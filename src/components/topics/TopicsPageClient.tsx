@@ -60,16 +60,30 @@ const TopicsPageClient = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* ── HERO ── */}
+<<<<<<< HEAD
       <section className="relative overflow-hidden">
         <div
           className="absolute inset-0 pointer-events-none"
          
+=======
+      <section className="relative overflow-hidden bg-[#fafafa]">
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle at 12% 15%, rgba(35,174,184,0.10), transparent 45%), radial-gradient(circle at 90% 85%, rgba(35,174,184,0.07), transparent 50%)",
+          }}
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
         />
         <div className="relative max-w-[1200px] mx-auto px-5 sm:px-6 pt-28 pb-16 md:pt-36 md:pb-24">
           <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-10 items-center">
             {/* Copy + search */}
             <div className="lg:py-12">
+<<<<<<< HEAD
               <div className="inline-flex items-center gap-2 text-[10px] tracking-[.2em] uppercase text-[#24bbcb] font-medium mb-5 bg-[#24bbcb]/8 px-3.5 py-1.5 rounded-full">
+=======
+              <div className="inline-flex items-center gap-2 text-[10px] tracking-[.2em] uppercase text-[#23AEB8] font-medium mb-5 bg-[#23AEB8]/8 px-3.5 py-1.5 rounded-full">
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                 <Sparkles className="h-3 w-3" />
                 Glamlink Topics
               </div>
@@ -87,8 +101,13 @@ const TopicsPageClient = () => {
               <div className="mt-9 max-w-lg">
                 <div
                   className="relative flex items-center rounded-full bg-white border border-gray-200
+<<<<<<< HEAD
                     shadow-sm transition-colors duration-200 focus-within:border-[#24bbcb]
                     focus-within:ring-2 focus-within:ring-[#24bbcb]/15"
+=======
+                    shadow-sm transition-colors duration-200 focus-within:border-[#23AEB8]
+                    focus-within:ring-2 focus-within:ring-[#23AEB8]/15"
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                 >
                   <Search className="absolute left-5 h-4 w-4 text-gray-400 pointer-events-none" />
                   <input
@@ -103,13 +122,21 @@ const TopicsPageClient = () => {
                   />
                   <div className="absolute right-4 flex items-center">
                     {isSearching ? (
+<<<<<<< HEAD
                       <Loader2 className="h-4 w-4 text-[#24bbcb] animate-spin" />
+=======
+                      <Loader2 className="h-4 w-4 text-[#23AEB8] animate-spin" />
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                     ) : searchInput ? (
                       <button
                         type="button"
                         onClick={() => setSearchInput("")}
                         aria-label="Clear search"
+<<<<<<< HEAD
                         className="p-1 rounded-full text-gray-400 hover:text-[#24bbcb] hover:bg-gray-50 transition-colors"
+=======
+                        className="p-1 rounded-full text-gray-400 hover:text-[#23AEB8] hover:bg-gray-50 transition-colors"
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -128,7 +155,11 @@ const TopicsPageClient = () => {
                         key={topic.id}
                         href={`/topics/${topic.slug || topic.id}`}
                         className="text-[13px] font-medium text-gray-600 bg-white px-3.5 py-1.5 rounded-full
+<<<<<<< HEAD
                           border border-gray-200 hover:border-[#24bbcb]/50 hover:text-[#24bbcb] transition-colors duration-150"
+=======
+                          border border-gray-200 hover:border-[#23AEB8]/50 hover:text-[#23AEB8] transition-colors duration-150"
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                       >
                         {topic.name}
                       </a>
@@ -140,7 +171,11 @@ const TopicsPageClient = () => {
 
             {/* Editorial image panel */}
             <div className="relative hidden lg:block">
+<<<<<<< HEAD
               <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-[0_20px_60px_-15px_rgba(36,187,203,0.35)]">
+=======
+              <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-[0_20px_60px_-15px_rgba(35,174,184,0.35)]">
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                 <Image
                   src="/assets/blog-featured.jpg"
                   alt="Glamlink beauty editorial"
@@ -153,9 +188,15 @@ const TopicsPageClient = () => {
               </div>
 
               {/* Floating stat card */}
+<<<<<<< HEAD
               {/* <div className="absolute -bottom-6 -left-8 bg-white rounded-2xl shadow-xl border border-gray-100 px-5 py-4 flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-[#24bbcb]/10 flex items-center justify-center flex-shrink-0">
                   <Sparkles className="h-4 w-4 text-[#24bbcb]" />
+=======
+              <div className="absolute -bottom-6 -left-8 bg-white rounded-2xl shadow-xl border border-gray-100 px-5 py-4 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-[#23AEB8]/10 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-4 w-4 text-[#23AEB8]" />
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                 </div>
                 <div>
                   <p className="font-serif text-lg text-gray-900 leading-none">
@@ -165,7 +206,11 @@ const TopicsPageClient = () => {
                     {topics.length === 1 ? "topic" : "topics"} covered
                   </p>
                 </div>
+<<<<<<< HEAD
               </div> */}
+=======
+              </div>
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
             </div>
           </div>
         </div>
@@ -233,7 +278,11 @@ const TopicsPageClient = () => {
             {normalizedQuery && (
               <button
                 onClick={() => setSearchInput("")}
+<<<<<<< HEAD
                 className="text-xs font-medium text-[#24bbcb] hover:underline mt-1"
+=======
+                className="text-xs font-medium text-[#23AEB8] hover:underline mt-1"
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
               >
                 Clear search
               </button>

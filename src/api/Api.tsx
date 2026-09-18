@@ -1,6 +1,7 @@
 import axios from "axios";
 const api = axios.create({
-  baseURL: "https://node.glamlink.net:5000/api/v1/",
+  // baseURL: "https://node.glamlink.net/api/v1/",
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 const getToken = () => {
   if (typeof window !== "undefined") {
@@ -56,6 +57,21 @@ export const getBlogsByCategoryId = async (
   return data;
 };
 /* ============================= */
+/* 📌 Topics */
+/* ============================= */
+export const getAllTopics = async () => {
+  const { data } = await api.get("journal/topic");
+  return data;
+};
+export const getTopicById = async (id: string | number) => {
+  const { data } = await api.get(`journal/topic/${id}`);
+  return data;
+};
+export const getTopicParagraphs = async (id: string | number) => {
+  const { data } = await api.get(`journal/topic/${id}/paragraphs`);
+  return data;
+};
+/* ============================= */
 /* 📌 Podcast */
 /* ============================= */
 export const getAllPodcast = async () => {
@@ -85,7 +101,6 @@ export const getBusinessCardBySlug = async (
 /* ============================= */
 export const searchBusinessCard = async (params: {
   search?: string;
-
 }) => {
   const { data } = await api.get(
     "businessCard/search",
@@ -228,6 +243,24 @@ export const loginUser = async (payload: {
   );
   return data;
 };
+export const forgotPasswordApi = async (payload: {
+  email: string;
+  password: string;
+  confirm_password: string;
+  token: string;
+}) => {
+  const { data } = await api.post(
+    "user/auth/forgot-password",
+    payload,
+    {
+      headers: {
+        role_id: "7",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+    }
+  );
+  return data;
+};
 export const LogoutUser = async () => {
   const { data } = await api.get("user/auth/logout", {
     headers: {
@@ -315,15 +348,40 @@ export const getMyBusinessCardForDashboard = async () => {
 /* 📌 Address APIs */
 /* ============================= */
 // Add New Address
-export const addNewAddress = async (payload: any) => {
-  const { data } = await api.post(
-    "order/addNewAddress",
-    payload,
-    {
+export const addNewAddress = async (
+  payload: any,
+  withToken: boolean = true
+) => {
+  const config = withToken
+    ? {
       headers: {
         "x-access-token": getToken(),
       },
     }
+    : {};
+  const { data } = await api.post(
+    "order/addNewAddress",
+    payload,
+    config
+  );
+  return data;
+};
+export const addNewAddressWithoutToken = async (
+  payload: any,
+) => {
+  const { data } = await api.post(
+    "order/addNewAddress-public",
+    payload,
+  );
+  return data;
+};
+export const EditAddressWithoutTokenAPI = async (
+  addressId: number | string,
+  payload: any,
+) => {
+  const { data } = await api.put(
+    `order/editAddress-public/${addressId}`,
+    payload,
   );
   return data;
 };
@@ -406,6 +464,30 @@ export const CreateSubscription = async (payload: any) => {
   );
   return data;
 };
+export const CreateSubscriptionWIthOutTokenAPI = async (payload: any) => {
+  const { data } = await api.post(
+    "businessCard/create-subscription-public",
+    payload,
+    {
+      headers: {
+        "x-access-token": getToken(),
+      },
+    }
+  );
+  return data;
+};
+export const CancelSubscription = async (payload: any) => {
+  const { data } = await api.post(
+    "businessCard/cancel-subscription",
+    payload,
+    {
+      headers: {
+        "x-access-token": getToken(),
+      },
+    }
+  );
+  return data;
+};
 export const getPaymenthistory = async () => {
   const { data } = await api.get(
     "businessCard/payment-history",
@@ -426,5 +508,54 @@ export const userProfile = async () => {
       },
     }
   );
+  return data;
+};
+export const userSpecialtiesApi = async () => {
+  const { data } = await api.get(
+    "profession?page=1&limit=1000&sortBy=asc",
+  );
+  return data;
+};
+export interface SelectPlanPayload {
+  business_card_id: number | string;
+  plan_type: string; // e.g. "free" | "pro"
+}
+export const SelectPlanAPI = async (payload: SelectPlanPayload) => {
+  const { data } = await api.post(
+    "businessCard/select-plan",
+    payload,
+  );
+  return data;
+};
+/* ============================= */
+/* 📌 Contact Us */
+/* ============================= */
+export const contactUs = async (payload: {
+  name: string;
+  subject: string;
+  email: string;
+  message: string;
+  mobile: string;
+}) => {
+  const { data } = await api.post("contactUs", payload);
+  return data;
+};
+export const ShippingRateWithoutTokenApi = async (payload: any) => {
+  const { data } = await api.post(
+    "businessCard/shipping-rate-public",
+    payload,
+    {
+      headers: {
+        "x-access-token": getToken(),
+      },
+    }
+  );
+  return data;
+};
+/* ============================= */
+/* 📌 Ads */
+/* ============================= */
+export const getAds = async () => {
+  const { data } = await api.get("ads");
   return data;
 };

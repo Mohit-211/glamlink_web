@@ -724,7 +724,7 @@ const removeLocation = (index: number) => {
                   }}
                   options={[
                     { value: '', label: 'Select…' },
-                    { value: 'Go to Booking Link', label: 'Go to Booking Link' },
+                    { value: 'Go to Booking Link', label: 'Go to Website' },
                     { value: 'Call / text', label: 'Call / text' },
                     { value: 'DM on Instagram', label: 'DM on_Instagram' },
                    

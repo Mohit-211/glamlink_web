@@ -7,7 +7,7 @@ interface Props {
 }
 
 const sectionClass =
-  "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
+  "space-y-6 rounded-xl border border-gray-200 bg-white p-4 sm:p-6";
 
 const labelClass = "text-sm font-medium text-gray-700";
 

@@ -5,7 +5,11 @@ import Link from "next/link";
 import BlogCard from "./BlogCard";
 import { getAllBlogs } from "@/api/Api";
 import slugify from "slugify";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, SearchX } from "lucide-react";
+import AdSlot from "@/ads/Adslot";
+import { useAds } from "@/ads/Useads";
+import { useDeviceType } from "@/ads/Usedevicetype";
+
 
 /* ─────────────────────────────────────────────────────────────
    Types
@@ -23,8 +27,14 @@ interface BlogPost {
 
 interface Props {
   activeCategory: string;
+  /** Debounced search query from JournalClient's search bar (title/category/author/content) */
+  searchQuery: string;
   /** Called whenever the category filter causes the page to reset */
   onPageReset?: () => void;
+  /** Resets the active category back to "All" (used by the search empty state) */
+  onResetCategory?: () => void;
+  /** Clears the search input (used by the search empty state) */
+  onClearSearch?: () => void;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -54,10 +64,20 @@ function buildPageRange(current: number, total: number): (number | "…")[] {
 /* ─────────────────────────────────────────────────────────────
    BlogGrid
 ───────────────────────────────────────────────────────────── */
-const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
+const BlogGrid: React.FC<Props> = ({
+  activeCategory,
+  searchQuery,
+  onResetCategory,
+  onClearSearch,
+}) => {
   const [allBlogs, setAllBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+
+  const device = useDeviceType();
+  const ads = useAds({ page: "journal-listing", device });
+
+  const normalizedQuery = searchQuery.trim().toLowerCase();
 
   /* Fetch once */
   useEffect(() => {
@@ -78,10 +98,10 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
     fetchBlogs();
   }, []);
 
-  /* Reset to page 1 whenever category changes */
+  /* Reset to page 1 whenever the category or search query changes */
   useEffect(() => {
     setPage(1);
-  }, [activeCategory]);
+  }, [activeCategory, normalizedQuery]);
 
   /* Determine the same "featured" post HeroSection shows, so we can exclude it here.
      Mirrors HeroSection's logic exactly: prefer a "Cover Feature" category blog,
@@ -97,8 +117,8 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
     return featuredBlog?.id ?? null;
   }, [allBlogs]);
 
-  /* Filter */
-  const filteredBlogs = useMemo(() => {
+  /* Filter by category */
+  const categoryFilteredBlogs = useMemo(() => {
     // Exclude the featured/cover-feature post so it isn't duplicated in the grid
     const withoutFeatured =
       featuredId != null
@@ -106,13 +126,30 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
         : allBlogs;
 
     if (!activeCategory || activeCategory === "All") return withoutFeatured;
-    return withoutFeatured.filter((blog) =>
-      blog?.journal_category?.title
-        ?.toLowerCase()
-        .trim()
-        .includes(activeCategory.toLowerCase().trim())
+    return withoutFeatured.filter(
+      (blog) =>
+        blog?.journal_category?.title &&
+        slugify(blog.journal_category.title, { lower: true, strict: true }) ===
+          activeCategory
     );
   }, [activeCategory, allBlogs, featuredId]);
+
+  /* Further filter by search query — matches title, category, author, or excerpt/content */
+  const filteredBlogs = useMemo(() => {
+    if (!normalizedQuery) return categoryFilteredBlogs;
+    return categoryFilteredBlogs.filter((blog) => {
+      const haystack = [
+        blog.title,
+        blog.short_description,
+        blog?.journal_category?.title,
+        blog?.journal_author?.name,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(normalizedQuery);
+    });
+  }, [categoryFilteredBlogs, normalizedQuery]);
 
   /* Paginate */
   const totalPages = Math.max(1, Math.ceil(filteredBlogs.length / POSTS_PER_PAGE));
@@ -126,30 +163,81 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  /* ── Loading ── */
+  /* ── Initial loading (skeleton) ── */
   if (loading) {
     return (
-      <p className="text-center py-16 text-sm text-muted-foreground">
-        Loading articles...
-      </p>
-    );
-  }
-
-  /* ── Empty ── */
-  if (!filteredBlogs.length) {
-    return (
-      <p className="text-center py-16 text-sm text-muted-foreground">
-        No articles found.
-      </p>
+      <section className="mt-10 space-y-10">
+        <div className="grid md:grid-cols-2 xl:grid-cols-2 gap-x-12 gap-y-16" aria-hidden="true">
+          {Array.from({ length: POSTS_PER_PAGE }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-4 animate-pulse">
+              <div className="w-full aspect-video rounded-2xl bg-muted/60" />
+              <div className="space-y-2">
+                <div className="h-2.5 w-16 rounded bg-muted/60" />
+                <div className="h-4 w-4/5 rounded bg-muted/60" />
+                <div className="h-3 w-full rounded bg-muted/40" />
+                <div className="h-3 w-2/3 rounded bg-muted/40" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="sr-only" role="status">
+          Loading articles…
+        </p>
+      </section>
     );
   }
 
   const pageRange = buildPageRange(page, totalPages);
+  const hasActiveCategory = !!activeCategory && activeCategory !== "All";
 
   return (
     <section className="mt-10 space-y-10">
-      {/* ── Grid ── */}
-      <div className="grid md:grid-cols-2 xl:grid-cols-2 gap-x-12 gap-y-16">
+      {/* ── Empty state ── */}
+      {!filteredBlogs.length ? (
+        <div className="flex flex-col items-center gap-3 py-16 text-center">
+          <SearchX className="h-8 w-8 text-muted-foreground/50" />
+          <p className="text-sm font-medium text-foreground">
+            {normalizedQuery
+              ? `No articles match "${searchQuery}"`
+              : "No articles found."}
+          </p>
+          <p className="max-w-sm text-xs text-muted-foreground">
+            {normalizedQuery
+              ? "Try a different keyword, or check the spelling. You can search by title, category, author, or content."
+              : "There are no articles in this category yet."}
+          </p>
+          <div className="flex items-center gap-3 pt-1">
+            {normalizedQuery && onClearSearch && (
+              <button
+                onClick={onClearSearch}
+                className="text-xs font-medium text-[#24bbcb] hover:underline"
+              >
+                Clear search
+              </button>
+            )}
+            {hasActiveCategory && onResetCategory && (
+              <button
+                onClick={onResetCategory}
+                className="text-xs font-medium text-[#24bbcb] hover:underline"
+              >
+                View all categories
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* ── Result count (search only) ── */}
+          {normalizedQuery && (
+            <p className="text-[11px] text-muted-foreground -mb-4">
+              {filteredBlogs.length}{" "}
+              {filteredBlogs.length === 1 ? "result" : "results"} for &ldquo;
+              {searchQuery}&rdquo;
+            </p>
+          )}
+
+          {/* ── Grid ── */}
+          <div className="grid md:grid-cols-2 xl:grid-cols-2 gap-x-12 gap-y-16">
         {paginated.map((item, index) => {
           const title = item.title || "Untitled";
           const author = item?.journal_author?.name || "Unknown";
@@ -163,24 +251,43 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
  
 });
           return (
-            <Link
-              key={item.id}
-              href={`/journal/${item.id}/${slugify(title, {
-                lower: true,
-                strict: true,
-              })}`}
-              className="block group animate-fade-up"
-              style={{ animationDelay: `${0.06 * index}s` }}
-            >
-              <BlogCard
-                image={image}
-                category={category}
-                title={title}
-                excerpt={excerpt}
-                author={author}
-                date={date}
-              />
-            </Link>
+            <React.Fragment key={item.id}>
+              <Link
+                href={`/journal/${item.id}/${slugify(title, {
+                  lower: true,
+                  strict: true,
+                })}`}
+                className="block group animate-fade-up"
+                style={{ animationDelay: `${0.06 * index}s` }}
+              >
+                <BlogCard
+                  image={image}
+                  category={category}
+                  title={title}
+                  excerpt={excerpt}
+                  author={author}
+                  date={date}
+                />
+              </Link>
+
+              {/* ── In-feed ad(s) — after the 1st row ── */}
+              {index === 1 && !!ads["journal-listing-in-feed"]?.length && (
+                <div className="md:col-span-2 flex flex-wrap justify-center gap-4">
+                  {ads["journal-listing-in-feed"].map((ad) => (
+                    <AdSlot key={ad.id} slotId="journal-listing-in-feed" ad={ad} />
+                  ))}
+                </div>
+              )}
+
+              {/* ── In-feed ad(s) — after the 2nd row ── */}
+              {index === 3 && !!ads["journal-listing-in-feed-2"]?.length && (
+                <div className="md:col-span-2 flex flex-wrap justify-center gap-4">
+                  {ads["journal-listing-in-feed-2"].map((ad) => (
+                    <AdSlot key={ad.id} slotId="journal-listing-in-feed-2" ad={ad} />
+                  ))}
+                </div>
+              )}
+            </React.Fragment>
           );
         })}
       </div>
@@ -254,6 +361,8 @@ const BlogGrid: React.FC<Props> = ({ activeCategory }) => {
             </button>
           </div>
         </div>
+      )}
+        </>
       )}
     </section>
   );

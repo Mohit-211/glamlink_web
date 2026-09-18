@@ -8,7 +8,7 @@ import { Instagram, Twitter, Facebook, Linkedin, Youtube } from "lucide-react";
 const footerLinks = {
   navigation: [
 
-    { label: "Directory", href: "/directory" },
+    // { label: "Directory", href: "/directory" },
     { label: "Magazine", href: "/magazine" },
     { label: "Journal", href: "/journal" },
     { label: "Media-kit", href: "/media-kit" },
@@ -19,6 +19,8 @@ const footerLinks = {
     { label: "CSAM Policy", href: "/csam-policy" },
     { label: "Terms of Use", href: "/terms" },
     { label: "Sitemap", href: "/sitemap.xml" },
+    { label: "Contact Us", href: "/contact-us" },
+
   ],
 };
 

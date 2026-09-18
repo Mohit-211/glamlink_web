@@ -1,10 +1,12 @@
 import JournalClient from '@/components/blogs/JournalClient'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 const JournalEducationPage = () => {
   return (
     <div>
-      <JournalClient path="education" />
+      <Suspense fallback={null}>
+        <JournalClient path="education" />
+      </Suspense>
     </div>
   )
 }

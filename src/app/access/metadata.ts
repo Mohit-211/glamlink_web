@@ -17,13 +17,13 @@ export const metadata: Metadata = {
   ],
 
   alternates: {
-    canonical: "/apply/digital-card",
+    canonical: "/access",
   },
 
   openGraph: {
     title: "Apply for Glamlink Digital Access Card",
     description:
       "Create your Glamlink Digital Access Card and showcase your beauty services to clients.",
-    url: "https://glamlink.net/apply/digital-card",
+    url: "https://glamlink.net/access",
   },
 };

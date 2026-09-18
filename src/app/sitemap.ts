@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 import { issues2025, issues2026 } from "@/data/issues";
-import { getAllBlogs } from "@/api/Api";
+import { getAllBlogs, getAllTopics } from "@/api/Api";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://glamlink.net";
@@ -71,6 +71,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   /* ----------------------------------
+     TOPICS
+  ----------------------------------- */
+
+  let topicRoutes: MetadataRoute.Sitemap = [];
+
+  try {
+    const res = await getAllTopics();
+    const topics = Array.isArray(res?.data) ? res.data : [];
+
+    topicRoutes = topics
+      .filter((topic: any) => topic?.is_active !== false)
+      .map((topic: any) => ({
+        url: `${baseUrl}/topics/${topic.slug || topic.id}`,
+        lastModified: new Date(topic.updated_at || topic.created_at || Date.now()),
+        changeFrequency: "weekly",
+        priority: 0.6,
+      }));
+  } catch (error) {
+    console.log("Topics sitemap error:", error);
+  }
+
+  /* ----------------------------------
      MAGAZINE ISSUES
   ----------------------------------- */
 
@@ -97,6 +119,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticRoutes,
     ...journalRoutes,
+    ...topicRoutes,
     ...magazineRoutes,
     ...digitalRoutes,
   ];

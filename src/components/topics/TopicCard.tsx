@@ -16,7 +16,11 @@ const TopicCard = ({ topic, compact = false }: TopicCardProps) => {
     <Link
       href={href}
       className="group flex flex-col h-full bg-white rounded-[1.5rem] overflow-hidden border border-gray-100
+<<<<<<< HEAD
         hover:border-transparent hover:shadow-[0_20px_45px_-15px_rgba(36,187,203,0.35)] hover:-translate-y-1
+=======
+        hover:border-transparent hover:shadow-[0_20px_45px_-15px_rgba(35,174,184,0.35)] hover:-translate-y-1
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
         transition-all duration-300"
     >
       <div
@@ -44,7 +48,11 @@ const TopicCard = ({ topic, compact = false }: TopicCardProps) => {
           <p className="text-[13px] leading-relaxed text-gray-500 font-light line-clamp-2 flex-1">
             {blurb}
           </p>
+<<<<<<< HEAD
           <div className="flex items-center gap-1.5 pt-4 mt-4 border-t border-gray-100 text-[12px] font-medium text-[#24bbcb] group-hover:gap-2.5 transition-all duration-200">
+=======
+          <div className="flex items-center gap-1.5 pt-4 mt-4 border-t border-gray-100 text-[12px] font-medium text-[#23AEB8] group-hover:gap-2.5 transition-all duration-200">
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
             Explore topic
             <ArrowUpRight className="h-3.5 w-3.5" />
           </div>

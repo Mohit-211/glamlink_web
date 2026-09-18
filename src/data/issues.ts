@@ -85,6 +85,16 @@ export const issues2026: Issue[] = [
       flipbookId: 2544725,
     },
   },
+   {
+    id: 8,
+    slug: "issue-117",
+    title: "Issue 117",
+    cover: "/magazine/issue117.png",
+    publuu: {
+      accountId: 992531,
+      flipbookId: 2578509,
+    },
+  },
 ];
 /* =======================
    2025 ISSUES

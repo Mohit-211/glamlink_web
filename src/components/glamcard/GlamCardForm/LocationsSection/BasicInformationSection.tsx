@@ -258,7 +258,11 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             value={
               /^#[0-9a-fA-F]{6}$/.test(data.color_code || "")
                 ? (data.color_code as string)
+<<<<<<< HEAD
                 : "#24bbcb"
+=======
+                : "#23b9cd"
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
             }
             onChange={(e) =>
               setData((p) => ({ ...p, color_code: e.target.value }))
@@ -269,7 +273,11 @@ const BasicInformationSection: React.FC<SectionProps> = ({
           <input
             type="text"
             className={`${inputClass} max-w-[140px]`}
+<<<<<<< HEAD
             placeholder="#24bbcb"
+=======
+            placeholder="#23B9CD"
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
             value={data.color_code || ""}
             onChange={(e) =>
               setData((p) => ({ ...p, color_code: e.target.value }))

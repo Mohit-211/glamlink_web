@@ -356,7 +356,11 @@ const formattedDate = article?.publish_date
                 {topics.map((topic) => (
                   <span
                     key={topic.id}
+<<<<<<< HEAD
                     className="text-xs font-medium text-gray-500 px-3 py-1 rounded-full border border-gray-200 hover:border-[#24bbcb]/40 hover:text-[#24bbcb] transition-colors duration-200"
+=======
+                    className="text-xs font-medium text-gray-500 px-3 py-1 rounded-full border border-gray-200 hover:border-[#23AEB8]/40 hover:text-[#23AEB8] transition-colors duration-200"
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                   >
                     {topic.name}
                   </span>
@@ -430,8 +434,13 @@ const formattedDate = article?.publish_date
                   {downloads.map((item) => (
                     <div
                       key={item.id}
+<<<<<<< HEAD
                       className="flex flex-col justify-between rounded-2xl border border-gray-100 p-6 hover:border-[#24bbcb]/40 hover:shadow-sm transition-all duration-300"
                       style={{ background: "rgba(36,187,203,0.03)" }}
+=======
+                      className="flex flex-col justify-between rounded-2xl border border-gray-100 p-6 hover:border-[#23AEB8]/40 hover:shadow-sm transition-all duration-300"
+                      style={{ background: "rgba(35,174,184,0.03)" }}
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                     >
                       <div>
                         <div className="flex items-start justify-between gap-3 mb-2">
@@ -440,10 +449,17 @@ const formattedDate = article?.publish_date
                           </h3>
                           {getFileExt(item.file_name) && (
                             <span
+<<<<<<< HEAD
                               className="flex-shrink-0 text-[10px] font-medium tracking-wider uppercase text-[#24bbcb] px-2 py-1 rounded-md"
                               style={{
                                 background: "rgba(36,187,203,0.1)",
                                 border: "1px solid rgba(36,187,203,0.25)",
+=======
+                              className="flex-shrink-0 text-[10px] font-medium tracking-wider uppercase text-[#23AEB8] px-2 py-1 rounded-md"
+                              style={{
+                                background: "rgba(35,174,184,0.1)",
+                                border: "1px solid rgba(35,174,184,0.25)",
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                               }}
                             >
                               {getFileExt(item.file_name)}
@@ -458,7 +474,11 @@ const formattedDate = article?.publish_date
                       <DownloadButton
                         fileUrl={item.file_name}
                         label={item.button_text || "Download"}
+<<<<<<< HEAD
                         className="mt-5 inline-flex items-center justify-center gap-2 text-sm font-medium text-white px-4 py-2.5 rounded-full bg-[#24bbcb] hover:bg-[#1ea8b5] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+=======
+                        className="mt-5 inline-flex items-center justify-center gap-2 text-sm font-medium text-white px-4 py-2.5 rounded-full bg-[#23AEB8] hover:bg-[#1d9aa3] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                       />
                     </div>
                   ))}
@@ -486,12 +506,21 @@ const formattedDate = article?.publish_date
                   {faqs.map((faq) => (
                     <details
                       key={faq.id}
+<<<<<<< HEAD
                       className="group rounded-2xl border border-gray-100 px-6 py-5 open:border-[#24bbcb]/40"
                       style={{ background: "rgba(36,187,203,0.03)" }}
                     >
                       <summary className="flex items-center justify-between gap-4 cursor-pointer list-none font-serif text-lg text-gray-900">
                         {faq.question}
                         <span className="flex-shrink-0 text-[#24bbcb] text-xl leading-none transition-transform duration-200 group-open:rotate-45">
+=======
+                      className="group rounded-2xl border border-gray-100 px-6 py-5 open:border-[#23AEB8]/40"
+                      style={{ background: "rgba(35,174,184,0.03)" }}
+                    >
+                      <summary className="flex items-center justify-between gap-4 cursor-pointer list-none font-serif text-lg text-gray-900">
+                        {faq.question}
+                        <span className="flex-shrink-0 text-[#23AEB8] text-xl leading-none transition-transform duration-200 group-open:rotate-45">
+>>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                           +
                         </span>
                       </summary>
