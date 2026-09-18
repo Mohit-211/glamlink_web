@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useRef, useCallback } from "react";
-=======
 ﻿import React, { useState, useEffect, useRef, useCallback } from "react";
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
 import { nanoid } from "nanoid";
 import { GripVertical, ImagePlus, X } from "lucide-react";
 import { BOOKING_METHODS, BookingMethod, FeaturedLink, FieldErrors, GlamCardFormData } from "./types";
@@ -800,11 +796,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           <button
             type="button"
             onClick={addFeaturedLink}
-<<<<<<< HEAD
-            className="flex-none rounded-lg bg-[#24bbcb] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3]"
-=======
             className="flex-none rounded-lg bg-[#23AEB8] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3]"
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
           >
             + Add Featured Link
           </button>
@@ -826,11 +818,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                   setDraggedFeaturedLinkIndex(null);
                 }}
                 onDragEnd={() => setDraggedFeaturedLinkIndex(null)}
-<<<<<<< HEAD
-                className={`flex flex-col gap-2 rounded-lg border bg-white p-3 ${link.is_featured ? "border-[#24bbcb] ring-1 ring-[#24bbcb]/30" : "border-gray-200"
-=======
                 className={`flex flex-col gap-2 rounded-lg border bg-white p-3 ${link.is_featured ? "border-[#23AEB8] ring-1 ring-[#23AEB8]/30" : "border-gray-200"
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                   }`}
               >
                 <div className="flex items-start gap-2">
@@ -906,11 +894,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                         type="checkbox"
                         checked={!!link.is_featured}
                         onChange={() => toggleFeaturedLinkFeatured(index)}
-<<<<<<< HEAD
-                        className="h-3.5 w-3.5 rounded border-gray-300 text-[#24bbcb] focus:ring-[#24bbcb]"
-=======
                         className="h-3.5 w-3.5 rounded border-gray-300 text-[#23AEB8] focus:ring-[#23AEB8]"
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                       />
                       Feature this link first
                     </label>
