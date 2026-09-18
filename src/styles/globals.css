@@ -405,11 +405,7 @@
   line-height: 0.85;
   margin-right: 12px;
   margin-top: 6px;
-<<<<<<< HEAD
-  color: #24bbcb;
-=======
   color: #23aeb8;
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
 }
 
 .prose-article img {
@@ -427,11 +423,7 @@
 }
 
 .prose-article a.mention-link {
-<<<<<<< HEAD
-  color: #24bbcb;
-=======
   color: #23aeb8;
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
   font-weight: 600;
   text-decoration: none;
 }
@@ -484,11 +476,7 @@
 }
 
 .prose-article th {
-<<<<<<< HEAD
-  background: rgba(36, 187, 203, 0.08);
-=======
   background: rgba(35, 174, 184, 0.08);
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
   font-weight: 600;
   color: #1f2937;
 }

@@ -8,11 +8,7 @@ interface PodcastGuestCardProps {
 }
 
 const PALETTES = [
-<<<<<<< HEAD
-  { bg: "rgba(36,187,203,0.12)", text: "#1d8b93" },
-=======
   { bg: "rgba(35,174,184,0.12)", text: "#1d8b93" },
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
   { bg: "rgba(147,51,234,0.10)", text: "#7e22ce" },
   { bg: "rgba(217,119,6,0.10)", text: "#b45309" },
   { bg: "rgba(219,39,119,0.10)", text: "#be185d" },
@@ -39,11 +35,7 @@ const PodcastGuestCard = ({ name, role, date, index = 0 }: PodcastGuestCardProps
   const formattedDate = formatDate(date);
 
   return (
-<<<<<<< HEAD
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-100 p-5 hover:border-[#24bbcb]/40 hover:shadow-lg transition-all duration-300">
-=======
     <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-100 p-5 hover:border-[#23AEB8]/40 hover:shadow-lg transition-all duration-300">
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
       <div className="flex items-start justify-between mb-4">
         <div
           className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0"

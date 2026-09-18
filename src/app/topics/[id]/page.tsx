@@ -88,11 +88,7 @@ function SectionHeader({
     <div className="flex items-end justify-between gap-4 mb-8">
       <div>
         <div className="flex items-center gap-2 mb-2">
-<<<<<<< HEAD
-          <Icon className="h-3.5 w-3.5 text-[#24bbcb]" />
-=======
           <Icon className="h-3.5 w-3.5 text-[#23AEB8]" />
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
           <p className="text-[10px] tracking-[.15em] uppercase text-gray-400">
             {eyebrow}
           </p>
@@ -102,11 +98,7 @@ function SectionHeader({
       {action && (
         <Link
           href={action.href}
-<<<<<<< HEAD
-          className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-[#24bbcb] hover:underline flex-shrink-0 mb-1"
-=======
           className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-[#23AEB8] hover:underline flex-shrink-0 mb-1"
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
         >
           {action.label}
           <ArrowRight className="h-3 w-3" />
@@ -261,11 +253,7 @@ console.log(realExperts,"realExperts")
           {/* ── HERO ── */}
           <section className="grid md:grid-cols-2 gap-10 md:gap-14 items-center">
             <div>
-<<<<<<< HEAD
-              <div className="inline-flex items-center gap-2 text-[10px] tracking-[.2em] uppercase text-[#24bbcb] font-medium mb-5 bg-[#24bbcb]/8 px-3.5 py-1.5 rounded-full">
-=======
               <div className="inline-flex items-center gap-2 text-[10px] tracking-[.2em] uppercase text-[#23AEB8] font-medium mb-5 bg-[#23AEB8]/8 px-3.5 py-1.5 rounded-full">
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                 <Sparkles className="h-3 w-3" />
                 Glamlink Topic
               </div>
@@ -283,11 +271,7 @@ console.log(realExperts,"realExperts")
                       key={category}
                       className="flex items-center gap-1.5 text-xs font-medium text-gray-600 px-3 py-1.5 rounded-full border border-gray-200 bg-white"
                     >
-<<<<<<< HEAD
-                      <span className="w-1 h-1 rounded-full bg-[#24bbcb]" />
-=======
                       <span className="w-1 h-1 rounded-full bg-[#23AEB8]" />
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                       {category}
                     </span>
                   ))}
@@ -295,11 +279,7 @@ console.log(realExperts,"realExperts")
               )}
             </div>
 
-<<<<<<< HEAD
-            <div className="relative rounded-[1.75rem] overflow-hidden aspect-[16/9] w-full shadow-[0_20px_50px_-20px_rgba(36,187,203,0.4)]">
-=======
             <div className="relative rounded-[1.75rem] overflow-hidden aspect-[16/9] w-full shadow-[0_20px_50px_-20px_rgba(35,174,184,0.4)]">
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
               <Image
                 unoptimized={process.env.NODE_ENV === "development"}
                 src={getTopicImage(topic)}
@@ -494,11 +474,7 @@ console.log(realExperts,"realExperts")
                 const href = getParagraphJournalHref(paragraph);
                 const textEl = (
                   <>
-<<<<<<< HEAD
-                    <Quote className="h-4 w-4 text-[#24bbcb]/40 mb-3" />
-=======
                     <Quote className="h-4 w-4 text-[#23AEB8]/40 mb-3" />
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                     <p
                       className="text-[15px] leading-[1.8] text-gray-600 font-light"
                       dangerouslySetInnerHTML={{ __html: text }}
@@ -508,21 +484,12 @@ console.log(realExperts,"realExperts")
                 return (
                   <div
                     key={paragraph.id}
-<<<<<<< HEAD
-                    className="group rounded-2xl border border-gray-100 bg-white p-6 shadow-sm hover:border-[#24bbcb]/40 hover:shadow-md transition-all duration-300"
-                  >
-                    {href ? (
-                      <Link href={href} className="block hover:text-[#24bbcb] transition-colors">
-                        {textEl}
-                        <span className="flex items-center gap-1 text-[11px] font-medium text-[#24bbcb] mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-=======
                     className="group rounded-2xl border border-gray-100 bg-white p-6 shadow-sm hover:border-[#23AEB8]/40 hover:shadow-md transition-all duration-300"
                   >
                     {href ? (
                       <Link href={href} className="block hover:text-[#23AEB8] transition-colors">
                         {textEl}
                         <span className="flex items-center gap-1 text-[11px] font-medium text-[#23AEB8] mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
                           Read the full article
                           <ArrowRight className="h-3 w-3" />
                         </span>
@@ -542,58 +509,35 @@ console.log(realExperts,"realExperts")
           <section
             className="relative overflow-hidden rounded-[1.75rem] px-6 py-12 md:px-14 md:py-16 text-center"
             style={{
-<<<<<<< HEAD
-              background:"#24bbcb"
-            }}
-          >
-            <p className="text-[10px] tracking-[.2em] uppercase text-white/70 font-medium mb-3">
-=======
               background:
                 "radial-gradient(circle at 15% 20%, rgba(35,174,184,0.16), transparent 55%), radial-gradient(circle at 85% 80%, rgba(35,174,184,0.12), transparent 55%), #0b1416",
             }}
           >
             <p className="text-[10px] tracking-[.2em] uppercase text-[#4fd7e0] font-medium mb-3">
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
               Glamlink
             </p>
             <h2 className="font-serif text-2xl md:text-4xl text-white">
               Continue Exploring Glamlink
             </h2>
-<<<<<<< HEAD
-            <p className="text-sm text-white/70 font-light mt-3 max-w-md mx-auto">
-=======
             <p className="text-sm text-white/60 font-light mt-3 max-w-md mx-auto">
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
               More topics, professionals, and stories are waiting for you.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
               <Link
                 href="/topics"
-<<<<<<< HEAD
-                className="inline-flex items-center justify-center rounded-full bg-white text-[#24bbcb] text-sm font-medium px-6 py-2.5 hover:bg-white/90 transition-colors duration-200"
-=======
                 className="inline-flex items-center justify-center rounded-full bg-[#23AEB8] text-white text-sm font-medium px-6 py-2.5 hover:bg-[#1d9aa3] transition-colors duration-200"
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
               >
                 Explore Topics
               </Link>
               <Link
                 href="/journal/directory"
-<<<<<<< HEAD
-                className="inline-flex items-center justify-center rounded-full border border-white/30 text-white text-sm font-medium px-6 py-2.5 hover:border-white/50 hover:bg-white/10 transition-colors duration-200"
-=======
                 className="inline-flex items-center justify-center rounded-full border border-white/20 text-white text-sm font-medium px-6 py-2.5 hover:border-white/40 hover:bg-white/5 transition-colors duration-200"
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
               >
                 Discover Professionals
               </Link>
               <Link
                 href="/journal"
-<<<<<<< HEAD
-                className="inline-flex items-center justify-center rounded-full border border-white/30 text-white text-sm font-medium px-6 py-2.5 hover:border-white/50 hover:bg-white/10 transition-colors duration-200"
-=======
                 className="inline-flex items-center justify-center rounded-full border border-white/20 text-white text-sm font-medium px-6 py-2.5 hover:border-white/40 hover:bg-white/5 transition-colors duration-200"
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
               >
                 Explore Journal
               </Link>

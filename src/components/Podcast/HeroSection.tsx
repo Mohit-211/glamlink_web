@@ -12,23 +12,6 @@ export default function HeroSection({ onGuestClick }: HeroSectionProps) {
   };
 
   return (
-<<<<<<< HEAD
-    <section className="relative pt-18 pb-18 md:pt-20 md:pb-20 overflow-hidden bg-white">
-      {/* Very subtle luxury texture */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.006]">
-        <div
-          className="w-full h-full"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 2px 2px, #e0e0e0 1px, transparent 0)",
-            backgroundSize: "50px 50px",
-          }}
-        />
-      </div>
-
-      <div className="container-glamlink px-5 md:px-8 relative z-10">
-        <div className="max-w-5xl mx-auto text-center">
-=======
     <section
       style={{
         background: "#fff",
@@ -47,7 +30,6 @@ export default function HeroSection({ onGuestClick }: HeroSectionProps) {
       >
         {/* Text content */}
         <div style={{ flex: 1, minWidth: 0 }}>
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
           {/* Eyebrow */}
           <div className="inline-flex items-center gap-2 bg-[#e4f6f8] border border-[#24bbcb] rounded-full px-4 py-1 mb-6 md:mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-[#24bbcb] animate-pulse" />
