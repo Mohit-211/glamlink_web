@@ -126,7 +126,7 @@ export default function Header({ activeRoute }: any) {
                     onClick={() =>
                       setProfileDropdownOpen(!profileDropdownOpen)
                     }
-                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-teal-500 to-cyan-500 hover:shadow-lg transition-all"
+                    className="flex items-center justify-center w-12 h-12 rounded-full bg-[#24bbcb] hover:shadow-lg transition-all"
                   >
                     <User className="w-6 h-6 text-white" />
                   </button>
@@ -137,7 +137,7 @@ export default function Header({ activeRoute }: any) {
                       className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50"
                       style={{
                         boxShadow:
-                          "0 10px 25px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(35, 174, 184, 0.1)",
+                          "0 10px 25px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(36,187,203, 0.1)",
                       }}
                     >
                       {/* Dashboard Option */}

@@ -54,7 +54,7 @@ function AvatarCircle({
   index: number;
 }) {
   const palettes = [
-    { bg: "hsl(184 50% 88%)", text: "hsl(184 70% 28%)" },
+    { bg: "hsl(186 50% 88%)", text: "hsl(186 70% 28%)" },
     { bg: "hsl(280 40% 90%)", text: "hsl(280 60% 35%)" },
     { bg: "hsl(30 50% 90%)", text: "hsl(30 70% 30%)" },
     { bg: "hsl(340 50% 90%)", text: "hsl(340 60% 35%)" },
@@ -132,9 +132,7 @@ console.log(response,"response=====")
     <section
       ref={ref}
       className="relative"
-      style={{
-        fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif",
-      }}
+      
     >
       <div
         className="divide-y"
@@ -154,7 +152,7 @@ console.log(response,"response=====")
                 }ms, background 0.15s ease`,
               background:
                 hoveredIndex === i
-                  ? "hsl(184 40% 97%)"
+                  ? "hsl(186 40% 97%)"
                   : "white",
             }}
             onMouseEnter={() => setHoveredIndex(i)}
@@ -180,8 +178,8 @@ console.log(response,"response=====")
                   <span
                     className="text-[9px] tracking-[0.15em] uppercase font-bold px-2 py-0.5 rounded-full flex-shrink-0"
                     style={{
-                      background: "hsl(184 50% 92%)",
-                      color: "hsl(184 70% 28%)",
+                      background: "hsl(186 50% 92%)",
+                      color: "hsl(186 70% 28%)",
                     }}
                   >
                     {formatDate(item.schedule_date)}
@@ -225,7 +223,7 @@ console.log(response,"response=====")
               )
             }
             className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide transition-all duration-150 hover:opacity-70"
-            style={{ color: "hsl(184 70% 35%)" }}
+            style={{ color: "#24bbcb" }}
           >
             Load{" "}
             {Math.min(
@@ -253,7 +251,7 @@ console.log(response,"response=====")
             type="button"
             onClick={() => setVisibleCount(PAGE_SIZE)}
             className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide transition-all duration-150 hover:opacity-70"
-            style={{ color: "hsl(210 12% 55%)" }}
+            style={{ color: "#24bbcb" }}
           >
             Show less
 

@@ -94,7 +94,7 @@ export default function DigitalCard() {
               <div
                 className="h-32"
                 style={{
-                  background: "#23AEB8",
+                  background: "#24bbcb",
                 }}
               />
 
@@ -105,7 +105,7 @@ export default function DigitalCard() {
                   <div
                     className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg"
                     style={{
-                      background: "#23AEB8",
+                      background: "#24bbcb",
                     }}
                   >
                     {initials}

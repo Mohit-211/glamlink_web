@@ -1,18 +1,18 @@
+import { nanoid } from "nanoid";
 import { BOOKING_METHODS, GlamCardFormData } from "./GlamCardForm/types";
-import profileImg from "../../../public/fashion/pexels-decembrenell-3317434.jpg";
-import galleryImg1 from "../../../public/fashion/pexels-element5-973403.jpg";
-import galleryImg2 from "../../../public/fashion/pexels-pixabay-38554.jpg";
-import galleryImg3 from "../../../public/fashion/pexels-pixabay-159780.jpg";
+
+const profileImgUrl =
+  "https://node.glamlink.net/images/profile_image-1786443475610.jpg";
+const galleryImg1Url =
+  "https://node.glamlink.net/images/images-1786443475619.jpg";
+const galleryImg2Url =
+  "https://node.glamlink.net/images/images-1786443475614.jpg";
 /* ================= HELPER ================= */
 async function urlToFile(
   url: string,
   filename: string
 ): Promise<File> {
-  const fullUrl =
-    typeof window !== "undefined"
-      ? window.location.origin + url
-      : url;
-  const res = await fetch(fullUrl);
+  const res = await fetch(url);
   const blob = await res.blob();
   return new File([blob], filename, {
     type: blob.type,
@@ -24,122 +24,101 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
   if (typeof window === "undefined") {
     return {} as GlamCardFormData;
   }
-  const [profile_image, img1, img2, img3] =
+  const [profile_image, img1, img2] =
     await Promise.all([
       urlToFile(
-        profileImg.src,
-        "pexels-decembrenell-3317434.jpg"
+        profileImgUrl,
+        "profile_image-1786443475610.jpg"
       ),
       urlToFile(
-        galleryImg1.src,
-        "pexels-element5-973403.jpg"
+        galleryImg1Url,
+        "images-1786443475619.jpg"
       ),
       urlToFile(
-        galleryImg2.src,
-        "pexels-pixabay-38554.jpg"
-      ),
-      urlToFile(
-        galleryImg3.src,
-        "pexels-pixabay-159780.jpg"
+        galleryImg2Url,
+        "images-1786443475614.jpg"
       ),
     ]);
   return {
     /* ================= BASIC INFO ================= */
-    name: "Sophia Martinez",
-    professional_title:
-      "Master Hair Stylist & Colorist",
-    email: "sophia@luxebeauty.com",
-    phone: "123-456-7890",
-    booking_phone: "123-456-7890",
-    business_name: "Luxe Beauty Studio",
+    name: "John Doe",
+    professional_title: "Your Profession",
+    email: "example@email.com",
+    phone: "1234567890",
+    booking_phone: "1234567890",
     bio: `
-      <p>Founder of Glamlink</p>
-      <p>The Glamlink Edit</p>
-      <p>The Beauty Vault</p>
-    `,
+    <p>Enter your bio here.</p>
+   
+  `,
+  is_phone_visible: true,
+    business_name: "Your Business Name",
     /* ================= SPECIALTIES ================= */
-    primary_specialty: "Hair Styling & Color",
-    specialties: [
-      "Balayage",
-      "Color Correction",
-      "Bridal Styling",
-      "Extensions",
-    ],
+    primary_specialty: "Hair Stylist",
+    specialties: ["Hair Styling", "Makeup", "Skincare", "Nails"],
     /* ================= HANDLES ================= */
-    custom_handle: "luxebeauty",
-    instagram_handle: "luxebeauty",
-    website: "https://luxebeauty.com",
-    /* ================= SOCIAL MEDIA ================= */
+    custom_handle: "yourhandle",
+    instagram_handle: "yourhandle",
+    website: "https://example.com",
+    /* ================= SOCIAL ================= */
     social_media: {
-      instagram: "",
-      tiktok: "",
-      linkedin:
-        "",
-      youtube:
-        "",
-      facebook:
-        "",
+      instagram: "https://instagram.com/yourhandle",
+      facebook: "https://facebook.com/yourhandle",
+      linkedin: "https://linkedin.com/in/yourhandle",
+      youtube: "https://youtube.com/@yourhandle",
+      tiktok: "https://tiktok.com/@yourhandle",
     },
-
-    other_links: [],
-    preferred_booking_methods: [
-     
-    ],
-    booking_link: "",
+    other_links: [{ title: "My Portfolio", url: "https://example.com/portfolio" }],
+    featured_links: [],
+    color_code: "#24bbcb",
+    preferred_booking_methods: [BOOKING_METHODS.LINK, BOOKING_METHODS.CALL],
+    booking_link: "https://example.com/book",
     important_info: [
-      "Deposit required to secure booking",
+      "Add your important information here.",
     ],
     /* ================= BUSINESS HOURS ================= */
-    business_hour: [],
+    business_hour: [
+      { note: "Mon–Fri: 9:00 AM – 6:00 PM" },
+      { note: "Sat: 10:00 AM – 4:00 PM" },
+      { note: "Sun: Closed" },
+    ],
     /* ================= LOCATION ================= */
     locations: [
       {
-        id: "location-1",
-        label:
-          "Luxe Beauty Studio - Las Vegas",
+        id: nanoid(),
+        label: "Location 1",
         location_type: "exact_address",
-        address:
-          "7575 S Rainbow Blvd UNIT 107, Las Vegas, NV 89139, USA",
-        city: "Las Vegas",
-        area: "Southwest",
-        state: "NV",
-        business_name: "Luxe Beauty Studio",
-        phone: "123-456-7890",
-        description:
-          "Located in SW Las Vegas near Rainbow Blvd",
+        address: "123 Main Street",
+        area: "Downtown",
+        city: "Los Angeles",
+        state: "CA",
+        phone: "1234567890",
+        description: "Our main studio location.",
         isPrimary: true,
         isOpen: true,
       },
     ],
-    /* ================= MEDIA ================= */
+    /* ================= IMAGES ================= */
     profile_image,
-    images: [img1, img2, img3],
+    images: [img1, img2],
     gallery_meta: [
       {
-        id: "sample-1",
-        caption:
-          "Stunning Balayage Transformation",
+        id: "1",
+        caption: "Sample Image 1",
         is_thumbnail: true,
         sort_order: 0,
       },
       {
-        id: "sample-2",
-        caption: "Color Correction Result",
+        id: "2",
+        caption: "Sample Image 2",
         is_thumbnail: false,
         sort_order: 1,
-      },
-      {
-        id: "sample-3",
-        caption: "Bridal Styling",
-        is_thumbnail: false,
-        sort_order: 2,
       },
     ],
     /* ================= MARKETING ================= */
     elite_setup: false,
-    offer_promotion: undefined,
-    promotion_details: "",
-    excites_about_glamlink: [],
-    biggest_pain_points: [],
+    offer_promotion: true,
+    promotion_details: "20% off first booking for new clients.",
+    excites_about_glamlink: ["Reaching new clients", "Easy online booking"],
+    biggest_pain_points: ["Finding new clients", "Managing appointments"],
   };
 }

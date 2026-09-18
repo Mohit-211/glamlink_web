@@ -1,27 +1,37 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Download, X, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CategoryNav from "./CategoryNav";
 import BlogGrid from "./BlogGrid";
 import HeroSection from "./HeroSection";
+import JournalSearchBar from "./JournalSearchBar";
 import { issues2025, issues2026, Issue } from "@/data/issues";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
 import JournalEducation from "./JournalEducation";
 import JournalEvent from "./JournalEvent";
 import JournalShop from "./JournalShop";
+import DirectoryPage from "@/components/directoryComponent/DirectoryPage";
+import { useDeviceType } from "@/ads/Usedevicetype";
+import { useAds } from "@/ads/Useads";
+import AdSlot from "@/ads/Adslot";
+
+
+
 /* ─────────────────────────────────────────────────────────────
    Constants
 ───────────────────────────────────────────────────────────── */
 const MOBILE_ISSUES_PER_PAGE = 4;
 const SIDEBAR_ISSUES_PER_PAGE = 3;
+const SEARCH_DEBOUNCE_MS = 300;
 
 const TOP_TABS = [
   { label: "Journal", path: "journal", href: "/journal" },
   { label: "Education", path: "education", href: "/journal/education" },
   { label: "Events", path: "event", href: "/journal/events" },
   { label: "Shop", path: "shop", href: "/journal/shop" },
+  { label: "Directory", path: "directory", href: "/journal/directory" },
 ];
 
 // Only the "journal" tab shows Category nav + Magazine sidebar
@@ -85,10 +95,10 @@ const PaginationControls = ({
 const TopTabs = ({ path }: { path: string }) => {
   const router = useRouter();
   return (
-    <div className="w-full flex justify-center mb-4 lg:mb-6">
+    <div className="w-full overflow-x-auto no-scrollbar mb-4 lg:mb-6">
       <div
         role="tablist"
-        className="inline-flex items-center gap-1 p-1 rounded-full
+        className="flex w-max mx-auto items-center gap-1 p-1 rounded-full
           bg-muted/40 border border-border/40"
       >
         {TOP_TABS.map((tab) => {
@@ -99,8 +109,8 @@ const TopTabs = ({ path }: { path: string }) => {
               role="tab"
               aria-selected={isActive}
               onClick={() => router.push(tab.href)}
-              className={`cursor-pointer px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold uppercase tracking-wide
-                rounded-full whitespace-nowrap transition-all duration-200
+              className={`cursor-pointer px-3 sm:px-6 py-2 text-[11px] sm:text-sm font-semibold uppercase tracking-wide
+                rounded-full whitespace-nowrap transition-all duration-200 shrink-0
                 ${isActive
                   ? "bg-background text-[#24bbcb] shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
@@ -368,46 +378,105 @@ const MagazineSidebar = ({
    only their centered main content.
 ───────────────────────────────────────────────────────────── */
 const JournalClient = ({ path }: { path: string }) => {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
+  const [activeCategory, setActiveCategoryState] = useState(
+    categoryParam || "All"
+  );
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+
+  const device = useDeviceType();
+  const ads = useAds({ page: "journal-listing", device });
+
+  // ── Journal article search (title, category, author, content) ──
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    setIsSearching(true);
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput.trim());
+      setIsSearching(false);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  // Keep local state in sync when the URL's ?category= changes externally
+  // (back/forward navigation, direct link)
+  useEffect(() => {
+    setActiveCategoryState(categoryParam || "All");
+  }, [categoryParam]);
+
+  // Updates both the active category and the URL, so the category is
+  // reflected in the address bar and shareable/bookmarkable
+  const setActiveCategory = (category: string) => {
+    setActiveCategoryState(category);
+    const params = new URLSearchParams(searchParams.toString());
+    if (!category || category === "All") {
+      params.delete("category");
+    } else {
+      params.set("category", category);
+    }
+    const query = params.toString();
+    router.replace(`/journal${query ? `?${query}` : ""}`, { scroll: false });
+  };
+
   const handleIssueClick = (issue: Issue) => {
     setSelectedIssue((prev) => (prev?.slug === issue.slug ? null : issue));
   };
 
   const fullLayout = isFullLayout(path);
-
+  console.log(fullLayout, "fullLayout")
   const renderMainContent = () => {
     switch (path) {
       case "journal":
         return (
           <main className="space-y-6 min-w-0">
             <HeroSection />
-            <BlogGrid activeCategory={activeCategory} />
+            <BlogGrid
+              activeCategory={activeCategory}
+              searchQuery={searchQuery}
+              onResetCategory={() => setActiveCategory("All")}
+              onClearSearch={() => setSearchInput("")}
+            />
           </main>
         );
       case "education":
         return (
-          <main className="space-y-6 min-w-0">
+          <main className="space-y-6 min-w-0 mt-20">
             <JournalEducation />
           </main>
         );
       case "event":
         return (
-          <main className="space-y-6 min-w-0">
+          <main className="space-y-6 min-w-0 mt-20">
             <JournalEvent />
           </main>
         );
       case "shop":
         return (
-          <main className="space-y-6 min-w-0">
+          <main className="space-y-6 min-w-0 mt-20">
             <JournalShop />
+          </main>
+        );
+      case "directory":
+        return (
+          <main className="space-y-6 min-w-0 mt-20">
+            <DirectoryPage />
           </main>
         );
       default:
         return (
           <main className="space-y-6 min-w-0">
             <HeroSection />
-            <BlogGrid activeCategory={activeCategory} />
+            <BlogGrid
+              activeCategory={activeCategory}
+              searchQuery={searchQuery}
+              onResetCategory={() => setActiveCategory("All")}
+              onClearSearch={() => setSearchInput("")}
+            />
           </main>
         );
     }
@@ -420,6 +489,23 @@ const JournalClient = ({ path }: { path: string }) => {
         <div className="max-w-[1700px] mx-auto px-4 sm:px-6 xl:px-14 mt-[120px] pb-8 lg:pb-14">
           {/* ── Top tab navigation (Journal / Education / Events / Shop) ── */}
           <TopTabs path={path} />
+          {fullLayout && (
+            <div className="flex flex-wrap justify-center gap-4 py-4">
+              {(ads["journal-top-banner"] ?? []).map((ad) => (
+                <AdSlot key={ad.id} slotId="journal-top-banner" ad={ad} />
+              ))}
+            </div>
+          )}
+          {/* ── Journal article search (title, category, author, content) ── */}
+          {fullLayout && (
+            <div className="w-full max-w-2xl mx-auto mb-6 lg:mb-8">
+              <JournalSearchBar
+                value={searchInput}
+                onChange={setSearchInput}
+                isSearching={isSearching}
+              />
+            </div>
+          )}
 
           {fullLayout ? (
             <>
@@ -436,13 +522,17 @@ const JournalClient = ({ path }: { path: string }) => {
               {/* ── Desktop 3-column layout (Journal only) ── */}
               <div className="hidden lg:grid grid-cols-[200px_1fr_300px] xl:grid-cols-[220px_1fr_300px] 2xl:grid-cols-[240px_1fr_320px] gap-10 xl:gap-14">
                 <aside>
-                  <div className="sticky top-28 pr-4">
+                  <div className="sticky top-28 space-y-6 pr-4">
                     <CategoryNav
                       activeCategory={activeCategory}
                       setActiveCategory={setActiveCategory}
                       vertical
                       path={path}
                     />
+                    {/* Left sidebar ad(s) */}
+                    {(ads["journal-sidebar-left"] ?? []).map((ad) => (
+                      <AdSlot key={ad.id} slotId="journal-sidebar-left" ad={ad} />
+                    ))}
                   </div>
                 </aside>
 
@@ -454,11 +544,19 @@ const JournalClient = ({ path }: { path: string }) => {
                       activeIssue={selectedIssue}
                       onIssueClick={handleIssueClick}
                     />
-                    <div className="border border-border/40 rounded-xl p-6 text-center text-sm text-muted-foreground">
-                      Ad Space
-                    </div>
+                    {/* Right sidebar ad(s) */}
+                    {(ads["journal-sidebar-right"] ?? []).map((ad) => (
+                      <AdSlot key={ad.id} slotId="journal-sidebar-right" ad={ad} />
+                    ))}
                   </div>
                 </aside>
+              </div>
+
+              {/* ── Mobile-only fixed bottom ad bar ── */}
+              <div className="lg:hidden">
+                {(ads["journal-mobile-bottom"] ?? []).map((ad) => (
+                  <AdSlot key={ad.id} slotId="journal-mobile-bottom" ad={ad} />
+                ))}
               </div>
 
               <FlipbookPanel
@@ -470,6 +568,11 @@ const JournalClient = ({ path }: { path: string }) => {
             /* ── Centered single-column layout (Education / Events / Shop) ── */
             <div className="max-w-4xl mx-auto">{renderMainContent()}</div>
           )}
+        </div>
+        <div className="flex flex-wrap justify-center gap-4">
+          {(ads["journal-bottom"] ?? []).map((ad) => (
+            <AdSlot key={ad.id} slotId="journal-bottom" ad={ad} />
+          ))}
         </div>
       </div>
     </>

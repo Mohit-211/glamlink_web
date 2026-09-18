@@ -26,6 +26,9 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
+
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Cormorant Garamond", Georgia, serif;
 }
 
 /* ────────────────────────────────────────────────
@@ -35,7 +38,7 @@
   --radius: 0.75rem;
 
   /* Primary */
-  --primary: 184 68% 43%;
+  --primary: 186 70% 47%;
   --primary-foreground: 0 0% 100%;
 
   /* Surfaces */
@@ -54,27 +57,27 @@
   --muted: 220 15% 96%;
   --muted-foreground: 220 10% 50%;
 
-  --accent: 184 68% 95%;
-  --accent-foreground: 184 68% 30%;
+  --accent: 186 68% 95%;
+  --accent-foreground: 186 68% 30%;
 
   --destructive: 0 84% 60%;
   --border: 220 15% 90%;
   --input: 220 15% 90%;
-  --ring: 184 68% 43%;
+  --ring: 186 70% 47%;
 
   /* Sidebar */
   --sidebar-background: 0 0% 98%;
   --sidebar-foreground: 240 5.3% 26.1%;
-  --sidebar-primary: 184 68% 43%;
+  --sidebar-primary: 186 70% 47%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 184 50% 95%;
+  --sidebar-accent: 186 50% 95%;
   --sidebar-border: 220 15% 90%;
 
   /* Shadows */
   --shadow-soft: 0 2px 8px -2px hsl(220 20% 15% / 0.08);
   --shadow-medium: 0 4px 16px -4px hsl(220 20% 15% / 0.12);
   --shadow-large: 0 8px 32px -8px hsl(220 20% 15% / 0.16);
-  --shadow-primary: 0 4px 20px -4px hsl(184 68% 43% / 0.35);
+  --shadow-primary: 0 4px 20px -4px hsl(186 70% 47% / 0.35);
 }
 
 /* Dark mode overrides */
@@ -94,15 +97,15 @@
   --muted: 220 15% 18%;
   --muted-foreground: 220 10% 60%;
 
-  --accent: 184 40% 15%;
-  --accent-foreground: 184 68% 70%;
+  --accent: 186 40% 15%;
+  --accent-foreground: 186 68% 70%;
 
   --border: 220 15% 20%;
   --input: 220 15% 20%;
 
   --sidebar-background: 220 20% 10%;
   --sidebar-foreground: 220 15% 85%;
-  --sidebar-accent: 184 40% 15%;
+  --sidebar-accent: 186 40% 15%;
   --sidebar-border: 220 15% 20%;
 }
 
@@ -116,7 +119,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family: "Cormorant Garamond", Georgia, serif;
   }
 
   h1,
@@ -129,7 +132,17 @@
   }
 
   .font-display {
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: "Cormorant Garamond", Georgia, serif;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
   }
 }
 
@@ -182,7 +195,7 @@
   }
 
   .card-glamlink {
-    @apply rounded-2xl border bg-card p-6
+    @apply rounded-2xl border bg-card p-4 sm:p-6
     shadow-[var(--shadow-soft)] transition-all duration-300;
 
     transform: translateY(0);
@@ -214,6 +227,23 @@
   .divider-glamlink {
     @apply my-20 border-t border-border/60;
   }
+
+  /* Shadow utility classes — use these instead of shadow-[var(--shadow-soft|medium|primary)] */
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-medium {
+    box-shadow: var(--shadow-medium);
+  }
+
+  .shadow-large {
+    box-shadow: var(--shadow-large);
+  }
+
+  .shadow-primary {
+    box-shadow: var(--shadow-primary);
+  }
 }
 
 /* ────────────────────────────────────────────────
@@ -226,6 +256,10 @@
 
   .animate-fade-up {
     animation: fadeUp 0.8s ease-out forwards;
+  }
+
+  .animate-banner-in {
+    animation: bannerIn 600ms ease-out forwards;
   }
 
   .animate-pulse-slow {
@@ -250,6 +284,25 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes bannerIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-banner-in {
+      animation: none;
+      opacity: 1;
+      transform: none;
     }
   }
 
@@ -335,6 +388,16 @@
   display: none;
 }
 
+.prose-article > p:first-of-type::first-letter {
+  float: left;
+  font-family: serif;
+  font-size: 72px;
+  line-height: 0.85;
+  margin-right: 12px;
+  margin-top: 6px;
+  color: #24bbcb;
+}
+
 .prose-article img {
   /* width: 100% !important; */
   height: auto !important;
@@ -349,12 +412,22 @@
   transition: 0.2s ease;
 }
 
+.prose-article a.mention-link {
+  color: #24bbcb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.prose-article a.mention-link:hover {
+  text-decoration: underline;
+}
+
 .prose-article a:hover {
   color: #4f46e5;
 }
 
 .prose-article blockquote {
-  border-left: 3px solid #bbe8eb;
+  border-left: 3px solid #bbe6eb;
   margin: 32px 0;
   padding-left: 20px;
   font-style: italic;
@@ -377,6 +450,31 @@
   font-weight: 600;
 }
 
+.prose-article table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 15px;
+}
+
+.prose-article th,
+.prose-article td {
+  border: 1px solid #e5e7eb;
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose-article th {
+  background: rgba(36, 187, 203, 0.08);
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.prose-article tr:nth-child(even) td {
+  background: #f9fafb;
+}
+
 @media (max-width: 768px) {
   .prose-article {
     font-size: 15px;
@@ -390,6 +488,11 @@
   .prose-article h3 {
     font-size: 20px;
   }
+  .prose-article table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }
 .prose-article ul {
   list-style: disc;
@@ -400,8 +503,8 @@
   list-style: decimal;
   padding-left: 1.5rem;
 }
-/* REMOVE CKEDITOR POWERED BY */
 
+/* REMOVE CKEDITOR POWERED BY */
 .ck.ck-powered-by,
 .ck-powered-by,
 .ck.ck-balloon-panel.ck-powered-by-balloon,
@@ -410,4 +513,15 @@
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
+}
+
+/* Hide scrollbar for horizontally scrollable rows (mobile tab bars, carousels) */
+.no-scrollbar,
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

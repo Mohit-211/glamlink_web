@@ -46,7 +46,7 @@ const SuccessModal: React.FC<Props> = ({
               className="flex-1 rounded-lg py-2.5 text-white font-medium hover:opacity-90"
               style={{
                 background:
-                  "linear-gradient(135deg, #23aeb8 0%, #53bec6 50%, #5cc2d6 100%)",
+                  "linear-gradient(135deg, #24bbcb 0%, #53bec6 50%, #5cc2d6 100%)",
               }}
             >
               Pay Now

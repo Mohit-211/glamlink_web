@@ -444,7 +444,7 @@ const GlamCardForm: React.FC<Props> = ({
                 className="flex-1 rounded-full text-sm font-semibold text-white shadow-lg"
                 style={{
                   background:
-                    "linear-gradient(135deg, #23aeb8 0%, #53bec6 50%, #5cc2d6 100%)",
+                    "linear-gradient(135deg, #24bbcb 0%, #53bec6 50%, #5cc2d6 100%)",
                 }}
               >
                 <button

@@ -221,7 +221,7 @@ function EpisodeCard({
           <span style={{
             fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase",
             fontWeight: 700, padding: "4px 10px", borderRadius: "100px",
-            background: "rgba(255,255,255,0.92)", color: "hsl(184 70% 32%)", backdropFilter: "blur(4px)",
+            background: "rgba(255,255,255,0.92)", color: "hsl(186 70% 32%)", backdropFilter: "blur(4px)",
           }}>
             EP. {episodeNum}
           </span>
@@ -241,7 +241,7 @@ function EpisodeCard({
                 style={{
                   width: "40px", height: "40px", borderRadius: "50%",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  background: "hsl(184 70% 41%)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+                  background: "hsl(186 70% 41%)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
                   flexShrink: 0,
                 }}
               >
@@ -261,7 +261,7 @@ function EpisodeCard({
       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
         <h3 style={{
           fontSize: "clamp(13px, 1.5vw, 14px)", lineHeight: 1.4, fontWeight: 600, marginBottom: "8px",
-          color: "hsl(210 30% 10%)", fontFamily: "'DM Sans', system-ui, sans-serif",
+          color: "hsl(210 30% 10%)",
           display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
         }}>
           {video.title}
@@ -287,7 +287,7 @@ function ListenOnCard() {
   return (
     <div style={{ borderRadius: "16px", overflow: "hidden", background: "white", border: "1px solid hsl(204 14% 88%)", boxShadow: "0 2px 12px -4px rgba(0,0,0,0.06)" }}>
       <div style={{ padding: "20px" }}>
-        <p style={{ fontSize: "10px", letterSpacing: "0.25em", textTransform: "uppercase", fontWeight: 600, marginBottom: "4px", color: "hsl(184 70% 38%)" }}>
+        <p style={{ fontSize: "10px", letterSpacing: "0.25em", textTransform: "uppercase", fontWeight: 600, marginBottom: "4px", color: "hsl(186 70% 38%)" }}>
           Listen On
         </p>
         <p style={{ fontSize: "12px", marginBottom: "16px", color: "hsl(210 12% 55%)" }}>Available on all major platforms</p>
@@ -333,8 +333,8 @@ function StatsBar({ episodeCount }: { episodeCount: number }) {
   return (
     <div style={{
       borderRadius: "16px", padding: "20px", marginBottom: "24px",
-      background: "linear-gradient(135deg, hsl(184 70% 41%) 0%, hsl(184 60% 34%) 100%)",
-      boxShadow: "0 4px 20px -4px hsl(184 70% 35% / 0.35)",
+      background: "#24bbcb",
+      boxShadow: "0 4px 20px -4px hsl(186 70% 35% / 0.35)",
     }}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
         {stats.map(({ value, label }) => (
@@ -368,7 +368,7 @@ export default function PodcastMain() {
   const displayedVideos = filter === "recent" ? finalVideos.slice(0, 6) : finalVideos;
 
   return (
-    <main style={{ minHeight: "100vh", color: "hsl(210 30% 10%)", background: "hsl(204 20% 96%)", fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif" }}>
+    <main style={{ minHeight: "100vh", color: "hsl(210 30% 10%)", background: "hsl(204 20% 96%)" }}>
 
       {/* Responsive styles */}
       <style>{`
@@ -455,7 +455,7 @@ export default function PodcastMain() {
               style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "32px" }}
             >
               <div>
-                <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 700, marginBottom: "6px", color: "hsl(184 70% 38%)" }}>
+                <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 700, marginBottom: "6px", color: "#24bbcb" }}>
                   ✦ Now Streaming
                 </p>
                 <h2 style={{ fontSize: "clamp(22px, 4vw, 30px)", fontWeight: 700, lineHeight: 1.1, color: "hsl(210 30% 8%)", letterSpacing: "-0.02em" }}>
@@ -473,7 +473,7 @@ export default function PodcastMain() {
                       padding: "6px 16px", borderRadius: "100px", fontSize: "11px", fontWeight: 600,
                       letterSpacing: "0.05em", textTransform: "capitalize", cursor: "pointer", border: "none",
                       background: filter === f ? "white" : "transparent",
-                      color: filter === f ? "hsl(184 70% 35%)" : "hsl(210 12% 50%)",
+                      color: filter === f ? "#24bbcb" : "hsl(210 12% 50%)",
                       boxShadow: filter === f ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
                       transition: "all 0.2s",
                       whiteSpace: "nowrap",
@@ -522,8 +522,8 @@ export default function PodcastMain() {
                   padding: "14px 32px", borderRadius: "100px",
                   fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase",
                   fontWeight: 700, color: "white", textDecoration: "none",
-                  background: "linear-gradient(135deg, hsl(184 70% 41%) 0%, hsl(184 60% 34%) 100%)",
-                  boxShadow: "0 4px 16px hsl(184 70% 35% / 0.3)",
+                background: "#24bbcb",
+                  boxShadow: "0 4px 16px hsl(186 70% 35% / 0.3)",
                   transition: "all 0.2s",
                 }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.filter = "brightness(1.1)"; el.style.transform = "translateY(-1px)"; }}
@@ -546,7 +546,7 @@ export default function PodcastMain() {
 
             {/* Upcoming Schedule card */}
             <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid hsl(204 14% 86%)", boxShadow: "0 2px 12px -4px rgba(0,0,0,0.06)" }}>
-              <div style={{ padding: "16px 20px", background: "linear-gradient(135deg, hsl(184 70% 41%) 0%, hsl(184 60% 34%) 100%)" }}>
+              <div style={{ padding: "16px 20px", background: "#24bbcb" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
                   <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "white", opacity: 0.7 }} />
                   <p style={{ fontSize: "9px", letterSpacing: "0.28em", textTransform: "uppercase", fontWeight: 700, color: "rgba(255,255,255,0.65)" }}>
@@ -569,7 +569,7 @@ export default function PodcastMain() {
       <NotifySection />
 
       {/* About Strip */}
-      <section style={{ padding: "clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 1.5rem)", background: "hsl(184 60% 34%)" }}>
+      <section style={{ padding: "clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 1.5rem)", background: "#24bbcb" }}>
         <div style={{ maxWidth: "768px", margin: "0 auto", textAlign: "center" }}>
           <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 700, marginBottom: "16px", color: "rgba(255,255,255,0.5)" }}>
             About the Show

@@ -5,6 +5,7 @@ import { CalendarDays, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getTypeBlogs } from "@/api/Api";
 import Link from "next/link";
+import SectionHeader from "./SectionHeader";
 const JournalEvent = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,18 +35,11 @@ const JournalEvent = () => {
   return (
     <section className="space-y-8">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <p className="text-[11px] uppercase tracking-widest text-[#24bbcb] font-semibold">
-          Save The Date
-        </p>
-        <h1 className="font-display text-2xl md:text-3xl tracking-tight">
-          Upcoming Events
-        </h1>
-        <p className="text-sm text-muted-foreground max-w-lg mx-auto">
-          Meet the community, learn from experts, and experience beauty in
-          person or online.
-        </p>
-      </div>
+      <SectionHeader
+        eyebrow="Save The Date"
+        title="Upcoming Events"
+        description="Meet the community, learn from experts, and experience beauty in person or online."
+      />
       {/* List */}
       <div className="space-y-5">
         {events.length > 0 ? (

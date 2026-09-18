@@ -44,10 +44,10 @@ const BlogCard = ({
         {/* {category && (
           <div className="absolute top-3 left-3">
             <span
-              className="text-[10px] font-medium tracking-widest uppercase text-[#23AEB8] px-3 py-1.5 rounded-full"
+              className="text-[10px] font-medium tracking-widest uppercase text-[#24bbcb] px-3 py-1.5 rounded-full"
               style={{
                 background: "rgba(255,255,255,0.93)",
-                border: "1px solid rgba(35,174,184,0.2)",
+                border: "1px solid rgba(36,187,203,0.2)",
               }}
             >
               {category}
@@ -62,7 +62,7 @@ const BlogCard = ({
           {category}
         </p>
         {/* Title */}
-        <h3 className="font-serif text-gray-900 text-[18px] leading-[1.35] mb-2 group-hover:text-[#23AEB8] transition-colors duration-200 line-clamp-2">
+        <h3 className="font-serif text-gray-900 text-[18px] leading-[1.35] mb-2 group-hover:text-[#24bbcb] transition-colors duration-200 line-clamp-2">
           {title}
         </h3>
 
@@ -77,7 +77,7 @@ const BlogCard = ({
         {(author || date) && (
           <div className="flex items-center gap-2 pt-3 border-t border-gray-100 mt-auto">
             {author && (
-              <div className="w-7 h-7 rounded-full bg-[#23AEB8] text-white flex items-center justify-center text-[11px] font-medium flex-shrink-0">
+              <div className="w-7 h-7 rounded-full bg-[#24bbcb] text-white flex items-center justify-center text-[11px] font-medium flex-shrink-0">
                 {author.charAt(0)}
               </div>
             )}

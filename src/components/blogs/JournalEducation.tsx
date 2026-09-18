@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Clock, BarChart2, CalendarDays } from "lucide-react";
 import { getTypeBlogs } from "@/api/Api";
 import Link from "next/link";
+import SectionHeader from "./SectionHeader";
 
 const levelColor: Record<string, string> = {
   Beginner: "bg-emerald-500/10 text-emerald-600",
@@ -48,20 +49,16 @@ const JournalEducation = () => {
   return (
     <section className="space-y-8">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <p className="text-[11px] uppercase tracking-widest text-[#24bbcb] font-semibold">
-          Learn &amp; Grow
-        </p>
-
-        <h1 className="font-display text-2xl md:text-3xl tracking-tight">
-          Beauty Education Hub
-        </h1>
-
-        <p className="text-sm text-muted-foreground max-w-lg mx-auto">
-          Guides, tutorials, and expert breakdowns to help you understand the
-          &quot;why&quot; behind every beauty routine.
-        </p>
-      </div>
+      <SectionHeader
+        eyebrow="Learn & Grow"
+        title="Beauty Education Hub"
+        description={
+          <>
+            Guides, tutorials, and expert breakdowns to help you understand
+            the &quot;why&quot; behind every beauty routine.
+          </>
+        }
+      />
 
       {/* Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

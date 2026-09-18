@@ -63,7 +63,7 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
 
             <button
               onClick={onApplyClick}
-              className="mt-10 inline-flex items-center justify-center rounded-md bg-[#23AEB8] px-10 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-[#1d98a2]"
+              className="mt-10 inline-flex items-center justify-center rounded-md bg-[#24bbcb] px-10 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-[#1d98a2]"
             >
               CREATE YOUR ACCESS CARD
             </button>

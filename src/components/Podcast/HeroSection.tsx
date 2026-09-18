@@ -1,177 +1,87 @@
 "use client";
-import { useState } from "react";
-
-const BRAND = "#1FA8B2";
-const BRAND_DARK = "#157a82";
-const BRAND_LIGHT = "#e4f6f8";
+import { Button } from "@/components/ui/button";
 
 interface HeroSectionProps {
   onGuestClick: () => void;
 }
 
 export default function HeroSection({ onGuestClick }: HeroSectionProps) {
-  const [suggestHovered, setSuggestHovered] = useState(false);
-  const [subscribeHovered, setSubscribeHovered] = useState(false);
-
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     window.open("https://mailchi.mp/glamlink/subscribe", "_blank");
   };
 
   return (
-    <section
-      style={{
-        background: "#fff",
-        borderBottom: "0.5px solid #d0e8ea",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-          display: "flex",
-          alignItems: "center",
-          gap: "3rem",
-        }}
-      >
-        {/* Text content */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+    <section className="relative pt-18 pb-18 md:pt-20 md:pb-20 overflow-hidden bg-white">
+      {/* Very subtle luxury texture */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.006]">
+        <div
+          className="w-full h-full"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 2px 2px, #e0e0e0 1px, transparent 0)",
+            backgroundSize: "50px 50px",
+          }}
+        />
+      </div>
+
+      <div className="container-glamlink px-5 md:px-8 relative z-10">
+        <div className="max-w-5xl mx-auto text-center">
           {/* Eyebrow */}
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              background: BRAND_LIGHT,
-              border: `0.5px solid ${BRAND}`,
-              borderRadius: "100px",
-              padding: "4px 14px",
-              marginBottom: "1.25rem",
-            }}
-          >
-            <span
-              style={{
-                width: "6px",
-                height: "6px",
-                borderRadius: "50%",
-                background: BRAND,
-                display: "inline-block",
-                animation: "heroPulse 2s ease-in-out infinite",
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                fontSize: "clamp(9px, 2vw, 10px)",
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: BRAND_DARK,
-                fontWeight: 600,
-                whiteSpace: "nowrap",
-              }}
-            >
+          <div className="inline-flex items-center gap-2 bg-[#e4f6f8] border border-[#24bbcb] rounded-full px-4 py-1 mb-6 md:mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#24bbcb] animate-pulse" />
+            <span className="text-[10px] md:text-xs tracking-[0.2em] uppercase text-[#157a82] font-semibold whitespace-nowrap">
               New Episode Every Week
             </span>
           </div>
 
           {/* Title */}
-          <h1
-            style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: "clamp(32px, 7vw, 62px)",
-              fontWeight: 300,
-              lineHeight: 1.05,
-              color: "#0f1a14",
-              marginBottom: "1.25rem",
-            }}
-          >
-            The Beauty{" "}
-            <em style={{ fontStyle: "italic", color: BRAND }}>Vault</em>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-light text-gray-950 tracking-tight leading-none mb-8 md:mb-10">
+            The Beauty <span className="text-[#24bbcb]">Vault</span>
           </h1>
 
           {/* Description */}
-          <p
-            style={{
-              fontSize: "clamp(13px, 2vw, 15px)",
-              lineHeight: 1.7,
-              color: "#4a5e55",
-              maxWidth: "480px",
-              marginBottom: "2rem",
-            }}
-          >
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-12 md:mb-16">
             Unfiltered conversations with the professionals, founders, and
             innovators actively shaping the future of beauty and wellness.
           </p>
 
           {/* CTAs */}
-          <div
-            style={{
-              display: "flex",
-              gap: "0.75rem",
-              flexWrap: "wrap",
-              marginBottom: "2.5rem",
-            }}
-          >
-            <button
-              onClick={onGuestClick}
-              style={{
-                background: suggestHovered ? BRAND_DARK : BRAND,
-                color: "#fff",
-                padding: "clamp(0.6rem, 2vw, 0.7rem) clamp(1.2rem, 4vw, 1.75rem)",
-                borderRadius: "100px",
-                fontSize: "clamp(10px, 2vw, 11px)",
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                fontWeight: 700,
-                border: "none",
-                cursor: "pointer",
-                transition: "background 0.2s, transform 0.15s",
-                transform: suggestHovered ? "translateY(-1px)" : "none",
-                whiteSpace: "nowrap",
-              }}
-              onMouseEnter={() => setSuggestHovered(true)}
-              onMouseLeave={() => setSuggestHovered(false)}
-            >
-              Apply to be a guest
-            </button>
-            <button
-              style={{
-                background: subscribeHovered ? BRAND_LIGHT : "transparent",
-                color: BRAND,
-                padding: "clamp(0.6rem, 2vw, 0.7rem) clamp(1.2rem, 4vw, 1.75rem)",
-                borderRadius: "100px",
-                fontSize: "clamp(10px, 2vw, 11px)",
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                fontWeight: 700,
-                border: `1.5px solid ${BRAND}`,
-                cursor: "pointer",
-                transition: "background 0.2s, transform 0.15s",
-                transform: subscribeHovered ? "translateY(-1px)" : "none",
-                whiteSpace: "nowrap",
-              }}
-              onMouseEnter={() => setSubscribeHovered(true)}
-              onMouseLeave={() => setSubscribeHovered(false)}
-              onClick={handleSubscribe}
-            >
-              Subscribe
-            </button>
-          </div>
+          <div className="max-w-xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4">
+              <Button
+                onClick={onGuestClick}
+                className="
+                  h-14 px-8 min-w-[160px]
+                  bg-[#24bbcb] hover:bg-[#1ea8b5]
+                  text-white font-medium rounded-full
+                  shadow-md hover:shadow-lg shadow-[#24bbcb]/20 hover:shadow-[#24bbcb]/30
+                  transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
+                "
+              >
+                Apply to be a guest
+              </Button>
 
-        
+              <Button
+                onClick={handleSubscribe}
+                variant="outline"
+                className="
+                  h-14 px-8 min-w-[160px]
+                  border border-[#24bbcb] bg-white text-[#24bbcb]
+                  hover:bg-[#e4f6f8] font-medium rounded-full shadow-sm hover:shadow
+                  transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
+                "
+              >
+                Subscribe
+              </Button>
+            </div>
+
+            <p className="mt-5 text-sm text-gray-500">
+              Join beauty enthusiasts • Unsubscribe anytime
+            </p>
+          </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes heroPulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(0.85); }
-        }
-
-        @media (max-width: 480px) {
-          /* Stack stats vertically on very small screens */
-        }
-      `}</style>
     </section>
   );
 }

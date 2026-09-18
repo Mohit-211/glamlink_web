@@ -213,7 +213,7 @@ export default function GuestModal({ open, onClose }: Props) {
               className="text-white font-medium transition"
               style={{
                 flex: 2, padding: "10px 0", borderRadius: 999,
-                background: loading ? "hsl(184, 40%, 60%)" : "hsl(184, 70%, 41%)",
+                background: loading ? "hsl(186, 40%, 60%)" : "hsl(186, 70%, 41%)",
                 fontSize: 14, border: "none",
               }}
             >

@@ -309,7 +309,7 @@ const Hero = () => {
                   className="w-full pl-14 pr-6 py-4.5 bg-white border border-gray-200 rounded-full text-base shadow-sm 
                              focus:outline-none focus:border-[#24bbcb]/60 focus:ring-4 focus:ring-[#24bbcb]/15 
                              transition-all duration-200 placeholder:text-gray-400"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  // style={{ fontFamily: "'DM Sans', sans-serif" }}
                 />
               </div>
               {/* Dropdown */}
