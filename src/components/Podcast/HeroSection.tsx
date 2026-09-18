@@ -26,6 +26,7 @@ export default function HeroSection({ onGuestClick }: HeroSectionProps) {
           display: "flex",
           alignItems: "center",
           gap: "3rem",
+          textAlign: "center"
         }}
       >
         {/* Text content */}
