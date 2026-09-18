@@ -27,6 +27,7 @@ export default function DirectoryPage() {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [professionals, setProfessionals] = useState<Provider[]>([]);
   const [services, setServices] = useState<any[]>([]);
+  const [providersLoading, setProvidersLoading] = useState(true);
 
   const [activeService, setActiveService] = useState(serviceParam || "All");
 
@@ -77,6 +78,8 @@ export default function DirectoryPage() {
   ====================== */
 
   const fetchProviders = async () => {
+    setProvidersLoading(true);
+
     try {
       const res = await GetBeauticianListApi();
       const providerList = res?.data || [];
@@ -103,6 +106,8 @@ export default function DirectoryPage() {
       setProviders(providersWithDetails);
     } catch (error) {
       console.log("API error:", error);
+    } finally {
+      setProvidersLoading(false);
     }
   };
 
@@ -191,7 +196,11 @@ export default function DirectoryPage() {
         {/* PROVIDERS */}
 
         <div className="mt-12">
-          <AreaSection title="Southwest" data={providers} />
+          <AreaSection
+            title="Southwest"
+            data={providers}
+            loading={providersLoading}
+          />
         </div>
 
         {/* CTA */}
