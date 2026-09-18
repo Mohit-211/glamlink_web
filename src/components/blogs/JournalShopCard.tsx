@@ -13,10 +13,6 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { encodeId } from "@/lib/idCodec";
-<<<<<<< HEAD
-import SectionHeader from "./SectionHeader";
-=======
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
 
 const PRODUCTS_PER_PAGE = 3;
 
@@ -109,15 +105,6 @@ const JournalShopCard = ({ shop,heading }: JournalShopCardProps) => {
   return (
     <section className="space-y-8">
       {/* Header */}
-<<<<<<< HEAD
-      {heading === "yes" && (
-        <SectionHeader
-          eyebrow="Curated Picks"
-          title="Shop The Journal"
-          description="Products featured in our articles, handpicked by the Glamlink editorial team."
-        />
-      )}
-=======
       {heading==="yes"&&
       <div className="text-center space-y-2">
         <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">
@@ -134,7 +121,6 @@ const JournalShopCard = ({ shop,heading }: JournalShopCardProps) => {
         </p>
       </div>
 }
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320
       {/* Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {paginatedProducts.map((product: any) => (

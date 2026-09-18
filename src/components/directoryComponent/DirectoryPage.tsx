@@ -29,12 +29,6 @@ export default function DirectoryPage() {
   const [professionals, setProfessionals] = useState<Provider[]>([]);
   const [services, setServices] = useState<any[]>([]);
 
-<<<<<<< HEAD:src/app/directory/DirectoryPage.tsx
-  const [providersLoading, setProvidersLoading] = useState(true);
-  const [professionalsLoading, setProfessionalsLoading] = useState(true);
-
-=======
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320:src/components/directoryComponent/DirectoryPage.tsx
   const [activeService, setActiveService] = useState(serviceParam || "All");
 
   /* =====================
@@ -114,11 +108,6 @@ export default function DirectoryPage() {
       setProviders(providersWithDetails);
     } catch (error) {
       console.log("API error:", error);
-<<<<<<< HEAD:src/app/directory/DirectoryPage.tsx
-    } finally {
-      setProvidersLoading(false);
-=======
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320:src/components/directoryComponent/DirectoryPage.tsx
     }
   };
 
@@ -157,10 +146,7 @@ export default function DirectoryPage() {
 
   return (
     <div className="page-soft">
-<<<<<<< HEAD:src/app/directory/DirectoryPage.tsx
-=======
   
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320:src/components/directoryComponent/DirectoryPage.tsx
 
 
       <div className="flex flex-wrap gap-3 mb-14 mt-4 justify-center">
@@ -221,10 +207,6 @@ export default function DirectoryPage() {
       <div className="mt-28">
         <CTASection />
       </div>
-<<<<<<< HEAD:src/app/directory/DirectoryPage.tsx
-    </div>
-=======
->>>>>>> 30a95675f69487a1ecbe33c4b72d31fa8e1de320:src/components/directoryComponent/DirectoryPage.tsx
 
   );
 }
