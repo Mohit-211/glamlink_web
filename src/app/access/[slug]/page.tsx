@@ -63,7 +63,7 @@ export async function generateMetadata({
   const image = toAbsoluteImageUrl(pro?.profile_image);
   const url = `https://glamlink.net/access/${slug}`;
 
-  console.log("[access-card metadata]", {
+  console.log("[access metadata]", {
     slug,
     pro,
     resolved: { title, description, image, url },
