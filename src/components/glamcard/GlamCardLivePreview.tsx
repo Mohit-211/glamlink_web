@@ -772,17 +772,17 @@ const GlamCardLivePreview: React.FC<Props> = ({
               <div
                 className="relative rounded-2xl overflow-hidden shadow-md"
                 style={{
-                  background: `linear-gradient(135deg, ${cardColor} 0%, ${shadeColor(cardColor, -25)} 100%)`,
+                  background: `#24bbcb`,
                 }}
               >
                 {/* bg pattern */}
                 <div className="absolute inset-0 opacity-10">
-                  <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white translate-x-8 -translate-y-8" />
-                  <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white -translate-x-6 translate-y-6" />
+                  {/* <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white translate-x-8 -translate-y-8" /> */}
+                  {/* <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white -translate-x-6 translate-y-6" /> */}
                 </div>
                 <div className="flex items-center gap-4 p-4">
                   {/* avatar */}
-                  <div className="w-28 h-28 rounded-full overflow-hidden bg-white/20 border-2 border-white shadow-lg flex-shrink-0">
+                  <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-white shadow-lg flex-shrink-0">
                     {data?.profile_image ? (
                       <img
                         src={
