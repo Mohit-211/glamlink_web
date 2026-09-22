@@ -420,7 +420,8 @@ const JournalClient = ({ path }: { path: string }) => {
       params.set("category", category);
     }
     const query = params.toString();
-    router.replace(`/journal${query ? `?${query}` : ""}`, { scroll: false });
+    console.log(query,"query")
+    router.replace(`/${query ? `?${query}` : ""}`, { scroll: false });
   };
 
   const handleIssueClick = (issue: Issue) => {
