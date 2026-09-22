@@ -1,4 +1,4 @@
-// pages/access-card/[slug]/page.tsx
+// pages/access/[slug]/page.tsx
 import type { Metadata } from "next";
 import { getBusinessCardBySlug } from "@/api/Api";
 import BusinessCardPageClient from "./BusinessCardPageClient";
@@ -61,7 +61,7 @@ export async function generateMetadata({
     : "Access by Glamlink";
   const description = buildDescription(pro);
   const image = toAbsoluteImageUrl(pro?.profile_image);
-  const url = `https://glamlink.net/access-card/${slug}`;
+  const url = `https://glamlink.net/access/${slug}`;
 
   console.log("[access-card metadata]", {
     slug,

@@ -16,7 +16,7 @@ const MENTION_REGEX = /(^|[\s(])@([a-zA-Z0-9_.-]{2,50})/g;
 // whether the handle matches a real business card. Set to false to
 // restore real per-handle existence checks via businessCardExists().
 const TEST_MODE_ALWAYS_LINK = true;
-const TEST_MODE_URL = "https://glamlink.net/access-card/niki-capobianco";
+const TEST_MODE_URL = "https://glamlink.net/access/niki-capobianco";
 
 async function businessCardExists(handle: string): Promise<boolean> {
   try {
@@ -107,7 +107,7 @@ async function linkifyMentions(html: string): Promise<string> {
       const anchor = document.createElement("a");
       anchor.href = TEST_MODE_ALWAYS_LINK
         ? TEST_MODE_URL
-        : `/access-card/${encodeURIComponent(handle)}`;
+        : `/access/${encodeURIComponent(handle)}`;
       anchor.className = "mention-link";
       anchor.textContent = `@${handle}`;
       frag.appendChild(anchor);

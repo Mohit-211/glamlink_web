@@ -34,7 +34,7 @@ import {
   FALLBACK_TREATMENT_OPTIONS,
   FallbackProduct,
   FallbackPodcastGuest,
-} from "@/data/topicFallbackContent";
+} from "@/app/access/[slug]/topicFallbackContent";
 import BlogCard from "@/components/blogs/BlogCard";
 import ArticleContent from "@/components/blogs/ArticleContent";
 import JournalShopCard from "@/components/blogs/JournalShopCard";
