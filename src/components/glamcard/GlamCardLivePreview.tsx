@@ -772,7 +772,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
               <div
                 className="relative rounded-2xl overflow-hidden shadow-md"
                 style={{
-                  background: `#24bbcb`,
+                  background: `${cardColor}`,
                 }}
               >
                 {/* bg pattern */}
