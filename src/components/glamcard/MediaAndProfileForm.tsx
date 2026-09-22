@@ -580,7 +580,9 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
 
       {/* PROFILE */}
       <div id="field-profile_image" className="space-y-3">
-        <label className={labelClass}>Profile Image</label>
+        <label className={labelClass}>
+          Profile Image <span className="text-red-500">*</span>
+        </label>
         <div className="flex items-center gap-5">
           <div className="relative w-32 h-32">
             <div
@@ -643,7 +645,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
           className={`text-xs pt-2 ${errors?.images ? "text-red-500 font-medium" : "text-gray-500"
             }`}
         >
-          Gallery media: {totalMediaCount}/{MAX_MEDIA_TOTAL} used (photos + videos combined)
+          Gallery media <span className="text-red-500">*</span>: {totalMediaCount}/{MAX_MEDIA_TOTAL} used (photos + videos combined)
         </p>
         {errors?.images && (
           <p className="mt-1 text-sm text-red-500">{errors.images}</p>
@@ -770,6 +772,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
                 zoom={zoom}
                 aspect={CROP_ASPECTS[cropContext]}
                 onCropChange={setCrop}
+                 cropShape={cropContext === "profile" ? "round" : "rect"}
                 onCropComplete={onCropComplete}
                 onZoomChange={setZoom}
               />

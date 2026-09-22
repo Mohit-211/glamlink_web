@@ -598,7 +598,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           <div id="field-instagram" className="md:col-span-2">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <label className={labelClass}>Instagram</label>
+                <label className={labelClass}>
+                  Instagram
+                  {data.preferred_booking_methods?.includes(BOOKING_METHODS.INSTAGRAM) && (
+                    <span className="text-red-500"> *</span>
+                  )}
+                </label>
                 <p className="text-xs text-gray-500">Add multiple Instagram handles</p>
               </div>
               <button
@@ -915,7 +920,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({
 
       <div id="field-preferred_booking_methods">
         <div className="flex items-center gap-2 relative">
-          <label className={labelClass}>Ways To Connects</label>
+          <label className={labelClass}>
+            Ways To Connects <span className="text-red-500">*</span>
+          </label>
         </div>
 
         <div
@@ -964,7 +971,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         {data.preferred_booking_methods?.includes(BOOKING_METHODS.LINK) && (
           <div id="field-booking_link" className="mt-4">
             <label className={`${labelClass} m-0`}>
-              Booking Link
+              Booking Link <span className="text-red-500">*</span>
             </label>
             <input
               type="url"

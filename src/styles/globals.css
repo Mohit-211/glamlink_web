@@ -403,6 +403,17 @@
   display: block;
 }
 
+.prose-article iframe {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+  border-radius: 12px;
+  margin: 24px 0;
+}
+
 .prose-article a {
   color: #6366f1;
   text-decoration: underline;

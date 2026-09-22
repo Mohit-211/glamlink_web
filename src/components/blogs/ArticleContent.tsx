@@ -28,6 +28,19 @@ async function businessCardExists(handle: string): Promise<boolean> {
   }
 }
 
+/**
+ * Decodes HTML entities (e.g. "&lt;iframe src=..." -> "<iframe src=...").
+ * This handles the case where the CMS/editor stored the content already
+ * HTML-escaped, which causes tags like <iframe> to render as visible text
+ * instead of being interpreted as markup.
+ */
+function decodeHtmlEntities(html: string): string {
+  if (typeof document === "undefined") return html;
+  const txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
+}
+
 async function linkifyMentions(html: string): Promise<string> {
   if (typeof document === "undefined" || !html.includes("@")) return html;
 
@@ -119,7 +132,13 @@ const ArticleContent = ({ content }: ArticleContentProps) => {
         return;
       }
 
-      const clean = DOMPurify.sanitize(content, {
+      // Decode HTML entities first, in case the content came through
+      // already escaped (e.g. "&lt;iframe...&gt;" instead of "<iframe...>").
+      // Without this, tags like <iframe> for embedded videos show up as
+      // literal text instead of being rendered.
+      const decoded = decodeHtmlEntities(content);
+
+      const clean = DOMPurify.sanitize(decoded, {
         ALLOWED_TAGS: [
           "html",
           "body",

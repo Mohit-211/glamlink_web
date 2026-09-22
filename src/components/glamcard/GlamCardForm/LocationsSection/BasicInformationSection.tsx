@@ -138,7 +138,10 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         {/* PHONE */}
     <div id="field-phone">
   <div className="mb-2 flex items-center justify-between">
-    <label className={labelClass}>Phone</label>
+    <label className={labelClass}>
+      Phone
+      {(data.is_phone_visible ?? true) && <span className="text-red-500"> *</span>}
+    </label>
 
     <label className="flex cursor-pointer items-center gap-2">
       <input
@@ -189,7 +192,9 @@ const BasicInformationSection: React.FC<SectionProps> = ({
 
         {/* BIO */}
         <div id="field-bio" className="md:col-span-2">
-          <label className={labelClass}>Professional Bio</label>
+          <label className={labelClass}>
+            Professional Bio <span className="text-red-500">*</span>
+          </label>
 
           <div
             className={
@@ -227,7 +232,9 @@ const BasicInformationSection: React.FC<SectionProps> = ({
       </div>
       {/* BUSINESS NAME */}
       <div id="field-business_name">
-        <label className={labelClass}>Business Name</label>
+        <label className={labelClass}>
+          Business Name <span className="text-red-500">*</span>
+        </label>
         <input
           className={`${inputClass} w-full ${errors?.business_name ? errorInputClass : ""}`}
           placeholder="e.g. Glow Beauty Studio"
