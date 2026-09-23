@@ -14,11 +14,11 @@ import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
    METADATA (SEO)
 ───────────────────────────────────────────── */
 export const metadata: Metadata = {
-  title: "Media Kit | The Glamlink Edit",
+  title: "Partner With Glamlink | The Glamlink Edit",
   description:
     "Advertise, get featured, or partner with The Glamlink Edit — a modern beauty & wellness publication built for discovery, credibility, and real client connection.",
   keywords: [
-    "beauty media kit",
+    "beauty Partner With Glamlink",
     "wellness advertising",
     "glamlink magazine",
     "med spa marketing",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     canonical: "https://glamlink.net/media-kit",
   },
   openGraph: {
-    title: "Media Kit | The Glamlink Edit",
+    title: "Partner With Glamlink | The Glamlink Edit",
     description:
       "Feature your brand, clinic, or expertise in The Glamlink Edit — a modern beauty & wellness publication.",
     url: "https://glamlink.net/media-kit",
@@ -39,14 +39,14 @@ export const metadata: Metadata = {
         url: "https://glamlink.net/default-blog.jpg",
         width: 1200,
         height: 630,
-        alt: "The Glamlink Edit Media Kit",
+        alt: "The Glamlink Edit Partner With Glamlink",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Media Kit | The Glamlink Edit",
+    title: "Partner With Glamlink | The Glamlink Edit",
     description:
       "Advertise and get featured in The Glamlink Edit — built for visibility and real business growth.",
     images: ["https://glamlink.net/default-blog.jpg"],
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
 const pageSchema = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  name: "Media Kit | The Glamlink Edit",
+  name: "Partner With Glamlink | The Glamlink Edit",
   description:
     "Advertising and feature opportunities in The Glamlink Edit beauty & wellness publication.",
   url: "https://glamlink.net/media-kit",
@@ -96,8 +96,8 @@ const breadcrumbSchema = {
     {
       "@type": "ListItem",
       position: 3,
-      name: "Media Kit",
-      item: "https://glamlink.net/media-kit",
+      name: "Partner With Glamlink",
+      item: "https://glamlink.net/partner-with-glamlink",
     },
   ],
 };

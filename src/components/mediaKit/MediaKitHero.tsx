@@ -25,7 +25,7 @@ export default function MediaKitHero() {
       <div className="container-glamlink relative mx-auto px-6 max-w-7xl">
         {/* Top Label */}
         <p className="text-xs tracking-[0.35em] uppercase text-primary/90 font-medium mb-6">
-          Media Kit 2025–2026
+          Partner With Glamlink 2025–2026
         </p>
 
         <div className="grid lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center">
@@ -39,11 +39,13 @@ export default function MediaKitHero() {
               Powered by Glamlink • Beauty &amp; Wellness Redefined
             </p>
 
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-md mb-10">
+            {/* <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-md mb-10">
               Where discovery meets credibility. A curated space connecting
               visionary professionals with the clients who seek them.
+            </p> */}
+ <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-md mb-10">
+             Glamlink offers opportunities across editorial, podcast, social, digital content, sponsorships and brand partnerships.
             </p>
-
             <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => router.push("/get-featured")}
