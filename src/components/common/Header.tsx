@@ -191,7 +191,7 @@ export default function Header({ activeRoute }: any) {
 
       {/* MOBILE MENU */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-background">
+        <div className="lg:hidden border-t border-border bg-white shadow-lg max-h-[calc(100dvh-4rem)] overflow-y-auto">
           <div className="container-glamlink py-6 flex flex-col gap-2">
             {navLinks.map((link) => (
               <Link

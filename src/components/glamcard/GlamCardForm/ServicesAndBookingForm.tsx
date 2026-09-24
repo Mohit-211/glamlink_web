@@ -596,7 +596,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           </div>
 
           <div id="field-instagram" className="md:col-span-2">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
               <div>
                 <label className={labelClass}>
                   Instagram
@@ -727,8 +727,8 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         </div>
 
         {/* Press / Articles / Other Links */}
-        <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5">
-          <div className="flex items-center justify-between">
+        <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-3 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <label className="text-sm font-semibold text-gray-800">
                 Press / Articles / Other Links
@@ -741,7 +741,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             <button
               type="button"
               onClick={addOtherLink}
-              className="flex-none rounded-lg bg-[#23AEB8] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3]"
+              className="w-full flex-none rounded-lg bg-[#23AEB8] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3] sm:w-auto"
             >
               + Add Link
             </button>
@@ -789,8 +789,8 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       </div>
 
       {/* Featured Links */}
-      <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-3 sm:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <label className="text-sm font-semibold text-gray-800">Featured Links</label>
             <p className="mt-1 text-xs text-gray-500">
@@ -801,7 +801,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           <button
             type="button"
             onClick={addFeaturedLink}
-            className="flex-none rounded-lg bg-[#23AEB8] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3]"
+            className="w-full flex-none rounded-lg bg-[#23AEB8] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3] sm:w-auto"
           >
             + Add Featured Link
           </button>
@@ -1011,7 +1011,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => removeInfo(i)}
-                  className="text-red-600 hover:text-red-800 text-xl"
+                  className="flex-none px-1 text-red-600 hover:text-red-800 text-xl"
                 >
                   ×
                 </button>
@@ -1035,7 +1035,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           <button
             type="button"
             onClick={addInfo}
-            className="rounded-lg bg-gray-200 p-1 text-sm font-medium hover:bg-gray-300"
+            className="flex-none whitespace-nowrap rounded-lg bg-gray-200 px-3 py-1 text-sm font-medium hover:bg-gray-300"
           >
             + Add
           </button>

@@ -467,7 +467,7 @@ const GlamCardForm: React.FC<Props> = ({
     authStep === "register" || authStep === "otp" || authStep === "login";
   return (
     <>
-      <div className="h-[90dvh] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+      <div className="lg:h-[90dvh] lg:overflow-y-auto lg:pr-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         {/* Wrapping container gives the fields a clearly-intentional
             "disabled while saving" look (dimmed + no pointer events + a
             centered spinner) instead of just going quiet with no
@@ -509,7 +509,7 @@ const GlamCardForm: React.FC<Props> = ({
               cardId={cardId}
             />
             {/* <GlamlinkIntegrationForm data={data} setData={setData} /> */}
-            <div className="mt-10 flex gap-3">
+            <div className="mt-10 flex flex-col-reverse gap-3 sm:flex-row">
               {isEdit && onCancel && (
                 <button
                   onClick={onCancel}

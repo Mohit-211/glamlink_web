@@ -13,10 +13,10 @@ const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
 
 const buttonClass =
-  "min-w-[120px] rounded-lg bg-[#23AEB8] px-5 py-2.5 text-sm font-medium text-white transition";
+  "flex-none sm:min-w-[120px] rounded-lg bg-[#23AEB8] px-5 py-2.5 text-sm font-medium text-white transition";
 
 const removeButtonClass =
-  "text-red-500 text-sm font-medium hover:underline";
+  "flex-none text-red-500 text-sm font-medium hover:underline";
 
 const BusinessHoursSection: React.FC<SectionProps> = ({
   data,
@@ -52,7 +52,7 @@ const BusinessHoursSection: React.FC<SectionProps> = ({
 
   return (
     <section className={sectionClass}>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h3 className="text-lg font-semibold">Business Hours</h3>
 
         <button
@@ -74,7 +74,7 @@ const BusinessHoursSection: React.FC<SectionProps> = ({
         {businessHours.map((item, index) => (
           <div
             key={index}
-            className="flex items-center gap-3"
+            className="flex items-center gap-2 sm:gap-3"
           >
             <input
               type="text"

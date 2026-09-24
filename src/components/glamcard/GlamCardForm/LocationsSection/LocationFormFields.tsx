@@ -322,7 +322,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       {/* CITY / STATE */}
       {location.location_type === "city_only" && (
         <div className="space-y-5">
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="md:grid gap-5 md:grid-cols-2">
             {/* STATE */}
             <div>
               <label className={labelClass}>State</label>

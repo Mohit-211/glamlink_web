@@ -39,14 +39,14 @@ const LocationCard: React.FC<CardProps> = ({
     <div className="rounded-lg border border-gray-200 overflow-hidden bg-white shadow-sm">
       {/* Header */}
       <div
-        className={`flex items-center justify-between px-5 py-3.5 border-b ${isPrimary
+        className={`flex items-center justify-between gap-3 px-3 sm:px-5 py-3.5 border-b ${isPrimary
             ? "bg-yellow-50/80 border-yellow-200"
             : "bg-gray-50/70 border-gray-200"
           }`}
       >
-        <div>
-          <div className="flex items-center gap-2.5">
-            <span className="font-medium text-gray-900">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            <span className="font-medium text-gray-900 break-words">
               {location.label || "Location"}
             </span>
 
@@ -64,7 +64,7 @@ const LocationCard: React.FC<CardProps> = ({
             )}
           </div>
 
-          <p className="mt-0.5 text-xs text-gray-600">
+          <p className="mt-0.5 text-xs text-gray-600 break-words">
             {locationSummary}
           </p>
 
@@ -77,7 +77,7 @@ const LocationCard: React.FC<CardProps> = ({
           )}
         </div>
 
-        <div className="flex items-center gap-4 sm:gap-6">
+        <div className="flex flex-none items-center gap-4 sm:gap-6">
           {!isPrimary && (
             <button
               type="button"
@@ -134,7 +134,7 @@ const LocationCard: React.FC<CardProps> = ({
       </div>
 
       {location.isOpen && (
-        <div className="p-6">
+        <div className="p-3 sm:p-6">
           <LocationFormFields
             location={location}
             onUpdate={onUpdate}

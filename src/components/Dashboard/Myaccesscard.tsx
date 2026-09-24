@@ -464,7 +464,7 @@ export default function MyAccessCard({
                     onClick={() => setSubscriptionPromptKey(null)}
                 >
                     <div
-                        className="card-glamlink w-full max-w-lg max-h-[85vh] overflow-y-auto"
+                        className="card-glamlink w-full max-h-[70vh] md:max-h-[60vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="mb-2 flex items-start justify-between gap-3">
@@ -510,7 +510,7 @@ export default function MyAccessCard({
                     onClick={() => setNfcPromptKey(null)}
                 >
                     <div
-                        className="card-glamlink w-full max-w-lg max-h-[85vh] overflow-y-auto"
+                        className="card-glamlink w-full max-h-[70vh] md:max-h-[60vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="mb-2 flex items-start justify-between gap-3">
