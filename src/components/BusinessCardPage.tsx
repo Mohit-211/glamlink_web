@@ -1,15 +1,19 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getBusinessCardBySlug } from "@/api/Api";
+import { trackEvent } from "@/utils/analytics";
 import { GlamCardFormData } from "./glamcard/GlamCardForm/types";
 import GlamCardLivePreview from "./glamcard/GlamCardLivePreview";
 interface BusinessCardPageProps {
   slug?: string;
   mode?: "live" | "view" | "download";
+  /** Only the public /access/[slug] page opts in to analytics. */
+  trackAnalytics?: boolean;
 }
 const BusinessCardPage: React.FC<BusinessCardPageProps> = ({
   slug,
   mode,
+  trackAnalytics = false,
 }) => {
   const [data, setData] = useState<GlamCardFormData | null>(
     null
@@ -76,6 +80,15 @@ const fetchData = async () => {
 };
     fetchData();
   }, [slug]);
+  // ACCESS_CARD_VIEW fires once per card (ref guards Strict Mode double effects / re-renders).
+  const trackedViewIdRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!trackAnalytics) return;
+    const businessCardId = Number(data?.id);
+    if (!businessCardId || trackedViewIdRef.current === businessCardId) return;
+    trackedViewIdRef.current = businessCardId;
+    trackEvent({ businessCardId, eventType: "ACCESS_CARD_VIEW" });
+  }, [data, trackAnalytics]);
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -122,6 +135,7 @@ const fetchData = async () => {
     <GlamCardLivePreview
       data={data}
       mode={mode}
+      trackAnalytics={trackAnalytics}
       onClose={() =>
         console.log("Close clicked")
       }

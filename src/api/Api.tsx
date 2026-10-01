@@ -559,3 +559,51 @@ export const getAds = async () => {
   const { data } = await api.get("ads");
   return data;
 };
+/* ============================= */
+/* 📌 Access Card Analytics */
+/* ============================= */
+export const trackAccessCardEventApi = async (payload: {
+  business_card_id: number;
+  event_type: string;
+  event_target: string | null;
+  visitor_id: string;
+  session_id: string;
+  metadata: Record<string, unknown>;
+}) => {
+  const { data } = await api.post("access-card/analytics/event", payload);
+  return data;
+};
+// Date params are YYYY-MM-DD; omit them to use the backend's default range.
+export interface AccessCardAnalyticsParams {
+  from?: string;
+  to?: string;
+}
+export const getAccessCardAnalytics = async (
+  businessCardId: number | string,
+  params?: AccessCardAnalyticsParams
+) => {
+  const { data } = await api.get(`access-card/analytics/${businessCardId}`, {
+    params,
+    headers: {
+      "x-access-token": getToken(),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
+  });
+  return data;
+};
+export const getAccessCardAnalyticsEvents = async (
+  businessCardId: number | string,
+  params?: AccessCardAnalyticsParams
+) => {
+  const { data } = await api.get(
+    `access-card/analytics/${businessCardId}/events`,
+    {
+      params,
+      headers: {
+        "x-access-token": getToken(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+    }
+  );
+  return data;
+};
