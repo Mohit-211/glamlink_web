@@ -31,7 +31,7 @@ const TOP_TABS = [
   { label: "Education", path: "education", href: "/journal/education" },
   { label: "Events", path: "event", href: "/journal/events" },
   { label: "Shop", path: "shop", href: "/journal/shop" },
-  { label: "Directory", path: "directory", href: "/journal/directory" },
+  // { label: "Directory", path: "directory", href: "/journal/directory" },
 ];
 
 // Only the "journal" tab shows Category nav + Magazine sidebar
