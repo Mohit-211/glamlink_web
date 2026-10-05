@@ -4,18 +4,29 @@
    The backend can report a missing/invalid token with an HTTP 200 and a
    body like { success: true, status: 400, message: "Token Not Found" },
    so this is detected from the response BODY, not from `success` or the
-   HTTP status alone. Only that specific message triggers a logout — every
-   other 400 is left for the caller to handle as before.
+   HTTP status alone. Only that specific message (or an expired/invalid
+   JWT error, see below) triggers a logout — every other 400/500 is left
+   for the caller to handle as before.
    ============================================================= */
 
 const TOKEN_NOT_FOUND_MESSAGE = "token not found";
 
-const isTokenNotFoundBody = (body: any): boolean =>
-  !!body &&
-  typeof body === "object" &&
-  Number(body.status ?? body.statusCode) === 400 &&
-  typeof body.message === "string" &&
-  body.message.trim().toLowerCase() === TOKEN_NOT_FOUND_MESSAGE;
+/* jsonwebtoken verification errors the backend passes straight through,
+   e.g. { success: false, status: 500, message: "jwt expired" }. These are
+   unambiguous auth failures, so they log out whatever the status code. */
+const JWT_ERROR_MESSAGES = ["jwt expired", "jwt malformed", "jwt must be provided"];
+
+const isTokenNotFoundBody = (body: any): boolean => {
+  if (!body || typeof body !== "object" || typeof body.message !== "string") {
+    return false;
+  }
+  const message = body.message.trim().toLowerCase();
+  if (JWT_ERROR_MESSAGES.includes(message)) return true;
+  return (
+    Number(body.status ?? body.statusCode) === 400 &&
+    message === TOKEN_NOT_FOUND_MESSAGE
+  );
+};
 
 /**
  * True when `payload` (or a response it's wrapped in — e.g. an axios
