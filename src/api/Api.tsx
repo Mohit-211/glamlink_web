@@ -1,8 +1,34 @@
 import axios from "axios";
+import {
+  TokenExpiredError,
+  handleTokenExpired,
+  isTokenNotFoundResponse,
+} from "@/lib/auth";
 const api = axios.create({
   // baseURL: "https://node.glamlink.net/api/v1/",
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
+/* Global "Token Not Found" handling for every request made through `api`
+   (profile, dashboard, business card, ...). The backend may send it as a
+   200 with { success: true, status: 400, message: "Token Not Found" } or
+   as an HTTP error, so both paths are checked. The request is rejected
+   afterwards so callers never continue with the invalid session. */
+api.interceptors.response.use(
+  (response) => {
+    if (isTokenNotFoundResponse(response?.data)) {
+      handleTokenExpired();
+      return Promise.reject(new TokenExpiredError());
+    }
+    return response;
+  },
+  (error) => {
+    if (isTokenNotFoundResponse(error?.response?.data)) {
+      handleTokenExpired();
+      return Promise.reject(new TokenExpiredError());
+    }
+    return Promise.reject(error);
+  }
+);
 const getToken = () => {
   if (typeof window !== "undefined") {
     return localStorage.getItem("GlamlinkaccessToken");

@@ -1,10 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid';
 import GlamCardForm from '../glamcard/GlamCardForm/GlamCardForm';
 import { AccessCardData } from './types';
-import { GlamCardFormData } from '../glamcard/GlamCardForm/types';
+import {
+  BOOKING_METHODS,
+  BookingMethod,
+  BusinessHour,
+  FeaturedLink,
+  GlamCardFormData,
+  Location,
+} from '../glamcard/GlamCardForm/types';
 
 interface Props {
   cardId: string | number;
@@ -41,6 +48,9 @@ export function syncGalleryMeta(images: any[], existingMeta: any[] = []) {
     const prev = metaById.get(id);
     return {
       id,
+      // GlamCardForm's buildFormData reads meta.file_type to tell existing
+      // videos apart from existing images when saving.
+      file_type: prev?.file_type ?? img?.file_type,
       caption: prev?.caption ?? img?.caption ?? '',
       is_thumbnail:
         prev?.is_thumbnail ?? Boolean(img?.is_thumbnail) ?? index === 0,
@@ -49,116 +59,229 @@ export function syncGalleryMeta(images: any[], existingMeta: any[] = []) {
   });
 }
 
+/* ================= API -> FORM NORMALIZERS ================= */
+
+/** Many list fields can come back as a JSON string instead of an array/object. */
+const parseJson = <T,>(value: any, fallback: T): T => {
+  if (typeof value === 'string') {
+    try {
+      return (JSON.parse(value) ?? fallback) as T;
+    } catch {
+      return fallback;
+    }
+  }
+  return (value ?? fallback) as T;
+};
+
+const toArray = (value: any): any[] => {
+  const parsed = parseJson<any>(value, []);
+  return Array.isArray(parsed) ? parsed : [];
+};
+
+/** Booleans can arrive as true/false, 1/0 or "true"/"false"/"1"/"0". */
+const toBool = (value: any, fallback = false): boolean => {
+  if (value === null || value === undefined || value === '') return fallback;
+  if (typeof value === 'string') return value === 'true' || value === '1';
+  return Boolean(value);
+};
+
+const toNumberOrUndefined = (value: any): number | undefined => {
+  if (value === null || value === undefined || value === '') return undefined;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : undefined;
+};
+
+const bySortOrder = (a: any, b: any) =>
+  (toNumberOrUndefined(a?.sort_order) ?? 0) - (toNumberOrUndefined(b?.sort_order) ?? 0);
+
+const toStringList = (value: any): string[] =>
+  toArray(value)
+    .map((item) =>
+      typeof item === 'string' ? item : item?.name ?? item?.title ?? item?.value ?? ''
+    )
+    .filter((item) => typeof item === 'string' && item.trim() !== '');
+
 /**
- * Maps the (smaller) AccessCardData shape you get on the dashboard into the
- * full GlamCardFormData shape GlamCardForm expects, filling in sane defaults
- * for fields AccessCardData doesn't carry (media, locations, booking prefs, etc).
- *
- * NOTE: if your AccessCardData fetch doesn't include profile_image / images /
- * locations / primary_specialty / preferred_booking_methods, the required-field
- * validation in GlamCardForm will block save until those are filled in on the
- * form. You may want to fetch the FULL card record (same shape used on create)
- * before opening edit, rather than the trimmed AccessCardData.
+ * The form's checkboxes compare against BOOKING_METHODS exactly (note LINK
+ * is "GO_tO_BOOKING_LINK"), while the API may return a differently cased
+ * value such as "GO_TO_BOOKING_LINK" — match case-insensitively and map back
+ * to the form's own constant so the right boxes show as checked.
+ */
+const normalizeBookingMethods = (value: any): BookingMethod[] => {
+  const known = Object.values(BOOKING_METHODS) as BookingMethod[];
+  let list = toArray(value);
+  // A single bare value like "CALL_TEXT" (not a JSON array string).
+  if (!list.length && typeof value === 'string' && value && !value.trim().startsWith('[')) {
+    list = [value];
+  }
+  const result: BookingMethod[] = [];
+  list.forEach((item) => {
+    const match = known.find((m) => m.toLowerCase() === String(item).toLowerCase());
+    if (match && !result.includes(match)) result.push(match);
+  });
+  return result;
+};
+
+/**
+ * Locations come back snake_case (is_primary) with numeric ids and possibly
+ * string coordinates; the form works with string ids and
+ * isPrimary/isOpen/isSet. Saved locations are already confirmed, so they
+ * show the ✓ (isSet) and only the primary one starts expanded.
+ */
+const normalizeLocations = (value: any): Location[] => {
+  const list = toArray(value).slice().sort(bySortOrder);
+  const hasPrimary = list.some((loc) => toBool(loc?.is_primary ?? loc?.isPrimary));
+
+  return list.map((loc: any, index: number) => {
+    // Drop the snake_case flag so it can't go stale against isPrimary on save.
+    const { is_primary, isPrimary, ...rest } = loc ?? {};
+    const primary = hasPrimary ? toBool(is_primary ?? isPrimary) : index === 0;
+    const latitude = toNumberOrUndefined(loc?.latitude);
+    const longitude = toNumberOrUndefined(loc?.longitude);
+    return {
+      ...rest,
+      id: String(loc?.id ?? nanoid()),
+      label: loc?.label ?? `Location ${index + 1}`,
+      location_type: loc?.location_type === 'city_only' ? 'city_only' : 'exact_address',
+      address: loc?.address ?? '',
+      area: loc?.area ?? '',
+      city: loc?.city ?? '',
+      state: loc?.state ?? '',
+      business_name: loc?.business_name ?? '',
+      phone: loc?.phone ?? '',
+      description: loc?.description ?? '',
+      latitude,
+      longitude,
+      is_thumbnail: toBool(loc?.is_thumbnail),
+      sort_order: toNumberOrUndefined(loc?.sort_order) ?? index,
+      isPrimary: primary,
+      isOpen: primary,
+      isSet: latitude !== undefined && longitude !== undefined,
+    } as Location;
+  });
+};
+
+/**
+ * The form edits business hours as free-text notes ({ note }), same as on
+ * create. The API can also return structured rows ({ day, open_time,
+ * close_time, is_closed }) — fold those into a readable note so nothing
+ * shows blank.
+ */
+const normalizeBusinessHours = (value: any): BusinessHour[] =>
+  toArray(value)
+    .map((item: any): BusinessHour | null => {
+      if (typeof item === 'string') return item.trim() ? { note: item } : null;
+      if (item?.note) return { note: String(item.note) };
+      if (item?.day) {
+        const hours =
+          item.open_time && item.close_time
+            ? `${item.open_time} - ${item.close_time}`
+            : toBool(item.is_closed)
+              ? 'Closed'
+              : '';
+        return { note: [item.day, hours].filter(Boolean).join(': ') };
+      }
+      return null;
+    })
+    .filter((item): item is BusinessHour => item !== null);
+
+/**
+ * Gallery media stays as the server objects ({ id, file_type, file_uri,
+ * thumbnail_uri, ... }) — MediaAndProfileForm renders those directly and
+ * GlamCardForm sends them back as existing ids, so nothing has to be
+ * re-uploaded. Sorted by sort_order, with url/type/thumbnail aliases added.
+ */
+const normalizeImages = (value: any): any[] =>
+  toArray(value)
+    .filter((item) => item && (typeof item === 'string' || item.file_uri || item.url))
+    .slice()
+    .sort(bySortOrder)
+    .map((item: any, index: number) => {
+      if (typeof item === 'string') return item;
+      return {
+        ...item,
+        type: item.file_type,
+        url: item.file_uri ?? item.url,
+        thumbnail: item.thumbnail_uri || null,
+        sort_order: toNumberOrUndefined(item.sort_order) ?? index,
+      };
+    });
+
+const normalizeFeaturedLinks = (value: any): FeaturedLink[] =>
+  toArray(value)
+    .slice()
+    .sort(bySortOrder)
+    .map((link: any, index: number) => ({
+      ...link,
+      // The API doesn't return an id per link (it's positional on the wire) —
+      // back one in for React keys / local editing.
+      id: link?.id ?? nanoid(),
+      title: link?.title ?? '',
+      url: link?.url ?? '',
+      image: link?.image ?? link?.thumbnail_url ?? link?.image_url ?? undefined,
+      sort_order: toNumberOrUndefined(link?.sort_order) ?? index + 1,
+      is_featured: toBool(link?.is_featured),
+    }));
+
+/**
+ * Maps the access-card API response into the GlamCardFormData shape the
+ * create form (GlamCardForm) works with, so edit mode renders the exact same
+ * fields pre-filled. Text fields that are null stay null — the inputs render
+ * them as empty and buildFormData skips them on save.
  */
 const normalize = (raw: AccessCardData | null | undefined): GlamCardFormData => {
   const base: any = raw && typeof raw === 'object' ? raw : {};
 
-  let specialties = base.specialties;
-  if (typeof specialties === 'string') {
-    try {
-      specialties = JSON.parse(specialties);
-    } catch {
-      specialties = [];
-    }
-  }
-  if (!Array.isArray(specialties)) specialties = [];
+  const socialRaw = parseJson<any>(base.social_media, {});
+  const social_media =
+    socialRaw && typeof socialRaw === 'object' && !Array.isArray(socialRaw)
+      ? Object.fromEntries(
+          Object.entries(socialRaw).map(([key, val]) => [key, val ?? ''])
+        )
+      : {};
 
-  let social_media = base.social_media;
-  if (typeof social_media === 'string') {
-    try {
-      social_media = JSON.parse(social_media);
-    } catch {
-      social_media = {};
-    }
-  }
-  if (!social_media || typeof social_media !== 'object') social_media = {};
+  const images = normalizeImages(base.images);
+  // `images` and `gallery_meta` are paired by index in MediaAndProfileForm,
+  // so the meta is built from the already-sorted images array.
+  const gallery_meta = syncGalleryMeta(images, base.gallery_meta);
 
-  let other_links = base.other_links;
-  if (typeof other_links === 'string') {
-    try {
-      other_links = JSON.parse(other_links);
-    } catch {
-      other_links = [];
-    }
-  }
-  if (!Array.isArray(other_links)) other_links = [];
-
-  let featured_links = base.featured_links;
-  if (typeof featured_links === 'string') {
-    try {
-      featured_links = JSON.parse(featured_links);
-    } catch {
-      featured_links = [];
-    }
-  }
-  if (!Array.isArray(featured_links)) featured_links = [];
-  // The API doesn't return an id per link (it's positional on the wire) —
-  // back one in for React keys / local editing, without touching any link
-  // that already has one.
-  featured_links = featured_links.map((link: any) => ({
-    ...link,
-    id: link?.id ?? nanoid(),
-  }));
-
-  // preferred_booking_method(s) can also come back from the API as a JSON
-  // string (e.g. '["GO_TO_BOOKING_LINK"]') rather than an actual array —
-  // parse it the same way as specialties/social_media/other_links above,
-  // instead of just checking Array.isArray (which fails on a raw string).
-  let preferred_booking_methods =
-    base.preferred_booking_methods ?? base.preferred_booking_method;
-  if (typeof preferred_booking_methods === 'string') {
-    try {
-      preferred_booking_methods = JSON.parse(preferred_booking_methods);
-    } catch {
-      preferred_booking_methods = [];
-    }
-  }
-  if (!Array.isArray(preferred_booking_methods)) preferred_booking_methods = [];
-
-  // The API returns `images` as an array of server objects but does NOT
-  // return a `gallery_meta` field on its own — synthesize/sync it here so
-  // the gallery has metadata (caption, is_thumbnail, sort_order) to render,
-  // preserving any gallery_meta the API did happen to send.
-  const rawImages = Array.isArray(base.images) ? base.images : [];
-  const gallery_meta = syncGalleryMeta(rawImages, base.gallery_meta);
-
-  // AccessCardData (the trimmed dashboard shape) doesn't carry these fields —
-  // every one of them gets iterated/spread somewhere downstream (locations list,
-  // gallery grid, booking-method checkboxes, business-hour rows, etc.), so they
-  // MUST default to real arrays/objects here rather than come through as undefined.
   return {
     ...base,
-    specialties,
+    bio: base.bio ?? '',
+    specialties: toStringList(base.specialties),
     social_media,
-    other_links,
-    featured_links,
-    locations: Array.isArray(base.locations) ? base.locations : [],
-    images: rawImages,
+    other_links: toArray(base.other_links).map((link: any) => ({
+      title: link?.title ?? '',
+      url: link?.url ?? '',
+    })),
+    featured_links: normalizeFeaturedLinks(base.featured_links),
+    locations: normalizeLocations(base.locations),
+    images,
     gallery_meta,
-    business_hour: Array.isArray(base.business_hour) ? base.business_hour : [],
-    preferred_booking_methods,
-    important_info: Array.isArray(base.important_info) ? base.important_info : [],
-    excites_about_glamlink: Array.isArray(base.excites_about_glamlink)
-      ? base.excites_about_glamlink
-      : [],
-    biggest_pain_points: Array.isArray(base.biggest_pain_points)
-      ? base.biggest_pain_points
-      : [],
+    business_hour: normalizeBusinessHours(base.business_hour),
+    preferred_booking_methods: normalizeBookingMethods(
+      base.preferred_booking_methods ?? base.preferred_booking_method
+    ),
+    important_info: toStringList(base.important_info),
+    excites_about_glamlink: toStringList(base.excites_about_glamlink),
+    biggest_pain_points: toStringList(base.biggest_pain_points),
+    is_phone_visible: toBool(base.is_phone_visible, true),
+    offer_promotion: toBool(base.offer_promotion),
+    elite_setup: toBool(base.elite_setup),
   } as GlamCardFormData;
 };
 
 export default function EditAccessCard({ cardId, cardData, onSave, onCancel }: Props) {
-  const [data, setData] = useState<GlamCardFormData>(normalize(cardData));
+  const [data, setData] = useState<GlamCardFormData>(() => normalize(cardData));
+
+  // Re-populate the form whenever a fresh API record arrives (dashboard
+  // refetch, or a different card opened) — not only on the first render.
+  const lastSource = useRef(cardData);
+  useEffect(() => {
+    if (lastSource.current === cardData) return;
+    lastSource.current = cardData;
+    setData(normalize(cardData));
+  }, [cardId, cardData]);
 
   return (
     <div className="space-y-6">
