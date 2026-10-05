@@ -534,7 +534,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
 
                 <div className="h-px bg-border" />
 
-                <div className="flex justify-between text-sm font-bold text-foreground">
+                <div className="flex justify-between text-sm font-semibold text-foreground">
                   <span>Total due today</span>
                   <span className="text-primary">
                     ${shippingData?.total_due_today?.toFixed(2)}
@@ -714,7 +714,7 @@ function GuestPaymentStep({
           <span className="text-sm font-semibold text-foreground">
             {shipping ? "Order Summary" : "Subscription Plan"}
           </span>
-          <span className="text-sm font-bold text-primary">${totalAmount.toFixed(2)}</span>
+          <span className="text-sm font-semibold text-primary">${totalAmount.toFixed(2)}</span>
         </div>
 
         {errorMsg && (

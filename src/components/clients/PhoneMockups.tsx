@@ -15,17 +15,12 @@ const PhoneMockups = () => {
       const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <section className="relative py-16 md:py-20 lg:py-24 overflow-hidden bg-gradient-to-b from-white via-[#24bbcb]/2 to-white">
-      {/* Softer background glows */}
-      <div className="absolute inset-0 -z-10 pointer-events-none">
-        <div className="absolute top-1/3 left-1/4 w-48 md:w-72 h-48 md:h-72 bg-[#24bbcb]/6 rounded-full blur-3xl animate-pulse-slow" />
-        <div className="absolute bottom-1/3 right-1/4 w-48 md:w-64 h-48 md:h-64 bg-[#24bbcb]/5 rounded-full blur-3xl animate-pulse-slow delay-1000" />
-      </div>
+    <section className="relative py-16 md:py-20 lg:py-24 overflow-hidden bg-background">
 
       <div className="container-glamlink px-5 md:px-8">
         {/* Header – compact */}
         <div className="text-center mb-10 md:mb-14">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">
+          <h2 className="section-title font-display mb-4">
             Your All-In-One
             <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-[#24bbcb] via-[#1ea8b5] to-[#24bbcb] bg-clip-text text-transparent">
@@ -42,7 +37,6 @@ const PhoneMockups = () => {
         {/* Phones – smaller & better spaced */}
         <div className="relative flex items-center justify-center mb-12 md:mb-16">
           {/* Subtle center glow */}
-          <div className="absolute w-[180px] md:w-[260px] h-[180px] md:h-[260px] bg-[#24bbcb]/10 rounded-full blur-3xl -z-10 animate-pulse-slow" />
 
           <div className="flex flex-row items-end justify-center gap-4 xs:gap-6 sm:gap-8 md:gap-12 lg:gap-16 perspective-[900px]">
             {images?.map((image, index) => {

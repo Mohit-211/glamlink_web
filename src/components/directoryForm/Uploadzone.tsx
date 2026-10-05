@@ -33,7 +33,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
         className={`
           border-2 border-dashed border-[#B4DCE9] rounded-xl text-center cursor-pointer
           bg-[#F7FAFB] transition-all duration-200
-          hover:border-[#3BBDD4] hover:bg-[#EEF9FC]
+          hover:border-[#24bbcb] hover:bg-[#EEF9FC]
           ${compact ? 'py-4 px-6' : 'py-7 px-6'}
         `}
       >
@@ -41,7 +41,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
           <div className="text-3xl mb-2">{icon}</div>
         )}
         <p className="text-[13px] text-[#7AAAB8] leading-relaxed">
-          <span className="text-[#3BBDD4] font-bold">{label}</span>
+          <span className="text-[#24bbcb] font-semibold">{label}</span>
           {!compact && <><br />JPG, PNG · max 5MB</>}
         </p>
         <input
@@ -54,12 +54,12 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
       </div>
       {file && (
         <div className="mt-1.5 flex items-center gap-1.5">
-          <span className="text-[#3BBDD4] font-bold text-xs">✓</span>
-          <span className="text-[11px] text-[#3BBDD4] font-bold truncate">{file.name}</span>
+          <span className="text-[#24bbcb] font-semibold text-xs">✓</span>
+          <span className="text-[11px] text-[#24bbcb] font-semibold truncate">{file.name}</span>
           <button
             type="button"
             onClick={() => onChange(null)}
-            className="text-[#7AAAB8] hover:text-[#3BBDD4] text-xs ml-auto"
+            className="text-[#7AAAB8] hover:text-[#24bbcb] text-xs ml-auto"
           >
             ×
           </button>

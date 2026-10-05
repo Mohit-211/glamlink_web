@@ -13,7 +13,7 @@ const inputClass =
   "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
 
 const buttonClass =
-  "flex-none sm:min-w-[120px] rounded-lg bg-[#23AEB8] px-5 py-2.5 text-sm font-medium text-white transition";
+  "flex-none sm:min-w-[120px] rounded-lg bg-[#24bbcb] px-5 py-2.5 text-sm font-medium text-white transition";
 
 const removeButtonClass =
   "flex-none text-red-500 text-sm font-medium hover:underline";

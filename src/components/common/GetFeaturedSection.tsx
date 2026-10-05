@@ -16,17 +16,14 @@ const GetFeaturedSection = () => {
 
   return (
     <>
-      <section className="relative py-20 overflow-hidden">
-        {/* BACKGROUND */}
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,rgba(250,250,249,1),rgba(245,245,244,1))]" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_20%,rgba(30,168,181,0.08),transparent_50%)]" />
+      <section className="relative py-20 overflow-hidden bg-muted/40">
 
         <div className="container-glamlink text-center max-w-2xl">
           {/* LABEL */}
           <SectionLabel>Get Featured</SectionLabel>
 
           {/* HEADING */}
-          <h2 className="font-display text-2xl md:text-3xl leading-tight mb-4">
+          <h2 className="section-title font-display mb-4">
             Step into the spotlight
           </h2>
 

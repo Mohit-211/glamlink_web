@@ -10,8 +10,6 @@ const ClientsCTA = () => {
 
   return (
     <section className="relative py-20 md:py-28 lg:py-32 overflow-hidden">
-      {/* Very soft background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-[#24bbcb]/3 to-white pointer-events-none" />
 
       <div className="container-glamlink px-5 md:px-8 relative z-10">
         <div className="relative rounded-3xl bg-white/70 backdrop-blur-xl border border-gray-100/80 shadow-2xl shadow-[#24bbcb]/10 p-8 md:p-12 lg:p-16 overflow-hidden">
@@ -32,13 +30,9 @@ const ClientsCTA = () => {
             </svg>
           </div>
 
-          {/* Elegant glow accents */}
-          <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-[#24bbcb]/8 rounded-full blur-3xl animate-pulse-slow" />
-          <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-[#24bbcb]/6 rounded-full blur-3xl animate-pulse-slow delay-1000" />
-
           {/* Content – centered & breathing */}
           <div className="relative z-10 text-center max-w-4xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 md:mb-8 leading-tight">
+            <h2 className="section-title font-display mb-6 md:mb-8">
               Meet the Pros,
               <br className="hidden sm:block" /> Shop Their Secrets,
               <br className="hidden sm:block" />

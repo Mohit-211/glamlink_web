@@ -16,19 +16,19 @@ export const SectionCard: React.FC<SectionCardProps> = ({
   <div className="
     bg-white border border-[#DCF0F6] rounded-2xl p-8 mb-6
     transition-all duration-200
-    focus-within:border-[#A8E0EE] focus-within:shadow-[0_4px_24px_rgba(59,189,212,0.1)]
+    focus-within:border-[#A8E0EE] focus-within:shadow-[0_4px_24px_rgba(36,187,203,0.1)]
   ">
     <div className="flex items-center gap-3 mb-5">
       <div className="
-        w-[30px] h-[30px] rounded-full bg-[#3BBDD4] text-white
-        text-[13px] font-bold flex items-center justify-center shrink-0
+        w-[30px] h-[30px] rounded-full bg-[#24bbcb] text-white
+        text-[13px] font-semibold flex items-center justify-center shrink-0
       ">
         {step}
       </div>
       <h2 className="font-poppins text-[17px] font-semibold text-[#1A3A42]">
         {title}
         {subtitle && (
-          <span className="font-nunito text-xs font-light text-[#7AAAB8] ml-2">
+          <span className="font-nunito text-xs font-normal text-[#7AAAB8] ml-2">
             {subtitle}
           </span>
         )}

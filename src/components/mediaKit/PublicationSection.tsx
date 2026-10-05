@@ -9,10 +9,10 @@ export default function PublicationSection() {
       <div className="grid md:grid-cols-2 gap-16 items-center">
         {/* LEFT — STORY */}
         <div className="max-w-xl">
-          <h2 className="font-display text-2xl md:text-3xl leading-tight mb-6">
+          <h2 className="section-title font-display mb-6">
             More than a magazine.
             <br />
-            <span className="italic text-primary/90">
+            <span className="text-primary">
               A platform for discovery.
             </span>
           </h2>
@@ -57,7 +57,7 @@ export default function PublicationSection() {
           </div>
 
           {/* BACKGROUND ACCENT */}
-          <div className="absolute -z-10 top-6 left-6 w-full h-full rounded-2xl bg-primary/5" />
+          <div className="absolute -z-10 top-4 left-4 sm:top-6 sm:left-6 w-full h-full rounded-2xl bg-primary/5" />
         </div>
       </div>
     </section>

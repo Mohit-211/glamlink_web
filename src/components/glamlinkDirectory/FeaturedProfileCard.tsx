@@ -22,7 +22,7 @@ export default function FeaturedProfileCard({ profile }: { profile: FeaturedProf
         />
 
         {/* Featured indicator */}
-        <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-primary shadow-sm">
+        <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary shadow-sm">
           <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
           Featured
         </span>

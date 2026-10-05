@@ -80,15 +80,15 @@ export default function TermsOfUsePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 mt-10">
+    <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-gray-50 to-white py-16">
-        <div className="container-custom">
+      <section className="bg-background pt-28 pb-12 md:pt-36 md:pb-16">
+        <div className="container-glamlink">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Terms of Use</h1>
-            <p className="text-lg text-gray-600 mb-6">Last revised on January 25, 2025</p>
+            <h1 className="section-title font-display mb-4">Terms of Use</h1>
+            <p className="text-lg text-muted-foreground mb-6">Last revised on January 25, 2025</p>
             <nav className="flex flex-wrap gap-2 justify-center">
-              <Link href="/" className="text-glamlink-teal hover:text-glamlink-teal-dark">
+              <Link href="/" className="text-primary hover:underline">
                 Home
               </Link>
               <span className="text-gray-400">/</span>
@@ -100,9 +100,9 @@ export default function TermsOfUsePage() {
 
       {/* Table of Contents */}
       <section className="py-8 bg-white border-b">
-        <div className="container-custom">
+        <div className="container-glamlink">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Table of Contents</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Table of Contents</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {sections.map((section) => (
                 <button key={section.id} onClick={() => scrollToSection(section.anchor)} className="text-left px-4 py-2 rounded-lg transition-colors" >
@@ -116,7 +116,7 @@ export default function TermsOfUsePage() {
 
       {/* Terms Content */}
       <section className="py-16">
-        <div className="container-custom">
+        <div className="container-glamlink">
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-sm border p-8 md:p-12">
               {/* Introduction */}
@@ -131,12 +131,12 @@ export default function TermsOfUsePage() {
               </div>
               {/* Section 1: Service Providers */}
               <div id="service-providers" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">1. SERVICE PROVIDERS</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">1. SERVICE PROVIDERS</h3>
                 <p className="text-gray-700 leading-relaxed mb-8">If you are a beauty professional or use the Glamlink Service for commercial or promotional purposes (collectively, "Beauty Professional"), the following provisions will apply in addition to the other Terms of Use.</p>
 
                 {/* Subsections */}
                 <div className="space-y-8">
-                  <div className="border-l-4 border-glamlink-teal pl-6">
+                  <div className="border-l-4 border-primary pl-6">
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">1.1. Beauty Professional Accounts</h4>
                     <p className="text-gray-700 leading-relaxed mb-6">
                       When you register to use the Glamlink Service, you agree to provide true, accurate, current, and complete information about your business and services. You may not promote any goods or services unless you and your business are properly licensed to provide the goods and services
@@ -262,10 +262,10 @@ export default function TermsOfUsePage() {
               </div>
               {/* Section 2: Client Booking Service */}
               <div id="client-booking-service" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">2. CLIENT BOOKING SERVICE</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">2. CLIENT BOOKING SERVICE</h3>
 
                 <div className="space-y-6">
-                  <div className="border-l-4 border-glamlink-teal pl-6">
+                  <div className="border-l-4 border-primary pl-6">
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">2.1. Booking Services</h4>
                     <p className="text-gray-700 leading-relaxed mb-6">
                       The Glamlink Service may allow users to book appointments or request other goods and services with Beauty Professionals ("Booking Service"). Glamlink is not involved in the actual transactions between Beauty Professionals and their clients. Rather, Glamlink merely allows Beauty
@@ -299,7 +299,7 @@ export default function TermsOfUsePage() {
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">2.6. Scams</h4>
                     <p className="text-gray-700 leading-relaxed mb-6">
                       Use common sense when using the Booking Service. Use the same common sense you would use in the real world when reading an ad. If it is too good to be true, it may be a scam. For more information about various online scams and how to avoid them, go to{" "}
-                      <a href="https://OnGuardOnline.gov" target="_blank" className="text-glamlink-teal underline">
+                      <a href="https://OnGuardOnline.gov" target="_blank" className="text-primary underline">
                         https://OnGuardOnline.gov.
                       </a>
                     </p>
@@ -321,8 +321,8 @@ export default function TermsOfUsePage() {
               </div>
               {/* Add remaining sections in similar format */}
               <div id="website-access" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">3. WEBSITE ACCESS</h3>
-                <div className="border-l-4 border-glamlink-teal pl-6">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">3. WEBSITE ACCESS</h3>
+                <div className="border-l-4 border-primary pl-6">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">3.1. Access</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">Glamlink grants you a limited, revocable, nonexclusive license to access the Glamlink Service for your own use.</p>
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">3.2. Account Creation</h4>
@@ -378,9 +378,9 @@ export default function TermsOfUsePage() {
                 </div>
               </div>
               <div id="third-party-content" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">4. THIRD-PARTY CONTENT / INTERACTIVE FEATURES</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">4. THIRD-PARTY CONTENT / INTERACTIVE FEATURES</h3>
 
-                <div className="border-l-4 border-glamlink-teal pl-6 mt-8">
+                <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">4.1. Submission of Third-Party Content</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
                     The Glamlink Service may permit the submission, hosting, sharing, and/or publishing of text, photographs, audio, videos, reviews, or other content, including as part of Promotional Content and Booking Services, by you, other users, and other third parties such as our partners or
@@ -405,43 +405,43 @@ export default function TermsOfUsePage() {
                   <p className="text-gray-700 leading-relaxed mb-6">By posting Third-Party Content to the Glamlink Service or by using any other interactive area of the website, you specifically agree to comply with each of the following:</p>
                   <ul className="ml-6 mt-2 space-y-1 mb-6">
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">You will not post or transmit any material that violates or infringes the rights of any other party, including, without limitation, rights of privacy, rights of publicity, copyright, trademark, or other intellectual property rights.</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">If your employer has rights to intellectual property you create, you have either received permission from your employer to post or make available the material, or secured a waiver as to all rights in the material.</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">You have fully complied with any third-party licenses relating to the material you post or transmit.</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">You will not post or transmit any material that is false, deceptive, misleading, or deceitful.</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">You will not post or transmit abusive, hateful, racist, bigoted, sexist, harassing, threatening, inflammatory, defamatory, vulgar, obscene, sexually-oriented, profane content, or any content violating applicable law.</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">You will not deceptively impersonate any person or entity.</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Your name, username, or the material you submit is not misleading.</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">You will not post content that constitutes or contains advertising, solicitation, or is for commercial purposes.</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">You will not post or transmit any software or files that contain malware, viruses, worms, Trojans, spyware, adware, or other malicious code.</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">You will not post content intended to promote or commit an illegal act.</span>
                     </li>
                   </ul>
@@ -476,9 +476,9 @@ export default function TermsOfUsePage() {
                 </div>
               </div>
               <div id="intellectual-property" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">5. INTELLECTUAL PROPERTY INFORMATION</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">5. INTELLECTUAL PROPERTY INFORMATION</h3>
 
-                <div className="border-l-4 border-glamlink-teal pl-6 mt-8">
+                <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">5.1. Ownership</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
                     Other than Third-Party Content, all content on the Glamlink Service, including without limitation, the text, software, scripts, tools, graphics, photos, sounds, music, videos, and interactive features ("Glamlink Content") and the trademarks, service marks and logos contained
@@ -501,9 +501,9 @@ export default function TermsOfUsePage() {
                 </div>
               </div>
               <div id="warranty-disclaimer" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">6. WARRANTY DISCLAIMER</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">6. WARRANTY DISCLAIMER</h3>
 
-                <div className="border-l-4 border-glamlink-teal pl-6 mt-8">
+                <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">6.1. General Disclaimer</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
                     THE GLAMLINK SERVICE, INCLUDING ANY GLAMLINK CONTENT, THIRD-PARTY CONTENT, PROMOTIONAL CONTENT, THE BOOKING SERVICE, OR ANY SITE-RELATED SERVICE, IS PROVIDED ON AN &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; BASIS. GLAMLINK HEREBY EXPRESSLY DISCLAIMS ALL WARRANTIES OF ANY
@@ -534,7 +534,7 @@ export default function TermsOfUsePage() {
               </div>
               {/* Section 7: Limitation of Liability */}
               <div id="limitation-of-liability" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">7. LIMITATION OF LIABILITY</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">7. LIMITATION OF LIABILITY</h3>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   TO THE EXTENT PERMITTED BY APPLICABLE LAW AND TO THE EXTENT THAT GLAMLINK IS OTHERWISE FOUND RESPONSIBLE FOR ANY DAMAGES, GLAMLINK IS RESPONSIBLE FOR ACTUAL DAMAGES ONLY. TO THE EXTENT PERMITTED BY LAW, IN NO EVENT SHALL GLAMLINK, ITS AFFILIATES, ITS LICENSORS, ITS SUPPLIERS OR ANY
                   THIRD PARTIES MENTIONED AT THE WEBSITE BE LIABLE FOR ANY INCIDENTAL, INDIRECT, EXEMPLARY, PUNITIVE AND CONSEQUENTIAL DAMAGES, LOST PROFITS, OR DAMAGES WHETHER BASED ON WARRANTY, CONTRACT, TORT, DELICT, OR ANY OTHER LEGAL THEORY, AND WHETHER OR NOT GLAMLINK IS ADVISED OF THE
@@ -544,8 +544,8 @@ export default function TermsOfUsePage() {
 
               {/* Section 8: Unsolicited Material and Ideas */}
               <div id="unsolicited-material" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">8. UNSOLICITED MATERIAL AND IDEAS</h3>
-                <div className="border-l-4 border-glamlink-teal pl-6 mt-8">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">8. UNSOLICITED MATERIAL AND IDEAS</h3>
+                <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">8.1. Submissions</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
                     We are happy to hear from users and welcome feedback regarding the Glamlink Service. However, if you transmit unsolicited submissions to us through the Glamlink Service or otherwise, you grant Glamlink a worldwide, royalty-free, perpetual, irrevocable, non-exclusive right and
@@ -564,8 +564,8 @@ export default function TermsOfUsePage() {
 
               {/* Section 9: Indemnity */}
               <div id="indemnity" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">9. INDEMNITY</h3>
-                <div className="border-l-4 border-glamlink-teal pl-6 mt-8">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">9. INDEMNITY</h3>
+                <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">9.1. Your Obligations</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
                     You agree to defend, indemnify and hold harmless Glamlink, its affiliated companies, officers, directors, employees and agents, from and against any and all claims, damages, obligations, losses, liabilities, costs or debt, and expenses (including but not limited to attorney's
@@ -616,9 +616,9 @@ export default function TermsOfUsePage() {
                 </div>
               </div>
               <div id="dmca" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">10. DIGITAL MILLENNIUM COPYRIGHT ACT</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">10. DIGITAL MILLENNIUM COPYRIGHT ACT</h3>
 
-                <div className="border-l-4 border-glamlink-teal pl-6 mt-8">
+                <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">10.1. Infringement Not Permitted</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
                     Glamlink does not permit copyright infringing activities and infringement of intellectual property rights on the Glamlink Services will remove any content if properly notified that such content infringes on another's intellectual property rights. Glamlink reserves the right to
@@ -662,7 +662,7 @@ export default function TermsOfUsePage() {
                     <br />
                     Las Vegas, NV 89113
                     <br />
-                    <a href="mailto:support@glamlink.net" className="text-glamlink-teal underline italic">
+                    <a href="mailto:support@glamlink.net" className="text-primary underline italic">
                       support@glamlink.net
                     </a>
                     <br />
@@ -701,12 +701,12 @@ export default function TermsOfUsePage() {
               </div>
               {/* Section 11: Privacy Policy */}
               <div id="privacy" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">11. PRIVACY</h3>
-                <div className="border-l-4 border-glamlink-teal pl-6 mt-8">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">11. PRIVACY</h3>
+                <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3 mt-6">11.1</h4>
                   <p className="text-gray-700 leading-relaxed mb-4">
                     Glamlink has established a Privacy Policy to explain to users how personal information is collected and used, which may be reviewed and accessed from the website:
-                    <a href="https://www.glamlink.net/" className="text-glamlink-teal underline ml-1">
+                    <a href="https://www.glamlink.net/" className="text-primary underline ml-1">
                       https://www.glamlink.net/
                     </a>
                   </p>
@@ -721,8 +721,8 @@ export default function TermsOfUsePage() {
 
               {/* Section 12: Governing Law / Disputes */}
               <div id="governing-law" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">12. GOVERNING LAW / DISPUTES</h3>
-                <div className="border-l-4 border-glamlink-teal pl-6 mt-8">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">12. GOVERNING LAW / DISPUTES</h3>
+                <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3 mt-6">12.1</h4>
                   <p className="text-gray-700 leading-relaxed">You agree that the Glamlink Service shall be deemed solely based in the State of Nevada.</p>
 
@@ -760,8 +760,8 @@ export default function TermsOfUsePage() {
 
               {/* Section 13: Assignment / Modification */}
               <div id="assignment-modification" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">13. ASSIGNMENT / MODIFICATION</h3>
-                <div className="border-l-4 border-glamlink-teal pl-6 mt-8">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">13. ASSIGNMENT / MODIFICATION</h3>
+                <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3 mt-6">13.1</h4>
                   <p className="text-gray-700 leading-relaxed">These Terms of Use, and any rights and licenses granted hereunder, may not be transferred or assigned by you. Glamlink may assign these Terms of Use, and any rights and license granted hereunder without restriction.</p>
 
@@ -775,8 +775,8 @@ export default function TermsOfUsePage() {
 
               {/* Section 14: Ability to Accept Terms of Use */}
               <div id="ability-to-accept" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">14. ABILITY TO ACCEPT TERMS OF USE</h3>
-                <div className="border-l-4 border-glamlink-teal pl-6 mt-8">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">14. ABILITY TO ACCEPT TERMS OF USE</h3>
+                <div className="border-l-4 border-primary pl-6 mt-8">
                   <p className="text-gray-700 leading-relaxed">
                     You hereby declare, represent and warrant that you (either personally or through parental or guardian consent) are fully able and competent to legally bind yourself to and abide by all of the terms, conditions, obligations, declarations, affirmations, representations, and
                     warranties set forth in these Terms of Use. The Glamlink Service is not directed to persons under 18. If you become aware that your child has provided us with personal information without your consent, please contact us. We do not knowingly collect personal information from
@@ -787,8 +787,8 @@ export default function TermsOfUsePage() {
 
               {/* Section 15: Consent */}
               <div id="consent" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">15. CONSENT</h3>
-                <div className="border-l-4 border-glamlink-teal pl-6 mt-8">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">15. CONSENT</h3>
+                <div className="border-l-4 border-primary pl-6 mt-8">
                   <p className="text-gray-700 leading-relaxed">
                     By using the Glamlink Service in any way, you agree to comply with these Terms of Use. In addition, when using a particular service, you agree to abide by any applicable posted guidelines, which may change from time to time. Should you object to any term or condition of the Terms
                     of Use, any guidelines, or any subsequent modifications thereto or become dissatisfied with the Glamlink Service in any way, your only recourse is to immediately discontinue your use of the Glamlink Service.
@@ -802,22 +802,22 @@ export default function TermsOfUsePage() {
 
       {/* Contact Section */}
       <section className="py-16 bg-gray-50">
-        <div className="container-custom">
+        <div className="container-glamlink">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Questions About Our Terms?</h2>
+            <h2 className="text-3xl font-semibold text-gray-900 mb-4">Questions About Our Terms?</h2>
             <p className="text-lg text-gray-600 mb-8">If you have any questions about these Terms of Use, please don't hesitate to contact us.</p>
             <div className="bg-white rounded-lg p-8 shadow-sm border">
               <div className="space-y-4">
                 <div className="flex items-center justify-center space-x-2">
-                  <svg className="w-5 h-5 text-glamlink-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <a href="mailto:support@glamlink.net" className="text-glamlink-teal underline">
+                  <a href="mailto:support@glamlink.net" className="text-primary underline">
                     support@glamlink.net
                   </a>
                 </div>
                 <div className="flex items-center justify-center space-x-2">
-                  <svg className="w-5 h-5 text-glamlink-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -830,7 +830,7 @@ export default function TermsOfUsePage() {
       </section>
 
       {/* Floating Back to Top Button */}
-      <button onClick={scrollToTop} className="fixed bottom-8 right-8 p-3 bg-glamlink-teal text-white rounded-full shadow-lg hover:bg-glamlink-teal-dark transition-all duration-300 transform hover:scale-110" aria-label="Back to top">
+      <button onClick={scrollToTop} className="fixed bottom-8 right-8 p-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-110" aria-label="Back to top">
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
         </svg>

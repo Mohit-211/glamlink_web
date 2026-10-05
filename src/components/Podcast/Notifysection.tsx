@@ -77,7 +77,7 @@ function Field({
             ? "1.5px solid hsl(184 70% 48%)"
             : "1.5px solid hsl(204 14% 86%)",
           color: "hsl(210 30% 12%)",
-          fontFamily: "'DM Sans', system-ui, sans-serif",
+          fontFamily: "inherit",
           boxShadow: focused
             ? "0 0 0 3px hsl(184 70% 48% / 0.1)"
             : "0 1px 3px hsl(210 20% 10% / 0.05)",
@@ -128,7 +128,7 @@ export default function NotifySection() {
       className="relative overflow-hidden"
       style={{
         background: "hsl(40 30% 97%)",
-        fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif",
+        fontFamily: "inherit",
       }}
     >
       {/* ── Background grid lines ─────────────────────────────────────── */}
@@ -157,9 +157,9 @@ export default function NotifySection() {
         className="absolute right-0 bottom-0 pointer-events-none select-none leading-none"
         aria-hidden
         style={{
-          fontFamily: "'Cormorant Garamond', Georgia, serif",
+          fontFamily: "inherit",
           fontSize: "clamp(80px, 16vw, 180px)",
-          fontWeight: 700,
+          fontWeight: 600,
           color: "hsl(184 30% 88%)",
           opacity: 0.6,
           letterSpacing: "-0.02em",
@@ -193,7 +193,7 @@ export default function NotifySection() {
             <div style={fade(100)}>
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontFamily: "inherit",
                   fontSize: "clamp(34px, 5vw, 58px)",
                   fontWeight: 600,
                   color: "hsl(210 30% 10%)",
@@ -208,10 +208,9 @@ export default function NotifySection() {
               </h2>
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontFamily: "inherit",
                   fontSize: "clamp(34px, 5vw, 58px)",
                   fontWeight: 600,
-                  fontStyle: "italic",
                   color: "hsl(184 65% 36%)",
                   lineHeight: 1.1,
                   letterSpacing: "-0.02em",
@@ -367,8 +366,7 @@ export default function NotifySection() {
                     <p
                       className="font-semibold text-[18px] mb-1"
                       style={{
-                        fontFamily: "'Cormorant Garamond', Georgia, serif",
-                        fontStyle: "italic",
+                        fontFamily: "inherit",
                         color: "hsl(210 30% 10%)",
                       }}
                     >

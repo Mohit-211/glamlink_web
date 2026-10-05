@@ -282,10 +282,10 @@ const formattedDate = article?.publish_date
             {/* Category pill */}
             <div className="mb-6 mt-6">
               <span
-                className="inline-flex items-center gap-1.5 text-[10px] font-medium tracking-widest uppercase text-[#23AEB8] px-3 py-1.5 rounded-full"
-                style={{ background: "rgba(35,174,184,0.08)", border: "1px solid rgba(35,174,184,0.25)" }}
+                className="inline-flex items-center gap-1.5 text-[10px] font-medium tracking-widest uppercase text-[#24bbcb] px-3 py-1.5 rounded-full"
+                style={{ background: "rgba(36,187,203,0.08)", border: "1px solid rgba(36,187,203,0.25)" }}
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#23AEB8]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#24bbcb]" />
                 {article?.journal_category?.title ?? "From the Treatment Room"}
               </span>
             </div>
@@ -326,13 +326,13 @@ const formattedDate = article?.publish_date
             <div className="flex flex-col md:flex-row md:items-start gap-6 pt-6 border-t border-gray-100">
 
               {/* Description */}
-              <p className="flex-1 text-[15px] leading-[1.75] text-gray-500 font-light">
+              <p className="flex-1 text-[15px] leading-[1.75] text-gray-500 font-normal">
                 {article.short_description}
               </p>
 
               {/* Author */}
               <div className="flex items-center gap-3 md:pl-6 md:border-l md:border-gray-100 flex-shrink-0">
-                <div className="w-9 h-9 rounded-full bg-[#23AEB8] text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#24bbcb] text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
                   {article?.journal_author?.name?.charAt(0) ?? "A"}
                 </div>
                 <div>
@@ -356,7 +356,7 @@ const formattedDate = article?.publish_date
                 {topics.map((topic) => (
                   <span
                     key={topic.id}
-                    className="text-xs font-medium text-gray-500 px-3 py-1 rounded-full border border-gray-200 hover:border-[#23AEB8]/40 hover:text-[#23AEB8] transition-colors duration-200"
+                    className="text-xs font-medium text-gray-500 px-3 py-1 rounded-full border border-gray-200 hover:border-[#24bbcb]/40 hover:text-[#24bbcb] transition-colors duration-200"
                   >
                     {topic.name}
                   </span>
@@ -376,21 +376,21 @@ const formattedDate = article?.publish_date
             <div
               className="
                 prose prose-lg max-w-none
-                prose-p:text-gray-500 prose-p:font-light prose-p:leading-[1.8]
+                prose-p:text-gray-500 prose-p:font-normal prose-p:leading-[1.8]
                 prose-headings:font-serif prose-headings:text-gray-900
                 prose-h2:text-3xl prose-h2:mt-10 prose-h2:mb-4
                 prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3
-                prose-a:text-[#23AEB8] prose-a:no-underline hover:prose-a:underline
+                prose-a:text-[#24bbcb] prose-a:no-underline hover:prose-a:underline
                 prose-strong:text-gray-800 prose-strong:font-medium
                 prose-img:rounded-xl prose-img:shadow-md
                 prose-ul:text-gray-500 prose-ol:text-gray-500
                 prose-li:leading-[1.8]
                 prose-blockquote:not-italic
-                prose-blockquote:border-l-[3px] prose-blockquote:border-[#23AEB8]
+                prose-blockquote:border-l-[3px] prose-blockquote:border-[#24bbcb]
                 prose-blockquote:rounded-r-xl
                 prose-blockquote:pl-8 prose-blockquote:pr-6
                 prose-blockquote:py-6 prose-blockquote:my-10
-                [&_blockquote]:bg-[rgba(35,174,184,0.08)]
+                [&_blockquote]:bg-[rgba(36,187,203,0.08)]
                 [&_blockquote_p]:font-serif [&_blockquote_p]:italic
                 [&_blockquote_p]:text-gray-800 [&_blockquote_p]:text-xl
                 [&_blockquote_p]:leading-snug
@@ -430,8 +430,8 @@ const formattedDate = article?.publish_date
                   {downloads.map((item) => (
                     <div
                       key={item.id}
-                      className="flex flex-col justify-between rounded-2xl border border-gray-100 p-6 hover:border-[#23AEB8]/40 hover:shadow-sm transition-all duration-300"
-                      style={{ background: "rgba(35,174,184,0.03)" }}
+                      className="flex flex-col justify-between rounded-2xl border border-gray-100 p-6 hover:border-[#24bbcb]/40 hover:shadow-sm transition-all duration-300"
+                      style={{ background: "rgba(36,187,203,0.03)" }}
                     >
                       <div>
                         <div className="flex items-start justify-between gap-3 mb-2">
@@ -440,17 +440,17 @@ const formattedDate = article?.publish_date
                           </h3>
                           {getFileExt(item.file_name) && (
                             <span
-                              className="flex-shrink-0 text-[10px] font-medium tracking-wider uppercase text-[#23AEB8] px-2 py-1 rounded-md"
+                              className="flex-shrink-0 text-[10px] font-medium tracking-wider uppercase text-[#24bbcb] px-2 py-1 rounded-md"
                               style={{
-                                background: "rgba(35,174,184,0.1)",
-                                border: "1px solid rgba(35,174,184,0.25)",
+                                background: "rgba(36,187,203,0.1)",
+                                border: "1px solid rgba(36,187,203,0.25)",
                               }}
                             >
                               {getFileExt(item.file_name)}
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 font-light leading-relaxed">
+                        <p className="text-sm text-gray-500 font-normal leading-relaxed">
                           {item.description}
                         </p>
                       </div>
@@ -458,7 +458,7 @@ const formattedDate = article?.publish_date
                       <DownloadButton
                         fileUrl={item.file_name}
                         label={item.button_text || "Download"}
-                        className="mt-5 inline-flex items-center justify-center gap-2 text-sm font-medium text-white px-4 py-2.5 rounded-full bg-[#23AEB8] hover:bg-[#1d9aa3] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                        className="mt-5 inline-flex items-center justify-center gap-2 text-sm font-medium text-white px-4 py-2.5 rounded-full bg-[#24bbcb] hover:bg-[#1d9aa3] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                       />
                     </div>
                   ))}
@@ -486,16 +486,16 @@ const formattedDate = article?.publish_date
                   {faqs.map((faq) => (
                     <details
                       key={faq.id}
-                      className="group rounded-2xl border border-gray-100 px-6 py-5 open:border-[#23AEB8]/40"
-                      style={{ background: "rgba(35,174,184,0.03)" }}
+                      className="group rounded-2xl border border-gray-100 px-6 py-5 open:border-[#24bbcb]/40"
+                      style={{ background: "rgba(36,187,203,0.03)" }}
                     >
                       <summary className="flex items-center justify-between gap-4 cursor-pointer list-none font-serif text-lg text-gray-900">
                         {faq.question}
-                        <span className="flex-shrink-0 text-[#23AEB8] text-xl leading-none transition-transform duration-200 group-open:rotate-45">
+                        <span className="flex-shrink-0 text-[#24bbcb] text-xl leading-none transition-transform duration-200 group-open:rotate-45">
                           +
                         </span>
                       </summary>
-                      <p className="mt-3 text-sm text-gray-500 font-light leading-relaxed">
+                      <p className="mt-3 text-sm text-gray-500 font-normal leading-relaxed">
                         {faq.answer}
                       </p>
                     </details>

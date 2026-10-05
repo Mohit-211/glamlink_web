@@ -15,29 +15,17 @@ const MagazineHero = () => {
     <>
       <NewsletterPopup openDelay={3000} />
 
-      <section className="relative pt-18 pb-18 md:pt-20 md:pb-20 overflow-hidden bg-white">
-        {/* Very subtle luxury texture */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.006]">
-          <div
-            className="w-full h-full"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 2px 2px, #e0e0e0 1px, transparent 0)",
-              backgroundSize: "50px 50px",
-            }}
-          />
-        </div>
-
-        <div className="container-glamlink px-5 md:px-8 relative z-10">
+      <section className="hero-glamlink relative overflow-hidden bg-background">
+        <div className="container-glamlink relative z-10">
           <div className="max-w-5xl mx-auto text-center">
 
             {/* Single-line friendly headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-light text-gray-950 tracking-tight leading-none mb-8 md:mb-10">
-              <span className="italic text-[#24bbcb]"> The Glamlink Edit</span>
+            <h1 className="hero-title">
+              <span className="text-primary">The Glamlink Edit</span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-12 md:mb-16">
+            <p className="hero-subtitle mt-6 max-w-3xl mx-auto mb-10 md:mb-12">
               The Glamlink Edit is your inside look at beauty and wellness. Where top professionals, top treatments and evolving innovation are spotlighted. Stories go deeper and insight actually mean something. Watch, shop beauty products and connect with professionals behind the stories.
             </p>
 

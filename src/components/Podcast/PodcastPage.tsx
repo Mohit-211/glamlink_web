@@ -220,7 +220,7 @@ function EpisodeCard({
               alignItems: "center", justifyContent: "center", background: ph.bg,
             }}
           >
-            <span style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 300, lineHeight: 1, marginBottom: "4px", fontFamily: "'Cormorant Garamond', Georgia, serif", color: ph.text, opacity: 0.9 }}>
+            <span style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 300, lineHeight: 1, marginBottom: "4px", fontFamily: "inherit", color: ph.text, opacity: 0.9 }}>
               {episodeNum}
             </span>
             <span style={{ fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 600, color: ph.text, opacity: 0.6 }}>
@@ -242,7 +242,7 @@ function EpisodeCard({
         <div style={{ position: "absolute", top: "12px", left: "12px" }}>
           <span style={{
             fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase",
-            fontWeight: 700, padding: "4px 10px", borderRadius: "100px",
+            fontWeight: 600, padding: "4px 10px", borderRadius: "100px",
             background: "rgba(255,255,255,0.92)", color: "hsl(184 70% 32%)", backdropFilter: "blur(4px)",
           }}>
             EP. {episodeNum}
@@ -283,7 +283,7 @@ function EpisodeCard({
       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
         <h3 style={{
           fontSize: "clamp(13px, 1.5vw, 14px)", lineHeight: 1.4, fontWeight: 600, marginBottom: "8px",
-          color: "hsl(210 30% 10%)", fontFamily: "'DM Sans', system-ui, sans-serif",
+          color: "hsl(210 30% 10%)", fontFamily: "inherit",
           display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
         }}>
           {video.title}
@@ -329,7 +329,7 @@ function StatsBar({ episodeCount }: { episodeCount: number }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
         {stats.map(({ value, label }) => (
           <div key={label} style={{ textAlign: "center" }}>
-            <p style={{ fontSize: "20px", fontWeight: 700, lineHeight: 1, color: "white" }}>{value}</p>
+            <p style={{ fontSize: "20px", fontWeight: 600, lineHeight: 1, color: "white" }}>{value}</p>
             <p style={{ fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase", marginTop: "2px", color: "rgba(255,255,255,0.6)" }}>{label}</p>
           </div>
         ))}
@@ -382,7 +382,7 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
   };
 
   return (
-    <main style={{ minHeight: "100vh", color: "hsl(210 30% 10%)", background: "hsl(204 20% 96%)", fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif" }}>
+    <main style={{ minHeight: "100vh", color: "hsl(210 30% 10%)", background: "hsl(204 20% 96%)", fontFamily: "inherit" }}>
 
       {/* Responsive styles */}
       <style>{`
@@ -453,9 +453,7 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
       `}</style>
 
       {/* Hero */}
-      <div style={{ marginTop: "120px" }}>
-        <HeroSection onGuestClick={() => setGuestModalOpen(true)} />
-      </div>
+      <HeroSection onGuestClick={() => setGuestModalOpen(true)} />
 
       {/* Main Content */}
       <section style={{ padding: "clamp(2.5rem, 6vw, 4rem) clamp(1rem, 4vw, 1.5rem)", maxWidth: "1240px", margin: "0 auto" }}>
@@ -469,10 +467,10 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
               style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "32px" }}
             >
               <div>
-                <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 700, marginBottom: "6px", color: "hsl(184 70% 38%)" }}>
+                <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 600, marginBottom: "6px", color: "hsl(184 70% 38%)" }}>
                   ✦ Now Streaming
                 </p>
-                <h2 style={{ fontSize: "clamp(22px, 4vw, 30px)", fontWeight: 700, lineHeight: 1.1, color: "hsl(210 30% 8%)", letterSpacing: "-0.02em" }}>
+                <h2 style={{ fontSize: "clamp(22px, 4vw, 30px)", fontWeight: 600, lineHeight: 1.1, color: "hsl(210 30% 8%)", letterSpacing: "-0.02em" }}>
                   Latest Episodes
                 </h2>
               </div>
@@ -535,7 +533,7 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
                   display: "inline-flex", alignItems: "center", gap: "12px",
                   padding: "14px 32px", borderRadius: "100px",
                   fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase",
-                  fontWeight: 700, color: "white", textDecoration: "none",
+                  fontWeight: 600, color: "white", textDecoration: "none",
                   background: "linear-gradient(135deg, hsl(184 70% 41%) 0%, hsl(184 60% 34%) 100%)",
                   boxShadow: "0 4px 16px hsl(184 70% 35% / 0.3)",
                   transition: "all 0.2s",
@@ -563,11 +561,11 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
               <div style={{ padding: "16px 20px", background: "linear-gradient(135deg, hsl(184 70% 41%) 0%, hsl(184 60% 34%) 100%)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
                   <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "white", opacity: 0.7 }} />
-                  <p style={{ fontSize: "9px", letterSpacing: "0.28em", textTransform: "uppercase", fontWeight: 700, color: "rgba(255,255,255,0.65)" }}>
+                  <p style={{ fontSize: "9px", letterSpacing: "0.28em", textTransform: "uppercase", fontWeight: 600, color: "rgba(255,255,255,0.65)" }}>
                     Coming Up
                   </p>
                 </div>
-                <h3 style={{ fontSize: "17px", fontWeight: 700, color: "white", letterSpacing: "-0.01em" }}>Upcoming Schedule</h3>
+                <h3 style={{ fontSize: "17px", fontWeight: 600, color: "white", letterSpacing: "-0.01em" }}>Upcoming Schedule</h3>
               </div>
               <div style={{ background: "white" }}>
                 <UpcomingSchedule />
@@ -585,12 +583,12 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
       {/* About Strip */}
       <section style={{ padding: "clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 1.5rem)", background: "hsl(184 60% 34%)" }}>
         <div style={{ maxWidth: "768px", margin: "0 auto", textAlign: "center" }}>
-          <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 700, marginBottom: "16px", color: "rgba(255,255,255,0.5)" }}>
+          <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 600, marginBottom: "16px", color: "rgba(255,255,255,0.5)" }}>
             About the Show
           </p>
           <p style={{
-            fontSize: "clamp(17px, 3vw, 22px)", lineHeight: 1.6, fontWeight: 300, marginBottom: "40px", color: "white",
-            fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: "italic", letterSpacing: "0.01em",
+            fontSize: "clamp(17px, 3vw, 22px)", lineHeight: 1.6, fontWeight: 400, marginBottom: "40px", color: "white",
+            fontFamily: "inherit", letterSpacing: "0.01em",
           }}>
             Unfiltered conversations with the professionals, founders, and innovators actively shaping the future of beauty and wellness.
           </p>
@@ -602,7 +600,7 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
             ].map(({ value, label }, i, arr) => (
               <div key={label} style={{ display: "flex", alignItems: "center", gap: "48px" }}>
                 <div style={{ textAlign: "center" }}>
-                  <p style={{ fontSize: "clamp(28px, 5vw, 36px)", fontWeight: 700, color: "white", lineHeight: 1, letterSpacing: "-0.02em" }}>{value}</p>
+                  <p style={{ fontSize: "clamp(28px, 5vw, 36px)", fontWeight: 600, color: "white", lineHeight: 1, letterSpacing: "-0.02em" }}>{value}</p>
                   <p style={{ fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", marginTop: "8px", color: "rgba(255,255,255,0.5)" }}>{label}</p>
                 </div>
                 {i < arr.length - 1 && (

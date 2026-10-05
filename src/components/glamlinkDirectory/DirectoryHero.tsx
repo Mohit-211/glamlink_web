@@ -17,7 +17,7 @@ const MOBILE_STRIP = [
 
 export default function DirectoryHero({ children }: { children: ReactNode }) {
   return (
-    <section className="relative overflow-hidden bg-background pt-24 pb-14 md:pt-32 md:pb-20 lg:pt-36 lg:pb-24">
+    <section className="hero-glamlink relative overflow-hidden bg-background">
       <div className="container-glamlink relative">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           {/* COPY + SEARCH */}
@@ -27,12 +27,12 @@ export default function DirectoryHero({ children }: { children: ReactNode }) {
               Nationwide Beauty + Wellness Directory
             </span>
 
-            <h1 className="font-display mt-5 text-[2.5rem] leading-[1.05] sm:text-5xl lg:text-6xl font-semibold text-foreground">
+            <h1 className="hero-title mt-6">
               Find Beauty + Wellness Professionals{" "}
-              <span className="text-[#24bbcb]">Near You</span>
+              <span className="text-primary">Near You</span>
             </h1>
 
-            <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl">
+            <p className="hero-subtitle mt-6 max-w-xl">
               Search trusted professionals and businesses across the U.S.
             </p>
 

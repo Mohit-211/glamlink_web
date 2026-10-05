@@ -14,16 +14,16 @@ export default function PartnerHero() {
   };
 
   return (
-    <section className="bg-background relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24 lg:pt-40 lg:pb-28">
+    <section className="hero-glamlink relative overflow-hidden bg-background">
       <div className="container-glamlink grid lg:grid-cols-12 gap-14 lg:gap-10 items-center">
         <div className="lg:col-span-7 animate-fade-up">
           <span className="badge-soft text-xs sm:text-sm">Partnerships</span>
 
-          <h1 className="font-display mt-6 text-[2.75rem] leading-[1.05] sm:text-6xl lg:text-7xl font-semibold text-foreground">
+          <h1 className="hero-title mt-6">
             Partner With Glamlink
           </h1>
 
-          <p className="mt-6 text-lg sm:text-xl text-foreground/80 max-w-xl">
+          <p className="hero-subtitle mt-6 max-w-xl">
             Connect your brand or business with the beauty + wellness community.
           </p>
 
@@ -35,7 +35,7 @@ export default function PartnerHero() {
           <a
             href={`#${INQUIRY_SECTION_ID}`}
             onClick={scrollToInquiry}
-            className="btn-primary mt-10 px-8 py-4 uppercase tracking-wider"
+            className="btn-primary btn-lg mt-10"
           >
             Let&apos;s Work Together
             <ArrowDown className="w-4 h-4" aria-hidden="true" />

@@ -20,21 +20,21 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
 }) => (
   <div className="
     bg-gradient-to-br from-[#E8F9FD] to-white
-    border-2 border-[#3BBDD4] rounded-2xl p-7
+    border-2 border-[#24bbcb] rounded-2xl p-7
     flex gap-5 items-start relative overflow-hidden mb-6
   ">
     {/* decorative glow */}
     <div className="
       absolute -top-10 -right-10 w-32 h-32 rounded-full
-      bg-[radial-gradient(circle,rgba(59,189,212,0.1)_0%,transparent_70%)]
+      bg-[radial-gradient(circle,rgba(36,187,203,0.1)_0%,transparent_70%)]
       pointer-events-none
     " />
 
     {/* icon */}
     <div className="
-      w-[50px] h-[50px] bg-[#3BBDD4] rounded-[13px]
+      w-[50px] h-[50px] bg-[#24bbcb] rounded-[13px]
       flex items-center justify-center text-2xl shrink-0
-      shadow-[0_4px_14px_rgba(59,189,212,0.3)]
+      shadow-[0_4px_14px_rgba(36,187,203,0.3)]
     ">
       ✦
     </div>
@@ -43,8 +43,8 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
       <h3 className="font-poppins text-[17px] font-semibold text-[#1A3A42] mb-1.5">
         Your Access Digital Business Card{' '}
         {/* <span className="
-          inline-block bg-[#3BBDD4] text-white
-          text-[10px] font-bold tracking-widest uppercase
+          inline-block bg-[#24bbcb] text-white
+          text-[10px] font-semibold tracking-widest uppercase
           px-2.5 py-0.5 rounded-full align-middle ml-1
         ">
           FREE
@@ -63,8 +63,8 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
           <span
             key={perk}
             className="
-              text-[11px] font-bold bg-[rgba(59,189,212,0.1)]
-              text-[#2A9BB5] border border-[rgba(59,189,212,0.25)]
+              text-[11px] font-semibold bg-[rgba(36,187,203,0.1)]
+              text-[#2A9BB5] border border-[rgba(36,187,203,0.25)]
               rounded-full px-3 py-1
             "
           >
@@ -81,7 +81,7 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
         <div
           className={`
             w-12 h-[26px] rounded-full relative transition-colors duration-250 shrink-0
-            ${enabled ? 'bg-[#3BBDD4]' : 'bg-[#B4DCE9]'}
+            ${enabled ? 'bg-[#24bbcb]' : 'bg-[#B4DCE9]'}
           `}
         >
           <div
@@ -94,7 +94,7 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
           />
         </div>
         <div>
-          <p className="text-sm font-bold text-[#1A3A42]">
+          <p className="text-sm font-semibold text-[#1A3A42]">
             Yes — create my Access digital business card & map listing
           </p>
           <p className="text-[11px] text-[#7AAAB8] mt-0.5">

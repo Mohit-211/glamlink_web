@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 
 const ProfessionalsCTA = () => {
   return (
-    <section className="w-full bg-gradient-to-r from-[#1fa2b6] to-[#1b8ea5] py-20">
+    <section className="w-full bg-primary py-20">
       <div className="max-w-5xl mx-auto px-6 text-center text-white">
         {/* Heading */}
-        <h2 className="text-4xl lg:text-5xl  tracking-tight mb-6">
+        <h2 className="section-title font-display mb-6">
           Your Future in Beauty Starts Here
         </h2>
 
@@ -19,7 +19,7 @@ const ProfessionalsCTA = () => {
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
           {/* Primary */}
-          <Button className="bg-gray-100 text-[#1b8ea5] hover:bg-white px-10 py-6 text-lg font-semibold rounded-full shadow-md">
+          <Button className="bg-gray-100 text-primary hover:bg-white px-10 py-6 text-lg font-semibold rounded-full shadow-md">
             Become a Founding Pro
           </Button>
 

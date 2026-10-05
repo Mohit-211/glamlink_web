@@ -76,7 +76,7 @@ export default function ForProfessionals() {
         }}
       />
 
-      <main className="pt-16 lg:pt-20">
+      <main>
         <ProfessionalsMarketplace />
         <ProfileCards />
         <SalesSection />

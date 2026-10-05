@@ -36,21 +36,18 @@ const features = [
 
 const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
   return (
-    <section className="section-glamlink page-soft">
+    <section className="hero-glamlink bg-background">
       <div className="container-glamlink">
         {/* Hero */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left */}
           <div className="max-w-2xl animate-fade-up">
-            <h1 className="font-display text-5xl md:text-6xl xl:text-7xl leading-tight text-foreground">
-              Everything your clients
-              <br />
-              need to know—
-              <br />
-              <span className="text-primary">in one tap.</span>
+            <h1 className="hero-title">
+              Everything your clients need to know—{" "}
+              <span className="text-primary sm:block">in one tap.</span>
             </h1>
 
-            <p className="mt-8 text-lg leading-8 text-muted-foreground">
+            <p className="hero-subtitle mt-6">
               One profile. One QR code. One link for your services, booking,
               photos, videos, social media, business hours, location, and more.
             </p>
@@ -63,7 +60,7 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
 
             <button
               onClick={onApplyClick}
-              className="mt-10 inline-flex items-center justify-center rounded-md bg-[#23AEB8] px-10 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-[#1d98a2]"
+              className="btn-primary btn-lg mt-10"
             >
               CREATE YOUR ACCESS CARD
             </button>

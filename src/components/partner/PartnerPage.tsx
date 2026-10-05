@@ -1,4 +1,3 @@
-import { directoryThemeStyle } from "@/components/glamlinkDirectory/directoryTheme";
 import PartnerHero from "./PartnerHero";
 import { INQUIRY_SECTION_ID } from "./partnerContent";
 import PartnershipWays from "./PartnershipWays";
@@ -6,7 +5,7 @@ import PartnershipInquiryForm from "./PartnershipInquiryForm";
 
 export default function PartnerPage() {
   return (
-    <div className="overflow-x-clip" style={directoryThemeStyle}>
+    <div className="overflow-x-clip">
       <PartnerHero />
 
       <PartnershipWays />
