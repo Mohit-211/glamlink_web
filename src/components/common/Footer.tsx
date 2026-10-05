@@ -11,7 +11,7 @@ const footerLinks = {
     // { label: "Directory", href: "/directory" },
     { label: "Magazine", href: "/magazine" },
     { label: "Journal", href: "/journal" },
-    { label: "Partner With Glamlink", href: "/partner-with-glamlink" },
+    { label: "Partner With Glamlink", href: "/partner" },
     { label: "Podcast", href: "/podcast" },
   ],
   company: [

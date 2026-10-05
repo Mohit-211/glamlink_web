@@ -97,7 +97,7 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       position: 3,
       name: "Partner With Glamlink",
-      item: "https://glamlink.net/partner-with-glamlink",
+      item: "https://glamlink.net/partner",
     },
   ],
 };
