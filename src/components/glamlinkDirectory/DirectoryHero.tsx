@@ -17,13 +17,7 @@ const MOBILE_STRIP = [
 
 export default function DirectoryHero({ children }: { children: ReactNode }) {
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_10%_20%,rgb(36_187_203/0.07),transparent_40%),radial-gradient(circle_at_90%_80%,rgb(36_187_203/0.06),transparent_45%)] bg-background pt-24 pb-14 md:pt-32 md:pb-20 lg:pt-36 lg:pb-24">
-      {/* Decorative glow */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-32 right-[-10%] h-[420px] w-[420px] rounded-full bg-primary/10 blur-3xl"
-      />
-
+    <section className="relative overflow-hidden bg-background pt-24 pb-14 md:pt-32 md:pb-20 lg:pt-36 lg:pb-24">
       <div className="container-glamlink relative">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           {/* COPY + SEARCH */}
@@ -35,7 +29,7 @@ export default function DirectoryHero({ children }: { children: ReactNode }) {
 
             <h1 className="font-display mt-5 text-[2.5rem] leading-[1.05] sm:text-5xl lg:text-6xl font-semibold text-foreground">
               Find Beauty + Wellness Professionals{" "}
-              <span className="bg-gradient-to-r from-[#24bbcb] to-[#1b9aa8] bg-clip-text text-transparent">Near You</span>
+              <span className="text-[#24bbcb]">Near You</span>
             </h1>
 
             <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl">

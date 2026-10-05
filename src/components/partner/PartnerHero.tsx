@@ -14,7 +14,7 @@ export default function PartnerHero() {
   };
 
   return (
-    <section className="page-soft relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24 lg:pt-40 lg:pb-28">
+    <section className="bg-background relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24 lg:pt-40 lg:pb-28">
       <div className="container-glamlink grid lg:grid-cols-12 gap-14 lg:gap-10 items-center">
         <div className="lg:col-span-7 animate-fade-up">
           <span className="badge-soft text-xs sm:text-sm">Partnerships</span>

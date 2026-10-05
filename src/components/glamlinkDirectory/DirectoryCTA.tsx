@@ -8,7 +8,7 @@ export default function DirectoryCTA() {
   return (
     <section aria-labelledby="directory-cta-heading" className="pb-20 md:pb-28">
       <div className="container-glamlink">
-        <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#24bbcb] via-[#21aebd] to-[#1b9aa8] px-6 py-14 sm:px-12 md:py-16 lg:px-16 shadow-large">
+        <div className="relative overflow-hidden rounded-[2rem] bg-[#24bbcb] px-6 py-14 sm:px-12 md:py-16 lg:px-16 shadow-large">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-white/10 blur-2xl"

@@ -40,7 +40,7 @@ export default function FeaturedProfiles({ profiles }: { profiles: FeaturedProfi
   return (
     <section
       aria-labelledby="featured-on-glamlink"
-      className="relative py-16 md:py-24 bg-gradient-to-b from-accent/70 via-accent/30 to-background"
+      className="relative py-16 md:py-24 bg-background"
     >
       <div className="container-glamlink">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8 md:mb-10">

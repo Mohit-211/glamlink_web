@@ -1,3 +1,4 @@
+import { directoryThemeStyle } from "@/components/glamlinkDirectory/directoryTheme";
 import PartnerHero from "./PartnerHero";
 import { INQUIRY_SECTION_ID } from "./partnerContent";
 import PartnershipWays from "./PartnershipWays";
@@ -5,7 +6,7 @@ import PartnershipInquiryForm from "./PartnershipInquiryForm";
 
 export default function PartnerPage() {
   return (
-    <div className="overflow-x-clip">
+    <div className="overflow-x-clip" style={directoryThemeStyle}>
       <PartnerHero />
 
       <PartnershipWays />
@@ -13,7 +14,7 @@ export default function PartnerPage() {
       <section
         id={INQUIRY_SECTION_ID}
         aria-labelledby="partner-inquiry-heading"
-        className="scroll-mt-20 md:scroll-mt-24 bg-gradient-to-b from-accent/60 to-background section-glamlink"
+        className="scroll-mt-20 md:scroll-mt-24 bg-background section-glamlink"
       >
         <div className="container-glamlink">
           <div className="mx-auto w-full max-w-160">
