@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import CommonHero from "@/components/common/CommonHero";
+import { unsplash } from "@/lib/directory/mockData";
 
 interface GlamCardHeroProps {
   onApplyClick: () => void;
@@ -36,63 +38,31 @@ const features = [
 
 const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
   return (
-    <section className="section-glamlink page-soft">
+    <>
+    <CommonHero
+      title="Everything your clients need to know—"
+      titleHighlight="in one tap."
+      description="One profile. One QR code. One link for your services, booking, photos, videos, social media, business hours, location, and more."
+      primaryAction={{ label: "CREATE YOUR ACCESS CARD", onClick: onApplyClick }}
+      footnote={<span className="italic">NFC keychain included.</span>}
+      collage={{
+        main: { src: "/magazine/6641.mp4", alt: "Access by Glamlink profile preview", video: true, label: "Access Card" },
+        top: { src: unsplash("1595079676339-1534801ad6cf", 600), alt: "Phone showing a QR code", label: "Scan + Connect" },
+        bottom: { src: unsplash("1570172619644-dfd03ed5d881", 600), alt: "Skin treatment by a beauty professional", label: "Your Services" },
+        accent: { src: unsplash("1607779097040-26e80aa78e66", 300), alt: "Manicured nails" },
+      }}
+    >
+      <div className="flex items-center gap-4 text-xl font-semibold text-foreground">
+        <span>$39.99 SETUP</span>
+        <span className="text-primary">•</span>
+        <span>$4.99/MONTH</span>
+      </div>
+    </CommonHero>
+
+    <section className="bg-background pb-16 md:pb-24">
       <div className="container-glamlink">
-        {/* Hero */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left */}
-          <div className="max-w-2xl animate-fade-up">
-            <h1 className="font-display text-5xl md:text-6xl xl:text-7xl leading-tight text-foreground">
-              Everything your clients
-              <br />
-              need to know—
-              <br />
-              <span className="text-primary">in one tap.</span>
-            </h1>
-
-            <p className="mt-8 text-lg leading-8 text-muted-foreground">
-              One profile. One QR code. One link for your services, booking,
-              photos, videos, social media, business hours, location, and more.
-            </p>
-
-            <div className="mt-8 flex items-center gap-4 text-xl font-semibold text-foreground">
-              <span>$39.99 SETUP</span>
-              <span className="text-primary">•</span>
-              <span>$4.99/MONTH</span>
-            </div>
-
-            <button
-              onClick={onApplyClick}
-              className="mt-10 inline-flex items-center justify-center rounded-md bg-[#24bbcb] px-10 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-[#1d98a2]"
-            >
-              CREATE YOUR ACCESS CARD
-            </button>
-
-            <p className="mt-4 text-sm italic text-muted-foreground">
-              NFC keychain included.
-            </p>
-          </div>
-
-          {/* Right */}
-          <div className="flex justify-center lg:justify-end">
-            <div className="w-full max-w-md overflow-hidden rounded-3xl border border-border bg-card shadow-[var(--shadow-large)]">
-              <video
-                className="aspect-[9/16] w-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-              >
-                <source src="/magazine/6641.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div>
-        </div>
-
         {/* Features */}
-        <div className="mx-auto mt-28 max-w-3xl">
+        <div className="mx-auto max-w-3xl">
           {features.map((feature) => (
             <div
               key={feature.title}
@@ -121,6 +91,7 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
         </div>
       </div>
     </section>
+    </>
   );
 };
 
