@@ -8,7 +8,7 @@ interface PodcastGuestCardProps {
 }
 
 const PALETTES = [
-  { bg: "rgba(35,174,184,0.12)", text: "#1d8b93" },
+  { bg: "rgba(36,187,203,0.12)", text: "#1d8b93" },
   { bg: "rgba(147,51,234,0.10)", text: "#7e22ce" },
   { bg: "rgba(217,119,6,0.10)", text: "#b45309" },
   { bg: "rgba(219,39,119,0.10)", text: "#be185d" },
@@ -35,7 +35,7 @@ const PodcastGuestCard = ({ name, role, date, index = 0 }: PodcastGuestCardProps
   const formattedDate = formatDate(date);
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-100 p-5 hover:border-[#23AEB8]/40 hover:shadow-lg transition-all duration-300">
+    <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-100 p-5 hover:border-[#24bbcb]/40 hover:shadow-lg transition-all duration-300">
       <div className="flex items-start justify-between mb-4">
         <div
           className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0"
@@ -49,7 +49,7 @@ const PodcastGuestCard = ({ name, role, date, index = 0 }: PodcastGuestCardProps
         </span>
       </div>
       <h3 className="font-serif text-gray-900 text-[15px] leading-snug">{name}</h3>
-      <p className="text-[12px] text-gray-500 font-light mt-1 flex-1">{role}</p>
+      <p className="text-[12px] text-gray-500 font-normal mt-1 flex-1">{role}</p>
       {formattedDate && (
         <p className="text-[11px] text-gray-400 mt-3 pt-3 border-t border-gray-100">
           Episode airing {formattedDate}

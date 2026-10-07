@@ -65,7 +65,7 @@ function AvatarCircle({
 
   return (
     <div
-      className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-bold"
+      className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-semibold"
       style={{ background: p.bg, color: p.text }}
     >
       {getInitials(name)}
@@ -176,7 +176,7 @@ console.log(response,"response=====")
                   </p>
 
                   <span
-                    className="text-[9px] tracking-[0.15em] uppercase font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+                    className="text-[9px] tracking-[0.15em] uppercase font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
                     style={{
                       background: "hsl(186 50% 92%)",
                       color: "hsl(186 70% 28%)",

@@ -87,7 +87,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${card?.name || 'access-card'}-qr.png`;
+      link.download = `${card?.name || 'access'}-qr.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

@@ -170,7 +170,7 @@ export const FALLBACK_PROFESSIONALS: TopicExpert[] = [
       "Mommy Makeover",
     ]),
     locations: [{ city: "Beverly Hills", state: "CA" }],
-    business_card_link: "https://glamlink.net/access-card/dr-neil-vranis",
+    business_card_link: "https://glamlink.net/access/dr-neil-vranis",
   },
   {
     id: 133,
@@ -182,7 +182,7 @@ export const FALLBACK_PROFESSIONALS: TopicExpert[] = [
       "Microneedling",
     ]),
     locations: [{ city: "Philadelphia", state: "PA" }],
-    business_card_link: "https://glamlink.net/access-card/michael-razzano",
+    business_card_link: "https://glamlink.net/access/michael-razzano",
   },
   {
     id: 100,
@@ -194,6 +194,6 @@ export const FALLBACK_PROFESSIONALS: TopicExpert[] = [
       "Medical Aesthetics Marketing",
     ]),
     locations: [{ city: "Los Angeles", state: "CA" }],
-    business_card_link: "https://glamlink.net/access-card/joseph-jericho",
+    business_card_link: "https://glamlink.net/access/joseph-jericho",
   },
 ];

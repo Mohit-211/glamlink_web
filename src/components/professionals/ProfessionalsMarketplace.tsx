@@ -88,7 +88,7 @@ const ProfessionalCard = ({
 
       {/* Info */}
       <div className="p-5 flex flex-col gap-2 flex-1">
-        <h3 className="text-[17px] font-bold text-gray-900 leading-tight">{pro.name}</h3>
+        <h3 className="text-[17px] font-semibold text-gray-900 leading-tight">{pro.name}</h3>
 
         <p className="text-gray-500 text-sm -mt-1">
           {pro.professional_title || "Beauty Expert"}
@@ -289,15 +289,15 @@ console.log(allSpecialties,"")
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
   return (
-    <section className="py-20 md:py-28 bg-gradient-to-b from-white via-gray-50/70 to-white">
-      <div className="container-glamlink px-5 md:px-8">
+    <section className="pt-28 pb-20 md:pt-36 md:pb-28 bg-background">
+      <div className="container-glamlink">
 
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
-          <h1 className="text-4xl md:text-6xl tracking-tight text-gray-900 mb-5">
-            <span className="text-[#24bbcb]">Meet the Professionals</span>
+          <h1 className="hero-title">
+            <span className="text-primary">Meet the Professionals</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="hero-subtitle mt-6 max-w-3xl mx-auto">
             Browse our verified beauty experts ready to transform your look.
           </p>
         </div>

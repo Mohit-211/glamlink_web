@@ -52,7 +52,7 @@ export default function DigitalApplyPage() {
         }}
       />
 
-      <main className="pt-16 lg:pt-20">
+      <main>
         <section className="pb-20">
           <GlamCardHero onApplyClick={scrollToApply} />
         </section>

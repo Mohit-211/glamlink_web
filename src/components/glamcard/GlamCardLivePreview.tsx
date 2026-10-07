@@ -24,6 +24,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
+import { trackEvent, AnalyticsEventType } from "@/utils/analytics";
 /* ================= VIDEO THUMBNAIL GENERATOR ================= */
 /**
  * Generates a JPEG data URL from a video's first safely-seekable frame.
@@ -138,6 +139,8 @@ interface Props {
   data: GlamCardFormData;
   sticky?: boolean;
   mode?: "live" | "view" | "download";
+  /** Only the public /access/[slug] page opts in to analytics. */
+  trackAnalytics?: boolean;
   onClose?: () => void;
   onDownload?: () => void;
   onCopyLink?: () => void;
@@ -276,6 +279,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   data,
   sticky = false,
   mode,
+  trackAnalytics = false,
   onClose,
   onDownload,
   onCopyLink,
@@ -494,6 +498,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
   const mapSrc = mapQuery
     ? `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=${mapZoom}&output=embed`
     : "";
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`;
   /* ================= SOCIAL MEDIA ================= */
   const socialMedia = useMemo(() => {
     if (!data?.social_media) return {};
@@ -617,7 +622,24 @@ const GlamCardLivePreview: React.FC<Props> = ({
       console.error("Failed to copy link:", error);
     }
   };
+  /* ================= ANALYTICS ================= */
+  // Fire-and-forget; runs alongside each existing action, never instead of it.
+  const track = (
+    eventType: AnalyticsEventType,
+    eventTarget: string | null = null,
+    metadata?: Record<string, unknown>,
+  ) => {
+    if (!trackAnalytics) return;
+    trackEvent({ businessCardId: Number(data?.id), eventType, eventTarget, metadata });
+  };
+  const handleSaveContact = () => {
+    track("SAVE_CONTACT_CLICK");
+    downloadVCF(data);
+  };
   const handleShare = async () => {
+    track("SHARE_CLICK", null, {
+      method: typeof navigator !== "undefined" && "share" in navigator ? "native_share" : "copy_link",
+    });
     const link = data?.business_card_link;
     if (!link) return;
     if (navigator.share) {
@@ -690,7 +712,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => downloadVCF(data)}
+              onClick={handleSaveContact}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--accent)] text-white text-xs font-semibold shadow transition active:scale-95"
             >
               <svg
@@ -741,7 +763,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
             {mode === "view" && (
               <div className="hidden lg:flex justify-end gap-2 mb-3">
                 <button
-                  onClick={() => downloadVCF(data)}
+                  onClick={handleSaveContact}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-strong)] text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap" style={socialIconStyle}
                 >
                   <svg
@@ -772,17 +794,17 @@ const GlamCardLivePreview: React.FC<Props> = ({
               <div
                 className="relative rounded-2xl overflow-hidden shadow-md"
                 style={{
-                  background: `linear-gradient(135deg, ${cardColor} 0%, ${shadeColor(cardColor, -25)} 100%)`,
+                  background: `${cardColor}`,
                 }}
               >
                 {/* bg pattern */}
                 <div className="absolute inset-0 opacity-10">
-                  <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white translate-x-8 -translate-y-8" />
-                  <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white -translate-x-6 translate-y-6" />
+                  {/* <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white translate-x-8 -translate-y-8" /> */}
+                  {/* <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white -translate-x-6 translate-y-6" /> */}
                 </div>
                 <div className="flex items-center gap-4 p-4">
                   {/* avatar */}
-                  <div className="w-28 h-28 rounded-full overflow-hidden bg-white/20 border-2 border-white shadow-lg flex-shrink-0">
+                  <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-white shadow-lg flex-shrink-0">
                     {data?.profile_image ? (
                       <img
                         src={
@@ -905,7 +927,16 @@ const GlamCardLivePreview: React.FC<Props> = ({
                       {normalizedImages.slice(0, 8).map((_, index) => (
                         <button
                           key={index}
-                          onClick={() => setThumbnailIndex(index)}
+                          onClick={() => {
+                            const item = normalizedImages[index];
+                            track("IMAGE_CLICK", galleryPreviews[index] || null, {
+                              image_id: item?.id ?? null,
+                              index,
+                              file_type: item?.file_type,
+                              caption: item?.caption || null,
+                            });
+                            setThumbnailIndex(index);
+                          }}
                           className={` h-12 w-12 overflow-hidden rounded-lg border flex-shrink-0 snap-start transition-all ${thumbnailIndex === index ? "ring-2 ring-[var(--accent)] border-[var(--accent)]" : "border-gray-200"}`}
                         >
                           {renderThumbImage(index, "Thumb")}
@@ -975,7 +1006,24 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         src={mapSrc}
                       />
                       <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`}
+                        href={directionsUrl}
+                        onClick={() => {
+                          const lat = Number(selectedLocation?.latitude);
+                          const lng = Number(selectedLocation?.longitude);
+                          const hasCoords =
+                            selectedLocation?.latitude != null &&
+                            selectedLocation?.longitude != null &&
+                            Number.isFinite(lat) &&
+                            Number.isFinite(lng);
+                          track(
+                            "LOCATION_CLICK",
+                            hasCoords ? `${lat.toFixed(6)},${lng.toFixed(6)}` : null,
+                            {
+                              location_id: selectedLocation?.id ?? null,
+                              label: selectedLocation?.label || null,
+                            },
+                          );
+                        }}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white font-medium px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-xs whitespace-nowrap active:scale-95 transition"
@@ -1119,6 +1167,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           <a
                             key={index}
                             href={link.url}
+                            onClick={() =>
+                              track("OTHER_LINK_CLICK", link.url, { title: link.title, index })
+                            }
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-700 transition hover:border-[var(--accent)] hover:bg-[var(--accent-faint)] active:scale-[0.98]" style={socialIconStyle}
@@ -1161,7 +1212,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                     </p>
                     <span className="flex-1 h-px bg-gray-400/60" />
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-1 gap-3 sm:gap-4">
                     {featuredLinks.map((link: any, index: number) => {
                       const thumbSrc = getFeaturedLinkThumbnailSrc(link);
                       const description: string = link?.description || "";
@@ -1179,6 +1230,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         <a
                           key={link?.id ?? index}
                           href={link.url}
+                          onClick={() =>
+                            track("FEATURED_LINK_CLICK", link.url, { title: link.title, index })
+                          }
                           target="_blank"
                           rel="noopener noreferrer"
                           className="group relative flex items-center gap-3 sm:gap-4 rounded-2xl bg-white p-3.5 sm:p-4 border border-gray-200/70 transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[var(--accent-border)] active:scale-[0.98] active:translate-y-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_1px_rgba(15,23,42,0.04),0_8px_16px_-4px_rgba(15,23,42,0.12),0_20px_40px_-14px_rgba(15,23,42,0.18)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_2px_2px_rgba(15,23,42,0.05),0_14px_24px_-4px_var(--accent-soft),0_28px_56px_-14px_rgba(15,23,42,0.24)]"
@@ -1237,7 +1291,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
             <div className="flex items-center gap-3 mt-5">
               <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent to-[var(--accent)]" />
               <button
-                onClick={() => setIsBookingModalOpen(true)}
+                onClick={() => {
+                  track("CONNECT_CLICK");
+                  setIsBookingModalOpen(true);
+                }}
                 className="flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-strong)] active:scale-95 text-white px-7 py-2.5 rounded-full text-sm font-bold tracking-widest transition-all whitespace-nowrap uppercase shadow-md" style={{
                   boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
                 }}
@@ -1253,6 +1310,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={data.website}
+                    onClick={() => track("WEBSITE_CLICK", data.website ?? null)}
                     target="_blank"
                     rel="noopener noreferrer"
                     title={data.website}
@@ -1268,6 +1326,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <div key={key} className="flex flex-col items-center gap-1.5">
                   <a
                     href={url}
+                    onClick={() => track("INSTAGRAM_CLICK", url, { index: idx })}
                     target="_blank"
                     rel="noopener noreferrer"
                     title={url}
@@ -1285,6 +1344,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.facebook}
+                    onClick={() => track("FACEBOOK_CLICK", socialMedia.facebook)}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Facebook"
@@ -1300,6 +1360,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.linkedin}
+                    onClick={() => track("LINKEDIN_CLICK", socialMedia.linkedin)}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="LinkedIn"
@@ -1315,6 +1376,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.youtube}
+                    onClick={() => track("YOUTUBE_CLICK", socialMedia.youtube)}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="YouTube"
@@ -1330,6 +1392,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.tiktok}
+                    onClick={() => track("TIKTOK_CLICK", socialMedia.tiktok)}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="TikTok"
@@ -1378,6 +1441,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   rel="noopener noreferrer"
                   onClick={(e) => {
                     if (!data.booking_link) e.preventDefault();
+                    else track("BOOKING_CLICK", data.booking_link);
                   }}
                   className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.booking_link ? "border-gray-200 hover:bg-gray-50" : "border-gray-200 opacity-50 cursor-not-allowed"}`}
                 >
@@ -1401,6 +1465,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   href={data.phone ? `tel:${data.phone}` : "#"}
                   onClick={(e) => {
                     if (!data.phone) e.preventDefault();
+                    else track("PHONE_CLICK", `tel:${data.phone}`);
                   }}
                   className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.phone ? "border-gray-200 hover:bg-gray-50" : "border-gray-200 opacity-50 cursor-not-allowed"}`}
                 >
@@ -1426,6 +1491,15 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         url.startsWith("http")
                           ? url
                           : `https://ig.me/m/${url.replace(/^@/, "")}`
+                      }
+                      onClick={() =>
+                        track(
+                          "INSTAGRAM_CLICK",
+                          url.startsWith("http")
+                            ? url
+                            : `https://ig.me/m/${url.replace(/^@/, "")}`,
+                          { source: "connect_modal", index: idx },
+                        )
                       }
                       target="_blank"
                       rel="noopener noreferrer"

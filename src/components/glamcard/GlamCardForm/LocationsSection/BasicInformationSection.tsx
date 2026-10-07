@@ -46,7 +46,7 @@ const inputClass =
 
 const errorInputClass = "border-red-500 focus:border-red-500 focus:ring-red-200";
 
-const labelClass = "text-sm font-medium text-gray-700";
+const labelClass = "mb-2 mt-2 block text-sm font-medium text-gray-700";
 
 const CHARACTER_LIMIT = 80;
 
@@ -65,7 +65,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
     <section className={sectionClass}>
       <h2 className="text-lg font-semibold">Basic Information</h2>
 
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="gap-5 md:grid md:grid-cols-2">
         {/* NAME */}
         <div id="field-name">
           <label className={labelClass}>
@@ -137,8 +137,11 @@ const BasicInformationSection: React.FC<SectionProps> = ({
 
         {/* PHONE */}
     <div id="field-phone">
-  <div className="mb-2 flex items-center justify-between">
-    <label className={labelClass}>Phone</label>
+  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+    <label className={labelClass}>
+      Phone
+      {(data.is_phone_visible ?? true) && <span className="text-red-500"> *</span>}
+    </label>
 
     <label className="flex cursor-pointer items-center gap-2">
       <input
@@ -189,7 +192,9 @@ const BasicInformationSection: React.FC<SectionProps> = ({
 
         {/* BIO */}
         <div id="field-bio" className="md:col-span-2">
-          <label className={labelClass}>Professional Bio</label>
+          <label className={labelClass}>
+            Professional Bio <span className="text-red-500">*</span>
+          </label>
 
           <div
             className={
@@ -213,7 +218,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             />
           </div>
 
-          <div className="mt-1 flex items-center justify-between">
+          <div className="mt-1 flex items-start justify-between gap-3">
             {errors?.bio ? (
               <p className="text-sm text-red-500">{errors.bio}</p>
             ) : (
@@ -227,7 +232,9 @@ const BasicInformationSection: React.FC<SectionProps> = ({
       </div>
       {/* BUSINESS NAME */}
       <div id="field-business_name">
-        <label className={labelClass}>Business Name</label>
+        <label className={labelClass}>
+          Business Name <span className="text-red-500">*</span>
+        </label>
         <input
           className={`${inputClass} w-full ${errors?.business_name ? errorInputClass : ""}`}
           placeholder="e.g. Glow Beauty Studio"
@@ -268,7 +275,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
           />
           <input
             type="text"
-            className={`${inputClass} max-w-[140px]`}
+            className={`${inputClass} min-w-0 max-w-[140px]`}
             placeholder="#23B9CD"
             value={data.color_code || ""}
             onChange={(e) =>

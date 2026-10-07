@@ -150,7 +150,7 @@ export default function NotifySection() {
         className="absolute right-0 bottom-0 pointer-events-none select-none leading-none"
         aria-hidden
         style={{
-          fontFamily: "'Cormorant Garamond', Georgia, serif",
+          fontFamily: "inherit",
           fontSize: "clamp(80px, 16vw, 180px)",
           fontWeight: 700,
           color: "hsl(186 30% 88%)",
@@ -186,7 +186,7 @@ export default function NotifySection() {
             <div style={fade(100)}>
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontFamily: "inherit",
                   fontSize: "clamp(34px, 5vw, 58px)",
                   fontWeight: 600,
                   color: "hsl(210 30% 10%)",
@@ -201,7 +201,7 @@ export default function NotifySection() {
               </h2>
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontFamily: "inherit",
                   fontSize: "clamp(34px, 5vw, 58px)",
                   fontWeight: 600,
                   fontStyle: "italic",
@@ -360,8 +360,7 @@ export default function NotifySection() {
                     <p
                       className="font-semibold text-[18px] mb-1"
                       style={{
-                        fontFamily: "'Cormorant Garamond', Georgia, serif",
-                        fontStyle: "italic",
+                        fontFamily: "inherit",
                         color: "hsl(210 30% 10%)",
                       }}
                     >

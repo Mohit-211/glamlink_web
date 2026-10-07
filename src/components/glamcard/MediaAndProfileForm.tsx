@@ -580,9 +580,11 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
 
       {/* PROFILE */}
       <div id="field-profile_image" className="space-y-3">
-        <label className={labelClass}>Profile Image</label>
-        <div className="flex items-center gap-5">
-          <div className="relative w-32 h-32">
+        <label className={labelClass}>
+          Profile Image <span className="text-red-500">*</span>
+        </label>
+        <div className="flex flex-wrap items-center gap-5">
+          <div className="relative w-32 h-32 flex-none">
             <div
               className={`w-32 h-32 rounded-full border overflow-hidden bg-gray-50 flex items-center justify-center ${errors?.profile_image ? "border-2 border-red-500" : ""
                 }`}
@@ -643,7 +645,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
           className={`text-xs pt-2 ${errors?.images ? "text-red-500 font-medium" : "text-gray-500"
             }`}
         >
-          Gallery media: {totalMediaCount}/{MAX_MEDIA_TOTAL} used (photos + videos combined)
+          Gallery media <span className="text-red-500">*</span>: {totalMediaCount}/{MAX_MEDIA_TOTAL} used (photos + videos combined)
         </p>
         {errors?.images && (
           <p className="mt-1 text-sm text-red-500">{errors.images}</p>
@@ -763,13 +765,14 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
                 {galleryCropQueue.length > 1 ? "s" : ""} to crop after this one
               </p>
             )}
-            <div className="relative h-80 bg-black rounded overflow-hidden">
+            <div className="relative h-64 sm:h-80 bg-black rounded overflow-hidden">
               <Cropper
                 image={imageSrc!}
                 crop={crop}
                 zoom={zoom}
                 aspect={CROP_ASPECTS[cropContext]}
                 onCropChange={setCrop}
+                 cropShape={cropContext === "profile" ? "round" : "rect"}
                 onCropComplete={onCropComplete}
                 onZoomChange={setZoom}
               />

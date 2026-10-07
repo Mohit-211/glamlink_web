@@ -169,10 +169,10 @@ const GlamCardApplication: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 items-start">
+    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
       {/* FORM — stacked full-width on mobile; sticky side column from lg up */}
       <div className="w-full lg:w-1/2 lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">
-        <div className="rounded-xl border bg-white p-6 shadow lg:h-full lg:overflow-y-auto">
+        <div className="rounded-xl border bg-white p-3 sm:p-6 shadow lg:h-full lg:overflow-y-auto">
           <GlamCardForm data={data} setData={setData} />
         </div>
       </div>

@@ -68,7 +68,7 @@ const BlogCard = ({
 
         {/* Excerpt */}
         {excerpt && (
-          <p className="text-[13px] leading-relaxed text-gray-400 font-light line-clamp-2 flex-1 mb-4">
+          <p className="text-[13px] leading-relaxed text-gray-400 font-normal line-clamp-2 flex-1 mb-4">
             {excerpt}
           </p>
         )}

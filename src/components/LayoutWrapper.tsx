@@ -15,7 +15,7 @@ export default function LayoutWrapper({
   const pathname = usePathname();
 
   // Hide Header & Footer on access card pages
-  const hideLayout = pathname.startsWith("/access-card/");
+  const hideLayout = pathname.startsWith("/access/");
 
   return (
     <>

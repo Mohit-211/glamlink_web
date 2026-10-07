@@ -110,7 +110,7 @@ const CapabilitiesGrid = () => {
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
             Complete Toolkit
           </span>
-          <h2 className="text-3xl lg:text-4xl xl:text-5xl  text-foreground mb-4">
+          <h2 className="section-title font-display mb-4">
             Everything You Need To{" "}
             <span className="gradient-text">Create, Build & Dominate</span>
           </h2>

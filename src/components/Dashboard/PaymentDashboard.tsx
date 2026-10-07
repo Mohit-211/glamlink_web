@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  BarChart3,
   CreditCard,
   Edit3,
   Package,
@@ -26,9 +27,11 @@ import EditAccessCard from './accessCardEdit';
 import ChangePasswordTab from './Changepasswordtab';
 import { PurchaseType } from './Purchasetypes';
 import SubscriptionPlansTab, { PlanId } from '../Pricing/SubscriptionPlansTab';
+import AccessCardAnalytics from './analytics/AccessCardAnalytics';
 type TabId =
   | 'my-card'
   | 'edit-card'
+  | 'analytics'
   | 'payment-history'
   | 'qr-code'
   | 'subscription-plans'
@@ -46,6 +49,12 @@ const NAV_ITEMS = [
     label: 'Edit Access Card',
     description: 'Update card details',
     icon: <Edit3 className="h-5 w-5" />,
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    description: 'Views, clicks and visitors',
+    icon: <BarChart3 className="h-5 w-5" />,
   },
   {
     id: 'payment-history',
@@ -370,6 +379,7 @@ export default function DashboardPage() {
                     }}
                   />
                 )}
+                {activeTab === 'analytics' && <AccessCardAnalytics cards={cardsArray} />}
                 {activeTab === 'payment-history' && <PaymentHistory payments={paymentHistory} />}
                 {activeTab === 'qr-code' && <ShowQRCode cardData={businessCard} error={error} />}
                 {activeTab === 'subscription-plans' && (

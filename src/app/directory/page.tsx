@@ -1,28 +1,25 @@
-import { Metadata } from "next";
 import { Suspense } from "react";
-import DirectoryPageClient from "@/components/directory/DirectoryPageClient";
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import GlamlinkDirectoryPage from "@/components/glamlinkDirectory/GlamlinkDirectoryPage";
+
 export const metadata: Metadata = {
-  title: "Directory | Glamlink",
+  title: "Beauty + Wellness Directory",
   description:
-    "Discover professionals, brands, software companies, manufacturers, and other businesses in the beauty industry.",
+    "Find beauty and wellness professionals near you. Search trusted estheticians, med spas and hair stylists across the U.S. on Glamlink.",
   alternates: {
     canonical: "https://glamlink.net/directory",
   },
   openGraph: {
-    title: "Directory | Glamlink",
-    description:
-      "Discover professionals, brands, software companies, manufacturers, and other businesses in the beauty industry.",
+    title: "Glamlink Directory | Find Beauty + Wellness Professionals Near You",
+    description: "Search trusted beauty and wellness professionals and businesses across the U.S.",
     url: "https://glamlink.net/directory",
-    type: "website",
   },
 };
 
 export default function DirectoryPage() {
-  redirect("/");
   return (
     <Suspense fallback={null}>
-      <DirectoryPageClient />
+      <GlamlinkDirectoryPage />
     </Suspense>
   );
 }

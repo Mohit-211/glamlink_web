@@ -1,8 +1,34 @@
 import axios from "axios";
+import {
+  TokenExpiredError,
+  handleTokenExpired,
+  isTokenNotFoundResponse,
+} from "@/lib/auth";
 const api = axios.create({
   // baseURL: "https://node.glamlink.net/api/v1/",
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
+/* Global "Token Not Found" handling for every request made through `api`
+   (profile, dashboard, business card, ...). The backend may send it as a
+   200 with { success: true, status: 400, message: "Token Not Found" } or
+   as an HTTP error, so both paths are checked. The request is rejected
+   afterwards so callers never continue with the invalid session. */
+api.interceptors.response.use(
+  (response) => {
+    if (isTokenNotFoundResponse(response?.data)) {
+      handleTokenExpired();
+      return Promise.reject(new TokenExpiredError());
+    }
+    return response;
+  },
+  (error) => {
+    if (isTokenNotFoundResponse(error?.response?.data)) {
+      handleTokenExpired();
+      return Promise.reject(new TokenExpiredError());
+    }
+    return Promise.reject(error);
+  }
+);
 const getToken = () => {
   if (typeof window !== "undefined") {
     return localStorage.getItem("GlamlinkaccessToken");
@@ -557,5 +583,53 @@ export const ShippingRateWithoutTokenApi = async (payload: any) => {
 /* ============================= */
 export const getAds = async () => {
   const { data } = await api.get("ads");
+  return data;
+};
+/* ============================= */
+/* 📌 Access Card Analytics */
+/* ============================= */
+export const trackAccessCardEventApi = async (payload: {
+  business_card_id: number;
+  event_type: string;
+  event_target: string | null;
+  visitor_id: string;
+  session_id: string;
+  metadata: Record<string, unknown>;
+}) => {
+  const { data } = await api.post("access-card/analytics/event", payload);
+  return data;
+};
+// Date params are YYYY-MM-DD; omit them to use the backend's default range.
+export interface AccessCardAnalyticsParams {
+  from?: string;
+  to?: string;
+}
+export const getAccessCardAnalytics = async (
+  businessCardId: number | string,
+  params?: AccessCardAnalyticsParams
+) => {
+  const { data } = await api.get(`access-card/analytics/${businessCardId}`, {
+    params,
+    headers: {
+      "x-access-token": getToken(),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
+  });
+  return data;
+};
+export const getAccessCardAnalyticsEvents = async (
+  businessCardId: number | string,
+  params?: AccessCardAnalyticsParams
+) => {
+  const { data } = await api.get(
+    `access-card/analytics/${businessCardId}/events`,
+    {
+      params,
+      headers: {
+        "x-access-token": getToken(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+    }
+  );
   return data;
 };

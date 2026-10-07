@@ -40,17 +40,12 @@ const HowItWorks = () => {
       const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <section className="relative py-20 md:py-28 bg-gradient-to-b from-gray-50/70 via-white to-gray-50/70 overflow-hidden">
-      {/* Subtle background accents */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-[#24bbcb]/5 rounded-full blur-3xl -translate-y-1/3 -translate-x-1/3 animate-pulse-slow" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#24bbcb]/5 rounded-full blur-3xl translate-y-1/3 translate-x-1/3 animate-pulse-slow delay-1000" />
-      </div>
+    <section className="relative py-20 md:py-28 bg-background overflow-hidden">
 
       <div className="container-glamlink px-5 md:px-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-16 md:mb-20">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl  tracking-tight text-gray-900 mb-5">
+          <h2 className="section-title font-display mb-5">
             How Glamlink
             <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-[#24bbcb] via-[#1ea8b5] to-[#24bbcb] bg-clip-text text-transparent">

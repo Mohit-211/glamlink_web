@@ -16,7 +16,7 @@ const MENTION_REGEX = /(^|[\s(])@([a-zA-Z0-9_.-]{2,50})/g;
 // whether the handle matches a real business card. Set to false to
 // restore real per-handle existence checks via businessCardExists().
 const TEST_MODE_ALWAYS_LINK = true;
-const TEST_MODE_URL = "https://glamlink.net/access-card/niki-capobianco";
+const TEST_MODE_URL = "https://glamlink.net/access/niki-capobianco";
 
 async function businessCardExists(handle: string): Promise<boolean> {
   try {
@@ -26,6 +26,19 @@ async function businessCardExists(handle: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+/**
+ * Decodes HTML entities (e.g. "&lt;iframe src=..." -> "<iframe src=...").
+ * This handles the case where the CMS/editor stored the content already
+ * HTML-escaped, which causes tags like <iframe> to render as visible text
+ * instead of being interpreted as markup.
+ */
+function decodeHtmlEntities(html: string): string {
+  if (typeof document === "undefined") return html;
+  const txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
 }
 
 async function linkifyMentions(html: string): Promise<string> {
@@ -94,7 +107,7 @@ async function linkifyMentions(html: string): Promise<string> {
       const anchor = document.createElement("a");
       anchor.href = TEST_MODE_ALWAYS_LINK
         ? TEST_MODE_URL
-        : `/access-card/${encodeURIComponent(handle)}`;
+        : `/access/${encodeURIComponent(handle)}`;
       anchor.className = "mention-link";
       anchor.textContent = `@${handle}`;
       frag.appendChild(anchor);
@@ -119,7 +132,13 @@ const ArticleContent = ({ content }: ArticleContentProps) => {
         return;
       }
 
-      const clean = DOMPurify.sanitize(content, {
+      // Decode HTML entities first, in case the content came through
+      // already escaped (e.g. "&lt;iframe...&gt;" instead of "<iframe...>").
+      // Without this, tags like <iframe> for embedded videos show up as
+      // literal text instead of being rendered.
+      const decoded = decodeHtmlEntities(content);
+
+      const clean = DOMPurify.sanitize(decoded, {
         ALLOWED_TAGS: [
           "html",
           "body",

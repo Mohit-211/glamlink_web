@@ -55,7 +55,7 @@ const SalesSection = () => {
             <DollarSign className="w-4 h-4" />
             Revenue Engine
           </span>
-          <h2 className="text-3xl lg:text-4xl xl:text-5xl  text-foreground mb-4">
+          <h2 className="section-title font-display mb-4">
             Turn Your Expertise Into{" "}
             <span className="gradient-text">Unstoppable Sales</span>
           </h2>
@@ -81,7 +81,7 @@ const SalesSection = () => {
             {/* Coming soon badge */}
             <div className="relative w-full max-w-5xl mx-auto rounded-3xl overflow-hidden shadow-2xl">
               {/* Gradient Background */}
-              <div className="bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 px-8 py-42 text-center text-white">
+              <div className="bg-primary px-8 py-42 text-center text-white">
                 {/* Floating Badge */}
                 <div className="absolute top-6 left-6">
                   <span
@@ -106,7 +106,7 @@ const SalesSection = () => {
                 </div>
 
                 {/* Heading */}
-                <h2 className="text-3xl md:text-4xl  mb-4">
+                <h2 className="section-title font-display mb-4">
                   Professional Video Coming Soon
                 </h2>
 

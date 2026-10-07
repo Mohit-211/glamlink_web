@@ -65,15 +65,15 @@ export default function PrivacyPolicyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 mt-10">
+    <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-gray-50 to-white py-16">
-        <div className="container-custom">
+      <section className="bg-background pt-28 pb-12 md:pt-36 md:pb-16">
+        <div className="container-glamlink">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
-            <p className="text-lg text-gray-600 mb-6">Last revised on January 25, 2025</p>
+            <h1 className="section-title font-display mb-4">Privacy Policy</h1>
+            <p className="text-lg text-muted-foreground mb-6">Last revised on January 25, 2025</p>
             <nav className="flex flex-wrap gap-2 justify-center">
-              <Link href="/" className="text-glamlink-teal hover:text-glamlink-teal-dark">
+              <Link href="/" className="text-primary hover:underline">
                 Home
               </Link>
               <span className="text-gray-400">/</span>
@@ -85,9 +85,9 @@ export default function PrivacyPolicyPage() {
 
       {/* Table of Contents */}
       <section className="py-8 bg-white border-b">
-        <div className="container-custom">
+        <div className="container-glamlink">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Table of Contents</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Table of Contents</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {sections.map((section) => (
                 <button key={section.id} onClick={() => scrollToSection(section.anchor)} className="text-left px-4 py-2 rounded-lg transition-colors" >
@@ -101,7 +101,7 @@ export default function PrivacyPolicyPage() {
 
       {/* Privacy Policy Content */}
       <section className="py-16">
-        <div className="container-custom">
+        <div className="container-glamlink">
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-sm border p-8 md:p-12">
               {/* Introduction */}
@@ -125,7 +125,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 1: Collection of Personal Information */}
               <div id="collection" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">1. Collection of Personal Information</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">1. Collection of Personal Information</h3>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   Typically, the personally identifiable information we receive comes directly from users like you who are interested in using the Glamlink Service, signing up as a user of the Glamlink Service, and obtaining various products and services from us. We collect personal information when
                   you sign up as a user, contact us with inquiries, purchase products or services, or participate in promotional offers.
@@ -135,43 +135,43 @@ export default function PrivacyPolicyPage() {
                   <h4 className="text-lg font-semibold text-gray-900 mb-4">The personally identifiable information we collect includes:</h4>
                   <ul className="space-y-3">
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Contact information, including name, email address, mailing address, age, date of birth and phone number</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Location data</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Unique identifiers such as username, account number, and password</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Internet network data, including IP addresses, browser data, or interactions with glamlink.net</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Commercial information including records of transactions and memberships purchased</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Preferences information such as the types of emails you would like to receive from us</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Promotional offers you may be interested in</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Requests made through our Booking Service</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Billing information submitted through our site to a third party payment processor who holds and manages the information</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Other personal information you voluntarily provide to us through the website, on the phone, via email, or in other communications</span>
                     </li>
                   </ul>
@@ -180,7 +180,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 2: Information Collected Through Technology / Cookies */}
               <div id="technology" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">2. Information Collected Through Technology / Cookies</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">2. Information Collected Through Technology / Cookies</h3>
                 <div className="space-y-6">
                   <div className="prose prose-lg max-w-none mb-12">
                     <p className="text-gray-700 leading-relaxed mb-6">
@@ -191,7 +191,7 @@ export default function PrivacyPolicyPage() {
                       When you use the Glamlink Service we may store a small amount of information on your computer. This information will be in the form of a &quot;cookie&quot; or similar file. Cookies are small files stored on your computer, not on our site. We use cookies in our interactive
                       website areas, to deliver content specific to your interests, and so you are not required to reenter your account data every time you connect to the site. Through your web browser you can choose to have your computer warn you each time a cookie is being set, or you can choose
                       to delete or turn off all cookies at any time. Each browser is a little different, so look at your browser&#39;s Help menu to learn the correct way to modify your cookie settings. For information about cookies from the FTC website visit{" "}
-                      <a href="https://www.consumer.ftc.gov/articles/0042-online-tracking" target="_blank" className="text-glamlink-teal hover:underline">
+                      <a href="https://www.consumer.ftc.gov/articles/0042-online-tracking" target="_blank" className="text-primary hover:underline break-all">
                         https://www.consumer.ftc.gov/articles/0042-online-tracking
                       </a>
                       .
@@ -222,7 +222,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 3: Use of Personal Information */}
               <div id="use" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">3. Use of Personal Information</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">3. Use of Personal Information</h3>
 
                 <p className="text-gray-700 leading-relaxed mb-6">
                   We may use your personally identifiable information in many ways, such as to send information you provide through the Booking Service to Beauty Professionals. In addition, sometimes we hire companies to help deliver products or services, such as a third-party content provider or a
@@ -237,72 +237,72 @@ export default function PrivacyPolicyPage() {
                 <p className="text-gray-700 leading-relaxed mb-6">We may use your personally identifiable information to:</p>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Provide you with the Glamlink Service and any products or services you request</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Send you requested product or service information</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Respond to customer service requests</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Administer your account</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Send you newsletters, text messages or email communications</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Respond to your questions and concerns</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Improve our website, app, and marketing efforts</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Conduct internal quality improvement or business analysis</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Display driving directions</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Process payments for bills and invoices</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Fulfill or meet the reason you provided the Personal Information to Glamlink, such as to create your account, process your transaction or respond to your inquiry.</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">
                       Communicate with you, including via e-mail, text message, push notification, social media and/or telephone calls. We may retain your e-mail, e-mail address and our responses to you. This information is used to answer your follow-up questions and concerns.
                     </span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">Measure how effectively we address your concerns.</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">
                       Personalize your experience and to deliver custom content and service offerings relevant to your interests, including targeted offers and ads through our Website, Mobile Apps, Communications, third-party sites, or on other devices you may use. We may ask you to voluntarily
                       provide us with information about your interests, demographics, experience with our services and contact preferences to help customize offerings to you.
                     </span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">If you send us a resume or curriculum vitae ("CV") to apply online for a position with Glamlink, we will use the Personal Information that you provide to match you with available Glamlink job opportunities.</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                    <span className="text-primary mr-3 mt-1">•</span>
                     <span className="text-gray-700">To recognize you and remember your information or location when you return to our website, mobile apps and services.</span>
                   </li>
                 </ul>
@@ -328,7 +328,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 4: Messages and Communications */}
               <div id="communications" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">4. Messages and Communications</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">4. Messages and Communications</h3>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   Comments or questions sent to us using email or messaging forms will be shared with Glamlink staff who are most able to address your concerns. We may archive your messages once we have made our best effort to provide you with a complete and satisfactory response.
                 </p>
@@ -349,7 +349,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 5: Third Party Services */}
               <div id="third-party" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">5. Third Party Services</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">5. Third Party Services</h3>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   Glamlink uses a third-party vendor to help us manage our email and text messaging communications with you. When you click on a link in an email, you may temporarily be redirected through one of the vendor&#39;s servers (although this process will be invisible to you) which will
                   register that you&#39;ve clicked on that link.
@@ -369,7 +369,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 6: Social Media / Remarketing */}
               <div id="social-media" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">6. Social Media / Remarketing</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">6. Social Media / Remarketing</h3>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   When we interact with you through our content on social media platforms, third-party platforms, third-party websites, applications, integrations, and services of our marketing partners, we may obtain any information regarding your interaction with that content, such as content you
                   have viewed and information about advertisements within the content you have been shown or may have clicked on. For a description on how social media services and other third-party platforms, plug-ins, integrations or applications handle your information, please refer to their
@@ -388,7 +388,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 7: Links to third party websites */}
               <div id="third-party-links" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">7. Links to third party websites</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">7. Links to third party websites</h3>
                 <p className="text-gray-700 leading-relaxed">
                   The Glamlink Service includes links to other websites whose privacy practices may differ from those of Glamlink. If you submit personal information to any of those sites or to Beauty Professionals, your information is governed by their Privacy Policies. We encourage you to
                   carefully read the Privacy Policy of any website you visit.
@@ -397,7 +397,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 8: Security */}
               <div id="security" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">8. Security</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">8. Security</h3>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   The Glamlink Service has security measures in place that are intended to help protect against the loss, misuse, unauthorized access or alteration of information under our control both during transmission and once the information is received. These measures include encryption of
                   data using the Secure Socket Layer (SSL) system when you send your personal information electronically to the Glamlink Service.
@@ -410,7 +410,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 9: Data Retention */}
               <div id="data-retention" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">9. Data Retention</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">9. Data Retention</h3>
                 <p className="text-gray-700 leading-relaxed">
                   Unless required under applicable law, we will retain your personally identifiable information for our business records even after your account is deleted. This is necessary for maintaining our business and accounting records as to the services you have purchased and the payments
                   you have made.
@@ -419,7 +419,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 10: Purchase or Sale of Businesses */}
               <div id="business-transfer" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">10. Purchase or Sale of Businesses</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">10. Purchase or Sale of Businesses</h3>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   We may buy, merge, or partner with other companies or businesses and in so doing, acquire or transfer information. We may also, sell, assign, or otherwise transfer such information in the regular course of business. Information collected through the Glamlink Service may be among
                   the transferred business assets. In the event that a portion or substantially all of our assets are sold or transferred to a third party, your information would likely be a transferred business asset, and you hereby agree to such a transfer.
@@ -432,7 +432,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 11: Additional Disclosures */}
               <div id="disclosures" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">11. Additional Disclosures</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">11. Additional Disclosures</h3>
                 <p className="text-gray-700 leading-relaxed">
                   We will disclose personal information when we believe in good faith that such disclosures are required by law, including, for example, to comply with a court order or subpoena; to enforce our Privacy Policy; to protect your safety or security; and/or, protect the safety and
                   security of our websites, us, and/or third parties, including the safety and security of property that belongs to us or third parties. We may disclose personal information to any person performing audit, legal, operational, or other services for us.
@@ -441,7 +441,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 12: Non-Personal Information */}
               <div id="non-personal" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">12. Non-Personal Information</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">12. Non-Personal Information</h3>
                 <p className="text-gray-700 leading-relaxed">
                   We may use and share non-personal information – that is, de-identified information that cannot be used to identify you - for any lawful business purpose without any obligation or accounting to you. For example, we can use non-personal information for developing products, services,
                   and providing those offerings to other users and third parties. We may use your personal information to generate non-personal information. When we do so, we will take reasonable measures to ensure that the non-personal information is no longer personally identifiable and cannot
@@ -451,7 +451,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 13: Children's Information */}
               <div id="children" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">13. Children's Information</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">13. Children's Information</h3>
 
                 <p className="text-gray-700 leading-relaxed">
                   We do not knowingly collect any information from, or sell to, children under the age of 13. If you are a parent or guardian who has discovered that your child under the age of 13 has submitted his or her personally identifiable information without your permission or consent, please
@@ -461,7 +461,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 14: Changes and Updates */}
               <div id="changes" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">14. Changes and Updates</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">14. Changes and Updates</h3>
                 <p className="text-gray-700 leading-relaxed">
                   We may revise this Privacy Policy from time to time as we add new features or modify the way in which we manage information, or as laws change that may affect our services. If we make material changes to our Privacy Policy, we will post notice of this on the Glamlink Service prior
                   to the changes becoming effective. Any revised Privacy Policy will apply both to information we already have about you at the time of the change, and any personal information created or received after the change takes effect. We include a version number on this Privacy Policy
@@ -472,13 +472,13 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 15: Do Not Track */}
               <div id="do-not-track" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">15. Do Not Track</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">15. Do Not Track</h3>
                 <p className="text-gray-700 leading-relaxed">We currently do not participate in any "Do Not Track" frameworks that would allow us to respond to signals or other mechanisms from you regarding the collection of data.</p>
               </div>
 
               {/* Section 16: Your State Privacy Rights */}
               <div id="state-rights" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">16. Your State Privacy Rights</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">16. Your State Privacy Rights</h3>
 
                 <div className="space-y-6">
                   <p className="text-gray-700 leading-relaxed">State consumer privacy laws may provide their residents with additional rights regarding our use of their personal information.</p>
@@ -487,43 +487,43 @@ export default function PrivacyPolicyPage() {
 
                   <ul className="space-y-3">
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Confirm whether we process their personal information</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Access and delete certain personal information</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Correct inaccuracies in their personal information, taking into account the information's nature and processing purpose (excluding Iowa and Utah)</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Data portability</span>
                     </li>
                     <li className="flex flex-col items-start">
                       <span className="flex items-start">
-                        <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                        <span className="text-primary mr-3 mt-1">•</span>
                         <span className="text-gray-700">Opt-out of personal data processing for:</span>
                       </span>
                       <ul className="ml-6 mt-2 space-y-1">
                         <li className="flex items-start">
-                          <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                          <span className="text-primary mr-3 mt-1">•</span>
                           <span className="text-gray-700">Targeted advertising (excluding Iowa)</span>
                         </li>
                         <li className="flex items-start">
-                          <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                          <span className="text-primary mr-3 mt-1">•</span>
                           <span className="text-gray-700">Sales</span>
                         </li>
                         <li className="flex items-start">
-                          <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                          <span className="text-primary mr-3 mt-1">•</span>
                           <span className="text-gray-700">Profiling in furtherance of decisions that produce legal or similarly significant effects (excluding Iowa and Utah)</span>
                         </li>
                       </ul>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-glamlink-teal mr-3 mt-1">•</span>
+                      <span className="text-primary mr-3 mt-1">•</span>
                       <span className="text-gray-700">Either limit (opt-out of) or require consent to process sensitive personal data</span>
                     </li>
                   </ul>
@@ -537,7 +537,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 17: International Privacy Laws */}
               <div id="international" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">17. International Privacy Laws / Storage and Transfer of your Data</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">17. International Privacy Laws / Storage and Transfer of your Data</h3>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   Glamlink is a U.S.-based company. If you are using the websites from outside the United States, please be aware that you are sending information (including potentially personally identifiable information) to the United States. Any information sent to Glamlink will be held in
                   accordance with privacy laws in the United States and this Privacy Policy.
@@ -566,7 +566,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 18: Contact Information */}
               <div id="contact" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">18. Contact Information</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">18. Contact Information</h3>
                 <p className="text-gray-700 leading-relaxed mb-6">If you have any questions about this Privacy Policy, our policies and practices concerning the Glamlink Service, your rights under this statement, and your dealings with Glamlink, please contact us.</p>
                 <p className="text-gray-700 leading-relaxed">
                   Glamlink Inc <br />
@@ -574,7 +574,7 @@ export default function PrivacyPolicyPage() {
                   8090 S. Durango Dr Ste 102 #1033 <br />
                   Las Vegas, NV 89113 <br />
                   Email:{" "}
-                  <a href="mailto:support@glamlink.net" className="text-glamlink-teal underline">
+                  <a href="mailto:support@glamlink.net" className="text-primary underline">
                     support@glamlink.net
                   </a>
                 </p>
@@ -586,10 +586,10 @@ export default function PrivacyPolicyPage() {
                   <h4 className="text-lg font-semibold text-gray-900 mb-4">Thank You for Reading</h4>
                   <p className="text-gray-600 mb-6">We are committed to protecting your privacy and handling your personal information with care and respect. If you have any questions about this Privacy Policy, please don't hesitate to contact us.</p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onClick={scrollToTop} className="px-6 py-3 bg-glamlink-teal text-white font-semibold rounded-full hover:bg-glamlink-teal-dark transition-colors">
+                    <button onClick={scrollToTop} className="px-6 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary-dark transition-colors">
                       Back to Top
                     </button>
-                    <Link href="/terms" className="px-6 py-3 bg-white text-glamlink-teal font-semibold rounded-full border-2 border-glamlink-teal hover:bg-gray-50 transition-colors">
+                    <Link href="/terms" className="px-6 py-3 bg-white text-primary font-semibold rounded-full border-2 border-primary hover:bg-gray-50 transition-colors">
                       View Terms of Use
                     </Link>
                   </div>
@@ -601,7 +601,7 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Floating Back to Top Button */}
-      <button onClick={scrollToTop} className="fixed bottom-8 right-8 p-3 bg-glamlink-teal text-white rounded-full shadow-lg hover:bg-glamlink-teal-dark transition-all duration-300 transform hover:scale-110" aria-label="Back to top">
+      <button onClick={scrollToTop} className="fixed bottom-8 right-8 p-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-110" aria-label="Back to top">
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
         </svg>

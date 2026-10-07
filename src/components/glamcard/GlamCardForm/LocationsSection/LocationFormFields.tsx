@@ -30,7 +30,7 @@ const inputClass =
 const labelClass = "text-sm font-medium text-gray-700 block mb-1.5";
 
 const buttonClass =
-  "min-w-[120px] rounded-lg bg-[#23AEB8] px-5 py-2.5 text-sm font-medium text-white transition";
+  "min-w-[120px] rounded-lg bg-[#24bbcb] px-5 py-2.5 text-sm font-medium text-white transition";
 
 // Helper: Convert state name/abbreviation to numeric ID
 const findStateId = (stateValue: string | undefined, statesArray: any[]): string | undefined => {
@@ -322,7 +322,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       {/* CITY / STATE */}
       {location.location_type === "city_only" && (
         <div className="space-y-5">
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="md:grid gap-5 md:grid-cols-2">
             {/* STATE */}
             <div>
               <label className={labelClass}>State</label>
@@ -387,7 +387,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
               disabled={!canSetCity}
               className={`w-full ${
                 canSetCity
-                  ? "bg-[#23AEB8] text-white hover:bg-[#1f9ba3]"
+                  ? "bg-[#24bbcb] text-white hover:bg-[#1f9ba3]"
                   : "cursor-not-allowed bg-gray-300 text-white"
               } ${buttonClass}`}
               onClick={handleSetCity}
@@ -423,7 +423,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                 disabled={!canConfirmExact}
                 className={`flex-1 sm:flex-none ${buttonClass} ${
                   canConfirmExact
-                    ? "bg-[#23AEB8] hover:bg-[#1F9CA5]"
+                    ? "bg-[#24bbcb] hover:bg-[#1F9CA5]"
                     : "cursor-not-allowed bg-gray-300"
                 }`}
                 onClick={handleConfirmExact}

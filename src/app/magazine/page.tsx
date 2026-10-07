@@ -109,7 +109,7 @@ export default function Magazine() {
           __html: JSON.stringify(collectionSchema),
         }}
       />
-      <main className="pt-16 lg:pt-20">
+      <main>
         <MagazineHero />
         <MagazineIssues />
       </main>

@@ -2,12 +2,24 @@
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { Manrope } from "next/font/google";
 
 import Providers from "./providers";
 import ScrollToTop from "@/components/ScrollToTop";
 import LayoutWrapper from "@/components/LayoutWrapper";
 
 import "../styles/globals.css"
+
+/* -------------------------
+   Fonts
+--------------------------*/
+
+// Manrope is the single Glamlink typeface (variable font: 200–800)
+const manrope = Manrope({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-manrope",
+});
 
 /* -------------------------
    Global Metadata
@@ -115,7 +127,7 @@ export default function RootLayout({
   children: ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={manrope.variable}>
       <head>
         {/* Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -8,7 +8,7 @@ const PromoBanner = () => {
         <div className="relative overflow-hidden rounded-3xl shadow-[0_40px_80px_rgba(0,0,0,0.15)]">
           {/* Gradient Background */}
           <div
-            className="bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600
+            className="bg-primary
  px-8 py-20 text-center  relative"
           >
             {/* Dotted pattern */}
@@ -35,7 +35,7 @@ const PromoBanner = () => {
               </div>
 
               {/* Heading */}
-              <h2 className="text-3xl md:text-4xl lg:text-5xl  mb-6">
+              <h2 className="section-title font-display text-white mb-6">
                 Join Now, Pay Less
               </h2>
 

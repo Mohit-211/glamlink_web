@@ -45,10 +45,10 @@ export default function DirectorySearch({
       onSubmit={handleSubmit}
       className="scroll-mt-28 w-full"
     >
-      <div className="rounded-3xl lg:rounded-full border border-border/80 bg-white p-2 shadow-large">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-1.5 lg:gap-0">
+      <div className="rounded-3xl md:rounded-full border border-border/80 bg-white p-2 shadow-large">
+        <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-0">
           {/* PROFESSIONAL TYPE */}
-          <div className="lg:w-[236px] lg:shrink-0">
+          <div className="md:w-[236px] md:shrink-0">
             <ProfessionalTypeSelect
               professionalTypes={professionalTypes}
               value={professionalType}
@@ -56,11 +56,11 @@ export default function DirectorySearch({
             />
           </div>
 
-          <span className="hidden lg:block h-10 w-px bg-border" aria-hidden="true" />
-          <span className="lg:hidden mx-4 h-px bg-border" aria-hidden="true" />
+          <span className="hidden md:block h-10 w-px bg-border" aria-hidden="true" />
+          <span className="md:hidden mx-4 h-px bg-border" aria-hidden="true" />
 
           {/* LOCATION */}
-          <div className="flex items-center gap-3 rounded-2xl lg:rounded-full px-4 py-2.5 lg:py-2 lg:flex-[1.2] hover:bg-muted/60 focus-within:bg-muted/60 transition-colors">
+          <div className="flex items-center gap-3 rounded-2xl md:rounded-full px-4 py-2.5 md:py-2 md:flex-[1.2] hover:bg-muted/60 focus-within:bg-muted/60 transition-colors">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
               <MapPin className="h-[18px] w-[18px]" aria-hidden="true" />
             </span>
@@ -93,7 +93,7 @@ export default function DirectorySearch({
               ) : (
                 <LocateFixed className="w-4 h-4" aria-hidden="true" />
               )}
-              <span className="hidden sm:inline lg:hidden">
+              <span className="hidden sm:inline md:hidden">
                 {isLocating ? "Locating…" : "Use my location"}
               </span>
             </button>
@@ -103,7 +103,7 @@ export default function DirectorySearch({
           <button
             type="submit"
             disabled={isSearching}
-            className="btn-primary mt-1 lg:mt-0 lg:ml-1 h-12 lg:h-14 w-full lg:w-auto lg:px-8 text-[15px] disabled:opacity-80"
+            className="btn-primary mt-1 md:mt-0 md:ml-1 h-12 md:h-14 w-full md:w-auto md:px-8 text-[15px] disabled:opacity-80"
           >
             {isSearching ? (
               <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />

@@ -596,9 +596,14 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           </div>
 
           <div id="field-instagram" className="md:col-span-2">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
               <div>
-                <label className={labelClass}>Instagram</label>
+                <label className={labelClass}>
+                  Instagram
+                  {data.preferred_booking_methods?.includes(BOOKING_METHODS.INSTAGRAM) && (
+                    <span className="text-red-500"> *</span>
+                  )}
+                </label>
                 <p className="text-xs text-gray-500">Add multiple Instagram handles</p>
               </div>
               <button
@@ -722,8 +727,8 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         </div>
 
         {/* Press / Articles / Other Links */}
-        <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5">
-          <div className="flex items-center justify-between">
+        <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-3 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <label className="text-sm font-semibold text-gray-800">
                 Press / Articles / Other Links
@@ -784,8 +789,8 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       </div>
 
       {/* Featured Links */}
-      <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-3 sm:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <label className="text-sm font-semibold text-gray-800">Featured Links</label>
             <p className="mt-1 text-xs text-gray-500">
@@ -796,7 +801,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           <button
             type="button"
             onClick={addFeaturedLink}
-            className="flex-none rounded-lg bg-[#23AEB8] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3]"
+            className="w-full flex-none rounded-lg bg-[#24bbcb] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3] sm:w-auto"
           >
             + Add Featured Link
           </button>
@@ -818,7 +823,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                   setDraggedFeaturedLinkIndex(null);
                 }}
                 onDragEnd={() => setDraggedFeaturedLinkIndex(null)}
-                className={`flex flex-col gap-2 rounded-lg border bg-white p-3 ${link.is_featured ? "border-[#23AEB8] ring-1 ring-[#23AEB8]/30" : "border-gray-200"
+                className={`flex flex-col gap-2 rounded-lg border bg-white p-3 ${link.is_featured ? "border-[#24bbcb] ring-1 ring-[#24bbcb]/30" : "border-gray-200"
                   }`}
               >
                 <div className="flex items-start gap-2">
@@ -894,7 +899,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                         type="checkbox"
                         checked={!!link.is_featured}
                         onChange={() => toggleFeaturedLinkFeatured(index)}
-                        className="h-3.5 w-3.5 rounded border-gray-300 text-[#23AEB8] focus:ring-[#23AEB8]"
+                        className="h-3.5 w-3.5 rounded border-gray-300 text-[#24bbcb] focus:ring-[#24bbcb]"
                       />
                       Feature this link first
                     </label>
@@ -915,7 +920,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({
 
       <div id="field-preferred_booking_methods">
         <div className="flex items-center gap-2 relative">
-          <label className={labelClass}>Ways To Connects</label>
+          <label className={labelClass}>
+            Ways To Connects <span className="text-red-500">*</span>
+          </label>
         </div>
 
         <div
@@ -964,7 +971,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         {data.preferred_booking_methods?.includes(BOOKING_METHODS.LINK) && (
           <div id="field-booking_link" className="mt-4">
             <label className={`${labelClass} m-0`}>
-              Booking Link
+              Booking Link <span className="text-red-500">*</span>
             </label>
             <input
               type="url"
@@ -1004,7 +1011,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => removeInfo(i)}
-                  className="text-red-600 hover:text-red-800 text-xl"
+                  className="flex-none px-1 text-red-600 hover:text-red-800 text-xl"
                 >
                   ×
                 </button>
@@ -1028,7 +1035,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           <button
             type="button"
             onClick={addInfo}
-            className="rounded-lg bg-gray-200 p-1 text-sm font-medium hover:bg-gray-300"
+            className="flex-none whitespace-nowrap rounded-lg bg-gray-200 px-3 py-1 text-sm font-medium hover:bg-gray-300"
           >
             + Add
           </button>

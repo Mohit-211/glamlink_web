@@ -31,7 +31,7 @@ const TOP_TABS = [
   { label: "Education", path: "education", href: "/journal/education" },
   { label: "Events", path: "event", href: "/journal/events" },
   { label: "Shop", path: "shop", href: "/journal/shop" },
-  { label: "Directory", path: "directory", href: "/journal/directory" },
+  // { label: "Directory", path: "directory", href: "/journal/directory" },
 ];
 
 // Only the "journal" tab shows Category nav + Magazine sidebar
@@ -142,7 +142,7 @@ const MobileMagazineCarousel = ({
     <div className="lg:hidden mt-2 px-0.5">
       {/* Header row */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-bold uppercase text-foreground tracking-wide">
+        <h3 className="text-xs font-semibold uppercase text-foreground tracking-wide">
           Latest Issues
         </h3>
         <span className="text-[10px] text-muted-foreground">
@@ -167,7 +167,7 @@ const MobileMagazineCarousel = ({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full text-xs text-[#24bbcb] font-bold">
+                  <div className="flex items-center justify-center h-full text-xs text-[#24bbcb] font-semibold">
                     #{issueNum}
                   </div>
                 )}
@@ -297,7 +297,7 @@ const MagazineSidebar = ({
     <div className="border border-border/40 rounded-xl bg-background shadow-sm overflow-hidden">
       {/* Header */}
       <div className="px-4 pt-5 pb-4 border-b border-border/30">
-        <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-foreground">
           The Glamlink Edit
         </h2>
         <p className="text-xs text-[#24bbcb] font-semibold mt-1">
@@ -331,7 +331,7 @@ const MagazineSidebar = ({
                     className="w-full h-full object-cover group-hover:scale-105 transition"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-[#24bbcb]">
+                  <div className="w-full h-full flex items-center justify-center text-[10px] font-semibold text-[#24bbcb]">
                     #{issueNum}
                   </div>
                 )}
@@ -420,7 +420,8 @@ const JournalClient = ({ path }: { path: string }) => {
       params.set("category", category);
     }
     const query = params.toString();
-    router.replace(`/journal${query ? `?${query}` : ""}`, { scroll: false });
+    console.log(query,"query")
+    router.replace(`/${query ? `?${query}` : ""}`, { scroll: false });
   };
 
   const handleIssueClick = (issue: Issue) => {

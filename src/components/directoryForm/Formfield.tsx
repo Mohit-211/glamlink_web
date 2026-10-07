@@ -16,9 +16,9 @@ export const FormField: React.FC<FormFieldProps> = ({
   className = '',
 }) => (
   <div className={`flex flex-col gap-1.5 ${className}`}>
-    <label className="text-[11px] font-bold uppercase tracking-widest text-[#4A7A88]">
+    <label className="text-[11px] font-semibold uppercase tracking-widest text-[#4A7A88]">
       {label}
-      {required && <span className="text-[#3BBDD4] ml-0.5">*</span>}
+      {required && <span className="text-[#24bbcb] ml-0.5">*</span>}
     </label>
     {children}
     {hint && (
@@ -36,7 +36,7 @@ export const Input: React.FC<InputProps> = ({ className = '', ...props }) => (
       px-3.5 py-[11px] font-nunito text-sm text-[#1A3A42]
       outline-none w-full transition-all duration-200
       placeholder:text-[#AACCDA]
-      focus:border-[#3BBDD4] focus:shadow-[0_0_0_3px_rgba(59,189,212,0.14)] focus:bg-white
+      focus:border-[#24bbcb] focus:shadow-[0_0_0_3px_rgba(36,187,203,0.14)] focus:bg-white
       ${className}
     `}
     {...props}
@@ -52,7 +52,7 @@ export const TextArea: React.FC<TextAreaProps> = ({ className = '', ...props }) 
       px-3.5 py-[11px] font-nunito text-sm text-[#1A3A42]
       outline-none w-full transition-all duration-200 resize-y min-h-[88px]
       placeholder:text-[#AACCDA]
-      focus:border-[#3BBDD4] focus:shadow-[0_0_0_3px_rgba(59,189,212,0.14)] focus:bg-white
+      focus:border-[#24bbcb] focus:shadow-[0_0_0_3px_rgba(36,187,203,0.14)] focus:bg-white
       ${className}
     `}
     {...props}
@@ -69,7 +69,7 @@ export const Select: React.FC<SelectProps> = ({ options, className = '', ...prop
       bg-[#F7FAFB] border-[1.5px] border-[#DCF0F6] rounded-[10px]
       px-3.5 py-[11px] font-nunito text-sm text-[#1A3A42]
       outline-none w-full transition-all duration-200
-      focus:border-[#3BBDD4] focus:shadow-[0_0_0_3px_rgba(59,189,212,0.14)] focus:bg-white
+      focus:border-[#24bbcb] focus:shadow-[0_0_0_3px_rgba(36,187,203,0.14)] focus:bg-white
       ${className}
     `}
     {...props}

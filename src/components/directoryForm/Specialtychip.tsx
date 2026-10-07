@@ -19,7 +19,7 @@ export const SpecialtyChip: React.FC<SpecialtyChipProps> = ({
       cursor-pointer select-none transition-all duration-150
       ${
         checked
-          ? 'border-[#3BBDD4] bg-[#EEF9FC]'
+          ? 'border-[#24bbcb] bg-[#EEF9FC]'
           : 'border-[#DCF0F6] bg-[#F7FAFB] hover:border-[#A8E0EE] hover:bg-[#EEF9FC]'
       }
     `}
@@ -34,7 +34,7 @@ export const SpecialtyChip: React.FC<SpecialtyChipProps> = ({
       className={`
         w-4 h-4 rounded-[5px] border-[1.5px] flex items-center justify-center
         shrink-0 transition-all duration-150
-        ${checked ? 'bg-[#3BBDD4] border-[#3BBDD4]' : 'bg-white border-[#B4DCE9]'}
+        ${checked ? 'bg-[#24bbcb] border-[#24bbcb]' : 'bg-white border-[#B4DCE9]'}
       `}
     >
       {checked && (

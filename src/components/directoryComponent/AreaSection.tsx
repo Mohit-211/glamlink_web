@@ -30,7 +30,7 @@ export default function AreaSection({ title, data, loading }: Props) {
 
     <section className="mb-16">
 
-      {/* <h2 className="text-2xl font-bold mb-8">
+      {/* <h2 className="text-2xl font-semibold mb-8">
         {title}
       </h2> */}
 

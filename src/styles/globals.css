@@ -26,9 +26,6 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-
-  --font-serif: "Cormorant Garamond", Georgia, serif;
-  --font-sans: "Cormorant Garamond", Georgia, serif;
 }
 
 /* ────────────────────────────────────────────────
@@ -38,7 +35,7 @@
   --radius: 0.75rem;
 
   /* Primary */
-  --primary: 186 70% 47%;
+  --primary: 184 68% 43%;
   --primary-foreground: 0 0% 100%;
 
   /* Surfaces */
@@ -57,8 +54,8 @@
   --muted: 220 15% 96%;
   --muted-foreground: 220 10% 50%;
 
-  --accent: 186 68% 95%;
-  --accent-foreground: 186 68% 30%;
+  --accent: 184 68% 95%;
+  --accent-foreground: 184 68% 30%;
 
   --destructive: 0 84% 60%;
   --border: 220 15% 90%;
@@ -70,7 +67,7 @@
   --sidebar-foreground: 240 5.3% 26.1%;
   --sidebar-primary: 186 70% 47%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 186 50% 95%;
+  --sidebar-accent: 184 50% 95%;
   --sidebar-border: 220 15% 90%;
 
   /* Shadows */
@@ -119,7 +116,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "Cormorant Garamond", Georgia, serif;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
   }
 
   h1,
@@ -132,7 +129,7 @@
   }
 
   .font-display {
-    font-family: "Cormorant Garamond", Georgia, serif;
+    font-family: var(--font-serif);
   }
 
   button:not(:disabled),
@@ -158,18 +155,9 @@
     @apply py-20 md:py-28;
   }
 
+  /* Plain page background (kept as a class for existing usages; no gradient) */
   .page-soft {
-    background: radial-gradient(
-        circle at 10% 20%,
-        rgba(30, 168, 181, 0.05),
-        transparent 40%
-      ),
-      radial-gradient(
-        circle at 90% 80%,
-        rgba(30, 168, 181, 0.04),
-        transparent 45%
-      ),
-      hsl(var(--background));
+    background: hsl(var(--background));
   }
 
   .btn-primary {
@@ -206,14 +194,29 @@
     box-shadow: var(--shadow-medium);
   }
 
+  /* Accent words in headings — solid brand teal (no gradient) */
   .gradient-text {
-    @apply bg-gradient-to-r from-primary via-[#1ea8b5] to-primary bg-clip-text text-transparent;
+    @apply text-primary;
   }
 
   .badge-soft {
     @apply inline-flex items-center gap-1.5 rounded-full
     bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary
     border border-primary/20;
+  }
+
+  /* ── Hero system: shared by every top-of-page hero ── */
+  .hero-glamlink {
+    @apply pt-28 pb-16 md:pt-36 md:pb-24;
+  }
+
+  .hero-title {
+    @apply font-sans text-4xl leading-[1.1] sm:text-5xl lg:text-6xl
+    font-semibold tracking-tight text-foreground text-balance;
+  }
+
+  .hero-subtitle {
+    @apply text-lg sm:text-xl leading-relaxed text-muted-foreground;
   }
 
   .section-title {
@@ -249,6 +252,13 @@
 /* ────────────────────────────────────────────────
    UTILITIES / ANIMATIONS
 ───────────────────────────────────────────────── */
+
+/* Larger size for hero / main CTAs — pair with .btn-primary or .btn-outline.
+   Declared as a utility so it overrides the component's default sizing. */
+@utility btn-lg {
+  @apply px-8 py-4 text-base;
+}
+
 @layer utilities {
   .animate-float {
     animation: float 6s ease-in-out infinite;
@@ -390,12 +400,13 @@
 
 .prose-article > p:first-of-type::first-letter {
   float: left;
-  font-family: serif;
+  font-family: inherit;
+  font-weight: 600;
   font-size: 72px;
   line-height: 0.85;
   margin-right: 12px;
   margin-top: 6px;
-  color: #23aeb8;
+  color: #24bbcb;
 }
 
 .prose-article img {
@@ -406,6 +417,17 @@
   display: block;
 }
 
+.prose-article iframe {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+  border-radius: 12px;
+  margin: 24px 0;
+}
+
 .prose-article a {
   color: #6366f1;
   text-decoration: underline;
@@ -413,7 +435,7 @@
 }
 
 .prose-article a.mention-link {
-  color: #23aeb8;
+  color: #24bbcb;
   font-weight: 600;
   text-decoration: none;
 }
@@ -466,7 +488,7 @@
 }
 
 .prose-article th {
-  background: rgba(35, 174, 184, 0.08);
+  background: rgba(36,187,203, 0.08);
   font-weight: 600;
   color: #1f2937;
 }

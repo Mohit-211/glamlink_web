@@ -84,12 +84,12 @@ export default function MagazineIssues() {
   };
 
   return (
-    <section className="py-16 lg:py-24 bg-gradient-to-b from-background to-secondary/5">
+    <section className="py-16 lg:py-24 bg-background">
       <div className="container-glamlink max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {sections.map(({ year, issues }) => (
           <div key={year} className="mb-16 lg:mb-20">
             <div className="flex items-baseline justify-between gap-4 mb-8 lg:mb-10">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif tracking-tight text-foreground">
+              <h2 className="section-title font-display">
                 {year}
               </h2>
               <span className="text-sm sm:text-base font-medium text-muted-foreground tabular-nums">

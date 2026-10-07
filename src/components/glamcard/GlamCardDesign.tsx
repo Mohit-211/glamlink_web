@@ -16,7 +16,7 @@ const GlamCardDesign: React.FC<Props> = ({ slug }) => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <BusinessCardPage slug={slug} mode="view" />
+      <BusinessCardPage slug={slug} mode="view" trackAnalytics />
     </div>
   );
 };

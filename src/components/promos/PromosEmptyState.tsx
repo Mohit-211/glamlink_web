@@ -22,7 +22,7 @@ const PromosEmptyState = () => {
           </div>
 
           {/* Message */}
-          <h2 className="text-2xl lg:text-3xl font-semibold text-foreground mb-3">
+          <h2 className="font-display text-2xl lg:text-3xl font-semibold text-foreground mb-3">
             No Active Promotions
           </h2>
           
