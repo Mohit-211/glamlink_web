@@ -1,9 +1,10 @@
 "use client";
 
 import type { MouseEvent } from "react";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, Handshake } from "lucide-react";
 
 import CommonHero from "@/components/common/CommonHero";
+import { unsplash } from "@/lib/directory/mockData";
 import { INQUIRY_SECTION_ID } from "./partnerContent";
 
 export default function PartnerHero() {
@@ -16,7 +17,13 @@ export default function PartnerHero() {
 
   return (
     <CommonHero
-      eyebrow="Partnerships"
+      className="border-b border-border"
+      eyebrow={
+        <>
+          <Handshake className="w-4 h-4" aria-hidden="true" />
+          Partnerships
+        </>
+      }
       title="Partner With"
       titleHighlight="Glamlink"
       description={
@@ -38,27 +45,12 @@ export default function PartnerHero() {
         href: `#${INQUIRY_SECTION_ID}`,
         onClick: scrollToInquiry,
       }}
-      media={
-        /* Editorial cover stack */
-        <div className="relative h-full w-full">
-          <img
-            src="/magazine/issue117.png"
-            alt="The Glamlink Edit, Issue 117"
-            className="absolute right-0 top-0 w-[62%] rounded-2xl object-cover shadow-large rotate-[4deg]"
-          />
-          <img
-            src="/magazine/issue115.png"
-            alt="The Glamlink Edit, Issue 115"
-            className="absolute left-0 top-[10%] w-[62%] rounded-2xl object-cover shadow-large -rotate-3"
-            fetchPriority="high"
-          />
-          <img
-            src="/podcastcover.png"
-            alt="The Beauty Vault podcast"
-            className="absolute bottom-0 right-[8%] w-[38%] rounded-2xl border-4 border-white object-cover shadow-large"
-          />
-        </div>
-      }
+      collage={{
+        main: { src: unsplash("1573496359142-b8d87734a5a2", 700), alt: "Beauty brand founder", label: "Brand Partners", priority: true },
+        top: { src: "/magazine/issue117.png", alt: "The Glamlink Edit, Issue 117", fit: "contain" },
+        bottom: { src: "/podcastcover.png", alt: "The Beauty Vault podcast cover", fit: "contain" },
+        accent: { src: unsplash("1516975080664-ed2fc6a32937", 300), alt: "Makeup brushes" },
+      }}
     />
   );
 }
