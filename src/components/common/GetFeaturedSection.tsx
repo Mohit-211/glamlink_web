@@ -16,7 +16,7 @@ const GetFeaturedSection = () => {
 
   return (
     <>
-      <section className="relative py-20 overflow-hidden bg-muted/40">
+      <section className="relative py-20 overflow-hidden bg-accent">
 
         <div className="container-glamlink text-center max-w-2xl">
           {/* LABEL */}
