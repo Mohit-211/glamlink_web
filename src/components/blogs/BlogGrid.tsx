@@ -167,7 +167,7 @@ const BlogGrid: React.FC<Props> = ({
   if (loading) {
     return (
       <section className="mt-10 space-y-10">
-        <div className="grid md:grid-cols-2 xl:grid-cols-2 gap-x-12 gap-y-16" aria-hidden="true">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-x-12 lg:gap-y-16" aria-hidden="true">
           {Array.from({ length: POSTS_PER_PAGE }).map((_, i) => (
             <div key={i} className="flex flex-col gap-4 animate-pulse">
               <div className="w-full aspect-video rounded-2xl bg-muted/60" />
@@ -237,7 +237,7 @@ const BlogGrid: React.FC<Props> = ({
           )}
 
           {/* ── Grid ── */}
-          <div className="grid md:grid-cols-2 xl:grid-cols-2 gap-x-12 gap-y-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-x-12 lg:gap-y-16">
         {paginated.map((item, index) => {
           const title = item.title || "Untitled";
           const author = item?.journal_author?.name || "Unknown";
@@ -257,7 +257,7 @@ const BlogGrid: React.FC<Props> = ({
                   lower: true,
                   strict: true,
                 })}`}
-                className="block group animate-fade-up"
+                className="block h-full group animate-fade-up"
                 style={{ animationDelay: `${0.06 * index}s` }}
               >
                 <BlogCard
