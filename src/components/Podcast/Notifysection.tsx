@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 
-<<<<<<< Updated upstream
 // ─── Floating diamond accent ──────────────────────────────────────────────────
 function Diamond({
   style,
@@ -28,10 +27,8 @@ function Diamond({
     />
   );
 }
-=======
 const inputClass =
   "w-full h-12 px-4 rounded-xl border border-input bg-background text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/15";
->>>>>>> Stashed changes
 
 function Field({
   label,
@@ -49,16 +46,13 @@ function Field({
   required?: boolean;
 }) {
   return (
-<<<<<<< Updated upstream
     <div className="relative group">
       <label
         className="block text-[9px] tracking-[0.25em] uppercase font-semibold mb-1.5 transition-colors duration-200"
         style={{ color: focused ? "#24bbcb" : "hsl(210 15% 52%)" }}
       >
-=======
     <label className="block min-w-0">
       <span className="block text-[11px] uppercase tracking-widest font-semibold text-muted-foreground mb-1.5">
->>>>>>> Stashed changes
         {label}
       </span>
       <input
@@ -67,7 +61,6 @@ function Field({
         value={value}
         required={required}
         onChange={(e) => onChange(e.target.value)}
-<<<<<<< Updated upstream
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         className="w-full px-4 py-3 text-[13px] outline-none transition-all duration-200 rounded-lg"
@@ -81,9 +74,7 @@ function Field({
             ? "0 0 0 3px #24bbcb / 0.1"
             : "0 1px 3px hsl(210 20% 10% / 0.05)",
         }}
-=======
         className={inputClass}
->>>>>>> Stashed changes
       />
     </label>
   );
@@ -107,7 +98,6 @@ export default function NotifySection() {
   };
 
   return (
-<<<<<<< Updated upstream
     <section
       ref={ref}
       className="relative overflow-hidden"
@@ -367,7 +357,6 @@ export default function NotifySection() {
                     ✦ New episodes every Sunday
                   </p>
                 </div>
-=======
     <div className="h-full rounded-2xl border border-border bg-card shadow-soft p-6 sm:p-8">
       {!submitted ? (
         <>
@@ -403,7 +392,6 @@ export default function NotifySection() {
                   Notify me
                   <ArrowRight className="w-4 h-4" />
                 </>
->>>>>>> Stashed changes
               )}
             </button>
           </form>
