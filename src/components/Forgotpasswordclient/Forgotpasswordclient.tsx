@@ -2,7 +2,18 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import {
+  AuthInput,
+  AuthLayout,
+  AuthOtpInput,
+  AuthPasswordInput,
+  AuthSubmitButton,
+  OTP_LENGTH,
+  PasswordStrength,
+  ResendCode,
+  authLinkClass,
+} from "../AuthPage/AuthLayout";
 import { message } from "antd";
 import { forgotPasswordApi, sendOtp, verifyOtp } from "@/api/Api";
 
@@ -24,63 +35,6 @@ function getStrength(password: string) {
   if (/[0-9]/.test(password)) score++;
   if (/[^A-Za-z0-9]/.test(password)) score++;
   return score;
-}
-
-function strengthLabel(score: number) {
-  if (score < 2) return "Weak";
-  if (score === 2) return "Fair";
-  if (score === 3) return "Good";
-  return "Strong";
-}
-
-/* ── Reusable password field (matches Login page styling) ─────── */
-function PasswordInput({
-  id,
-  label,
-  value,
-  onChange,
-  placeholder,
-  error,
-}: {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder: string;
-  error?: string;
-}) {
-  const [visible, setVisible] = useState(false);
-
-  return (
-    <div className="space-y-1.5">
-      <label htmlFor={id} className="block text-sm font-medium text-foreground">
-        {label}
-      </label>
-      <div className="relative">
-        <input
-          id={id}
-          type={visible ? "text" : "password"}
-          autoComplete="new-password"
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          aria-invalid={!!error}
-          className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-            error ? "border-red-500" : "border-input"
-          }`}
-        />
-        <button
-          type="button"
-          onClick={() => setVisible((v) => !v)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
-          aria-label={visible ? "Hide password" : "Show password"}
-        >
-          {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-        </button>
-      </div>
-      {error && <p className="text-xs text-red-500">{error}</p>}
-    </div>
-  );
 }
 
 export default function ForgotPasswordClient() {
@@ -301,180 +255,131 @@ export default function ForgotPasswordClient() {
     }
   };
 
+  const submit = (handler: () => void) => (e: React.FormEvent) => {
+    e.preventDefault();
+    handler();
+  };
+
+  const title = { request: "Forgot Password?", otp: "Check your email", reset: "Reset Password" }[step];
+  const subtitle = {
+    request: "Enter the email linked to your account and we'll send you a code to reset your password.",
+    otp: (
+      <>
+        Enter the {OTP_LENGTH}-digit code we sent to{" "}
+        <span className="font-medium text-foreground break-all">{email}</span>
+      </>
+    ),
+    reset: email ? (
+      <>
+        Create a new password for{" "}
+        <span className="font-medium text-foreground break-all">{email}</span>
+      </>
+    ) : (
+      "Create a new password for your account."
+    ),
+  }[step];
+
   return (
-    <div className="page-soft min-h-screen flex items-center justify-center">
-      {/* Ambient blobs */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="animate-pulse-slow absolute -top-32 -left-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-        <div className="animate-pulse-slow animation-delay-700 absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-primary/8 blur-3xl" />
-      </div>
+    <AuthLayout
+      title={title}
+      subtitle={subtitle}
+      footer={
+        <>
+          Remember your password?{" "}
+          <Link href="/login" className={authLinkClass}>Back to Sign In</Link>
+        </>
+      }
+    >
+      {step === "request" && (
+        <form onSubmit={submit(handleRequestOtp)} noValidate className="space-y-4" aria-busy={loading}>
+          <AuthInput
+            id="email"
+            name="email"
+            label="Email address"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
+            placeholder="you@example.com"
+            value={email}
+            disabled={loading}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
+            }}
+            error={errors.email}
+          />
+          <AuthSubmitButton loading={loading} loadingText="Sending…">
+            Send Reset Code
+          </AuthSubmitButton>
+        </form>
+      )}
 
-      <div className="relative w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            {step === "request" && "Forgot Password"}
-            {step === "otp" && "Verify your email"}
-            {step === "reset" && "Reset Password"}
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {step === "request" && "Enter your email to receive a verification code"}
-            {step === "otp" && (
-              <>
-                We sent a code to{" "}
-                <span className="font-medium text-foreground">{email}</span>
-              </>
-            )}
-            {step === "reset" && "Create a new password for your account"}
+      {step === "otp" && (
+        <form onSubmit={submit(handleVerifyOtp)} noValidate className="space-y-5" aria-busy={loading}>
+          <AuthOtpInput
+            value={otp}
+            onChange={(v) => {
+              setOtp(v);
+              if (otpError) setOtpError(null);
+            }}
+            error={otpError}
+            disabled={loading}
+          />
+          <AuthSubmitButton loading={loading} loadingText="Verifying…">
+            Verify
+          </AuthSubmitButton>
+          <ResendCode cooldown={resendCooldown} resending={resending} onResend={handleResend} />
+          <p className="text-center text-sm">
+            <button
+              type="button"
+              onClick={() => {
+                setOtp("");
+                setOtpError(null);
+                setStep("request");
+              }}
+              className={`${authLinkClass} font-medium`}
+            >
+              Use a different email
+            </button>
           </p>
-        </div>
+        </form>
+      )}
 
-        <div className="card-glamlink !hover:transform-none rounded-2xl border bg-card p-8 shadow-[var(--shadow-medium)]">
-          {step === "request" && (
-            <div className="space-y-5">
-              <div className="space-y-1.5">
-                <label htmlFor="email" className="block text-sm font-medium text-foreground">
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
-                  }}
-                  aria-invalid={!!errors.email}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                    errors.email ? "border-red-500" : "border-input"
-                  }`}
-                />
-                {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
-              </div>
-              <button
-                type="button"
-                onClick={handleRequestOtp}
-                disabled={loading}
-                className="btn-primary w-full justify-center disabled:opacity-50"
-              >
-                {loading ? "Sending..." : "Send Verification Code"}
-              </button>
-              <p className="text-center text-sm text-muted-foreground">
-                Back to{" "}
-                <button
-                  type="button"
-                  onClick={() => router.push("/login")}
-                  className="font-medium text-primary hover:underline"
-                >
-                  Login
-                </button>
-              </p>
-            </div>
-          )}
+      {step === "reset" && (
+        <form onSubmit={submit(handleReset)} noValidate className="space-y-4" aria-busy={loading}>
+          <AuthPasswordInput
+            id="password"
+            name="password"
+            label="New password"
+            autoComplete="new-password"
+            placeholder="Min. 8 characters"
+            value={password}
+            disabled={loading}
+            onChange={(e) => updateField("password", e.target.value)}
+            error={errors.password}
+          >
+            {password && !errors.password && <PasswordStrength score={strength} />}
+          </AuthPasswordInput>
 
-          {step === "otp" && (
-            <div className="space-y-5">
-              <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-foreground">
-                  Verification Code
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="Enter code"
-                  value={otp}
-                  onChange={(e) => {
-                    setOtp(e.target.value.replace(/\D/g, ""));
-                    if (otpError) setOtpError(null);
-                  }}
-                  aria-invalid={!!otpError}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 text-center text-lg tracking-[0.3em] outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                    otpError ? "border-red-500" : "border-input"
-                  }`}
-                />
-                {otpError && <p className="text-xs text-red-500 text-center">{otpError}</p>}
-              </div>
-              <button
-                type="button"
-                onClick={handleVerifyOtp}
-                disabled={loading}
-                className="btn-primary w-full justify-center disabled:opacity-50"
-              >
-                {loading ? "Verifying..." : "Verify"}
-              </button>
-              <p className="text-center text-sm text-muted-foreground">
-                Didn't get a code?{" "}
-                <button
-                  type="button"
-                  onClick={handleResend}
-                  disabled={resendCooldown > 0 || resending}
-                  className="font-medium text-primary hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline"
-                >
-                  {resendCooldown > 0
-                    ? `Resend in ${resendCooldown}s`
-                    : resending
-                      ? "Resending..."
-                      : "Resend code"}
-                </button>
-              </p>
-            </div>
-          )}
+          <AuthPasswordInput
+            id="confirm"
+            name="confirm"
+            label="Confirm password"
+            autoComplete="new-password"
+            placeholder="Re-enter password"
+            value={confirm}
+            disabled={loading}
+            onChange={(e) => updateField("confirm", e.target.value)}
+            error={errors.confirm || (mismatch ? "Passwords do not match" : undefined)}
+          />
 
-          {step === "reset" && (
-            <div className="space-y-5">
-              {email && <p className="text-center text-sm font-semibold text-primary">{email}</p>}
-
-              <PasswordInput
-                id="password"
-                label="New password"
-                value={password}
-                onChange={(e) => updateField("password", e.target.value)}
-                placeholder="••••••••"
-                error={errors.password}
-              />
-
-              <PasswordInput
-                id="confirm"
-                label="Confirm password"
-                value={confirm}
-                onChange={(e) => updateField("confirm", e.target.value)}
-                placeholder="••••••••"
-                error={errors.confirm}
-              />
-
-              {password && !errors.password && (
-                <p className="text-xs text-muted-foreground">
-                  Strength: <span className="font-semibold">{strengthLabel(strength)}</span>
-                </p>
-              )}
-
-              {mismatch && !errors.confirm && (
-                <p className="text-xs text-red-500">Passwords do not match</p>
-              )}
-
-              <button
-                type="button"
-                onClick={handleReset}
-                disabled={loading}
-                className="btn-primary w-full justify-center disabled:opacity-50"
-              >
-                {loading ? "Resetting..." : "Reset Password"}
-              </button>
-
-              <p className="text-center text-sm text-muted-foreground">
-                Back to{" "}
-                <button
-                  type="button"
-                  onClick={() => router.push("/login")}
-                  className="font-medium text-primary hover:underline"
-                >
-                  Login
-                </button>
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+          <AuthSubmitButton loading={loading} loadingText="Resetting…">
+            Reset Password
+          </AuthSubmitButton>
+        </form>
+      )}
+    </AuthLayout>
   );
 }

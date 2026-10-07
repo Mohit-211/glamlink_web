@@ -14,6 +14,7 @@ import type {
 import { buildChartSeries, formatRangeLabel, prettyUrl } from './analyticsHelpers';
 import AnalyticsDateFilter, { presetRange } from './AnalyticsDateFilter';
 import AnalyticsSummaryCards from './AnalyticsSummaryCards';
+import { PageHeader } from '../shell/ui';
 import ViewsClicksChart from './ViewsClicksChart';
 import ClickActivity from './ClickActivity';
 import DeviceBreakdown from './DeviceBreakdown';
@@ -110,49 +111,47 @@ export default function AccessCardAnalytics({ cards }: { cards: CardOption[] }) 
 
   if (cards.length === 0) {
     return (
-      <AnalyticsEmptyState
-        title="No Access Card yet"
-        message="Create your Access Card to start tracking views and clicks."
-      />
+      <div>
+        <PageHeader title="Analytics" description="See how clients find and interact with your Access Card." />
+        <AnalyticsEmptyState
+          title="No Access Card yet"
+          message="Create your Access Card to start tracking views and clicks."
+        />
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
-          <h2 className="text-lg font-semibold text-foreground sm:text-xl">Access Card Analytics</h2>
-          {(name || businessName) && (
-            <p className="mt-1 truncate text-sm text-muted-foreground">
-              {[name, businessName].filter(Boolean).join(' • ')}
-            </p>
-          )}
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Analytics</h1>
+          <p className="mt-1 truncate text-sm text-muted-foreground">
+            {name || businessName
+              ? [name, businessName].filter(Boolean).join(' · ')
+              : 'How clients find and interact with your Access Card.'}
+          </p>
           {cardLink && (
-            <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
-              <span className="min-w-0 max-w-full truncate rounded-md bg-secondary px-2 py-1 font-mono text-[11px] text-muted-foreground">
-                {prettyUrl(cardLink)}
-              </span>
-              <a
-                href={cardLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground hover:opacity-90"
-              >
-                <ExternalLink className="h-3 w-3" />
-                View Access Card
-              </a>
-            </div>
+            <a
+              href={cardLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex min-w-0 max-w-full items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+            >
+              <span className="truncate font-mono">{prettyUrl(cardLink)}</span>
+              <ExternalLink className="h-3 w-3 flex-shrink-0" />
+            </a>
           )}
         </div>
 
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-shrink-0 sm:items-end">
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center lg:w-auto lg:flex-shrink-0">
           {cards.length > 1 && (
             <select
               value={selectedId}
               onChange={(e) => setSelectedId(e.target.value)}
               aria-label="Select Access Card"
-              className="w-full rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground outline-none focus:border-primary sm:w-56"
+              className="h-10 w-full rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 sm:w-56"
             >
               {cards.map((c) => (
                 <option key={c.id} value={String(c.id)}>
@@ -162,9 +161,6 @@ export default function AccessCardAnalytics({ cards }: { cards: CardOption[] }) 
             </select>
           )}
           <AnalyticsDateFilter value={range} onChange={setRange} disabled={loading} />
-          {summary && !loading && (
-            <p className="text-[11px] text-muted-foreground">Showing {rangeLabel}</p>
-          )}
         </div>
       </div>
 
@@ -175,7 +171,7 @@ export default function AccessCardAnalytics({ cards }: { cards: CardOption[] }) 
         <AnalyticsErrorState onRetry={retry} />
       ) : (
         <>
-          <AnalyticsSummaryCards summary={summary.summary} />
+          <AnalyticsSummaryCards summary={summary.summary} rangeLabel={rangeLabel} />
           {isEmpty ? (
             <AnalyticsEmptyState />
           ) : (

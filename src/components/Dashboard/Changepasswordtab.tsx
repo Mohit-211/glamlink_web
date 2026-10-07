@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Check, ShieldCheck, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { PageHeader, btn, field } from './shell/ui';
 import { ChangePassword } from '../../api/Api';
 import { useRouter } from 'next/navigation';
 type FieldName = 'old_password' | 'new_password' | 'confirm_password';
@@ -109,74 +110,96 @@ export default function ChangePasswordTab() {
             autoComplete: 'new-password',
         },
     ];
+    const requirements = [
+        { label: 'At least 8 characters', met: form.new_password.length >= 8 },
+        { label: 'Different from your current password', met: !!form.new_password && form.new_password !== form.old_password },
+        { label: 'Both new passwords match', met: !!form.confirm_password && form.new_password === form.confirm_password },
+    ];
     return (
-        <div className="max-w-md">
-            <div className="mb-6">
-                <h2 className="text-lg font-semibold text-foreground">Change Password</h2>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                    Update the password used to sign in to your account
-                </p>
-            </div>
-            {success && (
-                <div className="mb-4 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
-                    <CheckCircle className="h-4 w-4 flex-shrink-0" />
-                    Password changed successfully.
-                </div>
-            )}
-            {error && (
-                <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                    {error}
-                </div>
-            )}
-            <form onSubmit={handleSubmit} className="space-y-4">
-                {fields.map(({ name, label, placeholder, autoComplete }) => (
-                    <div key={name}>
-                        <label htmlFor={name} className="mb-1.5 block text-xs font-medium text-foreground">
-                            {label}
-                        </label>
-                        <div className="relative">
-                            <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                            <input
-                                id={name}
-                                type={showPassword[name] ? 'text' : 'password'}
-                                value={form[name]}
-                                onChange={handleChange(name)}
-                                placeholder={placeholder}
-                                autoComplete={autoComplete}
-                                disabled={submitting}
-                                className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-60"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => toggleVisibility(name)}
-                                tabIndex={-1}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                                aria-label={showPassword[name] ? 'Hide password' : 'Show password'}
-                            >
-                                {showPassword[name] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </button>
-                        </div>
+        <div>
+            <PageHeader title="Change Password" description="Update the password you use to sign in to Glamlink." />
+            <section className="mx-auto max-w-lg rounded-2xl border border-border bg-card p-5 sm:p-7">
+                <div className="mb-6 flex items-center gap-3">
+                    <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
+                        <ShieldCheck className="h-5 w-5" />
+                    </span>
+                    <div>
+                        <h2 className="text-base font-semibold text-foreground">Account security</h2>
+                        <p className="text-xs text-muted-foreground">You&apos;ll be signed out and asked to log in with your new password.</p>
                     </div>
-                ))}
-                <p className="text-[11px] text-muted-foreground">
-                    Password must be at least 8 characters and different from your current password.
-                </p>
-                <button
-                    type="submit"
-                    disabled={submitting}
-                    className="btn-primary flex w-full items-center justify-center gap-2 !rounded-xl !py-2.5 !text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                    {submitting ? (
-                        <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Updating...
-                        </>
-                    ) : (
-                        'Update Password'
-                    )}
-                </button>
-            </form>
+                </div>
+                {success && (
+                    <div role="status" className="mb-5 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                        <CheckCircle className="h-4 w-4 flex-shrink-0" />
+                        Password changed successfully. Signing you out…
+                    </div>
+                )}
+                {error && (
+                    <div role="alert" className="mb-5 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                        <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                        {error}
+                    </div>
+                )}
+                <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+                    {fields.map(({ name, label, placeholder, autoComplete }) => (
+                        <div key={name}>
+                            <label htmlFor={name} className={field.label}>
+                                {label}
+                            </label>
+                            <div className="relative">
+                                <input
+                                    id={name}
+                                    type={showPassword[name] ? 'text' : 'password'}
+                                    value={form[name]}
+                                    onChange={handleChange(name)}
+                                    placeholder={placeholder}
+                                    autoComplete={autoComplete}
+                                    disabled={submitting}
+                                    className={`${field.input} pr-12`}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => toggleVisibility(name)}
+                                    className="absolute right-1 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                                    aria-label={showPassword[name] ? 'Hide password' : 'Show password'}
+                                    aria-pressed={showPassword[name]}
+                                    aria-controls={name}
+                                >
+                                    {showPassword[name] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    <ul className="space-y-1.5 rounded-xl bg-secondary/50 px-4 py-3" aria-label="Password requirements">
+                        {requirements.map(({ label, met }) => (
+                            <li key={label} className={`flex items-center gap-2 text-xs transition-colors ${met ? 'text-emerald-700' : 'text-muted-foreground'}`}>
+                                <span
+                                    className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full ${met ? 'bg-emerald-500 text-white' : 'border border-border bg-background'}`}
+                                    aria-hidden="true"
+                                >
+                                    {met && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+                                </span>
+                                {label}
+                                <span className="sr-only">{met ? '(met)' : '(not met)'}</span>
+                            </li>
+                        ))}
+                    </ul>
+                    <button
+                        type="submit"
+                        disabled={submitting}
+                        className={`${btn.primary} h-11 w-full`}
+                    >
+                        {submitting ? (
+                            <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Updating...
+                            </>
+                        ) : (
+                            'Update Password'
+                        )}
+                    </button>
+                </form>
+            </section>
         </div>
     );
 }

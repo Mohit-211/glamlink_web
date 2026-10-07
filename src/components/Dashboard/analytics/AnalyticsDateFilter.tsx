@@ -63,7 +63,7 @@ export default function AnalyticsDateFilter({
         <button
           type="button"
           disabled={disabled}
-          className="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-primary/5 disabled:opacity-50 sm:w-auto"
+          className="inline-flex h-10 w-full items-center justify-between gap-2 rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-primary/5 disabled:opacity-50 sm:w-auto sm:min-w-[180px]"
         >
           <span className="flex min-w-0 items-center gap-2">
             <CalendarDays className="h-4 w-4 flex-shrink-0 text-primary" />
@@ -112,7 +112,7 @@ export default function AnalyticsDateFilter({
               draft?.from &&
               apply({ from: toApiDate(draft.from), to: toApiDate(draft.to ?? draft.from) })
             }
-            className="flex-shrink-0 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-shrink-0 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Apply
           </button>

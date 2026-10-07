@@ -1,22 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  BarChart3,
-  CreditCard,
-  Edit3,
-  Package,
-  QrCode,
-  MapPin,
-  ChevronRight,
-  CheckCircle,
-  LayoutDashboard,
-  Loader2,
-  LogOut,
-  Lock,
-  Nfc,
-  Sparkles,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle, CreditCard, Lock, RefreshCw } from 'lucide-react';
 import { getMyBusinessCardForDashboard, getPaymenthistory, LogoutUser, userProfile } from '../../api/Api';
 import MyAccessCard from './Myaccesscard';
 import ShowQRCode from './Showqrcode';
@@ -26,69 +11,27 @@ import PaymentHistory from './PaymentHistory';
 import EditAccessCard from './accessCardEdit';
 import ChangePasswordTab from './Changepasswordtab';
 import { PurchaseType } from './Purchasetypes';
-import SubscriptionPlansTab, { PlanId } from '../Pricing/SubscriptionPlansTab';
+import type { PlanId } from '../Pricing/SubscriptionPlansTab';
+import PlansTab from './PlansTab';
+import { EmptyState, PageHeader, btn } from './shell/ui';
 import AccessCardAnalytics from './analytics/AccessCardAnalytics';
-type TabId =
-  | 'my-card'
-  | 'edit-card'
-  | 'analytics'
-  | 'payment-history'
-  | 'qr-code'
-  | 'subscription-plans'
-  | 'addresses'
-  | 'change-password';
-const NAV_ITEMS = [
-  {
-    id: 'my-card',
-    label: 'My Access Card',
-    description: 'View your public card',
-    icon: <CreditCard className="h-5 w-5" />,
-  },
-  {
-    id: 'edit-card',
-    label: 'Edit Access Card',
-    description: 'Update card details',
-    icon: <Edit3 className="h-5 w-5" />,
-  },
-  {
-    id: 'analytics',
-    label: 'Analytics',
-    description: 'Views, clicks and visitors',
-    icon: <BarChart3 className="h-5 w-5" />,
-  },
-  {
-    id: 'payment-history',
-    label: 'Payment History',
-    description: 'View payment history',
-    icon: <Package className="h-5 w-5" />,
-  },
-  {
-    id: 'qr-code',
-    label: 'QR Code',
-    description: 'Share your card link',
-    icon: <QrCode className="h-5 w-5" />,
-  },
-  {
-    id: 'subscription-plans',
-    label: 'Subscription Plans',
-    description: 'View or upgrade your plan',
-    icon: <Sparkles className="h-5 w-5" />,
-  },
-  {
-    id: 'addresses',
-    label: 'Addresses',
-    description: 'Manage saved addresses',
-    icon: <MapPin className="h-5 w-5" />,
-  },
-  {
-    id: 'change-password',
-    label: 'Change Password',
-    description: 'Update your account password',
-    icon: <Lock className="h-5 w-5" />,
-  },
-] as const;
-const isSubscriptionActive = (card: any): boolean =>
-  ((card?.business_user?.subscription_status || '') as string).toLowerCase() === 'active';
+import DashboardOverview, { DashboardOverviewSkeleton } from './DashboardOverview';
+import DashboardSidebar, { CONTENT_OFFSET, SIDEBAR_WIDTH, type DashboardUser } from './shell/DashboardSidebar';
+import DashboardHeader from './shell/DashboardHeader';
+import type { TabId } from './shell/nav';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+import {
+  ACCESS_CARD_UPGRADE_MESSAGE,
+  ensureCanEditAccessCard,
+  getAccessCardPermissions,
+  showAccessCardUpgradeMessage,
+} from '@/lib/accessCardPermissions';
+
+const SIDEBAR_COLLAPSED_KEY = 'glamlink-dashboard-sidebar-collapsed';
+const CARD_NOT_FOUND = 'Business card not found.';
+
 class TabErrorBoundary extends React.Component<
   { children: React.ReactNode; onReset: () => void },
   { hasError: boolean; message: string }
@@ -106,11 +49,14 @@ class TabErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="p-6 text-sm">
-          <p className="mb-3 font-medium text-destructive">
+        <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <AlertCircle className="h-5 w-5" />
+          </span>
+          <p className="mt-3 text-sm font-semibold text-foreground">
             Something went wrong loading this section.
           </p>
-          <p className="mb-4 text-xs text-muted-foreground break-words">
+          <p className="mt-1 max-w-md break-words text-xs text-muted-foreground">
             {this.state.message}
           </p>
           <button
@@ -118,8 +64,9 @@ class TabErrorBoundary extends React.Component<
               this.setState({ hasError: false, message: '' });
               this.props.onReset();
             }}
-            className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+            className="btn-primary mt-5 !py-2 !text-xs !shadow-none"
           >
+            <RefreshCw className="h-3.5 w-3.5" />
             Try again
           </button>
         </div>
@@ -130,7 +77,7 @@ class TabErrorBoundary extends React.Component<
 }
 export default function DashboardPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabId>('my-card');
+  const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [businessCard, setBusinessCard] = useState<any>(null);
   const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -146,6 +93,36 @@ export default function DashboardPage() {
   const [payModalPurchaseType, setPayModalPurchaseType] = useState<PurchaseType>(
 
   );
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // Width transitions are switched on only after the saved state is applied,
+  // so a remembered "collapsed" rail doesn't animate shut on every page load.
+  const [sidebarAnimated, setSidebarAnimated] = useState(false);
+  useEffect(() => {
+    try {
+      setSidebarCollapsed(localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1');
+    } catch {
+      // storage unavailable — keep the expanded default
+    }
+    const frame = requestAnimationFrame(() => setSidebarAnimated(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+  // The drawer is mobile/tablet only — drop it if the viewport grows to desktop.
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 1024px)');
+    const onChange = () => mql.matches && setDrawerOpen(false);
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+  const toggleSidebar = () => {
+    const next = !sidebarCollapsed;
+    setSidebarCollapsed(next);
+    try {
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, next ? '1' : '0');
+    } catch {
+      // ignore
+    }
+  };
   useEffect(() => {
     const token = localStorage.getItem('GlamlinkaccessToken');
     if (!token) {
@@ -195,14 +172,6 @@ export default function DashboardPage() {
         console.error(error);
       });
   }, []);
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-  const activeItem = NAV_ITEMS.find((n) => n.id === activeTab)!;
   const cardsArray: any[] = Array.isArray(businessCard)
     ? businessCard
     : businessCard
@@ -218,7 +187,11 @@ export default function DashboardPage() {
     cardsArray.find((c) => String(c?.id) === effectiveEditCardId) ??
     cardsArray[0] ??
     null;
-  const editCardEnabled = !!editingCard && isSubscriptionActive(editingCard);
+  // Edit permission comes only from the card's plan_type (see lib/accessCardPermissions).
+  // `loading` keeps every edit entry point locked until the card API has answered.
+  const editCardEnabled = getAccessCardPermissions(editingCard, { loading }).canEditAccessCard;
+  // The sidebar / breadcrumb "Edit Card" entry always opens the first card.
+  const defaultCardPermissions = getAccessCardPermissions(cardsArray[0], { loading });
   const handleSelectNfcPlan = (type: PurchaseType, businessId: string | number) => {
     setSelectedCardId(String(businessId ?? cardsArray[0]?.id ?? ''));
     setPayModalPurchaseType(type);
@@ -235,127 +208,158 @@ export default function DashboardPage() {
     if (!planType) return "Free";
     return PLAN_TYPE_LABELS[planType.toLowerCase()] || "Free";
   }
+
+  const dashboardUser: DashboardUser = {
+    name: userdata?.name || 'User',
+    email: userdata?.email,
+    image: userdata?.profile_image || null,
+    planLabel: getActivePlanLabel(cardsArray[0]?.plan_type),
+  };
+
+  const editLockReason = loading
+    ? 'Checking your plan…'
+    : !cardsArray[0]
+      ? 'Create an Access Card first'
+      : !defaultCardPermissions.canEditAccessCard
+        ? 'Upgrade your plan to edit'
+        : undefined;
+  const lockedTabs: Partial<Record<TabId, string>> = editLockReason ? { 'edit-card': editLockReason } : {};
+
+  function selectTab(tab: TabId) {
+    if (lockedTabs[tab]) {
+      // Plan-locked: explain and offer the existing Plans page instead of silently ignoring the click.
+      if (tab === 'edit-card' && !loading && cardsArray[0]) showAccessCardUpgradeMessage(goToPlans);
+      return;
+    }
+    if (tab === 'edit-card') setEditCardId(null);
+    setActiveTab(tab);
+    setDrawerOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goToPlans() {
+    selectTab('subscription-plans');
+  }
+
+  const openEditor = (card: any) => {
+    // Guard first — before switching tabs or preparing any form state.
+    if (!ensureCanEditAccessCard(card, { loading, onUpgrade: goToPlans })) return;
+    setEditCardId(String(card?.id ?? ''));
+    setActiveTab('edit-card');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // A failed card fetch other than "you don't have one yet" deserves a visible retry.
+  const loadFailed = !loading && !!error && error !== CARD_NOT_FOUND;
+
+  const sidebarProps = {
+    activeTab,
+    onSelect: selectTab,
+    lockedTabs,
+    user: dashboardUser,
+    onSignOut: handleSignOut,
+    signingOut,
+  };
+
   return (
-    <div className="min-h-screen bg-background page-soft mt-16 sm:mt-18">
-      <div className="container-glamlink py-6 sm:py-8 md:py-12">
-        <div className="mb-6 sm:mb-8">
-          <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-accent px-3 py-1 text-[11px] font-medium text-accent-foreground">
-              <LayoutDashboard className="h-3 w-3" />
-              Dashboard
-            </span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Manage your access card, orders, and account settings
-          </p>
-        </div>
-        <div className="flex flex-col lg:flex-row gap-6 items-start">
-          {/* Sidebar becomes a full-width nav above the content until `lg`
-              (1024px) — at `md` there wasn't enough room for a 256px rail
-              next to the card, so it now stacks through tablet widths too. */}
-          <aside className="w-full lg:w-64 flex-shrink-0">
-            <nav className="rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden">
-              <div className="px-4 py-4 border-b border-border bg-secondary/30 sm:px-5">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground ring-2 ring-primary/20">
-                    {userdata?.name?.slice(0, 2)?.toUpperCase() || 'GL'}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">{userdata?.name || 'User'}</p>
-                    <span className="inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground mt-0.5">
-                      {getActivePlanLabel(cardsArray[0]?.plan_type)} Plan
-                    </span>
-                  </div>
-                </div>
+    <div className="min-h-dvh bg-secondary/40">
+      {/* Desktop sidebar */}
+      <aside
+        className={cn(
+          'fixed inset-y-0 left-0 z-40 hidden border-r border-border lg:block',
+          sidebarAnimated && 'transition-[width] duration-[250ms] ease-out',
+          sidebarCollapsed ? SIDEBAR_WIDTH.collapsed : SIDEBAR_WIDTH.expanded
+        )}
+      >
+        <DashboardSidebar {...sidebarProps} collapsed={sidebarCollapsed} onToggleCollapse={toggleSidebar} />
+      </aside>
+
+      {/* Mobile / tablet drawer */}
+      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <SheetContent side="left" className="w-[280px] max-w-[85vw] gap-0 p-0 sm:max-w-[280px]" aria-describedby={undefined}>
+          <SheetTitle className="sr-only">Dashboard navigation</SheetTitle>
+          <DashboardSidebar {...sidebarProps} />
+        </SheetContent>
+      </Sheet>
+
+      <div
+        className={cn(
+          'flex min-h-dvh min-w-0 flex-col',
+          sidebarAnimated && 'transition-[padding] duration-[250ms] ease-out',
+          sidebarCollapsed ? CONTENT_OFFSET.collapsed : CONTENT_OFFSET.expanded
+        )}
+      >
+        <DashboardHeader
+          activeTab={activeTab}
+          user={dashboardUser}
+          onOpenMenu={() => setDrawerOpen(true)}
+          onSelect={selectTab}
+          onSignOut={handleSignOut}
+        />
+
+        <div className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+          {showSuccess && (
+            <div className="mb-6 flex flex-col gap-3 rounded-xl border border-primary/30 bg-accent px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-accent-foreground">
+                <CheckCircle className="h-4 w-4 flex-shrink-0" />
+                Business card created successfully! Complete payment to activate it.
               </div>
-              {/* Nav items: horizontally scrollable row on mobile/tablet
-                  (no wrapping, no squashed labels), vertical stack from `lg` up. */}
-              <div className="flex gap-1 overflow-x-auto p-2 lg:block lg:overflow-visible">
-                {NAV_ITEMS.map((item) => {
-                  const isEditCard = item.id === 'edit-card';
-                  const isDisabled = isEditCard && !editCardEnabled;
-                  return (
-                    <button
-                      key={item.id}
-                      disabled={isDisabled}
-                      title={isDisabled ? 'Subscribe to unlock editing' : undefined}
-                      onClick={() => {
-                        if (isDisabled) return;
-                        if (item.id === 'edit-card') {
-                          setEditCardId(null);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }
-                        setActiveTab(item.id);
-                      }}
-                      className={`flex flex-shrink-0 items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-150 lg:w-full ${isDisabled
-                        ? 'opacity-50 cursor-not-allowed text-muted-foreground'
-                        : activeTab === item.id
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-foreground hover:bg-secondary'
-                        }`}
-                    >
-                      {item.icon}
-                      <div className="min-w-[110px] flex-1 lg:min-w-0">
-                        <p className="whitespace-nowrap text-sm font-medium lg:whitespace-normal">{item.label}</p>
-                        <p className="hidden text-[11px] opacity-70 lg:block">{item.description}</p>
-                      </div>
-                      {isDisabled ? (
-                        <Lock className="hidden h-4 w-4 lg:block" />
-                      ) : (
-                        <ChevronRight className="hidden h-4 w-4 lg:block" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="border-t border-border p-2">
-                <button
-                  onClick={handleSignOut}
-                  disabled={signingOut}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-destructive transition-all duration-150 hover:bg-destructive/10 disabled:opacity-50"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
-                      {signingOut ? 'Signing out...' : 'Sign Out'}
-                    </p>
-                    <p className="text-[11px] opacity-70">End your session</p>
-                  </div>
-                </button>
-              </div>
-            </nav>
-          </aside>
-          <main className="w-full flex-1 min-w-0">
-            <div className="mb-4 flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-              <span className="flex-shrink-0">Dashboard</span>
-              <ChevronRight className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate font-medium text-foreground">{activeItem.label}</span>
+              <button
+                onClick={() => {
+                  setSelectedCardId(createdCardId);
+                  setPayModalPurchaseType('SUBSCRIPTION_ONLY');
+                  setPayOpen(true);
+                }}
+                disabled={!hasValidPaymentCardId}
+                className="btn-primary w-full flex-shrink-0 !py-2 !text-xs !shadow-none disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              >
+                Pay Now
+              </button>
             </div>
-            {showSuccess && (
-              <div className="mb-4 flex flex-col gap-3 rounded-xl border border-primary/30 bg-accent px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-accent-foreground">
-                  <CheckCircle className="h-4 w-4 flex-shrink-0" />
-                  Business card created successfully! Complete payment to activate it.
-                </div>
-                <button
-                  onClick={() => {
-                    setSelectedCardId(createdCardId);
-                    setPayModalPurchaseType('SUBSCRIPTION_ONLY');
-                    setPayOpen(true);
-                  }}
-                  disabled={!hasValidPaymentCardId}
-                  className="w-full flex-shrink-0 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
-                >
-                  Pay Now
-                </button>
+          )}
+
+          {loadFailed && (
+            <div role="alert" className="mb-6 flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-2 text-sm text-red-700">
+                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <span>We couldn&apos;t load your dashboard. {error}</span>
               </div>
-            )}
-            {/* Content card: min-height scales with viewport instead of
-                pinning to 100dvh on every breakpoint from `md` up, which
-                added a full extra screen of empty space below short tabs
-                (e.g. Change Password) on tablet/desktop. */}
-            <div className="card-glamlink min-h-[50vh] sm:min-h-[55vh] lg:min-h-[65vh]">
-              <TabErrorBoundary onReset={() => fetchDashboardData()}>
+              <button
+                onClick={() => {
+                  setError('');
+                  fetchDashboardData();
+                }}
+                className="inline-flex flex-shrink-0 items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white px-4 py-2 text-xs font-semibold text-red-700 hover:bg-red-50"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Retry
+              </button>
+            </div>
+          )}
+
+          <TabErrorBoundary onReset={() => fetchDashboardData()}>
+            {loading ? (
+              activeTab === 'overview' ? (
+                <DashboardOverviewSkeleton />
+              ) : (
+                <div className="rounded-2xl border border-border bg-card p-4 sm:p-6" aria-busy="true">
+                  <Skeleton className="h-6 w-48" />
+                  <Skeleton className="mt-2 h-4 w-72 max-w-full" />
+                  <Skeleton className="mt-6 h-48 w-full rounded-xl" />
+                </div>
+              )
+            ) : activeTab === 'overview' ? (
+              <DashboardOverview
+                userName={userdata?.name || ''}
+                cards={cardsArray}
+                payments={paymentHistory}
+                cardError={error}
+                canEdit={defaultCardPermissions.canEditAccessCard}
+                onNavigate={selectTab}
+                onEditCard={openEditor}
+              />
+            ) : (
+              <div className="min-w-0">
                 {activeTab === 'my-card' && (
                   <MyAccessCard
                     cardData={businessCard}
@@ -372,18 +376,16 @@ export default function DashboardPage() {
                       );
                       setPayOpen(true);
                     }}
-                    onEdit={(card: any) => {
-                      setEditCardId(String(card?.id ?? ''));
-                      setActiveTab('edit-card');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
+                    onEdit={openEditor}
                   />
                 )}
                 {activeTab === 'analytics' && <AccessCardAnalytics cards={cardsArray} />}
                 {activeTab === 'payment-history' && <PaymentHistory payments={paymentHistory} />}
                 {activeTab === 'qr-code' && <ShowQRCode cardData={businessCard} error={error} />}
                 {activeTab === 'subscription-plans' && (
-                  <SubscriptionPlansTab
+                  <PlansTab
+                    card={cardsArray[0]}
+                    planLabel={getActivePlanLabel(cardsArray[0]?.plan_type)}
                     selectedPlan={selectedPlan}
                     onSelectPlan={setSelectedPlan}
                     canContinue={!!selectedPlan}
@@ -398,7 +400,14 @@ export default function DashboardPage() {
                 )}
                 {activeTab === 'addresses' && <AddressTab />}
                 {activeTab === 'change-password' && <ChangePasswordTab />}
+                {activeTab === 'edit-card' && (
+                  <PageHeader
+                    title="Edit Access Card"
+                    description="Changes are reflected on your public card as soon as you save."
+                  />
+                )}
                 {activeTab === 'edit-card' && editCardEnabled && hasValidEditCardId && editingCard && (
+                  <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
                   <EditAccessCard
                     cardId={effectiveEditCardId}
                     cardData={editingCard}
@@ -423,18 +432,36 @@ export default function DashboardPage() {
                       fetchDashboardData();
                     }}
                   />
+                  </div>
                 )}
                 {activeTab === 'edit-card' &&
                   (!editCardEnabled || !hasValidEditCardId || !editingCard) && (
-                    <div className="p-6 text-sm text-muted-foreground">
-                      {!hasValidEditCardId || !editingCard
-                        ? 'No business card found to edit yet.'
-                        : 'Your subscription is inactive. Subscribe to unlock editing.'}
-                    </div>
+                    <EmptyState
+                      bordered
+                      icon={!hasValidEditCardId || !editingCard ? CreditCard : Lock}
+                      title={!hasValidEditCardId || !editingCard ? 'No Access Card to edit yet' : 'Editing is locked on your plan'}
+                      message={
+                        !hasValidEditCardId || !editingCard
+                          ? 'Create your Glamlink Access Card first, then come back here to update it.'
+                          : ACCESS_CARD_UPGRADE_MESSAGE
+                      }
+                      action={
+                        <button
+                          onClick={() =>
+                            !hasValidEditCardId || !editingCard
+                              ? router.push('/access')
+                              : goToPlans()
+                          }
+                          className={btn.primary}
+                        >
+                          {!hasValidEditCardId || !editingCard ? 'Create Access Card' : 'Upgrade plan'}
+                        </button>
+                      }
+                    />
                   )}
-              </TabErrorBoundary>
-            </div>
-          </main>
+              </div>
+            )}
+          </TabErrorBoundary>
         </div>
       </div>
       <SubscriptionPaymentModal

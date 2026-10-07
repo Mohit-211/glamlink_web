@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Receipt,
   ChevronDown,
-  ChevronUp,
-  CreditCard,
   ExternalLink,
   XCircle,
   Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { CancelSubscription } from '@/api/Api';
+import { cn } from '@/lib/utils';
+import { EmptyState, PageHeader, StatusBadge, btn, formatDate, formatMoney, humanize, type Tone } from './shell/ui';
 
 interface Payment {
   id: number;
@@ -31,6 +32,30 @@ interface PaymentHistoryProps {
 
 const CANCELABLE_TYPES = ['SUBSCRIPTION_ONLY', 'NFC_WITH_SUBSCRIPTION'];
 
+const getStatusConfig = (status: string): { label: string; tone: Tone } => {
+  switch (status?.toUpperCase()) {
+    case 'SUCCESS':
+      return { label: 'Paid', tone: 'success' };
+    case 'PENDING':
+      return { label: 'Pending', tone: 'warning' };
+    case 'FAILED':
+      return { label: 'Failed', tone: 'danger' };
+    case 'CANCELLED':
+      return { label: 'Cancelled', tone: 'neutral' };
+    default:
+      return { label: humanize(status) || 'Unknown', tone: 'neutral' };
+  }
+};
+
+const PURCHASE_LABELS: Record<string, string> = {
+  SUBSCRIPTION_ONLY: 'Access Pro subscription',
+  NFC_WITH_SUBSCRIPTION: 'Pro + NFC keychain',
+  NFC_ONLY: 'NFC keychain',
+};
+
+// Shared column template so the header row and each payment row line up.
+const COLUMNS = 'md:grid md:grid-cols-[minmax(0,1fr)_130px_120px_110px_100px_36px] md:items-center md:gap-4';
+
 export default function PaymentHistory({
   payments = [],
 }: PaymentHistoryProps) {
@@ -41,30 +66,14 @@ export default function PaymentHistory({
   const [errorId, setErrorId] = useState<number | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>('');
 
-  const getStatusConfig = (status: string) => {
-    switch (status?.toUpperCase()) {
-      case 'SUCCESS':
-        return {
-          label: 'Success',
-          cls: 'bg-green-100 text-green-700 border-green-200',
-        };
-      case 'PENDING':
-        return {
-          label: 'Pending',
-          cls: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-        };
-      case 'FAILED':
-        return {
-          label: 'Failed',
-          cls: 'bg-red-100 text-red-700 border-red-200',
-        };
-      default:
-        return {
-          label: status || 'Unknown',
-          cls: 'bg-gray-100 text-gray-700 border-gray-200',
-        };
-    }
-  };
+  const summary = useMemo(() => {
+    const successful = payments.filter((p) => p.payment_status?.toUpperCase() === 'SUCCESS');
+    const total = successful.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    const latest = [...payments]
+      .filter((p) => !Number.isNaN(new Date(p.created_at).getTime()))
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+    return { total, currency: successful[0]?.currency, count: payments.length, latest };
+  }, [payments]);
 
   const handleCancelSubscription = async (payment: Payment) => {
     setCancellingId(payment.id);
@@ -88,243 +97,183 @@ export default function PaymentHistory({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">
-            Payment History
-          </h2>
-
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {payments.length} payments total
-          </p>
-        </div>
-      </div>
+    <div>
+      <PageHeader title="Payment History" description="Receipts for your plan and keychain purchases." />
 
       {payments.length === 0 ? (
-        <div className="card-glamlink flex flex-col items-center justify-center py-12 text-center !hover:transform-none">
-          <CreditCard className="h-10 w-10 text-muted-foreground/40 mb-3" />
-
-          <p className="text-sm font-medium text-muted-foreground">
-            No payments found
-          </p>
-
-          <p className="text-xs text-muted-foreground mt-1">
-            Your payment history will appear here.
-          </p>
-        </div>
+        <EmptyState
+          bordered
+          icon={Receipt}
+          title="No payments yet"
+          message="When you upgrade your plan or order an NFC keychain, your receipts will appear here."
+        />
       ) : (
-        <div className="space-y-3">
-          {payments.map((payment) => {
-            const config = getStatusConfig(payment.payment_status);
-            const isExpanded = expandedId === payment.id;
-            const canCancel =
-              CANCELABLE_TYPES.includes(payment.payment_type || '') &&
-              !cancelledIds.has(payment.id);
-            const isConfirming = confirmingId === payment.id;
-            const isCancelling = cancellingId === payment.id;
-            const hasError = errorId === payment.id;
-
-            return (
-              <div
-                key={payment.id}
-                className="rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden"
-              >
-                <div className="flex items-center gap-3 px-3 py-3 sm:gap-4 sm:px-5 sm:py-4">
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-accent">
-                    <Receipt className="h-5 w-5 text-accent-foreground" />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="break-words text-sm font-semibold text-foreground">
-                        {payment.description}
-                      </p>
-
-                      <span
-                        className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${config.cls}`}
-                      >
-                        {config.label}
-                      </span>
-
-                      {cancelledIds.has(payment.id) && (
-                        <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold bg-gray-100 text-gray-500 border-gray-200">
-                          Cancelled
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {/* {payment.transaction_id} ·{' '} */}
-                      {new Date(payment.created_at).toLocaleDateString(
-                        'en-IN',
-                        {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                        }
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2 flex-shrink-0 sm:gap-3">
-                    <p className="text-base font-bold text-primary">
-                      ${Number(payment.amount).toFixed(2)}
-                    </p>
-
-                    <button
-                      onClick={() =>
-                        setExpandedId(
-                          isExpanded ? null : payment.id
-                        )
-                      }
-                      className="rounded-lg p-1.5 hover:bg-secondary transition-colors text-muted-foreground"
-                    >
-                      {isExpanded ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {isExpanded && (
-                  <div className="border-t border-border bg-secondary/30 px-5 py-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      {/* <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
-                          Transaction ID
-                        </p>
-
-                        <p className="font-mono text-foreground break-all">
-                          {payment.transaction_id}
-                        </p>
-                      </div> */}
-
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
-                          Date
-                        </p>
-
-                        <p className="text-foreground">
-                          {new Date(payment.created_at).toLocaleDateString(
-                            'en-IN',
-                            {
-                              day: '2-digit',
-                              month: 'long',
-                              year: 'numeric',
-                            }
-                          )}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
-                          Amount
-                        </p>
-
-                        <p className="font-semibold text-foreground">
-                          ${Number(payment.amount).toFixed(2)}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
-                          Status
-                        </p>
-
-                        <span
-                          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${config.cls}`}
-                        >
-                          {config.label}
-                        </span>
-                      </div>
-
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
-                          Payment Mode
-                        </p>
-
-                        <p className="text-foreground">
-                          {payment.payment_mode || 'N/A'}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
-                          Currency
-                        </p>
-
-                        <p className="text-foreground">
-                          {payment.currency || 'USD'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex flex-wrap items-center gap-3">
-                      {payment.receipt_url && (
-                        <a
-                          href={payment.receipt_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:opacity-90"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          View Receipt
-                        </a>
-                      )}
-
-                      {payment.payment_status !== "CANCELLED" && canCancel && !isConfirming && (
-                        <button
-                          onClick={() => setConfirmingId(payment.id)}
-                          className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
-                        >
-                          <XCircle className="h-4 w-4" />
-                          Cancel Subscription
-                        </button>
-                      )}
-
-                      {canCancel && isConfirming && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">
-                            Are you sure?
-                          </span>
-
-                          <button
-                            onClick={() => handleCancelSubscription(payment)}
-                            disabled={isCancelling}
-                            className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-60"
-                          >
-                            {isCancelling ? (
-                              <>
-                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                Cancelling...
-                              </>
-                            ) : (
-                              'Yes, cancel'
-                            )}
-                          </button>
-
-                          <button
-                            onClick={() => setConfirmingId(null)}
-                            disabled={isCancelling}
-                            className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-secondary disabled:opacity-60"
-                          >
-                            Keep it
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {hasError && (
-                      <p className="mt-2 text-xs text-red-600">{errorMsg}</p>
-                    )}
-                  </div>
-                )}
+        <div className="space-y-6">
+          {/* Summary */}
+          <section
+            aria-label="Billing summary"
+            className="grid grid-cols-1 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-3 sm:divide-x sm:divide-y-0"
+          >
+            {[
+              { label: 'Total paid', value: formatMoney(summary.total, summary.currency) },
+              { label: 'Payments', value: String(summary.count) },
+              { label: 'Last payment', value: summary.latest ? formatDate(summary.latest.created_at) : '—' },
+            ].map(({ label, value }) => (
+              <div key={label} className="flex items-center justify-between gap-4 px-5 py-4 sm:block">
+                <p className="text-xs font-medium text-muted-foreground">{label}</p>
+                <p className="text-lg font-semibold tracking-tight text-foreground tabular-nums sm:mt-1 sm:text-2xl">{value}</p>
               </div>
-            );
-          })}
+            ))}
+          </section>
+
+          {/* List */}
+          <section className="overflow-hidden rounded-2xl border border-border bg-card">
+            <div className={cn('hidden border-b border-border bg-secondary/40 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground', COLUMNS)}>
+              <span>Description</span>
+              <span>Date</span>
+              <span>Method</span>
+              <span>Status</span>
+              <span className="text-right">Amount</span>
+              <span className="sr-only">Details</span>
+            </div>
+
+            <ul className="divide-y divide-border">
+              {payments.map((payment) => {
+                const isCancelled = cancelledIds.has(payment.id);
+                const config = isCancelled ? getStatusConfig('CANCELLED') : getStatusConfig(payment.payment_status);
+                const isExpanded = expandedId === payment.id;
+                const canCancel =
+                  CANCELABLE_TYPES.includes(payment.payment_type || '') &&
+                  !cancelledIds.has(payment.id);
+                const isConfirming = confirmingId === payment.id;
+                const isCancelling = cancellingId === payment.id;
+                const hasError = errorId === payment.id;
+                const method = humanize(payment.payment_mode) || '—';
+
+                return (
+                  <li key={payment.id}>
+                    <button
+                      type="button"
+                      onClick={() => setExpandedId(isExpanded ? null : payment.id)}
+                      aria-expanded={isExpanded}
+                      className={cn(
+                        'flex w-full items-start gap-3 px-5 py-4 text-left transition-colors hover:bg-secondary/40',
+                        COLUMNS,
+                        isExpanded && 'bg-secondary/40'
+                      )}
+                    >
+                      {/* Description (+ mobile meta) */}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold text-foreground">{payment.description}</span>
+                        {payment.payment_type && PURCHASE_LABELS[payment.payment_type] && (
+                          <span className="hidden truncate text-xs text-muted-foreground md:block">
+                            {PURCHASE_LABELS[payment.payment_type]}
+                          </span>
+                        )}
+                        <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs capitalize text-muted-foreground md:hidden">
+                          {formatDate(payment.created_at)} · {method}
+                          <StatusBadge tone={config.tone}>{config.label}</StatusBadge>
+                        </span>
+                      </span>
+                      <span className="hidden text-sm text-muted-foreground md:block">{formatDate(payment.created_at)}</span>
+                      <span className="hidden truncate text-sm capitalize text-muted-foreground md:block">{method}</span>
+                      <span className="hidden md:block">
+                        <StatusBadge tone={config.tone}>{config.label}</StatusBadge>
+                      </span>
+                      <span className="flex-shrink-0 text-right text-sm font-semibold text-foreground tabular-nums">
+                        {formatMoney(payment.amount, payment.currency)}
+                      </span>
+                      <ChevronDown
+                        className={cn(
+                          'mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform duration-200 md:mt-0 md:justify-self-end',
+                          isExpanded && 'rotate-180'
+                        )}
+                        aria-hidden="true"
+                      />
+                    </button>
+
+                    {isExpanded && (
+                      <div className="border-t border-border bg-secondary/30 px-5 py-4">
+                        <dl className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
+                          <div>
+                            <dt className="text-xs text-muted-foreground">Date</dt>
+                            <dd className="mt-0.5 font-medium text-foreground">{formatDate(payment.created_at, 'long')}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-xs text-muted-foreground">Amount</dt>
+                            <dd className="mt-0.5 font-medium text-foreground tabular-nums">{formatMoney(payment.amount, payment.currency)}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-xs text-muted-foreground">Payment mode</dt>
+                            <dd className="mt-0.5 font-medium capitalize text-foreground">{payment.payment_mode || 'N/A'}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-xs text-muted-foreground">Currency</dt>
+                            <dd className="mt-0.5 font-medium text-foreground">{(payment.currency || 'USD').toUpperCase()}</dd>
+                          </div>
+                        </dl>
+
+                        <div className="mt-4 flex flex-wrap items-center gap-2">
+                          {payment.receipt_url && (
+                            <a
+                              href={payment.receipt_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={btn.chip}
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                              View receipt
+                            </a>
+                          )}
+
+                          {payment.payment_status !== "CANCELLED" && canCancel && !isConfirming && (
+                            <button onClick={() => setConfirmingId(payment.id)} className={btn.danger}>
+                              <XCircle className="h-3.5 w-3.5" />
+                              Cancel subscription
+                            </button>
+                          )}
+
+                          {canCancel && isConfirming && (
+                            <div className="flex flex-wrap items-center gap-2 rounded-full border border-red-200 bg-red-50 py-1 pl-4 pr-1">
+                              <span className="text-xs font-medium text-red-700">Cancel this subscription?</span>
+                              <button
+                                onClick={() => handleCancelSubscription(payment)}
+                                disabled={isCancelling}
+                                className="inline-flex h-8 items-center gap-1.5 rounded-full bg-red-600 px-3.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-60"
+                              >
+                                {isCancelling ? (
+                                  <>
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    Cancelling...
+                                  </>
+                                ) : (
+                                  'Yes, cancel'
+                                )}
+                              </button>
+                              <button
+                                onClick={() => setConfirmingId(null)}
+                                disabled={isCancelling}
+                                className="inline-flex h-8 items-center rounded-full bg-white px-3.5 text-xs font-semibold text-foreground hover:bg-secondary disabled:opacity-60"
+                              >
+                                Keep it
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {hasError && (
+                          <p className="mt-3 flex items-center gap-1.5 text-xs text-red-600">
+                            <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+                            {errorMsg}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
         </div>
       )}
     </div>

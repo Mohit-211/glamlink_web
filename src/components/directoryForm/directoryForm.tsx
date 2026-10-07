@@ -1,9 +1,13 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react'
+import {
+  AlertCircle, Check, CreditCard, ImagePlus, Loader2, Mail, Map as MapIcon, MapPin, Plus, QrCode, UserRound, X,
+} from 'lucide-react'
 import { FormField, Input, TextArea, Select } from './Formfield'
 import { AccessCardToggle } from './Accesscardtoggle'
 import { SuccessModal } from './Successmodal'
 import { SectionCard } from './Sectioncard'
+import { Switch } from './Switch'
 import { getAllCategories } from '@/api/Api'
 
 // ── Types ─────────────────────────────────────────────────
@@ -115,13 +119,33 @@ const PAIN_POINTS_OPTIONS = [
 ]
 
 const HERO_BADGES = [
-  { icon: '🗺️', label: 'Found on Treatment Map' },
-  { icon: '📇', label: 'Free Digital Card' },
-  { icon: '🔗', label: 'QR Code in Articles' },
-  { icon: '📧', label: 'Email Marketing Ready' },
+  { icon: MapIcon, label: 'Found on the treatment map' },
+  { icon: CreditCard, label: 'Free digital card' },
+  { icon: QrCode, label: 'QR code in articles' },
+  { icon: Mail, label: 'Email marketing ready' },
 ]
 
-const PROCESS_STEPS = ['Submit Form', 'Admin Reviews', 'Approved & Live', 'Map + Card + Articles', 'Email Campaigns']
+const PROCESS_STEPS = ['Submit form', 'Admin reviews', 'Approved & live', 'Map + card + articles', 'Email campaigns']
+
+const BOOKING_METHOD_OPTIONS = [
+  { value: 'Go to Booking Link', label: 'Go to Website' },
+  { value: 'Call / text', label: 'Call / text' },
+  { value: 'DM on Instagram', label: 'DM on Instagram' },
+]
+
+const LOCATION_TYPE_OPTIONS = [
+  { value: 'exact_address' as const, label: 'Exact address', icon: MapPin },
+  { value: 'service_area' as const, label: 'City / area only', icon: MapIcon },
+]
+
+const SECTIONS = [
+  { id: 'about', title: 'About You', short: 'About You' },
+  { id: 'professional', title: 'Professional Information', short: 'Professional' },
+  { id: 'booking', title: 'Booking & Social', short: 'Booking' },
+  { id: 'locations', title: 'Locations & Hours', short: 'Locations' },
+  { id: 'profile', title: 'Directory Profile', short: 'Profile' },
+  { id: 'final', title: 'Final Details', short: 'Final Details' },
+]
 
 const INITIAL_FORM: FormData = {
   name: '',
@@ -153,60 +177,94 @@ const INITIAL_FORM: FormData = {
   createAccessCard: true,
 }
 
-// ── Reusable UI ───────────────────────────────────────────
+// ── Validation (fields the form marks as required) ────────
 
-function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <div
-      onClick={() => onChange(!enabled)}
-      className={`w-10 h-[22px] rounded-full relative transition-colors duration-200 shrink-0 cursor-pointer ${enabled ? 'bg-[#24bbcb]' : 'bg-[#B4DCE9]'}`}
-    >
-      <div className={`absolute w-4 h-4 bg-white rounded-full top-[3px] shadow-sm transition-transform duration-200 ${enabled ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
-    </div>
-  )
+type FieldErrors = Partial<Record<keyof FormData, string>>
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+// Listed in page order so the first error is the one nearest the top.
+function validate(f: FormData): FieldErrors {
+  const e: FieldErrors = {}
+  if (!f.name.trim()) e.name = 'Please enter your full name.'
+  if (!f.professional_title.trim()) e.professional_title = 'Please enter your professional title.'
+  if (!f.email.trim()) e.email = 'Please enter your email address.'
+  else if (!EMAIL_RE.test(f.email.trim())) e.email = 'Please enter a valid email address.'
+  if (f.preferred_booking_method === 'Go to Booking Link' && !f.booking_link.trim()) {
+    e.booking_link = 'Please add your booking link.'
+  }
+  if (!f.bio.trim()) e.bio = 'Please add a short professional bio.'
+  if (f.excites_about_glamlink.length === 0) e.excites_about_glamlink = 'Select at least one option.'
+  if (f.biggest_pain_points.length === 0) e.biggest_pain_points = 'Select at least one option.'
+  return e
 }
 
-function CheckIcon() {
+const SECTION_FIELDS: Record<string, (keyof FormData)[]> = {
+  about: ['name', 'professional_title', 'email'],
+  booking: ['booking_link'],
+  profile: ['bio'],
+  final: ['excites_about_glamlink', 'biggest_pain_points'],
+}
+
+const fieldId = (key: string) => `dir-${key}`
+
+// ── Reusable UI ───────────────────────────────────────────
+
+const chipClass = (active: boolean) =>
+  `inline-flex min-h-10 items-center gap-2 rounded-full border px-3.5 py-2 text-left text-sm transition-colors outline-none focus-visible:ring-4 focus-visible:ring-primary/15
+  ${active
+    ? 'border-primary bg-primary/[0.07] font-medium text-foreground'
+    : 'border-input bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground'}`
+
+function CheckBox({ checked }: { checked: boolean }) {
   return (
-    <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-      <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <span
+      className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border transition-colors ${checked ? 'border-primary bg-primary text-primary-foreground' : 'border-input bg-background'}`}
+      aria-hidden="true"
+    >
+      {checked && <Check className="h-3 w-3" strokeWidth={3} />}
+    </span>
   )
 }
 
 function MultiSelect({
-  options, selected, onChange, minLabel,
+  id, options, selected, onChange, invalid,
 }: {
+  id: string
   options: string[]
   selected: string[]
   onChange: (next: string[]) => void
-  minLabel?: string
+  invalid?: boolean
 }) {
   const toggle = (val: string) =>
     onChange(selected.includes(val) ? selected.filter((x) => x !== val) : [...selected, val])
 
   return (
-    <div className="flex flex-col gap-2">
+    <div
+      id={id}
+      tabIndex={-1}
+      role="group"
+      aria-describedby={invalid ? `${id}-error` : undefined}
+      className="grid grid-cols-1 gap-2 outline-none sm:grid-cols-2"
+    >
       {options.map((opt) => {
         const active = selected.includes(opt)
         return (
           <button
             key={opt}
             type="button"
+            aria-pressed={active}
             onClick={() => toggle(opt)}
-            className={`text-left text-[13px] px-4 py-3 rounded-xl border-[1.5px] transition-all duration-150 leading-snug flex items-center gap-3
-              ${active ? 'bg-[#EEF9FC] border-[#24bbcb] text-[#1A3A42] font-semibold' : 'bg-[#F7FAFB] border-[#DCF0F6] text-[#4A7A88] hover:border-[#A8E0EE] hover:bg-[#EEF9FC]'}`}
+            className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm leading-snug transition-colors outline-none focus-visible:ring-4 focus-visible:ring-primary/15
+              ${active
+                ? 'border-primary bg-primary/[0.05] text-foreground'
+                : `${invalid ? 'border-red-300' : 'border-input'} bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground`}`}
           >
-            <span className={`w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 ${active ? 'bg-[#24bbcb] border-[#24bbcb]' : 'border-[#B4DCE9]'}`}>
-              {active && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
-            </span>
+            <span className="mt-px"><CheckBox checked={active} /></span>
             {opt}
           </button>
         )
       })}
-      {minLabel && selected.length === 0 && (
-        <p className="text-[11px] text-[#F4928A] mt-1">{minLabel}</p>
-      )}
     </div>
   )
 }
@@ -214,164 +272,197 @@ function MultiSelect({
 // ── Business Hours ────────────────────────────────────────
 
 function BusinessHoursSection({ hours, onChange }: { hours: BusinessHourNote[]; onChange: (h: BusinessHourNote[]) => void }) {
+  const [draft, setDraft] = useState('')
+  const custom = hours.filter((h) => !BUSINESS_HOUR_PRESETS.some((p) => p.note === h.note))
+
   const toggle = (note: string) => {
     const exists = hours.some((h) => h.note === note)
     onChange(exists ? hours.filter((h) => h.note !== note) : [...hours, { note }])
   }
+
+  const addDraft = () => {
+    const value = draft.trim()
+    if (!value) return
+    if (!hours.some((h) => h.note === value)) onChange([...hours, { note: value }])
+    setDraft('')
+  }
+
   return (
-    <div className="flex flex-col gap-2">
-      {BUSINESS_HOUR_PRESETS.map((preset) => {
-        const active = hours.some((h) => h.note === preset.note)
-        return (
-          <button
-            key={preset.note}
-            type="button"
-            onClick={() => toggle(preset.note)}
-            className={`text-left text-[13px] px-4 py-3 rounded-xl border-[1.5px] transition-all duration-150 flex items-center gap-3
-              ${active ? 'bg-[#EEF9FC] border-[#24bbcb] text-[#1A3A42] font-semibold' : 'bg-[#F7FAFB] border-[#DCF0F6] text-[#4A7A88] hover:border-[#A8E0EE]'}`}
-          >
-            <div className={`w-4 h-4 rounded-[4px] border-[1.5px] flex items-center justify-center shrink-0 ${active ? 'bg-[#24bbcb] border-[#24bbcb]' : 'border-[#B4DCE9] bg-white'}`}>
-              {active && (
-                <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
-                  <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
-            </div>
-            {preset.note}
-          </button>
-        )
-      })}
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap gap-2">
+        {BUSINESS_HOUR_PRESETS.map((preset) => {
+          const active = hours.some((h) => h.note === preset.note)
+          return (
+            <button key={preset.note} type="button" aria-pressed={active} onClick={() => toggle(preset.note)} className={chipClass(active)}>
+              <CheckBox checked={active} />
+              {preset.note}
+            </button>
+          )
+        })}
+        {custom.map((item) => (
+          <span key={item.note} className={chipClass(true)}>
+            {item.note}
+            <button
+              type="button"
+              onClick={() => toggle(item.note)}
+              aria-label={`Remove “${item.note}”`}
+              className="-mr-1 flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:bg-red-50 hover:text-red-500"
+            >
+              <X className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+          </span>
+        ))}
+      </div>
+
+      <div className="flex gap-2">
+        <Input
+          id={fieldId('business-note')}
+          aria-label="Add your own availability note"
+          placeholder="Add your own note, e.g. Sundays by request"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              addDraft()
+            }
+          }}
+        />
+        <button type="button" onClick={addDraft} className="btn-outline h-12 shrink-0 rounded-xl px-5 py-0">
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          Add
+        </button>
+      </div>
     </div>
   )
 }
 
 // ── Media & Profile ───────────────────────────────────────
 
-function MediaSection({
-  profilePhotoPreview, gallery,
-  onProfileChange, onGalleryAdd, onGalleryRemove, onGalleryCaption, onGalleryThumbnail,
+function ProfilePhotoField({
+  preview, onChange, onRemove,
 }: {
-  profilePhotoPreview: string
-  gallery: GalleryItem[]
-  onProfileChange: (file: File, preview: string) => void
-  onGalleryAdd: (files: FileList) => void
-  onGalleryRemove: (i: number) => void
-  onGalleryCaption: (i: number, caption: string) => void
-  onGalleryThumbnail: (i: number) => void
+  preview: string
+  onChange: (file: File, preview: string) => void
+  onRemove: () => void
 }) {
-  const profileRef = useRef<HTMLInputElement>(null)
-  const galleryRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  return (
+    <div className={`flex flex-col items-center gap-5 rounded-xl border p-5 text-center sm:flex-row sm:text-left ${preview ? 'border-input' : 'border-dashed border-input bg-muted/30'}`}>
+      <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-background">
+        {preview
+          ? <img src={preview} alt="Profile preview" className="h-full w-full object-cover" />
+          : <UserRound className="h-9 w-9 text-muted-foreground/60" aria-hidden="true" />}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-foreground">{preview ? 'Profile photo added' : 'Upload a profile photo'}</p>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          Square image works best — face centered, clean background. JPG or PNG recommended.
+        </p>
+        <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
+          <button type="button" onClick={() => inputRef.current?.click()} className="btn-outline h-10 rounded-xl px-4 py-0">
+            <ImagePlus className="h-4 w-4" aria-hidden="true" />
+            {preview ? 'Replace' : 'Choose image'}
+          </button>
+          {preview && (
+            <button
+              type="button"
+              onClick={onRemove}
+              className="inline-flex h-10 items-center rounded-xl px-4 text-sm font-semibold text-red-500 transition-colors hover:bg-red-50"
+            >
+              Remove
+            </button>
+          )}
+        </div>
+      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0]
+          if (f) onChange(f, URL.createObjectURL(f))
+          e.target.value = ''
+        }}
+      />
+    </div>
+  )
+}
+
+function GalleryField({
+  gallery, onAdd, onRemove, onCaption, onThumbnail,
+}: {
+  gallery: GalleryItem[]
+  onAdd: (files: FileList) => void
+  onRemove: (i: number) => void
+  onCaption: (i: number, caption: string) => void
+  onThumbnail: (i: number) => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const canAdd = gallery.length < 5
+
+  const addTile = (
+    <button
+      type="button"
+      onClick={() => inputRef.current?.click()}
+      className="flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-input bg-muted/30 px-4 py-6 text-center transition-colors hover:border-primary/50 hover:bg-primary/[0.04] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
+    >
+      <ImagePlus className="h-6 w-6 text-primary" aria-hidden="true" />
+      <span className="text-sm font-semibold text-foreground">Add gallery photos</span>
+      <span className="text-xs text-muted-foreground">{5 - gallery.length} of 5 remaining · JPG or PNG</span>
+    </button>
+  )
 
   return (
     <div>
-      {/* Profile Image */}
-      <div className="mb-8">
-        <p className="text-[13px] font-semibold text-[#24bbcb] mb-3">Profile Image</p>
-        <div className="flex items-center gap-6">
-          <div className="relative shrink-0">
-            <div className="w-[90px] h-[90px] rounded-full border-2 border-[#DCF0F6] overflow-hidden bg-[#EEF9FC] flex items-center justify-center">
-              {profilePhotoPreview
-                ? <img src={profilePhotoPreview} alt="Profile" className="w-full h-full object-cover" />
-                : <span className="text-4xl">👤</span>
-              }
-            </div>
-            <button
-              type="button"
-              onClick={() => profileRef.current?.click()}
-              className="absolute bottom-0 right-0 w-7 h-7 bg-[#24bbcb] rounded-full flex items-center justify-center shadow-md hover:bg-[#2A9BB5] transition-colors"
-            >
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                <path d="M9.5 1.5L11.5 3.5L4.5 10.5H2.5V8.5L9.5 1.5Z" stroke="white" strokeWidth="1.4" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <input ref={profileRef} type="file" accept="image/*" className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0]
-                if (f) onProfileChange(f, URL.createObjectURL(f))
-              }}
-            />
-          </div>
-          <p className="text-[13px] text-[#7AAAB8] leading-relaxed">
-            Square image works best. Face centered. Clean background.
-          </p>
-        </div>
-      </div>
-
-      {/* Gallery */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-[13px] font-semibold text-[#24bbcb]">
-            Gallery <span className="text-[#7AAAB8] font-normal">(Max 5)</span>
-          </p>
-          {gallery.length < 5 && (
-            <button
-              type="button"
-              onClick={() => galleryRef.current?.click()}
-              className="bg-[#24bbcb] hover:bg-[#2A9BB5] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors flex items-center gap-1.5"
-            >
-              + Upload
-            </button>
-          )}
-          <input ref={galleryRef} type="file" accept="image/*" multiple className="hidden"
-            onChange={(e) => { if (e.target.files) onGalleryAdd(e.target.files) }}
-          />
-        </div>
-
-        {gallery.length === 0 ? (
-          <div
-            className="border-2 border-dashed border-[#B4DCE9] rounded-xl p-10 text-center cursor-pointer hover:border-[#24bbcb] hover:bg-[#EEF9FC] transition-all"
-            onClick={() => galleryRef.current?.click()}
-          >
-            <p className="text-[13px] text-[#7AAAB8]">
-              <span className="text-[#24bbcb] font-semibold">Click to upload</span> gallery photos
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-3 gap-3">
-            {gallery.map((item, i) => (
-              <div key={i} className="border border-[#DCF0F6] rounded-xl overflow-hidden bg-white">
-                <div className="relative h-[140px]">
-                  <img src={item.preview_url} alt={item.caption || `Photo ${i + 1}`} className="w-full h-full object-cover" />
-                  {item.is_thumbnail && (
-                    <span className="absolute top-2 left-2 bg-[#24bbcb] text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full">
-                      Thumbnail
-                    </span>
-                  )}
-                </div>
-                {/* Caption */}
-                <div className="px-3 py-2 border-t border-[#DCF0F6]">
-                  <input
-                    type="text"
-                    value={item.caption}
-                    onChange={(e) => onGalleryCaption(i, e.target.value)}
-                    placeholder="Add caption…"
-                    className="w-full text-[12px] text-[#1A3A42] bg-transparent outline-none placeholder:text-[#AAC8D0]"
-                  />
-                </div>
-                {/* Actions */}
-                <div className="px-3 py-2 flex items-center gap-3 border-t border-[#DCF0F6]">
-                  {!item.is_thumbnail && (
-                    <button
-                      type="button"
-                      onClick={() => onGalleryThumbnail(i)}
-                      className="text-[11px] text-[#24bbcb] font-semibold hover:underline"
-                    >
-                      Make Thumbnail
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => onGalleryRemove(i)}
-                    className="text-[11px] text-[#F4928A] font-semibold hover:underline ml-auto"
-                  >
-                    Remove
-                  </button>
-                </div>
+      {gallery.length === 0 ? addTile : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {gallery.map((item, i) => (
+            <div key={item.preview_url} className="flex flex-col overflow-hidden rounded-xl border bg-background">
+              <div className="relative aspect-square bg-muted">
+                <img src={item.preview_url} alt={item.caption || `Gallery photo ${i + 1}`} className="h-full w-full object-cover" />
+                {item.is_thumbnail && (
+                  <span className="absolute left-2 top-2 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-semibold text-primary-foreground">
+                    Thumbnail
+                  </span>
+                )}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              <input
+                type="text"
+                value={item.caption}
+                onChange={(e) => onCaption(i, e.target.value)}
+                placeholder="Add caption…"
+                aria-label={`Caption for photo ${i + 1}`}
+                className="w-full border-t bg-transparent px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground/70 focus:bg-primary/[0.03] sm:text-xs"
+              />
+              <div className="mt-auto flex items-center gap-2 border-t px-3 py-2">
+                {!item.is_thumbnail && (
+                  <button type="button" onClick={() => onThumbnail(i)} className="text-xs font-semibold text-primary hover:underline">
+                    Make thumbnail
+                  </button>
+                )}
+                <button type="button" onClick={() => onRemove(i)} className="ml-auto text-xs font-semibold text-red-500 hover:underline">
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+          {canAdd && <div className="flex [&>button]:h-full">{addTile}</div>}
+        </div>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          if (e.target.files) onAdd(e.target.files)
+          e.target.value = ''
+        }}
+      />
     </div>
   )
 }
@@ -383,13 +474,18 @@ export default function DirectoryFormApply() {
   const [submitted, setSubmitted] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [categoriesLoading, setCategoriesLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+  // Errors appear after the first submit attempt, then update live as fields are fixed.
+  const [attempted, setAttempted] = useState(false)
+
+  const errors = attempted ? validate(form) : {}
+  const hasErrors = Object.keys(errors).length > 0
 
 useEffect(() => {
   const fetchCategories = async () => {
     try {
       const response = await getAllCategories();
-
-      console.log(response, "===>>");
 
       const categoryArray = Array.isArray(response?.data?.rows)
         ? response.data.rows
@@ -406,28 +502,12 @@ useEffect(() => {
 
   fetchCategories();
 }, []);
-console.log(categories,"==")
+
   const set = <K extends keyof FormData>(key: K, value: FormData[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }))
 
   const setSocial = (key: keyof SocialMedia, value: string) =>
     setForm((prev) => ({ ...prev, social_media: { ...prev.social_media, [key]: value } }))
-
-  const setLocation = (idx: number, key: keyof Location, value: string | boolean | number) =>
-    setForm((prev) => {
-      const locs = [...prev?.locations]
-      locs[idx] = { ...locs[idx], [key]: value }
-      return { ...prev, locations: locs }
-    })
-
-  const toggleSpecialty = (title: string) => {
-    if (form.specialties.includes(title)) {
-      set('specialties', form.specialties.filter((s) => s !== title))
-    } else {
-      if (form.specialties.length >= 5) return
-      set('specialties', [...form.specialties, title])
-    }
-  }
 
   const handleGalleryAdd = (files: FileList) => {
     const remaining = 5 - form.gallery.length
@@ -459,7 +539,19 @@ console.log(categories,"==")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (submitting) return
 
+    setAttempted(true)
+    setSubmitError('')
+    const firstError = Object.keys(validate(form))[0]
+    if (firstError) {
+      const el = document.getElementById(fieldId(firstError))
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      el?.focus({ preventScroll: true })
+      return
+    }
+
+    setSubmitting(true)
     try {
       const formData = new FormData()
 
@@ -555,7 +647,9 @@ console.log(categories,"==")
 
     } catch (err: any) {
       console.error(err)
-      alert(err.message || "Submission failed")
+      setSubmitError(err.message || "Submission failed")
+    } finally {
+      setSubmitting(false)
     }
   }
 // ✅ UPDATE LOCATION
@@ -579,7 +673,6 @@ const updateLocation = (
   })
 }
 
-// ✅ ADD LOCATION
 // ✅ ADD LOCATION
 const addLocation = () => {
   setForm((prev) => {
@@ -624,551 +717,460 @@ const removeLocation = (index: number) => {
     }
   })
 }
+
+  const maxSpecialties = form.specialties.length >= 5
+
   return (
-    <div className="bg-[#F7FAFB] min-h-screen pt-16 md:pt-20 text-[#1A3A42]">
+    <div className="min-h-screen bg-muted/40 text-foreground">
 
-      {/* HERO */}
-      <section className="bg-[#24bbcb] py-[68px] px-5 sm:px-10 text-center relative overflow-hidden">
-        <div className="absolute bottom-[-2px] left-0 right-0 h-12 bg-[#F7FAFB] [clip-path:ellipse(56%_100%_at_50%_100%)]" />
-        <div className="inline-flex items-center gap-2 bg-white/20 border border-white/35 backdrop-blur-sm rounded-full px-5 py-1.5 text-[11px] font-semibold tracking-[0.18em] uppercase text-white mb-5 relative">
-          ✦ &nbsp;Professional Directory Application
-        </div>
-        <h1 className="hero-title text-white mb-4 relative">
-          Get Listed on GlamLink<br /><span className="text-white/80 font-medium">Beauty & Wellness Directory</span>
+      {/* INTRO */}
+      <header className="container-glamlink pb-10 pt-28 text-center md:pb-12 md:pt-32">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Glamlink Directory</p>
+        <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-[44px] lg:leading-[1.1]">
+          Join the Glamlink Directory
         </h1>
-        <p className="text-[15px] text-white/80 max-w-[520px] mx-auto mb-8 leading-[1.75] font-normal relative">
-          Join thousands of beauty professionals. Get discovered by clients, appear on the treatment map, and receive your free Access digital business card — all in one application.
+        <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
+          Beauty + wellness professionals and businesses can apply to be listed on Glamlink — get
+          discovered by clients nearby and receive a free Access digital business card.
         </p>
-        <div className="flex justify-center flex-wrap gap-2.5 relative">
-          {HERO_BADGES.map((b) => (
-            <div key={b.label} className="bg-white/16 border border-white/32 rounded-full px-4 py-1.5 text-xs font-semibold text-white flex items-center gap-1.5">
-              {b.icon} {b.label}
-            </div>
+        <ul className="mx-auto mt-6 flex max-w-2xl flex-wrap justify-center gap-x-5 gap-y-2.5 text-sm text-muted-foreground">
+          {HERO_BADGES.map(({ icon: Icon, label }) => (
+            <li key={label} className="inline-flex items-center gap-1.5">
+              <Icon className="h-4 w-4 text-primary" aria-hidden="true" />
+              {label}
+            </li>
           ))}
-        </div>
-      </section>
+        </ul>
+      </header>
 
-      <div className="max-w-[840px] mx-auto px-5 pt-9 pb-20">
+      <div className="mx-auto max-w-[880px] px-4 pb-20 sm:px-6">
+        <form onSubmit={handleSubmit} noValidate className="overflow-hidden rounded-2xl border bg-card shadow-soft">
 
-        {/* Process Bar */}
-        <div className="bg-white border border-[#DCF0F6] rounded-2xl px-7 py-5 flex items-center justify-center flex-wrap gap-0 mb-8">
-          {PROCESS_STEPS.map((step, i) => (
-            <React.Fragment key={step}>
-              <div className="flex flex-col items-center gap-1.5 px-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#EEF9FC] border-2 border-[#D6F2F8] text-[#24bbcb] font-semibold text-[13px] flex items-center justify-center">{i + 1}</div>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[#7AAAB8] text-center max-w-[70px] leading-tight">{step}</span>
-              </div>
-              {i < PROCESS_STEPS.length - 1 && <span className="text-[#D6F2F8] text-xl mb-5 px-1 hidden sm:block">›</span>}
-            </React.Fragment>
-          ))}
-        </div>
+          {/* SECTION INDEX */}
+          <nav aria-label="Application sections" className="border-b bg-muted/30">
+            <ol className="flex gap-1 overflow-x-auto px-3 py-2.5 [scrollbar-width:none] sm:px-6 [&::-webkit-scrollbar]:hidden">
+              {SECTIONS.map((s, i) => {
+                const sectionHasError = SECTION_FIELDS[s.id]?.some((k) => errors[k])
+                return (
+                  <li key={s.id} className="shrink-0">
+                    <a
+                      href={`#${s.id}`}
+                      className="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+                    >
+                      <span className="text-xs font-semibold tabular-nums text-primary">{String(i + 1).padStart(2, '0')}</span>
+                      {s.short}
+                      {sectionHasError && (
+                        <>
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true" />
+                          <span className="sr-only">(needs attention)</span>
+                        </>
+                      )}
+                    </a>
+                  </li>
+                )
+              })}
+            </ol>
+          </nav>
 
-        <form onSubmit={handleSubmit} noValidate>
-
-          {/* 1. PROFILE */}
-          <SectionCard step={1} title="Your Profile">
-            <div className="grid grid-cols-2 gap-[18px]">
-              <FormField label="Full Name" required>
-                <Input placeholder="Kate Sue" value={form.name} onChange={(e) => set('name', e.target.value)} required />
+          {/* 1. ABOUT YOU */}
+          <SectionCard id="about" step={1} title="About You" description="The basics clients will see on your listing.">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <FormField label="Full Name" htmlFor={fieldId('name')} required error={errors.name}>
+                <Input id={fieldId('name')} autoComplete="name" placeholder="Kate Sue" value={form.name} invalid={!!errors.name} onChange={(e) => set('name', e.target.value)} />
               </FormField>
-              <FormField label="Professional Title" required>
-                <Input placeholder="Makeup Artist" value={form.professional_title} onChange={(e) => set('professional_title', e.target.value)} required />
+              <FormField label="Professional Title" htmlFor={fieldId('professional_title')} required error={errors.professional_title}>
+                <Input id={fieldId('professional_title')} autoComplete="organization-title" placeholder="Makeup Artist" value={form.professional_title} invalid={!!errors.professional_title} onChange={(e) => set('professional_title', e.target.value)} />
               </FormField>
-              <FormField label="Email" required>
-                <Input type="email" placeholder="kate@example.com" value={form.email} onChange={(e) => set('email', e.target.value)} required />
+              <FormField label="Email" htmlFor={fieldId('email')} required error={errors.email}>
+                <Input id={fieldId('email')} type="email" autoComplete="email" inputMode="email" placeholder="kate@example.com" value={form.email} invalid={!!errors.email} onChange={(e) => set('email', e.target.value)} />
               </FormField>
-              <FormField label="Phone">
-                <Input type="tel" placeholder="(702) 677-4576" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
+              <FormField label="Phone" htmlFor={fieldId('phone')}>
+                <Input id={fieldId('phone')} type="tel" autoComplete="tel" placeholder="(702) 677-4576" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
               </FormField>
-              <FormField label="Custom Handle" hint="Your public URL: glamlink.net/pro/@handle">
-                <Input placeholder="@katesue_bee" value={form.custom_handle} onChange={(e) => set('custom_handle', e.target.value)} />
+              <FormField label="Custom Handle" htmlFor={fieldId('custom_handle')} hint="Your public URL: glamlink.net/pro/@handle">
+                <Input id={fieldId('custom_handle')} placeholder="@katesue_bee" value={form.custom_handle} onChange={(e) => set('custom_handle', e.target.value)} />
               </FormField>
-              <FormField label="Website (optional)">
-                <Input type="url" placeholder="https://yoursite.com" value={form.website} onChange={(e) => set('website', e.target.value)} />
-              </FormField>
-              <FormField label="Professional Bio" required hint="Appears on your public listing and Access card. 2–4 sentences recommended." className="col-span-2">
-                <TextArea
-                  placeholder={"Makeup Artist | Bridal • Editorial • Events\n\nAvailable For Travel\n\nSend DM On IG @makeupbyadison"}
-                  value={form.bio}
-                  onChange={(e) => set('bio', e.target.value)}
-                  required
-                />
+              <FormField label="Website" htmlFor={fieldId('website')} hint="Optional">
+                <Input id={fieldId('website')} type="url" inputMode="url" placeholder="https://yoursite.com" value={form.website} onChange={(e) => set('website', e.target.value)} />
               </FormField>
             </div>
           </SectionCard>
 
-          {/* 2. SOCIAL & BOOKING */}
-          <SectionCard step={2} title="Social Media & Booking">
-            <div className="grid grid-cols-2 gap-[18px]">
-              <FormField label="Instagram URL">
-                <Input placeholder="https://www.instagram.com/makeupbyadison" value={form.social_media.instagram ?? ''} onChange={(e) => setSocial('instagram', e.target.value)} />
+          {/* 2. PROFESSIONAL INFORMATION */}
+          <SectionCard id="professional" step={2} title="Professional Information" description="Tell clients what you specialize in. Add up to 5 specialties.">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <FormField label="Primary Specialty" htmlFor={fieldId('primary_specialty')}>
+                <Input id={fieldId('primary_specialty')} placeholder="e.g. Makeup Artist" value={form.primary_specialty} onChange={(e) => set('primary_specialty', e.target.value)} />
               </FormField>
-              <FormField label="TikTok URL">
-                <Input placeholder="https://tiktok.com/@makeupbyadison" value={form.social_media.tiktok ?? ''} onChange={(e) => setSocial('tiktok', e.target.value)} />
-              </FormField>
-              <FormField label="Preferred Booking Method">
+
+              <FormField
+                label="Additional Specialties"
+                htmlFor={fieldId('specialties')}
+                hint={maxSpecialties ? 'Maximum reached — remove one to add another.' : `${form.specialties.length}/5 selected`}
+              >
                 <Select
-                  value={form.preferred_booking_method}
-                  onChange={(e) => {
-                    set('preferred_booking_method', e.target.value as BookingMethod)
-                    if (e.target.value !== 'Go to Booking Link') set('booking_link', '')
+                  id={fieldId('specialties')}
+                  value=""
+                  disabled={categoriesLoading || maxSpecialties}
+                  placeholder={categoriesLoading ? 'Loading specialties…' : maxSpecialties ? 'Maximum of 5 selected' : 'Select a specialty…'}
+                  options={categories.map((c) => ({ value: c.title, label: c.title, disabled: form.specialties.includes(c.title) }))}
+                  onValueChange={(value) => {
+                    if (!value || form.specialties.includes(value) || form.specialties.length >= 5) return
+                    set('specialties', [...form.specialties, value])
                   }}
-                  options={[
-                    { value: '', label: 'Select…' },
-                    { value: 'Go to Booking Link', label: 'Go to Website' },
-                    { value: 'Call / text', label: 'Call / text' },
-                    { value: 'DM on Instagram', label: 'DM on_Instagram' },
-                   
-                  ]}
+                />
+              </FormField>
+
+              {form.specialties.length > 0 && (
+                <ul className="flex flex-wrap gap-2 sm:col-span-2" aria-label="Selected specialties">
+                  {form.specialties.map((item) => (
+                    <li key={item} className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/[0.07] py-1 pl-3.5 pr-1 text-sm font-medium text-foreground">
+                      {item}
+                      <button
+                        type="button"
+                        onClick={() => set('specialties', form.specialties.filter((s) => s !== item))}
+                        aria-label={`Remove ${item}`}
+                        className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-500"
+                      >
+                        <X className="h-3.5 w-3.5" aria-hidden="true" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </SectionCard>
+
+          {/* 3. BOOKING & SOCIAL */}
+          <SectionCard id="booking" step={3} title="Booking & Social" description="How clients find your work and book with you.">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <FormField label="Instagram URL" htmlFor={fieldId('instagram')}>
+                <Input id={fieldId('instagram')} type="url" inputMode="url" placeholder="https://instagram.com/makeupbyadison" value={form.social_media.instagram ?? ''} onChange={(e) => setSocial('instagram', e.target.value)} />
+              </FormField>
+              <FormField label="TikTok URL" htmlFor={fieldId('tiktok')}>
+                <Input id={fieldId('tiktok')} type="url" inputMode="url" placeholder="https://tiktok.com/@makeupbyadison" value={form.social_media.tiktok ?? ''} onChange={(e) => setSocial('tiktok', e.target.value)} />
+              </FormField>
+              <FormField label="Preferred Booking Method" htmlFor={fieldId('preferred_booking_method')}>
+                <Select
+                  id={fieldId('preferred_booking_method')}
+                  value={form.preferred_booking_method}
+                  placeholder="Select a booking method…"
+                  options={BOOKING_METHOD_OPTIONS}
+                  onValueChange={(value) => {
+                    set('preferred_booking_method', value as BookingMethod)
+                    if (value !== 'Go to Booking Link') set('booking_link', '')
+                  }}
                 />
               </FormField>
               {/* Conditional booking link — only shown when "Go to Booking Link" selected */}
               {form.preferred_booking_method === 'Go to Booking Link' && (
-                <FormField label="Booking Link" required hint="e.g. https://qrco.de/bfw5e3">
+                <FormField label="Booking Link" htmlFor={fieldId('booking_link')} required error={errors.booking_link}>
                   <Input
+                    id={fieldId('booking_link')}
                     type="url"
+                    inputMode="url"
                     placeholder="https://qrco.de/bfw5e3"
                     value={form.booking_link}
+                    invalid={!!errors.booking_link}
                     onChange={(e) => set('booking_link', e.target.value)}
-                    required
                   />
                 </FormField>
               )}
             </div>
           </SectionCard>
 
-          {/* 3. SPECIALTY — loaded from API */}
-          {/* 3. SPECIALTY */}
-          <SectionCard step={3} title="Specialty / Profession" subtitle="— select up to 5">
+          {/* 4. LOCATIONS & HOURS */}
+          <SectionCard id="locations" step={4} title="Locations & Hours" description="Where you work and when clients can book.">
+            <div className="flex flex-col gap-4">
+              {form.locations.map((loc, index) => (
+                <div key={index} className="rounded-xl border bg-muted/30 p-4 sm:p-5">
 
-            {/* Primary Specialty → INPUT */}
-            <FormField label="Primary Specialty" className="mb-5">
-              <Input
-                placeholder="e.g. Makeup Artist"
-                value={form.primary_specialty}
-                onChange={(e) => set('primary_specialty', e.target.value)}
-              />
-            </FormField>
+                  {/* HEADER */}
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <p className="truncate text-sm font-semibold text-foreground">
+                        {loc.label || `Location ${index + 1}`}
+                      </p>
+                      {loc.is_primary && (
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                          Primary
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {!loc.is_primary && (
+                        <button
+                          type="button"
+                          onClick={() => updateLocation(index, { is_primary: true })}
+                          className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
+                        >
+                          Make primary
+                        </button>
+                      )}
+                      {form.locations.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeLocation(index)}
+                          className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-red-500 transition-colors hover:bg-red-50"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
 
-            {/* Additional Specialties → DROPDOWN MULTI SELECT */}
-            <FormField label="Additional Specialties">
-              <div className="relative">
-                <select
-                  className="w-full border border-[#DCF0F6] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#24bbcb]"
-                  onChange={(e) => {
-                    const value = e.target.value
-                    if (!value) return
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {/* LOCATION TYPE */}
+                    <FormField label="Location Type" className="sm:col-span-2">
+                      <div role="radiogroup" aria-label="Location type" className="grid grid-cols-2 gap-2">
+                        {LOCATION_TYPE_OPTIONS.map(({ value, label, icon: Icon }) => {
+                          const active = loc.location_type === value
+                          return (
+                            <label
+                              key={value}
+                              className={`flex min-h-12 cursor-pointer items-center gap-2.5 rounded-xl border px-3.5 py-2.5 text-sm transition-colors has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-primary/15
+                                ${active ? 'border-primary bg-background font-semibold text-foreground' : 'border-input bg-background text-muted-foreground hover:border-primary/40'}`}
+                            >
+                              <input
+                                type="radio"
+                                name={`location-type-${index}`}
+                                className="sr-only"
+                                checked={active}
+                                onChange={() => updateLocation(index, { location_type: value })}
+                              />
+                              <Icon className={`h-4 w-4 shrink-0 ${active ? 'text-primary' : ''}`} aria-hidden="true" />
+                              {label}
+                            </label>
+                          )
+                        })}
+                      </div>
+                    </FormField>
 
-                    if (form.specialties.includes(value)) return
+                    {/* DISPLAY LABEL */}
+                    <FormField label="Display Label" htmlFor={fieldId(`loc-${index}-label`)} className="sm:col-span-2">
+                      <Input
+                        id={fieldId(`loc-${index}-label`)}
+                        placeholder="e.g. Luxe Beauty Studio - Las Vegas"
+                        value={loc.label}
+                        onChange={(e) => updateLocation(index, { label: e.target.value })}
+                      />
+                    </FormField>
 
-                    if (form.specialties.length >= 5) return
+                    {/* ADDRESS (ONLY IF EXACT) */}
+                    {loc.location_type === "exact_address" && (
+                      <FormField label="Address" htmlFor={fieldId(`loc-${index}-address`)} className="sm:col-span-2">
+                        <div className="flex gap-2">
+                          <Input
+                            id={fieldId(`loc-${index}-address`)}
+                            autoComplete="street-address"
+                            placeholder="Street, city, state"
+                            value={loc.address}
+                            onChange={(e) => updateLocation(index, { address: e.target.value })}
+                          />
+                          <button type="button" className="btn-outline h-12 shrink-0 rounded-xl px-5 py-0">
+                            Confirm
+                          </button>
+                        </div>
+                      </FormField>
+                    )}
 
-                    set('specialties', [...form.specialties, value])
-                  }}
-                >
-                  <option value="">Select specialty...</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.title}>
-                      {c.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </FormField>
+                    {/* CITY + STATE (ONLY IF CITY ONLY) */}
+                    {loc.location_type === "service_area" && (
+                      <>
+                        <FormField label="City" htmlFor={fieldId(`loc-${index}-city`)}>
+                          <Input id={fieldId(`loc-${index}-city`)} value={loc.city} onChange={(e) => updateLocation(index, { city: e.target.value })} />
+                        </FormField>
+                        <FormField label="State" htmlFor={fieldId(`loc-${index}-state`)}>
+                          <Input id={fieldId(`loc-${index}-state`)} value={loc.state} onChange={(e) => updateLocation(index, { state: e.target.value })} />
+                        </FormField>
+                      </>
+                    )}
 
-            {/* Selected Items */}
-            <div className="flex flex-wrap gap-2 mt-3">
-              {form.specialties.map((item, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-2 bg-[#EEF9FC] border border-[#24bbcb] text-[#1A3A42] text-xs font-semibold px-3 py-1.5 rounded-full"
-                >
-                  {item}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      set(
-                        'specialties',
-                        form.specialties.filter((s) => s !== item)
-                      )
-                    }
-                    className="text-[#F4928A] font-semibold"
-                  >
-                    ✕
-                  </button>
+                    {/* BUSINESS NAME + PHONE */}
+                    <FormField label="Business Name" htmlFor={fieldId(`loc-${index}-business`)} hint="Optional">
+                      <Input id={fieldId(`loc-${index}-business`)} value={loc.business_name} onChange={(e) => updateLocation(index, { business_name: e.target.value })} />
+                    </FormField>
+                    <FormField label="Phone" htmlFor={fieldId(`loc-${index}-phone`)} hint="Optional">
+                      <Input id={fieldId(`loc-${index}-phone`)} type="tel" value={loc.phone} onChange={(e) => updateLocation(index, { phone: e.target.value })} />
+                    </FormField>
+
+                    {/* NOTES */}
+                    <FormField label="Notes / Description" htmlFor={fieldId(`loc-${index}-notes`)} hint="Optional" className="sm:col-span-2">
+                      <TextArea
+                        id={fieldId(`loc-${index}-notes`)}
+                        rows={3}
+                        value={loc.description}
+                        onChange={(e) => updateLocation(index, { description: e.target.value })}
+                      />
+                    </FormField>
+                  </div>
                 </div>
               ))}
+
+              <button
+                type="button"
+                onClick={addLocation}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-input text-sm font-semibold text-primary transition-colors hover:border-primary/50 hover:bg-primary/[0.04]"
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                Add another location
+              </button>
             </div>
 
-            {/* Counter */}
-            <div className="flex justify-between mt-2">
-              <span className="text-[11px] text-[#7AAAB8]">
-                {form.specialties.length}/5 selected
-              </span>
-              {form.specialties.length >= 5 && (
-                <span className="text-[11px] text-[#24bbcb] font-semibold">
-                  Maximum reached
-                </span>
-              )}
+            <div className="mt-8 border-t pt-8">
+              <FormField label="Business Hours" hint="Select every note that applies to your availability, or add your own.">
+                <div className="mt-1">
+                  <BusinessHoursSection hours={form.business_hours} onChange={(h) => set('business_hours', h)} />
+                </div>
+              </FormField>
             </div>
-
           </SectionCard>
 
-          {/* 4. LOCATION */}
-         {/* 4. LOCATIONS */}
-{/* 4. LOCATIONS */}
-<SectionCard step={4} title="Business Locations">
-  <div className="space-y-5">
+          {/* 5. DIRECTORY PROFILE */}
+          <SectionCard id="profile" step={5} title="Directory Profile" description="Your photo, bio and gallery appear on your public listing and Access card.">
+            <div className="flex flex-col gap-6">
+              <FormField label="Profile Image">
+                <ProfilePhotoField
+                  preview={form.profilePhotoPreview}
+                  onChange={(file, preview) => setForm((prev) => ({ ...prev, profilePhoto: file, profilePhotoPreview: preview }))}
+                  onRemove={() => setForm((prev) => ({ ...prev, profilePhoto: null, profilePhotoPreview: '' }))}
+                />
+              </FormField>
 
-    {form.locations.map((loc, index) => (
-      <div key={index} className="border border-[#E5E7EB] rounded-xl bg-[#F9FAFB] p-4">
+              <FormField label="Professional Bio" htmlFor={fieldId('bio')} required error={errors.bio} hint="2–4 sentences recommended.">
+                <TextArea
+                  id={fieldId('bio')}
+                  rows={6}
+                  placeholder={"Makeup Artist | Bridal • Editorial • Events\n\nAvailable For Travel\n\nSend DM On IG @makeupbyadison"}
+                  value={form.bio}
+                  invalid={!!errors.bio}
+                  onChange={(e) => set('bio', e.target.value)}
+                />
+              </FormField>
 
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-2">
-            <p className="font-semibold text-sm text-[#1A3A42]">
-              {loc.label || `Location ${index + 1}`}
-            </p>
-
-            {loc.is_primary && (
-              <span className="bg-[#FDE68A] text-[10px] px-2 py-0.5 rounded-full font-semibold">
-                Primary
-              </span>
-            )}
-          </div>
-
-          <div className="flex gap-3 text-xs">
-            {!loc.is_primary && (
-              <button
-                type="button"
-                onClick={() => updateLocation(index, { is_primary: true })}
-                className="text-[#F59E0B] font-medium"
-              >
-                Make primary
-              </button>
-            )}
-
-            {form.locations.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeLocation(index)}
-                className="text-[#EF4444]"
-              >
-                Remove
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* LOCATION TYPE */}
-        <div className="mb-4">
-          <p className="text-xs font-medium mb-2">Location Type</p>
-
-          <div className="flex gap-6 text-sm">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                checked={loc.location_type === "exact_address"}
-                onChange={() =>
-                  updateLocation(index, { location_type: "exact_address" })
-                }
-              />
-              Exact Address
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                checked={loc.location_type === "service_area"}
-                onChange={() =>
-                  updateLocation(index, { location_type: "service_area" })
-                }
-              />
-              City / Area Only
-            </label>
-          </div>
-        </div>
-
-        {/* DISPLAY LABEL */}
-        <FormField label="Display Label">
-          <Input
-            placeholder="e.g. Luxe Beauty Studio - Las Vegas"
-            value={loc.label}
-            onChange={(e) =>
-              updateLocation(index, { label: e.target.value })
-            }
-          />
-        </FormField>
-
-        {/* ADDRESS (ONLY IF EXACT) */}
-        {loc.location_type === "exact_address" && (
-          <FormField label="Address" className="mt-3">
-            <div className="flex gap-2">
-              <Input
-                value={loc.address}
-                onChange={(e) =>
-                  updateLocation(index, { address: e.target.value })
-                }
-              />
-              <button
-                type="button"
-                className="bg-[#374151] text-white px-4 rounded-md text-sm"
-              >
-                Confirm
-              </button>
+              <FormField label="Gallery" hint="Up to 5 photos. The thumbnail is shown first on your listing.">
+                <GalleryField
+                  gallery={form.gallery}
+                  onAdd={handleGalleryAdd}
+                  onRemove={handleGalleryRemove}
+                  onCaption={handleGalleryCaption}
+                  onThumbnail={handleGalleryThumbnail}
+                />
+              </FormField>
             </div>
-          </FormField>
-        )}
-
-        {/* CITY + STATE (ONLY IF CITY ONLY) */}
-        {loc.location_type === "service_area" && (
-          <div className="grid grid-cols-2 gap-4 mt-3">
-            <FormField label="City">
-              <Input
-                value={loc.city}
-                onChange={(e) =>
-                  updateLocation(index, { city: e.target.value })
-                }
-              />
-            </FormField>
-
-            <FormField label="State">
-              <Input
-                value={loc.state}
-                onChange={(e) =>
-                  updateLocation(index, { state: e.target.value })
-                }
-              />
-            </FormField>
-          </div>
-        )}
-
-        {/* BUSINESS NAME + PHONE */}
-        <div className="grid grid-cols-2 gap-4 mt-3">
-          <FormField label="Business Name (optional)">
-            <Input
-              value={loc.business_name}
-              onChange={(e) =>
-                updateLocation(index, { business_name: e.target.value })
-              }
-            />
-          </FormField>
-
-          <FormField label="Phone (optional)">
-            <Input
-              value={loc.phone}
-              onChange={(e) =>
-                updateLocation(index, { phone: e.target.value })
-              }
-            />
-          </FormField>
-        </div>
-
-        {/* NOTES */}
-        <FormField label="Notes / Description (optional)" className="mt-3">
-          <TextArea
-            value={loc.description}
-            onChange={(e) =>
-              updateLocation(index, { description: e.target.value })
-            }
-          />
-        </FormField>
-
-      </div>
-    ))}
-
-    {/* ADD LOCATION */}
-    <button
-      type="button"
-      onClick={addLocation}
-      className="w-full border-dashed border border-[#B4DCE9] py-3 rounded-xl text-sm text-[#24bbcb] font-semibold hover:bg-[#EEF9FC]"
-    >
-      + Add Another Location
-    </button>
-
-  </div>
-</SectionCard>
-          {/* 5. BUSINESS HOURS */}
-       <SectionCard step={5} title="Business Hours">
-  <p className="text-[13px] text-[#4A7A88] mb-4 leading-relaxed">
-    Select all notes that apply to your availability.
-  </p>
-
-  {/* ✅ Manual Input */}
-  <div className="flex gap-2 mb-4">
-    <input
-      id="business-note-input"
-      type="text"
-      placeholder="Enter business note..."
-      className="flex-1 border border-[#DCF0F6] rounded-xl px-4 py-2 text-sm outline-none focus:border-[#24bbcb]"
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          e.preventDefault()
-          const value = (e.target as HTMLInputElement).value.trim()
-          if (!value) return
-
-          if (form.business_hours.some((h) => h.note === value)) return
-
-          set("business_hours", [...form.business_hours, { note: value }])
-          ;(e.target as HTMLInputElement).value = ""
-        }
-      }}
-    />
-
-    <button
-      type="button"
-      onClick={() => {
-        const input = document.getElementById(
-          "business-note-input"
-        ) as HTMLInputElement
-        const value = input?.value.trim()
-        if (!value) return
-
-        if (form.business_hours.some((h) => h.note === value)) return
-
-        set("business_hours", [...form.business_hours, { note: value }])
-        input.value = ""
-      }}
-      className="bg-[#24bbcb] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#2A9BB5]"
-    >
-      Add
-    </button>
-  </div>
-
-  {/* ✅ Selected Notes */}
-  {form.business_hours.length > 0 && (
-    <div className="flex flex-wrap gap-2 mb-4">
-      {form.business_hours.map((item, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-2 bg-[#EEF9FC] border border-[#24bbcb] text-[#1A3A42] text-xs font-semibold px-3 py-1.5 rounded-full"
-        >
-          {item.note}
-          <button
-            type="button"
-            onClick={() =>
-              set(
-                "business_hours",
-                form.business_hours.filter((h) => h.note !== item.note)
-              )
-            }
-            className="text-[#F4928A] font-semibold"
-          >
-            ✕
-          </button>
-        </div>
-      ))}
-    </div>
-  )}
-
- 
-</SectionCard>
-
-          {/* 6. MEDIA & PROFILE */}
-          <SectionCard step={6} title="Media & Profile">
-            <MediaSection
-              profilePhotoPreview={form.profilePhotoPreview}
-              gallery={form.gallery}
-              onProfileChange={(file, preview) => setForm((prev) => ({ ...prev, profilePhoto: file, profilePhotoPreview: preview }))}
-              onGalleryAdd={handleGalleryAdd}
-              onGalleryRemove={handleGalleryRemove}
-              onGalleryCaption={handleGalleryCaption}
-              onGalleryThumbnail={handleGalleryThumbnail}
-            />
           </SectionCard>
 
-          {/* ACCESS CARD */}
-          <AccessCardToggle enabled={form.createAccessCard} onChange={(v) => set('createAccessCard', v)} />
+          {/* 6. FINAL DETAILS */}
+          <SectionCard id="final" step={6} title="Final Details" description="Help us understand your needs and how we can best support your business.">
+            <div className="flex flex-col gap-8">
+              <AccessCardToggle enabled={form.createAccessCard} onChange={(v) => set('createAccessCard', v)} />
 
-          {/* 7. GLAMLINK INTEGRATION */}
-          <SectionCard step={7} title="Glamlink Integration">
-            <p className="text-[13px] text-[#4A7A88] mb-6 leading-relaxed">
-              Help us understand your needs and how we can best support your business.
-            </p>
+              <FormField label="What excites you about Glamlink?" errorId={`${fieldId('excites_about_glamlink')}-error`} required error={errors.excites_about_glamlink} hint="Select at least one.">
+                <MultiSelect
+                  id={fieldId('excites_about_glamlink')}
+                  options={EXCITES_OPTIONS}
+                  selected={form.excites_about_glamlink}
+                  invalid={!!errors.excites_about_glamlink}
+                  onChange={(v) => set('excites_about_glamlink', v)}
+                />
+              </FormField>
 
-            {/* Excites */}
-            <div className="mb-6">
-              <p className="text-sm font-semibold text-[#1A3A42] mb-1">
-                What excites you about Glamlink? <span className="text-[#F4928A]">*</span>
-                <span className="text-[#7AAAB8] font-normal text-xs ml-1">(Select at least 1)</span>
-              </p>
-              <MultiSelect
-                options={EXCITES_OPTIONS}
-                selected={form.excites_about_glamlink}
-                onChange={(v) => set('excites_about_glamlink', v)}
-                minLabel="Minimum 1 selection required"
-              />
-            </div>
+              <FormField label="Your biggest pain points" errorId={`${fieldId('biggest_pain_points')}-error`} required error={errors.biggest_pain_points} hint="Select at least one.">
+                <MultiSelect
+                  id={fieldId('biggest_pain_points')}
+                  options={PAIN_POINTS_OPTIONS}
+                  selected={form.biggest_pain_points}
+                  invalid={!!errors.biggest_pain_points}
+                  onChange={(v) => set('biggest_pain_points', v)}
+                />
+              </FormField>
 
-            {/* Pain points */}
-            <div className="mb-6">
-              <p className="text-sm font-semibold text-[#1A3A42] mb-1">
-                Biggest pain points <span className="text-[#F4928A]">*</span>
-                <span className="text-[#7AAAB8] font-normal text-xs ml-1">(Select at least 1)</span>
-              </p>
-              <MultiSelect
-                options={PAIN_POINTS_OPTIONS}
-                selected={form.biggest_pain_points}
-                onChange={(v) => set('biggest_pain_points', v)}
-                minLabel="Minimum 1 selection required"
-              />
-            </div>
+              <div className="flex flex-col gap-4 border-t pt-8">
+                <Switch checked={form.offer_promotion} onChange={(v) => set('offer_promotion', v)}>
+                  <span className="block text-sm font-semibold text-foreground">
+                    I would like to offer a promotion with my digital card
+                  </span>
+                </Switch>
+                {form.offer_promotion && (
+                  <FormField label="Promotion Details" htmlFor={fieldId('promotion_details')} className="sm:pl-14">
+                    <Input
+                      id={fieldId('promotion_details')}
+                      placeholder="e.g. 20% off Balayage for first-time clients"
+                      value={form.promotion_details}
+                      onChange={(e) => set('promotion_details', e.target.value)}
+                    />
+                  </FormField>
+                )}
 
-            <div className="flex flex-col gap-4 pt-4 border-t border-[#DCF0F6]">
-
-              {/* Promotion toggle */}
-              <div className="flex items-center gap-3 cursor-pointer" onClick={() => set('offer_promotion', !form.offer_promotion)}>
-                <Toggle enabled={form.offer_promotion} onChange={(v) => set('offer_promotion', v)} />
-                <span className="text-sm font-semibold text-[#1A3A42]">
-                  I would like to offer a promotion with my digital card
-                </span>
+                <button
+                  type="button"
+                  aria-pressed={form.elite_setup}
+                  onClick={() => set('elite_setup', !form.elite_setup)}
+                  className={`mt-2 flex items-start gap-3 rounded-xl border p-4 text-left transition-colors outline-none focus-visible:ring-4 focus-visible:ring-primary/15 sm:p-5
+                    ${form.elite_setup ? 'border-primary bg-primary/[0.04]' : 'border-input hover:border-primary/40'}`}
+                >
+                  <span className="mt-0.5"><CheckBox checked={form.elite_setup} /></span>
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">
+                      The Elite Setup{' '}
+                      <span className="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">Recommended</span>
+                    </span>
+                    <span className="mt-1.5 block text-sm leading-relaxed text-muted-foreground">
+                      I agree to let the Glamlink Concierge Team build my professional profile and digital business card using my existing public social media content. We&apos;ll curate your first clips, photo albums, and service menu so you can launch instantly.
+                    </span>
+                  </span>
+                </button>
               </div>
-              {form.offer_promotion && (
-                <FormField label="Promotion Details" hint="e.g. 20% off Balayage for first-time clients">
-                  <Input
-                    placeholder="20% off on Balayage for first-time clients"
-                    value={form.promotion_details}
-                    onChange={(e) => set('promotion_details', e.target.value)}
-                  />
-                </FormField>
-              )}
-
-              {/* Elite setup */}
-              <div
-                className="flex items-start gap-3 cursor-pointer p-4 rounded-xl border-[1.5px] border-[#DCF0F6] hover:border-[#A8E0EE] transition-colors bg-[#F7FAFB]"
-                onClick={() => set('elite_setup', !form.elite_setup)}
-              >
-                <div className={`mt-0.5 w-5 h-5 rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 transition-all ${form.elite_setup ? 'bg-[#24bbcb] border-[#24bbcb]' : 'bg-white border-[#B4DCE9]'}`}>
-                  {form.elite_setup && <CheckIcon />}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[#1A3A42]">
-                    The Elite Setup{' '}
-                    <span className="text-[11px] text-[#24bbcb] font-semibold">(Recommended)</span>
-                  </p>
-                  <p className="text-xs text-[#7AAAB8] mt-1 leading-relaxed">
-                    I agree to let the Glamlink Concierge Team build my professional profile and digital business card using my existing public social media content. We'll curate your first clips, photo albums, and service menu so you can launch instantly.
-                  </p>
-                </div>
-              </div>
-
             </div>
           </SectionCard>
 
           {/* SUBMIT */}
-          <div className="text-center pt-2">
-            <button
-              type="submit"
-              className="btn-primary btn-lg px-16"
-            >
-              Submit My Application →
-            </button>
-            <p className="text-xs text-[#7AAAB8] mt-3.5 leading-[1.7]">
-              By submitting you agree to GlamLink's{' '}
-              <a href="#" className="text-[#24bbcb] font-semibold hover:underline">Terms of Service</a>{' '}and{' '}
-              <a href="#" className="text-[#24bbcb] font-semibold hover:underline">Directory Guidelines</a>.
-              <br />Applications are reviewed within 2–3 business days. Confirmation email sent immediately.
+          <div className="border-t bg-muted/30 px-5 py-10 text-center sm:px-10">
+            <h2 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">Ready to submit your application?</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+              Your application will be reviewed by the Glamlink team within 2–3 business days.
+              A confirmation email is sent immediately.
             </p>
+
+            <ol className="mx-auto mt-5 flex max-w-xl flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground" aria-label="What happens next">
+              {PROCESS_STEPS.map((step, i) => (
+                <li key={step} className="inline-flex items-center gap-1.5">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">{i + 1}</span>
+                  {step}
+                </li>
+              ))}
+            </ol>
+
+            <div className="mx-auto mt-7 flex max-w-md flex-col items-center gap-3">
+              {submitError && (
+                <div role="alert" className="flex w-full items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-left text-sm text-red-700">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{submitError}</span>
+                </div>
+              )}
+              {hasErrors && (
+                <p role="status" className="text-sm text-red-500">Please fix the highlighted fields above.</p>
+              )}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="btn-primary btn-lg w-full disabled:opacity-70 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 sm:w-auto sm:px-12"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                    Submitting…
+                  </>
+                ) : (
+                  'Submit Application'
+                )}
+              </button>
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                By submitting you agree to Glamlink&apos;s{' '}
+                <a href="#" className="font-semibold text-primary hover:underline">Terms of Service</a>{' '}and{' '}
+                <a href="#" className="font-semibold text-primary hover:underline">Directory Guidelines</a>.
+              </p>
+            </div>
           </div>
 
         </form>

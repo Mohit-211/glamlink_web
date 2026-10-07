@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { getAllPodcast } from "@/api/Api";
-
 
 interface ScheduleItem {
   id: number;
@@ -19,7 +19,6 @@ const PAGE_SIZE = 4;
 
 function getInitials(name: string) {
   if (!name || name === "TBA") return "?";
-
   return name
     .split(" ")
     .map((w) => w[0])
@@ -30,247 +29,103 @@ function getInitials(name: string) {
 
 function formatDate(dateString: string) {
   if (!dateString) return "";
-
   const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateString);
-
-  const date = isDateOnly
-    ? new Date(`${dateString}T00:00:00`)
-    : new Date(dateString);
-
+  const date = isDateOnly ? new Date(`${dateString}T00:00:00`) : new Date(dateString);
   if (isNaN(date.getTime())) return "";
-
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function AvatarCircle({
-  name,
-  index,
-}: {
-  name: string;
-  index: number;
-}) {
-  const palettes = [
-    { bg: "hsl(186 50% 88%)", text: "hsl(186 70% 28%)" },
-    { bg: "hsl(280 40% 90%)", text: "hsl(280 60% 35%)" },
-    { bg: "hsl(30 50% 90%)", text: "hsl(30 70% 30%)" },
-    { bg: "hsl(340 50% 90%)", text: "hsl(340 60% 35%)" },
-    { bg: "hsl(200 50% 88%)", text: "hsl(200 70% 28%)" },
-  ];
-
-  const p = palettes[index % palettes.length];
-
-  return (
-    <div
-      className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-semibold"
-      style={{ background: p.bg, color: p.text }}
-    >
-      {getInitials(name)}
-    </div>
-  );
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 export default function UpcomingSchedule() {
-  const [visible, setVisible] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const ref = useRef<HTMLDivElement>(null);
 
   const shownItems = schedule.slice(0, visibleCount);
   const hasMore = visibleCount < schedule.length;
 
   useEffect(() => {
-    fetchPodcast();
-  }, []);
-
-  const fetchPodcast = async () => {
-    try {
-      setLoading(true);
-
-      const response = await getAllPodcast();
-console.log(response,"response=====")
-      setSchedule(response?.data || []);
-    } catch (error) {
-      console.error("Podcast fetch error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
+    getAllPodcast()
+      .then((response) => setSchedule(response?.data || []))
+      .catch((error) => console.error("Podcast fetch error:", error))
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
     return (
-      <div className="py-10 text-center text-sm text-gray-500">
-        Loading schedule...
+      <div className="divide-y divide-border">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex items-start gap-3 px-5 py-4">
+            <div className="w-9 h-9 rounded-full bg-muted animate-pulse shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
+              <div className="h-3 w-5/6 rounded bg-muted animate-pulse" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
 
+  if (schedule.length === 0) {
+    return (
+      <p className="px-5 py-10 text-center text-sm text-muted-foreground">
+        New guests are announced every week. Check back soon.
+      </p>
+    );
+  }
+
   return (
-    <section
-      ref={ref}
-      className="relative"
-      
-    >
-      <div
-        className="divide-y"
-        style={{ borderColor: "hsl(204 14% 92%)" }}
-      >
-        {shownItems.map((item, i) => (
-          <div
-            key={item.id}
-            className="px-5 py-4 transition-all duration-200 cursor-default"
-            style={{
-              // opacity: visible ? 1 : 0,
-              transform: visible
-                ? "translateY(0)"
-                : "translateY(10px)",
-              transition: `opacity 0.45s ease ${i * 70
-                }ms, transform 0.45s ease ${i * 70
-                }ms, background 0.15s ease`,
-              background:
-                hoveredIndex === i
-                  ? "hsl(186 40% 97%)"
-                  : "white",
-            }}
-            onMouseEnter={() => setHoveredIndex(i)}
-            onMouseLeave={() => setHoveredIndex(null)}
-          >
-            <div className="flex items-start gap-3">
-              <AvatarCircle
-                name={item.name}
-                index={i}
-              />
+    <div>
+      <div className="divide-y divide-border">
+        {shownItems.map((item) => (
+          <div key={item.id} className="flex items-start gap-3 px-5 py-4 transition-colors hover:bg-accent/50">
+            <div className="w-9 h-9 rounded-full bg-accent text-accent-foreground flex items-center justify-center shrink-0 text-[12px] font-semibold">
+              {getInitials(item.name)}
+            </div>
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-0.5">
-                  <p
-                    className="text-[13px] font-semibold leading-tight truncate"
-                    style={{
-                      color: "hsl(210 30% 10%)",
-                    }}
-                  >
-                    {item.name}
-                  </p>
-
-                  <span
-                    className="text-[9px] tracking-[0.15em] uppercase font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
-                    style={{
-                      background: "hsl(186 50% 92%)",
-                      color: "hsl(186 70% 28%)",
-                    }}
-                  >
-                    {formatDate(item.schedule_date)}
-                  </span>
-                </div>
-
-                <p
-                  className="text-[12px] leading-snug mb-2"
-                  style={{
-                    color: "hsl(210 15% 42%)",
-                  }}
-                >
-                  {item.short_description}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2 mb-0.5">
+                <p className="text-sm font-semibold leading-tight text-foreground truncate">
+                  {item.name}
                 </p>
+                <span className="text-[10px] uppercase tracking-widest font-semibold text-primary shrink-0">
+                  {formatDate(item.schedule_date)}
+                </span>
               </div>
+              <p className="text-[13px] leading-snug text-muted-foreground">
+                {item.short_description}
+              </p>
             </div>
           </div>
         ))}
       </div>
 
-      <div
-        className="px-5 py-3 flex items-center justify-between"
-        style={{
-          borderTop: "1px solid hsl(204 14% 92%)",
-          background: "hsl(204 18% 98%)",
-        }}
-      >
-        <p
-          className="text-[10px]"
-          style={{ color: "hsl(210 12% 60%)" }}
-        >
-          {shownItems.length} of {schedule.length} episodes
-        </p>
-
-        {hasMore ? (
-          <button
-            type="button"
-            onClick={() =>
-              setVisibleCount((c) =>
-                Math.min(c + PAGE_SIZE, schedule.length)
-              )
-            }
-            className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide transition-all duration-150 hover:opacity-70"
-            style={{ color: "#24bbcb" }}
-          >
-            Load{" "}
-            {Math.min(
-              PAGE_SIZE,
-              schedule.length - visibleCount
-            )}{" "}
-            more
-
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              className="w-3 h-3"
+      {schedule.length > PAGE_SIZE && (
+        <div className="px-5 py-3 flex items-center justify-between border-t border-border">
+          <p className="text-[11px] text-muted-foreground">
+            {shownItems.length} of {schedule.length} upcoming
+          </p>
+          {hasMore ? (
+            <button
+              type="button"
+              onClick={() => setVisibleCount((c) => Math.min(c + PAGE_SIZE, schedule.length))}
+              className="inline-flex items-center gap-1 text-[12px] font-semibold text-primary hover:opacity-80 transition-opacity"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-        ) : schedule.length > PAGE_SIZE ? (
-          <button
-            type="button"
-            onClick={() => setVisibleCount(PAGE_SIZE)}
-            className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide transition-all duration-150 hover:opacity-70"
-            style={{ color: "#24bbcb" }}
-          >
-            Show less
-
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              className="w-3 h-3"
+              Show more
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setVisibleCount(PAGE_SIZE)}
+              className="inline-flex items-center gap-1 text-[12px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 15l7-7 7 7"
-              />
-            </svg>
-          </button>
-        ) : null}
-      </div>
-    </section>
+              Show less
+              <ChevronUp className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

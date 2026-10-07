@@ -183,11 +183,17 @@ console.log(planType,"planType")
         }
       `}</style>
 
-      <div className="grid gap-5 sm:grid-cols-3">
+      <div className="grid gap-5 pt-2 sm:grid-cols-3">
         {UPGRADE_PLANS.map((p) => {
           const isDisabled = disabledSet.has(p.id);
+          const isIncluded = !!businessCard && isPlanAlreadyIncluded(p.id, businessCard);
           return (
             <div key={p.id} className="relative">
+              {isIncluded && (
+                <span className="absolute -top-2.5 left-4 z-10 inline-flex items-center gap-1 rounded-full border border-primary/30 bg-background px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+                  Included in your plan
+                </span>
+              )}
               <div className={isDisabled ? "pointer-events-none opacity-50 grayscale-[35%]" : ""}>
                 <PlanCard
                   plan={p}
@@ -206,15 +212,17 @@ console.log(planType,"planType")
 
       {submitError && <p className="mt-3 text-xs text-destructive">{submitError}</p>}
 
-      <button
-        type="button"
-        onClick={handleContinue}
-        disabled={!effectiveCanContinue}
-        className="btn-primary mt-6 flex w-full items-center justify-center gap-2 !rounded-xl !py-3 !text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {submitting ? "Saving..." : "Continue"}
-        <ArrowRight className="h-4 w-4" />
-      </button>
+      <div className="mt-6 flex sm:justify-end">
+        <button
+          type="button"
+          onClick={handleContinue}
+          disabled={!effectiveCanContinue}
+          className="btn-primary w-full !py-3 !text-sm disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto sm:min-w-[220px]"
+        >
+          {submitting ? "Saving..." : "Continue"}
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      </div>
     </div>
   );
 }

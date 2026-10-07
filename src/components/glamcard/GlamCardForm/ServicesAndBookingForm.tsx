@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import { GripVertical, ImagePlus, X } from "lucide-react";
 import { BOOKING_METHODS, BookingMethod, FeaturedLink, FieldErrors, GlamCardFormData } from "./types";
 import { userSpecialtiesApi } from "@/api/Api";
+import { ensureCanEditAccessCard } from "@/lib/accessCardPermissions";
 
 interface Props {
   data: GlamCardFormData;
@@ -12,6 +13,8 @@ interface Props {
   /** Needed to persist a Featured Links reorder immediately via its own endpoint (edit mode only). */
   mode?: "create" | "edit";
   cardId?: string | number;
+  /** Card record whose plan_type gates the immediate reorder request (see lib/accessCardPermissions). */
+  editPermissionCard?: unknown;
 }
 
 const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-4 sm:p-6";
@@ -60,6 +63,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
   clearError,
   mode,
   cardId,
+  editPermissionCard,
 }) => {
   const [specialtyInput, setSpecialtyInput] = useState("");
   const [infoInput, setInfoInput] = useState("");
@@ -391,6 +395,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
   // goes out with the rest of the data on submit via buildFormData.
   const persistFeaturedLinksOrder = async (links: FeaturedLink[]) => {
     if (mode !== "edit" || !cardId) return;
+    if (!ensureCanEditAccessCard(editPermissionCard)) return;
     try {
       const token = localStorage.getItem("GlamlinkaccessToken");
       const API_URL = process.env.NEXT_PUBLIC_API_URL;

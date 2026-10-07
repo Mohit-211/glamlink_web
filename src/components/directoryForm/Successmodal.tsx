@@ -1,4 +1,5 @@
 import React from 'react'
+import { CheckCircle2 } from 'lucide-react'
 
 interface SuccessModalProps {
   open: boolean
@@ -13,48 +14,48 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
 }) => {
   if (!open) return null
 
+  const chips = [
+    'Application received',
+    ...(accessCard ? ['Access card queued'] : []),
+    'Map listing pending',
+  ]
+
   return (
-    <div className="
-      fixed inset-0 bg-[rgba(26,58,66,0.55)] backdrop-blur-md
-      z-50 flex items-center justify-center p-4
-    ">
-      <div className="
-        bg-white rounded-[22px] p-12 text-center max-w-[430px] w-full
-        border-t-4 border-[#24bbcb]
-        animate-[popIn_0.42s_cubic-bezier(0.34,1.56,0.64,1)]
-      ">
-        <div className="text-5xl mb-3.5">🎉</div>
-        <h2 className="font-poppins text-2xl font-semibold text-[#1A3A42] mb-2.5">
-          Application Submitted!
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="directory-success-title"
+        className="w-full max-w-[440px] rounded-2xl border bg-card p-8 text-center shadow-large animate-fade-up sm:p-10"
+      >
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
+        </span>
+        <h2 id="directory-success-title" className="mt-5 text-2xl font-semibold tracking-tight text-foreground">
+          Application submitted
         </h2>
-        <p className="text-sm text-[#4A7A88] leading-[1.7] mb-5">
-          Thank you for joining GlamLink! Our team will review your listing within
+        <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+          Thank you for applying to Glamlink! Our team will review your listing within
           2–3 business days. Check your inbox for confirmation
           {accessCard && ' — and your free Access card on approval'}.
         </p>
-        <div className="flex flex-wrap gap-2 justify-center mb-7">
-          <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-[#EDFAF4] border-[#A8E5C8] text-[#2E8A5A]">
-            ✓ Application Received
-          </span>
-          {accessCard && (
-            <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-[#EEF9FC] border-[#D6F2F8] text-[#2A9BB5]">
-              ✦ Access Card Queued
-            </span>
-          )}
-          <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-[#EEF9FC] border-[#D6F2F8] text-[#2A9BB5]">
-            🗺️ Map Listing Pending
-          </span>
-        </div>
+        <ul className="mt-5 flex flex-wrap justify-center gap-2">
+          {chips.map((chip) => (
+            <li
+              key={chip}
+              className="rounded-full border border-primary/20 bg-primary/[0.06] px-3 py-1 text-xs font-medium text-foreground/80"
+            >
+              {chip}
+            </li>
+          ))}
+        </ul>
         <button
+          type="button"
           onClick={onClose}
-          className="
-            bg-[#24bbcb] hover:bg-[#2A9BB5] text-white border-none rounded-full
-            px-10 py-3.5 font-poppins text-sm font-semibold
-            transition-colors duration-200
-            shadow-[0_4px_14px_rgba(36,187,203,0.3)]
-          "
+          autoFocus
+          className="btn-primary mt-7 w-full sm:w-auto sm:px-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
         >
-          Got it, thanks!
+          Got it, thanks
         </button>
       </div>
     </div>

@@ -24,6 +24,8 @@
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
 
+  --color-destructive: hsl(var(--destructive));
+
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));

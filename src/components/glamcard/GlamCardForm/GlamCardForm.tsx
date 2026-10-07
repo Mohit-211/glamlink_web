@@ -13,6 +13,7 @@ import VerifyOtp from "@/components/AuthPage/VerifyOtp";
 import Register from "@/components/AuthPage/Register";
 import Login from "@/components/AuthPage/Login";
 import { SubscriptionPaymentModal } from "../../Dashboard/SubscriptionPay";
+import { ensureCanEditAccessCard } from "@/lib/accessCardPermissions";
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
@@ -24,6 +25,12 @@ interface Props {
   onSuccess?: (result: any) => void;
   /** shown as a Cancel action when mode === "edit" */
   onCancel?: () => void;
+  /**
+   * The business-card API record being edited (mode === "edit"). Its plan_type
+   * decides — via lib/accessCardPermissions — whether saves/reorders may run.
+   * Without it, edit mode stays locked.
+   */
+  editPermissionCard?: unknown;
 }
 const FORM_STORAGE_KEY = "glamcard_form_draft";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -42,6 +49,7 @@ const GlamCardForm: React.FC<Props> = ({
   cardId,
   onSuccess,
   onCancel,
+  editPermissionCard,
 }) => {
   const isEdit = mode === "edit";
   const router = useRouter();
@@ -341,7 +349,11 @@ const GlamCardForm: React.FC<Props> = ({
     formData.append("is_phone_visible", String(data.is_phone_visible ?? true));
     return formData;
   };
+  // Edits to an existing card are allowed only when its plan_type permits it.
+  // Checked before validation / building form data, and again right before the request.
+  const canSubmitEdit = () => !isEdit || ensureCanEditAccessCard(editPermissionCard);
   const checkAuthAndSubmit = () => {
+    if (!canSubmitEdit()) return;
     if (!validateData()) return;
     const formData = buildFormData();
     // Session storage is only a hand-off mechanism for the logged-out ->
@@ -394,6 +406,7 @@ const GlamCardForm: React.FC<Props> = ({
     window.location.href = "/login";
   };
   const handleSubmit = async (formData: FormData) => {
+    if (!canSubmitEdit()) return;
     console.log("FINAL DATA 👉", data);
     const newVideoItems = (data.images ?? [])
       .map((file, index) => ({ file, meta: data.gallery_meta?.[index], index }))
@@ -507,6 +520,7 @@ const GlamCardForm: React.FC<Props> = ({
               clearError={clearError}
               mode={mode}
               cardId={cardId}
+              editPermissionCard={editPermissionCard}
             />
             {/* <GlamlinkIntegrationForm data={data} setData={setData} /> */}
             <div className="mt-10 flex flex-col-reverse gap-3 sm:flex-row">

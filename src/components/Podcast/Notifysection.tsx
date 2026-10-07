@@ -1,6 +1,8 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { ArrowRight, Check, Loader2 } from "lucide-react";
 
+<<<<<<< Updated upstream
 // ─── Floating diamond accent ──────────────────────────────────────────────────
 function Diamond({
   style,
@@ -26,17 +28,11 @@ function Diamond({
     />
   );
 }
+=======
+const inputClass =
+  "w-full h-12 px-4 rounded-xl border border-input bg-background text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/15";
+>>>>>>> Stashed changes
 
-// ─── Animated check icon ──────────────────────────────────────────────────────
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-5 h-5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-    </svg>
-  );
-}
-
-// ─── Input field ──────────────────────────────────────────────────────────────
 function Field({
   label,
   type = "text",
@@ -52,22 +48,26 @@ function Field({
   onChange: (v: string) => void;
   required?: boolean;
 }) {
-  const [focused, setFocused] = useState(false);
-
   return (
+<<<<<<< Updated upstream
     <div className="relative group">
       <label
         className="block text-[9px] tracking-[0.25em] uppercase font-semibold mb-1.5 transition-colors duration-200"
         style={{ color: focused ? "#24bbcb" : "hsl(210 15% 52%)" }}
       >
+=======
+    <label className="block min-w-0">
+      <span className="block text-[11px] uppercase tracking-widest font-semibold text-muted-foreground mb-1.5">
+>>>>>>> Stashed changes
         {label}
-      </label>
+      </span>
       <input
         type={type}
         placeholder={placeholder}
         value={value}
         required={required}
         onChange={(e) => onChange(e.target.value)}
+<<<<<<< Updated upstream
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         className="w-full px-4 py-3 text-[13px] outline-none transition-all duration-200 rounded-lg"
@@ -81,29 +81,20 @@ function Field({
             ? "0 0 0 3px #24bbcb / 0.1"
             : "0 1px 3px hsl(210 20% 10% / 0.05)",
         }}
+=======
+        className={inputClass}
+>>>>>>> Stashed changes
       />
-    </div>
+    </label>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 export default function NotifySection() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
-      { threshold: 0.15 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,13 +106,8 @@ export default function NotifySection() {
     setSubmitted(true);
   };
 
-  const fade = (delay: number): React.CSSProperties => ({
-    opacity: visible ? 1 : 0,
-    transform: visible ? "translateY(0)" : "translateY(20px)",
-    transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
-  });
-
   return (
+<<<<<<< Updated upstream
     <section
       ref={ref}
       className="relative overflow-hidden"
@@ -381,12 +367,62 @@ export default function NotifySection() {
                     ✦ New episodes every Sunday
                   </p>
                 </div>
-              )}
-            </div>
-          </div>
+=======
+    <div className="h-full rounded-2xl border border-border bg-card shadow-soft p-6 sm:p-8">
+      {!submitted ? (
+        <>
+          <p className="text-[10px] uppercase tracking-widest text-primary mb-2">Never miss an episode</p>
+          <h3 className="font-display text-2xl leading-snug text-foreground mb-2">
+            Get notified when your guest drops
+          </h3>
+          <p className="text-sm leading-relaxed text-muted-foreground mb-6">
+            New episodes every Sunday, straight to your inbox. No spam, unsubscribe anytime.
+          </p>
 
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="First name" placeholder="Marie" value={firstName} onChange={setFirstName} required />
+              <Field label="Last name" placeholder="Matteucci" value={lastName} onChange={setLastName} />
+            </div>
+            <Field
+              label="Email address"
+              type="email"
+              placeholder="you@email.com"
+              value={email}
+              onChange={setEmail}
+              required
+            />
+            <button type="submit" disabled={loading} className="btn-primary w-full mt-2 disabled:opacity-70">
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Subscribing…
+                </>
+              ) : (
+                <>
+                  Notify me
+                  <ArrowRight className="w-4 h-4" />
+                </>
+>>>>>>> Stashed changes
+              )}
+            </button>
+          </form>
+        </>
+      ) : (
+        <div className="h-full flex flex-col items-center justify-center text-center gap-4 py-8">
+          <div className="w-14 h-14 rounded-full bg-accent text-primary flex items-center justify-center">
+            <Check className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="font-display text-lg font-semibold text-foreground mb-1">
+              You&apos;re on the list, {firstName}!
+            </p>
+            <p className="text-sm text-muted-foreground">
+              We&apos;ll let you know the moment a new episode drops.
+            </p>
+          </div>
         </div>
-      </div>
-    </section>
+      )}
+    </div>
   );
 }

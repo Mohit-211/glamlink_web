@@ -1,8 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import {
+  AuthFormError,
+  AuthInput,
+  AuthLayout,
+  AuthPasswordInput,
+  AuthSubmitButton,
+  authLinkClass,
+} from "./AuthLayout";
 import { loginUser } from "@/api/Api";
 import { message } from "antd";
 import {
@@ -21,15 +28,42 @@ type FieldErrors = {
   password?: string;
 };
 
+
+/** Only same-site paths are allowed, so ?redirect= can't send users off-site. */
+function safeRedirectPath(path: string | null): string | null {
+  if (!path || !path.startsWith("/") || path.startsWith("//") || path.startsWith("/login")) {
+    return null;
+  }
+  return path;
+}
+
+/**
+ * Where to go after login. A pending postLoginRedirect (set by flows such as the
+ * Access card form before sending the user here) wins, then a ?redirect= query
+ * param, then the dashboard.
+ *
+ * postLoginRedirect is deliberately left in storage: the destination page reads
+ * it to know it should restore the user's saved draft, and clears it itself.
+ */
+function getPostLoginPath(): string {
+  const pending = safeRedirectPath(localStorage.getItem("postLoginRedirect"));
+  if (pending) return pending;
+  const fromQuery = safeRedirectPath(new URLSearchParams(window.location.search).get("redirect"));
+  return fromQuery ?? "/dashboard";
+}
+
 export default function Login({ onSuccess }: LoginProps = {}) {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [formError, setFormError] = useState("");
+  const submittingRef = useRef(false);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const storedPayload = getFormDataFromSession();
@@ -45,7 +79,7 @@ export default function Login({ onSuccess }: LoginProps = {}) {
   useEffect(() => {
     const accessToken = localStorage.getItem("GlamlinkaccessToken");
     if (accessToken) {
-      router.replace("/dashboard");
+      router.replace(getPostLoginPath());
     }
   }, [router]);
 
@@ -55,7 +89,7 @@ export default function Login({ onSuccess }: LoginProps = {}) {
 
     if (!form.email.trim()) {
       next.email = "Please enter your email address";
-    } else if (!emailRegex.test(form.email)) {
+    } else if (!emailRegex.test(form.email.trim())) {
       next.email = "Please enter a valid email address";
     }
 
@@ -68,20 +102,26 @@ export default function Login({ onSuccess }: LoginProps = {}) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittingRef.current) return;
 
+    setFormError("");
     const fieldErrors = validate();
     setErrors(fieldErrors);
-    if (Object.keys(fieldErrors).length > 0) {
-      const firstError = Object.values(fieldErrors)[0];
-      if (firstError) message.error(firstError);
+    if (fieldErrors.email) {
+      emailRef.current?.focus();
+      return;
+    }
+    if (fieldErrors.password) {
+      passwordRef.current?.focus();
       return;
     }
 
     try {
+      submittingRef.current = true;
       setLoading(true);
 
       const response = await loginUser({
-        email: form.email,
+        email: form.email.trim(),
         password: form.password,
       });
 
@@ -109,23 +149,18 @@ export default function Login({ onSuccess }: LoginProps = {}) {
           return;
         }
 
-        const redirectPath = localStorage.getItem("postLoginRedirect");
-        if (redirectPath) {
-          localStorage.removeItem("postLoginRedirect");
-          router.push(redirectPath);
-        } else {
-          router.push("/dashboard");
-        }
+        router.push(getPostLoginPath());
         return;
       }
 
-      message.error(response?.message || "Login failed");
+      setFormError(response?.message || "Login failed. Please check your details and try again.");
     } catch (error: any) {
       console.error(error);
-      const errorMessage =
-        error?.response?.data?.message || error?.message || "Something went wrong";
-      message.error(errorMessage);
+      setFormError(
+        error?.response?.data?.message || error?.message || "Something went wrong. Please try again."
+      );
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
@@ -135,122 +170,63 @@ export default function Login({ onSuccess }: LoginProps = {}) {
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+    if (formError) setFormError("");
   };
 
   return (
-    <div className="page-soft min-h-screen flex items-center justify-center">
-      {/* Ambient blobs */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 overflow-hidden"
-      >
-        <div className="animate-pulse-slow absolute -top-32 -left-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-        <div className="animate-pulse-slow animation-delay-700 absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-primary/8 blur-3xl" />
-      </div>
-      <div className="relative w-full max-w-md">
-        {/* Logo */}
-        <div className="mb-8 text-center">
-          <p className="mt-3 text-sm text-muted-foreground">
-            Welcome back — sign in to your account
-          </p>
-        </div>
+    <AuthLayout
+      title="Welcome Back"
+      subtitle="Sign in to your account to continue."
+      footer={
+        <>
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className={authLinkClass}>Sign Up</Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} noValidate className="space-y-4" aria-busy={loading}>
+        <AuthFormError>{formError}</AuthFormError>
 
-        <div className="card-glamlink !hover:transform-none rounded-2xl border bg-card p-8 shadow-[var(--shadow-medium)]">
-          <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
-            Sign in
-          </h1>
-          <form onSubmit={handleSubmit} noValidate className="space-y-5">
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-foreground"
-              >
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={(e) => updateField("email", e.target.value)}
-                aria-invalid={!!errors.email}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                  errors.email ? "border-red-500" : "border-input"
-                }`}
-              />
-              {errors.email && (
-                <p className="text-xs text-red-500">{errors.email}</p>
-              )}
-            </div>
-            {/* Password */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-foreground"
-                >
-                  Password
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs font-medium text-primary hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  value={form.password}
-                  onChange={(e) => updateField("password", e.target.value)}
-                  aria-invalid={!!errors.password}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                    errors.password ? "border-red-500" : "border-input"
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-xs text-red-500">{errors.password}</p>
-              )}
-            </div>
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full justify-center disabled:opacity-50"
-            >
-              {loading ? "Signing in..." : "Sign in"}
-            </button>
-            {/* Register Link */}
-            <p className="text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Link
-                href="/register"
-                className="font-medium text-primary hover:underline"
-              >
-                Create Access Account
-              </Link>
-            </p>
-          </form>
-        </div>
-      </div>
-    </div>
+        <AuthInput
+          ref={emailRef}
+          id="email"
+          name="email"
+          label="Email address"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          autoCapitalize="none"
+          spellCheck={false}
+          placeholder="you@example.com"
+          value={form.email}
+          disabled={loading}
+          onChange={(e) => updateField("email", e.target.value)}
+          error={errors.email}
+        />
+
+        <AuthPasswordInput
+          ref={passwordRef}
+          id="password"
+          name="password"
+          label="Password"
+          autoComplete="current-password"
+          placeholder="Enter your password"
+          value={form.password}
+          disabled={loading}
+          onChange={(e) => updateField("password", e.target.value)}
+          error={errors.password}
+        >
+          <div className="flex justify-end pt-0.5">
+            <Link href="/forgot-password" className={`${authLinkClass} text-xs font-medium`}>
+              Forgot Password?
+            </Link>
+          </div>
+        </AuthPasswordInput>
+
+        <AuthSubmitButton loading={loading} loadingText="Signing in…">
+          Sign In
+        </AuthSubmitButton>
+      </form>
+    </AuthLayout>
   );
 }

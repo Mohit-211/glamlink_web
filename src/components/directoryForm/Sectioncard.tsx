@@ -1,39 +1,39 @@
 import React from 'react'
 
 interface SectionCardProps {
+  id: string
   step: number
   title: string
-  subtitle?: string
+  description?: string
   children: React.ReactNode
 }
 
+/** One numbered section inside the application card, divided from the previous by a rule. */
 export const SectionCard: React.FC<SectionCardProps> = ({
+  id,
   step,
   title,
-  subtitle,
+  description,
   children,
 }) => (
-  <div className="
-    bg-white border border-[#DCF0F6] rounded-2xl p-8 mb-6
-    transition-all duration-200
-    focus-within:border-[#A8E0EE] focus-within:shadow-[0_4px_24px_rgba(36,187,203,0.1)]
-  ">
-    <div className="flex items-center gap-3 mb-5">
-      <div className="
-        w-[30px] h-[30px] rounded-full bg-[#24bbcb] text-white
-        text-[13px] font-semibold flex items-center justify-center shrink-0
-      ">
-        {step}
-      </div>
-      <h2 className="font-poppins text-[17px] font-semibold text-[#1A3A42]">
-        {title}
-        {subtitle && (
-          <span className="font-nunito text-xs font-normal text-[#7AAAB8] ml-2">
-            {subtitle}
-          </span>
+  <section
+    id={id}
+    aria-labelledby={`${id}-title`}
+    className="scroll-mt-28 border-t px-5 py-8 first:border-t-0 sm:px-8 sm:py-10 md:px-10"
+  >
+    <header className="mb-6 flex items-baseline gap-3 sm:mb-8 sm:gap-4">
+      <span className="text-sm font-semibold tabular-nums text-primary" aria-hidden="true">
+        {String(step).padStart(2, '0')}
+      </span>
+      <div className="min-w-0">
+        <h2 id={`${id}-title`} className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+          {title}
+        </h2>
+        {description && (
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{description}</p>
         )}
-      </h2>
-    </div>
+      </div>
+    </header>
     {children}
-  </div>
+  </section>
 )

@@ -3,6 +3,15 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { verifyOtp, sendOtp } from "@/api/Api"; // NOTE: verify this export exists — guessed signature
 import { message } from "antd";
+import Link from "next/link";
+import {
+  AuthLayout,
+  AuthOtpInput,
+  AuthSubmitButton,
+  OTP_LENGTH,
+  ResendCode,
+  authLinkClass,
+} from "./AuthLayout";
 
 interface VerifyOtpProps {
   email: string;
@@ -107,69 +116,36 @@ export default function VerifyOtp({
   };
 
   return (
-    <div className="page-soft min-h-screen flex items-center justify-center ">
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 overflow-hidden"
-      >
-        <div className="animate-pulse-slow absolute -top-32 -right-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-        <div className="animate-pulse-slow animation-delay-500 absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-primary/8 blur-3xl" />
-      </div>
-      <div className="relative w-full max-w-md">
-        <div className="mb-8 text-center">
-          <p className="mt-3 text-sm text-muted-foreground">
-            We sent a verification code to{" "}
-            <span className="font-medium text-foreground">{email}</span>
-          </p>
-        </div>
-        <div className="rounded-2xl border bg-card p-8 shadow-[var(--shadow-medium)]">
-          <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
-            Verify your email
-          </h1>
-          <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Verification Code</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                placeholder="Enter code"
-                value={otp}
-                onChange={(e) => {
-                  setOtp(e.target.value.replace(/\D/g, ""));
-                  if (error) setError(null);
-                }}
-                aria-invalid={!!error}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-center text-lg tracking-[0.3em] text-sm ${
-                  error ? "border-red-500" : "border-input"
-                }`}
-              />
-              {error && <p className="text-xs text-red-500 text-center">{error}</p>}
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full justify-center disabled:opacity-50"
-            >
-              {loading ? "Verifying..." : "Verify"}
-            </button>
-            <p className="text-center text-sm text-muted-foreground">
-              Didn't get a code?{" "}
-              <button
-                type="button"
-                onClick={handleResend}
-                disabled={resendCooldown > 0 || resending}
-                className="font-medium text-primary hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline"
-              >
-                {resendCooldown > 0
-                  ? `Resend in ${resendCooldown}s`
-                  : resending
-                    ? "Resending..."
-                    : "Resend code"}
-              </button>
-            </p>
-          </form>
-        </div>
-      </div>
-    </div>
+    <AuthLayout
+      title="Verify your email"
+      subtitle={
+        <>
+          Enter the {OTP_LENGTH}-digit code we sent to{" "}
+          <span className="font-medium text-foreground break-all">{email || "your email"}</span>
+        </>
+      }
+      footer={
+        <>
+          Wrong email?{" "}
+          <Link href="/register" className={authLinkClass}>Back to Sign Up</Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} noValidate className="space-y-5" aria-busy={loading}>
+        <AuthOtpInput
+          value={otp}
+          onChange={(v) => {
+            setOtp(v);
+            if (error) setError(null);
+          }}
+          error={error}
+          disabled={loading}
+        />
+        <AuthSubmitButton loading={loading} loadingText="Verifying…">
+          Verify
+        </AuthSubmitButton>
+        <ResendCode cooldown={resendCooldown} resending={resending} onResend={handleResend} />
+      </form>
+    </AuthLayout>
   );
 }

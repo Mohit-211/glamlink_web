@@ -2,7 +2,14 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Script from "next/script";
-import { Eye, EyeOff, Sparkles } from "lucide-react";
+import {
+  AuthInput,
+  AuthLayout,
+  AuthPasswordInput,
+  AuthSubmitButton,
+  PasswordStrength,
+  authLinkClass,
+} from "./AuthLayout";
 import { registerUser, sendOtp } from "@/api/Api";
 import { useRouter } from "next/navigation";
 import { message } from "antd";
@@ -51,7 +58,6 @@ type FieldErrors = {
 
 export default function Register({ onSuccess }: RegisterProps = {}) {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [turnstileScriptLoaded, setTurnstileScriptLoaded] = useState(false);
   const [form, setForm] = useState({
@@ -125,14 +131,6 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
     if (/[^A-Za-z0-9]/.test(p)) score++;
     return score;
   })();
-  const strengthLabel = ["", "Weak", "Fair", "Good", "Strong"][passwordStrength];
-  const strengthColor = [
-    "",
-    "bg-red-400",
-    "bg-yellow-400",
-    "bg-emerald-400",
-    "bg-emerald-500",
-  ][passwordStrength];
 
   // Live (pre-submit) checks — recomputed on every keystroke so the user
   // sees "too short" / "doesn't match" instantly instead of only after
@@ -342,7 +340,17 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
   };
 
   return (
-    <div className="page-soft min-h-screen flex items-center justify-center mt-10">
+    <AuthLayout
+      wide
+      title="Create Your Account"
+      subtitle="Join Glamlink and connect with the beauty & wellness community."
+      footer={
+        <>
+          Already have an account?{" "}
+          <Link href="/login" className={authLinkClass}>Sign In</Link>
+        </>
+      }
+    >
       {/* Cloudflare Turnstile script — invisible mode, no checkbox UI */}
       {TURNSTILE_SITE_KEY && (
         <Script
@@ -354,169 +362,98 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
       {/* Container Turnstile renders into — stays empty/invisible in "invisible" size */}
       <div ref={turnstileContainerRef} />
 
-      {/* Background Effects */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 overflow-hidden"
-      >
-        <div className="animate-pulse-slow absolute -top-32 -right-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-        <div className="animate-pulse-slow animation-delay-500 absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-primary/8 blur-3xl" />
-      </div>
-      <div className="relative w-full max-w-md">
-        {/* Card */}
-        <div className="rounded-2xl border bg-card p-8 shadow-[var(--shadow-medium)]">
-          <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
-            Create Your Access Account
-          </h1>
-          <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            {/* Name */}
-            <div className="grid grid-cols-1 gap-3">
-              <div className="space-y-1.5">
-                <label className="block text-sm font-medium">Name</label>
-                <input
-                  type="text"
-                  placeholder="John"
-                  value={form.name}
-                  onChange={(e) => updateField("name", e.target.value)}
-                  aria-invalid={!!errors.name}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.name ? "border-red-500" : "border-input"
-                    }`}
-                />
-                {errors.name && (
-                  <p className="text-xs text-red-500">{errors.name}</p>
-                )}
-              </div>
-            </div>
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Email Address</label>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={(e) => updateField("email", e.target.value)}
-                aria-invalid={!!errors.email}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.email ? "border-red-500" : "border-input"
-                  }`}
-              />
-              {errors.email && (
-                <p className="text-xs text-red-500">{errors.email}</p>
-              )}
-            </div>
-            {/* Mobile */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Mobile Number</label>
-              <input
-                type="tel"
-                maxLength={10}
-                placeholder="9876543210"
-                value={form.mobile}
-                onChange={(e) =>
-                  updateField("mobile", e.target.value.replace(/\D/g, ""))
-                }
-                aria-invalid={!!errors.mobile}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.mobile ? "border-red-500" : "border-input"
-                  }`}
-              />
-              {errors.mobile && (
-                <p className="text-xs text-red-500">{errors.mobile}</p>
-              )}
-            </div>
-            {/* Password */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  minLength={8}
-                  placeholder="Min. 8 characters"
-                  value={form.password}
-                  onChange={(e) => updateField("password", e.target.value)}
-                  aria-invalid={!!passwordError}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm ${passwordError ? "border-red-500" : "border-input"
-                    }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-              {passwordError && (
-                <p className="text-xs text-red-500">{passwordError}</p>
-              )}
-              {form.password.length > 0 && (
-                <>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        className={`h-1 flex-1 rounded-full ${i <= passwordStrength ? strengthColor : "bg-border"
-                          }`}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Password strength:
-                    <span className="ml-1 font-medium text-foreground">
-                      {strengthLabel}
-                    </span>
-                  </p>
-                </>
-              )}
-            </div>
-            {/* Confirm Password */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Confirm Password</label>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Confirm Password"
-                value={form.confirm_password}
-                onChange={(e) => updateField("confirm_password", e.target.value)}
-                aria-invalid={!!confirmPasswordError}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${confirmPasswordError ? "border-red-500" : "border-input"
-                  }`}
-              />
-              {confirmPasswordError && (
-                <p className="text-xs text-red-500">{confirmPasswordError}</p>
-              )}
-            </div>
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full justify-center disabled:opacity-50"
-            >
-              {loading ? "Creating Access Account..." : "Create Access Account"}
-            </button>
-            {TURNSTILE_SITE_KEY && (
-              <p className="text-[11px] text-muted-foreground text-center">
-                This site is protected by Cloudflare Turnstile and its{" "}
-                <a
-                  href="https://www.cloudflare.com/privacypolicy/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  Privacy Policy
-                </a>{" "}
-                and{" "}
-                <a
-                  href="https://www.cloudflare.com/website-terms/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  Terms of Service
-                </a>{" "}
-                apply.
-              </p>
-            )}
-          </form>
+      <form onSubmit={handleSubmit} noValidate className="space-y-4 [@media(max-height:760px)]:space-y-3" aria-busy={loading}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 [@media(max-height:760px)]:gap-3">
+          <AuthInput
+            id="name"
+            name="name"
+            label="Name"
+            autoComplete="name"
+            placeholder="Jane Doe"
+            value={form.name}
+            disabled={loading}
+            onChange={(e) => updateField("name", e.target.value)}
+            error={errors.name}
+          />
+          <AuthInput
+            id="mobile"
+            name="mobile"
+            label="Mobile (optional)"
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel-national"
+            maxLength={10}
+            placeholder="9876543210"
+            value={form.mobile}
+            disabled={loading}
+            onChange={(e) => updateField("mobile", e.target.value.replace(/\D/g, ""))}
+            error={errors.mobile}
+          />
         </div>
-      </div>
-    </div>
+
+        <AuthInput
+          id="email"
+          name="email"
+          label="Email address"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          autoCapitalize="none"
+          spellCheck={false}
+          placeholder="you@example.com"
+          value={form.email}
+          disabled={loading}
+          onChange={(e) => updateField("email", e.target.value)}
+          error={errors.email}
+        />
+
+        <div className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 [@media(max-height:760px)]:gap-3">
+            <AuthPasswordInput
+              id="password"
+              name="password"
+              label="Password"
+              autoComplete="new-password"
+              minLength={8}
+              placeholder="Min. 8 characters"
+              value={form.password}
+              disabled={loading}
+              onChange={(e) => updateField("password", e.target.value)}
+              error={passwordError}
+            />
+            <AuthPasswordInput
+              id="confirm_password"
+              name="confirm_password"
+              label="Confirm password"
+              autoComplete="new-password"
+              placeholder="Re-enter password"
+              value={form.confirm_password}
+              disabled={loading}
+              onChange={(e) => updateField("confirm_password", e.target.value)}
+              error={confirmPasswordError}
+            />
+          </div>
+          {form.password.length > 0 && <PasswordStrength score={passwordStrength} />}
+        </div>
+
+        <AuthSubmitButton loading={loading} loadingText="Creating account…">
+          Create Account
+        </AuthSubmitButton>
+
+        {TURNSTILE_SITE_KEY && (
+          <p className="text-[11px] leading-snug text-muted-foreground text-center">
+            Protected by Cloudflare Turnstile. Its{" "}
+            <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noreferrer" className="underline hover:text-foreground">
+              Privacy Policy
+            </a>{" "}
+            and{" "}
+            <a href="https://www.cloudflare.com/website-terms/" target="_blank" rel="noreferrer" className="underline hover:text-foreground">
+              Terms of Service
+            </a>{" "}
+            apply.
+          </p>
+        )}
+      </form>
+    </AuthLayout>
   );
 }

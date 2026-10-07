@@ -1,106 +1,30 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import GuestModal from "./GuestModal";
 import NotifySection from "./Notifysection";
 import UpcomingSchedule from "./UpcomingSchedule";
 import HeroSection from "./HeroSection";
+import EpisodeCard from "./EpisodeCard";
+import FeaturedEpisode from "./FeaturedEpisode";
+import {
+  CATEGORIES,
+  Category,
+  Episode,
+  PLACEHOLDER_EPISODES,
+  YOUTUBE_PLAYLIST_URL,
+  extractIdFromSlug,
+  fetchEpisodes,
+  getEpisodeSlug,
+} from "./episodes";
 
-interface Video {
-  id: string;
-  title: string;
-  thumbnail: string;
-  publishedAt: string;
-  duration?: string;
-}
+const EPISODES_PER_PAGE = 9;
 
-const YOUTUBE_API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY || "";
-const YOUTUBE_PLAYLIST_ID = "PLJPmuOJKw5YbrNAxnyi7SuQx9gNisadgY";
-const YOUTUBE_PLAYLIST_URL = `https://www.youtube.com/playlist?list=${YOUTUBE_PLAYLIST_ID}`;
-const SPOTIFY_URL = "https://open.spotify.com/show/0GEWcvRT3PFalAaN2faX4z?si=OWqOPcyZSZqNn7ATTnGJng";
-const APPLE_PODCASTS_URL = "https://podcasts.apple.com/us/podcast/the-beauty-vault/id1885669168";
-
-const PLACEHOLDER_PALETTE = [
-  { bg: "linear-gradient(135deg,#e8f5f2 0%,#d0ede8 100%)", text: "#5bbfb0" },
-  { bg: "linear-gradient(135deg,#f5f0eb 0%,#ede4d8 100%)", text: "#b8997a" },
-  { bg: "linear-gradient(135deg,#eef1f7 0%,#dde4f0 100%)", text: "#7a95c0" },
-  { bg: "linear-gradient(135deg,#f5eef7 0%,#ead8f0 100%)", text: "#a870c0" },
-  { bg: "linear-gradient(135deg,#faf0ee 0%,#f0dbd7 100%)", text: "#c47a6e" },
-  { bg: "linear-gradient(135deg,#eef5e8 0%,#d8eccc 100%)", text: "#6da855" },
-];
-
-// ─── Slug helpers ─────────────────────────────────────────────────────────────
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-/** Builds a readable, unique URL slug: title-based text + the YouTube video ID. */
-function getVideoSlug(video: Video): string {
-  const base = slugify(video.title);
-  return base ? `${base}` : video.id;
-}
-
-/** Pulls the trailing YouTube video ID (11 chars) back out of a slug, as a fallback. */
-function extractIdFromSlug(slug: string): string {
-  const match = slug.match(/([a-zA-Z0-9_-]{11})$/);
-  return match ? match[1] : slug;
-}
-
-const YouTubeIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: "16px", height: "16px" }}>
-    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-  </svg>
-);
-
-const SpotifyIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: "16px", height: "16px" }}>
-    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
-  </svg>
-);
-
-const ApplePodcastsIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: "16px", height: "16px" }}>
-    <path d="M5.34 0A5.328 5.328 0 0 0 0 5.34v13.32A5.328 5.328 0 0 0 5.34 24h13.32A5.328 5.328 0 0 0 24 18.66V5.34A5.328 5.328 0 0 0 18.66 0zm7.006 2.06c3.106 0 5.633 1.02 7.585 3.026 1.773 1.802 2.7 4.198 2.7 6.942 0 5.747-3.9 9.847-9.378 9.847-5.478 0-9.385-4.1-9.385-9.847 0-2.744.927-5.14 2.7-6.942 1.958-2.006 4.477-3.026 7.583-3.026zm0 1.99c-2.617 0-4.73.882-6.228 2.55-1.397 1.558-2.13 3.64-2.13 5.993 0 4.835 3.136 7.96 7.758 7.96 4.623 0 7.752-3.125 7.752-7.96 0-2.354-.733-4.435-2.13-5.993-1.498-1.668-3.61-2.55-6.22-2.55zm.008 3.08c1.65 0 2.99 1.34 2.99 2.99s-1.34 2.99-2.99 2.99-2.99-1.34-2.99-2.99 1.34-2.99 2.99-2.99zm0 1.5a1.49 1.49 0 1 0 0 2.98 1.49 1.49 0 0 0 0-2.98zm0 4.79c2.26 0 4.09 1.83 4.09 4.09h-1.5a2.59 2.59 0 0 0-2.59-2.59 2.59 2.59 0 0 0-2.59 2.59H9.264c0-2.26 1.83-4.09 4.09-4.09z" />
-  </svg>
-);
-
-const FALLBACK_EPISODES: Video[] = [
-  { id: "fallback-1", title: "Behind the Glam: A Raiderettes Makeup Artist's Journey", thumbnail: "", publishedAt: "2025-01-01" },
-  { id: "fallback-2", title: "Holistic + Non-Toxic Skincare: The Truth About Your Skincare", thumbnail: "", publishedAt: "2025-01-08" },
-  { id: "fallback-3", title: "Innovation, Retinol and the Science Behind Results-Driven Skincare", thumbnail: "", publishedAt: "2025-01-15" },
-  { id: "fallback-4", title: "Inside the Pretty Kitty: How Tricia Evans Built a Multi-Location Waxing Brand", thumbnail: "", publishedAt: "2025-01-22" },
-];
-
-async function fetchPlaylistVideos(playlistId: string): Promise<{ videos: Video[]; totalCount: number }> {
-  if (!YOUTUBE_API_KEY) return { videos: [], totalCount: 0 };
-  const allItems: Video[] = [];
-  let pageToken = "";
-  do {
-    const pageParam = pageToken ? `&pageToken=${pageToken}` : "";
-    const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}${pageParam}`;
-    const res = await fetch(url);
-    if (!res.ok) break;
-    const data = await res.json();
-    const items: Video[] = (data.items || [])
-      .filter((item: any) => item.snippet?.resourceId?.videoId && item.snippet.title !== "Deleted video" && item.snippet.title !== "Private video")
-      .map((item: any) => ({
-        id: item.snippet.resourceId.videoId,
-        title: item.snippet.title,
-        thumbnail: item.snippet.thumbnails?.maxres?.url || item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.medium?.url || "",
-        publishedAt: item.snippet.publishedAt,
-      }));
-    allItems.push(...items);
-    pageToken = data.nextPageToken || "";
-  } while (pageToken);
-  return { videos: [...allItems], totalCount: allItems.length };
-}
+type Filter = "All" | Category;
 
 // ─── Video Modal ──────────────────────────────────────────────────────────────
-function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
+function VideoModal({ episode, onClose }: { episode: Episode; onClose: () => void }) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", handler);
@@ -110,98 +34,56 @@ function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
 
   return (
     <div
-      style={{
-        position: "fixed", inset: 0, zIndex: 50,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "clamp(1rem, 4vw, 2rem)",
-        background: "rgba(4,20,18,0.96)", backdropFilter: "blur(8px)",
-      }}
+      role="dialog"
+      aria-modal="true"
+      aria-label={episode.title || "Podcast episode"}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-sm"
       onClick={onClose}
     >
-      <div
-        style={{ position: "relative", width: "100%", maxWidth: "1030px" ,marginTop:"20px"}}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="relative w-full max-w-[1030px] mt-5" onClick={(e) => e.stopPropagation()}>
         <button
+          type="button"
           onClick={onClose}
-          style={{
-            position: "absolute", top: "-48px", right: 0,
-            display: "flex", alignItems: "center", gap: "8px",
-            color: "rgba(255,255,255,0.6)",
-            background: "none", border: "none", cursor: "pointer",
-            fontSize: "11px", letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 500,
-            transition: "color 0.2s",
-          }}
-          onMouseEnter={e => (e.currentTarget.style.color = "white")}
-          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
+          className="absolute -top-12 right-0 inline-flex items-center gap-2 text-[11px] uppercase tracking-widest font-medium text-white/70 hover:text-white transition-colors"
         >
-          <span
-            style={{
-              width: "28px", height: "28px", borderRadius: "50%",
-              border: "1px solid rgba(255,255,255,0.2)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: "14px", height: "14px" }}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+          <span className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center">
+            <X className="w-3.5 h-3.5" />
           </span>
           Close
         </button>
-        <div
-          style={{
-            position: "relative", width: "100%", borderRadius: "16px",
-            overflow: "hidden", paddingTop: "56.25%",
-            boxShadow: "0 40px 80px -20px rgba(0,0,0,0.8)",
-          }}
-        >
+        <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-large">
           <iframe
-            src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
-            title={video.title}
+            src={`https://www.youtube.com/embed/${episode.id}?autoplay=1&rel=0`}
+            title={episode.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
+            className="absolute inset-0 w-full h-full border-0"
           />
         </div>
-        <p style={{ marginTop: "20px", fontSize: "13px", fontWeight: 500, color: "rgba(255,255,255,0.7)", textAlign: "center", lineHeight: 1.4 }}>
-          {video.title}
-        </p>
+        {episode.title && (
+          <p className="mt-5 text-sm font-medium text-white/70 text-center leading-snug">{episode.title}</p>
+        )}
       </div>
     </div>
   );
 }
 
-// ─── Episode Card ─────────────────────────────────────────────────────────────
-function EpisodeCard({
-  video, index, episodeNumber, onPlay, placeholderStyle,
+// ─── Category filter (same pill-tab treatment as the Journal top tabs) ────────
+function CategoryFilter({
+  options,
+  active,
+  onChange,
 }: {
-  video: Video; index: number; episodeNumber?: number; onPlay: (video: Video) => void; placeholderStyle?: { bg: string; text: string };
+  options: Filter[];
+  active: Filter;
+  onChange: (f: Filter) => void;
 }) {
-  const episodeNum = String(Math.max(1, episodeNumber ?? index + 1)).padStart(2, "0");
-  const isFallback = video.id.startsWith("fallback");
-  const ph = placeholderStyle ?? { bg: "linear-gradient(135deg,#e8f5f2,#d0ede8)", text: "#5bbfb0" };
-  const date = new Date(video.publishedAt);
-  const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  const [hovered, setHovered] = useState(false);
-
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      {/* Thumbnail */}
+    <div className="w-full overflow-x-auto scrollbar-hide">
       <div
-        style={{
-          position: "relative", aspectRatio: "16/9", borderRadius: "16px",
-          overflow: "hidden", marginBottom: "16px",
-          border: "1px solid rgba(0,0,0,0.06)",
-          boxShadow: hovered
-            ? "0 20px 48px -12px rgba(0,0,0,0.18), 0 4px 12px -4px rgba(0,0,0,0.08)"
-            : "0 2px 12px -4px rgba(0,0,0,0.08), 0 1px 3px -1px rgba(0,0,0,0.05)",
-          transform: hovered ? "translateY(-3px)" : "none",
-          transition: "box-shadow 0.4s ease, transform 0.4s ease",
-          cursor: isFallback ? "default" : "pointer",
-        }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onClick={() => !isFallback && onPlay(video)}
+        role="tablist"
+        aria-label="Filter episodes by category"
+        className="flex w-max items-center gap-1 p-1 rounded-full bg-muted/40 border border-border/40"
       >
         {video.thumbnail ? (
           <img
@@ -298,8 +180,7 @@ function EpisodeCard({
   );
 }
 
-// ─── Listen On Card ───────────────────────────────────────────────────────────
-function ListenOnCard() {
+function CardSkeleton() {
   return (
     <div style={{ borderRadius: "16px", overflow: "hidden", background: "white", border: "1px solid hsl(204 14% 88%)", boxShadow: "0 2px 12px -4px rgba(0,0,0,0.06)" }}>
       <div style={{ padding: "20px" }}>
@@ -340,45 +221,63 @@ function StatsBar({ episodeCount }: { episodeCount: number }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function PodcastMain({ initialSlug }: { initialSlug?: string } = {}) {
-  console.log(initialSlug, "initialSlug")
   const router = useRouter();
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [totalCount, setTotalCount] = useState<number>(0);
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeVideo, setActiveVideo] = useState<Video | null>(null);
+  const [activeEpisode, setActiveEpisode] = useState<Episode | null>(null);
   const [guestModalOpen, setGuestModalOpen] = useState(false);
-  const [filter, setFilter] = useState<"all" | "recent">("all");
+  const [filter, setFilter] = useState<Filter>("All");
+  const [visibleCount, setVisibleCount] = useState(EPISODES_PER_PAGE);
 
   useEffect(() => {
-    fetchPlaylistVideos(YOUTUBE_PLAYLIST_ID)
-      .then(({ videos, totalCount }) => { setVideos(videos); setTotalCount(totalCount); })
+    fetchEpisodes()
+      .then(setEpisodes)
+      .catch((error) => console.error("Podcast episodes fetch error:", error))
       .finally(() => setLoading(false));
   }, []);
 
-  const finalVideos = videos.length > 0 ? videos : FALLBACK_EPISODES;
-  const episodeCount = totalCount > 0 ? totalCount : FALLBACK_EPISODES.length;
-  const displayedVideos = filter === "recent" ? finalVideos.slice(0, 6) : finalVideos;
+  const allEpisodes = episodes.length > 0 ? episodes : PLACEHOLDER_EPISODES;
+  const featured = allEpisodes[0];
+
+  // Only offer categories that actually have episodes, in the canonical order.
+  const filterOptions = useMemo<Filter[]>(
+    () => ["All", ...CATEGORIES.filter((c) => allEpisodes.some((e) => e.category === c))],
+    [allEpisodes]
+  );
+
+  // The featured episode is already shown above, so leave it out of the unfiltered grid.
+  const filteredEpisodes = useMemo(
+    () =>
+      filter === "All"
+        ? allEpisodes.filter((e) => e.id !== featured?.id)
+        : allEpisodes.filter((e) => e.category === filter),
+    [allEpisodes, featured, filter]
+  );
+  const shownEpisodes = filteredEpisodes.slice(0, visibleCount);
+
+  const changeFilter = (f: Filter) => {
+    setFilter(f);
+    setVisibleCount(EPISODES_PER_PAGE);
+  };
 
   // Open the modal for a video passed via the /podcast/{slug} URL once episodes are loaded.
   useEffect(() => {
     if (!initialSlug || loading) return;
-    const match = finalVideos.find((v) => getVideoSlug(v) === initialSlug);
-    if (match) {
-      setActiveVideo(match);
-    } else {
-      // Fallback: slug didn't match any known video (e.g. deep link to a video
-      // not in the current playlist window) — try to recover the raw YouTube ID.
-      setActiveVideo({ id: extractIdFromSlug(initialSlug), title: "", thumbnail: "", publishedAt: "" });
-    }
+    const match = allEpisodes.find((e) => getEpisodeSlug(e) === initialSlug);
+    // Fallback: slug didn't match any known video — try to recover the raw YouTube ID.
+    setActiveEpisode(
+      match ?? { ...PLACEHOLDER_EPISODES[0], id: extractIdFromSlug(initialSlug), title: "", isPlaceholder: false }
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialSlug, loading]);
 
-  const playVideo = (video: Video) => {
-    router.push(`/podcast/${getVideoSlug(video)}`);
+  const playEpisode = (episode: Episode) => {
+    router.push(`/podcast/${getEpisodeSlug(episode)}`, { scroll: false });
   };
 
-  const closeVideo = () => {
-    router.push("/podcast");
+  const closeEpisode = () => {
+    setActiveEpisode(null);
+    router.push("/podcast", { scroll: false });
   };
 
   return (
@@ -496,32 +395,28 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
                 ))}
               </div>
             </div>
+          ) : (
+            featured && <FeaturedEpisode episode={featured} onPlay={playEpisode} />
+          )}
+        </div>
+      </section>
 
-            {/* Episode grid */}
-            {loading ? (
-              <div className="episodes-grid">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i}>
-                    <div style={{ aspectRatio: "16/9", borderRadius: "16px", marginBottom: "16px", background: "hsl(204 14% 88%)", animation: "pulse 1.5s ease-in-out infinite" }} />
-                    <div style={{ height: "12px", borderRadius: "8px", marginBottom: "10px", background: "hsl(204 14% 88%)", width: "60%" }} />
-                    <div style={{ height: "16px", borderRadius: "8px", background: "hsl(204 14% 88%)", width: "90%" }} />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="episodes-grid">
-                {displayedVideos.map((video, i) => (
-                  <EpisodeCard
-                    key={video.id}
-                    video={video}
-                    index={i}
-                    episodeNumber={episodeCount - i}
-                    placeholderStyle={PLACEHOLDER_PALETTE[i % PLACEHOLDER_PALETTE.length]}
-                    onPlay={playVideo}
-                  />
-                ))}
+      {/* Episode listing */}
+      <section id="episodes" className="scroll-mt-28 py-16 md:py-20">
+        <div className="container-glamlink">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-8 md:mb-10">
+            <div className="min-w-0">
+              <h2 className="section-title font-display">All Episodes</h2>
+              <p className="section-subtitle">
+                Beauty, wellness and business conversations with the people building the industry.
+              </p>
+            </div>
+            {filterOptions.length > 2 && (
+              <div className="min-w-0 lg:max-w-[60%]">
+                <CategoryFilter options={filterOptions} active={filter} onChange={changeFilter} />
               </div>
             )}
+          </div>
 
             {/* View All */}
             <div style={{ marginTop: "48px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
@@ -609,11 +504,11 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
               </div>
             ))}
           </div>
+          <NotifySection />
         </div>
       </section>
 
-      {/* Modals */}
-      {activeVideo && <VideoModal video={activeVideo} onClose={closeVideo} />}
+      {activeEpisode && <VideoModal episode={activeEpisode} onClose={closeEpisode} />}
       {guestModalOpen && <GuestModal open={guestModalOpen} onClose={() => setGuestModalOpen(false)} />}
     </main>
   );

@@ -22,7 +22,7 @@ export function AnalyticsPanel({
   return (
     <section
       className={cn(
-        'min-w-0 rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] sm:p-5',
+        'min-w-0 rounded-2xl border border-border bg-card p-5',
         className
       )}
     >
@@ -41,20 +41,17 @@ export function AnalyticsPanel({
 /* ============================= */
 /* 📌 Loading */
 /* ============================= */
-const panelClass = 'rounded-2xl border border-border bg-card p-4 sm:p-5';
+const panelClass = 'rounded-2xl border border-border bg-card p-5';
 
 export function AnalyticsSkeleton() {
   return (
     <div className="space-y-4 sm:space-y-6" aria-busy="true" aria-label="Loading analytics">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
+      <div className="grid grid-cols-1 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {[0, 1, 2].map((i) => (
-          <div key={i} className={cn(panelClass, i === 2 && 'sm:col-span-2 xl:col-span-1')}>
-            <div className="flex items-center justify-between">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-9 w-9 rounded-xl" />
-            </div>
-            <Skeleton className="mt-4 h-8 w-20" />
-            <Skeleton className="mt-3 h-3 w-48 max-w-full" />
+          <div key={i} className="px-5 py-5">
+            <Skeleton className="h-3.5 w-24" />
+            <Skeleton className="mt-3 h-8 w-20" />
+            <Skeleton className="mt-2 h-3 w-40 max-w-full" />
           </div>
         ))}
       </div>
@@ -109,10 +106,10 @@ export function AnalyticsEmptyState({
     <div
       className={cn(
         'flex flex-col items-center justify-center text-center',
-        compact ? 'py-8' : 'rounded-2xl border border-dashed border-border bg-secondary/30 px-6 py-12 sm:py-16'
+        compact ? 'py-8' : 'rounded-2xl border border-dashed border-border bg-card px-6 py-14'
       )}
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-foreground">
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
         <BarChart3 className="h-5 w-5" />
       </div>
       <p className="mt-4 text-sm font-semibold text-foreground">{title}</p>
@@ -132,7 +129,7 @@ export function AnalyticsErrorState({ onRetry }: { onRetry: () => void }) {
       <button
         type="button"
         onClick={onRetry}
-        className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+        className="mt-5 inline-flex h-10 items-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
       >
         <RefreshCw className="h-3.5 w-3.5" />
         Retry

@@ -3,7 +3,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid';
 import GlamCardForm from '../glamcard/GlamCardForm/GlamCardForm';
+import { Lock } from 'lucide-react';
 import { AccessCardData } from './types';
+import { ACCESS_CARD_UPGRADE_MESSAGE, useAccessCardPermissions } from '@/lib/accessCardPermissions';
 import {
   BOOKING_METHODS,
   BookingMethod,
@@ -283,6 +285,21 @@ export default function EditAccessCard({ cardId, cardData, onSave, onCancel }: P
     setData(normalize(cardData));
   }, [cardId, cardData]);
 
+  // Defence in depth: whoever mounts this editor, a card whose plan_type doesn't
+  // allow editing never gets the form — so no inputs, file pickers or save calls.
+  const { canEditAccessCard } = useAccessCardPermissions(cardData);
+  if (!canEditAccessCard) {
+    return (
+      <div role="alert" className="flex flex-col items-center justify-center px-4 py-12 text-center">
+        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
+          <Lock className="h-5 w-5" />
+        </span>
+        <p className="mt-4 text-sm font-semibold text-foreground">Editing is locked on your plan</p>
+        <p className="mt-1 max-w-sm text-sm text-muted-foreground">{ACCESS_CARD_UPGRADE_MESSAGE}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -297,6 +314,7 @@ export default function EditAccessCard({ cardId, cardData, onSave, onCancel }: P
         setData={setData}
         mode="edit"
         cardId={cardId}
+        editPermissionCard={cardData}
         onCancel={onCancel}
         onSuccess={(result) => onSave(result ?? (data as unknown as AccessCardData))}
       />
