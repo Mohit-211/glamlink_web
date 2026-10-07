@@ -1,6 +1,5 @@
 "use client";
-import { useState } from "react";
-import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 // ─── Floating diamond accent ──────────────────────────────────────────────────
 function Diamond({
@@ -18,7 +17,7 @@ function Diamond({
       style={{
         width: size,
         height: size,
-        background: "#24bbcb",
+        background: "hsl(184 55% 42%)",
         opacity,
         transform: "rotate(45deg)",
         borderRadius: 1,
@@ -27,9 +26,17 @@ function Diamond({
     />
   );
 }
-const inputClass =
-  "w-full h-12 px-4 rounded-xl border border-input bg-background text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/15";
 
+// ─── Animated check icon ──────────────────────────────────────────────────────
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-5 h-5">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  );
+}
+
+// ─── Input field ──────────────────────────────────────────────────────────────
 function Field({
   label,
   type = "text",
@@ -45,16 +52,16 @@ function Field({
   onChange: (v: string) => void;
   required?: boolean;
 }) {
+  const [focused, setFocused] = useState(false);
+
   return (
     <div className="relative group">
       <label
         className="block text-[9px] tracking-[0.25em] uppercase font-semibold mb-1.5 transition-colors duration-200"
-        style={{ color: focused ? "#24bbcb" : "hsl(210 15% 52%)" }}
+        style={{ color: focused ? "hsl(184 70% 38%)" : "hsl(210 15% 52%)" }}
       >
-    <label className="block min-w-0">
-      <span className="block text-[11px] uppercase tracking-widest font-semibold text-muted-foreground mb-1.5">
         {label}
-      </span>
+      </label>
       <input
         type={type}
         placeholder={placeholder}
@@ -67,25 +74,37 @@ function Field({
         style={{
           background: "hsl(0 0% 100%)",
           border: focused
-            ? "1.5px solid #24bbcb"
+            ? "1.5px solid hsl(184 70% 48%)"
             : "1.5px solid hsl(204 14% 86%)",
           color: "hsl(210 30% 12%)",
+          fontFamily: "inherit",
           boxShadow: focused
-            ? "0 0 0 3px #24bbcb / 0.1"
+            ? "0 0 0 3px hsl(184 70% 48% / 0.1)"
             : "0 1px 3px hsl(210 20% 10% / 0.05)",
         }}
-        className={inputClass}
       />
-    </label>
+    </div>
   );
 }
 
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function NotifySection() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold: 0.15 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,22 +116,34 @@ export default function NotifySection() {
     setSubmitted(true);
   };
 
+  const fade = (delay: number): React.CSSProperties => ({
+    opacity: visible ? 1 : 0,
+    transform: visible ? "translateY(0)" : "translateY(20px)",
+    transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
+  });
+
   return (
     <section
       ref={ref}
       className="relative overflow-hidden"
-      
+      style={{
+        background: "hsl(40 30% 97%)",
+        fontFamily: "inherit",
+      }}
     >
       {/* ── Background grid lines ─────────────────────────────────────── */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "hsl(204 14% 88%)" }}
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(90deg, transparent, transparent 79px, hsl(184 20% 88% / 0.4) 79px, hsl(184 20% 88% / 0.4) 80px)",
+        }}
       />
 
       {/* ── Left teal accent bar ──────────────────────────────────────── */}
       <div
         className="absolute left-0 top-0 bottom-0 w-1"
-        style={{ background: "linear-gradient(to bottom, #24bbcb, #1a8a9c)" }}
+        style={{ background: "linear-gradient(to bottom, hsl(184 70% 48%), hsl(184 50% 36%))" }}
       />
 
       {/* ── Decorative diamonds ───────────────────────────────────────── */}
@@ -122,14 +153,14 @@ export default function NotifySection() {
       <Diamond style={{ top: 20, right: "35%" }} size={5} opacity={0.1} />
 
       {/* ── Large background serif word ───────────────────────────────── */}
-      {/* <div
+      <div
         className="absolute right-0 bottom-0 pointer-events-none select-none leading-none"
         aria-hidden
         style={{
           fontFamily: "inherit",
           fontSize: "clamp(80px, 16vw, 180px)",
-          fontWeight: 700,
-          color: "hsl(186 30% 88%)",
+          fontWeight: 600,
+          color: "hsl(184 30% 88%)",
           opacity: 0.6,
           letterSpacing: "-0.02em",
           lineHeight: 0.9,
@@ -138,7 +169,7 @@ export default function NotifySection() {
         }}
       >
         notify
-      </div> */}
+      </div>
 
       {/* ── Content ──────────────────────────────────────────────────── */}
       <div className="relative z-10 max-w-5xl mx-auto px-8 md:px-12 py-20">
@@ -149,11 +180,11 @@ export default function NotifySection() {
             <div style={fade(0)}>
               <p
                 className="text-[9px] tracking-[0.35em] uppercase font-semibold mb-5 flex items-center gap-2"
-                style={{ color: "#24bbcb" }}
+                style={{ color: "hsl(184 70% 38%)" }}
               >
                 <span
                   className="inline-block w-5 h-px"
-                  style={{ background: "#24bbcb " }}
+                  style={{ background: "hsl(184 70% 48%)" }}
                 />
                 Never Miss an Episode
               </p>
@@ -180,8 +211,7 @@ export default function NotifySection() {
                   fontFamily: "inherit",
                   fontSize: "clamp(34px, 5vw, 58px)",
                   fontWeight: 600,
-                  fontStyle: "italic",
-                  color: "#24bbcb",
+                  color: "hsl(184 65% 36%)",
                   lineHeight: 1.1,
                   letterSpacing: "-0.02em",
                   marginBottom: "clamp(20px, 3vw, 32px)",
@@ -213,12 +243,12 @@ export default function NotifySection() {
                   <div key={i} className="flex items-start gap-2.5">
                     <div
                       className="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0"
-                      style={{ background: "hsl(186 70% 94%)" }}
+                      style={{ background: "hsl(184 70% 94%)" }}
                     >
                       <svg viewBox="0 0 12 12" fill="none" className="w-2.5 h-2.5">
                         <path
                           d="M2.5 6l2.5 2.5 4.5-5"
-                          stroke="hsl(186 70% 38%)"
+                          stroke="hsl(184 70% 38%)"
                           strokeWidth="1.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -248,7 +278,7 @@ export default function NotifySection() {
               {/* Card top accent line */}
               <div
                 className="absolute top-0 left-8 right-8 h-px rounded-full"
-                style={{ background: "linear-gradient(to right, transparent, hsl(186 70% 48%), transparent)" }}
+                style={{ background: "linear-gradient(to right, transparent, hsl(184 70% 48%), transparent)" }}
               />
 
               {!submitted ? (
@@ -283,9 +313,9 @@ export default function NotifySection() {
                     className="mt-2 w-full py-3.5 rounded-xl text-[11px] tracking-[0.18em] uppercase font-semibold text-white transition-all duration-200 hover:brightness-110 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     style={{
                       background: loading
-                        ? "hsl(186 55% 44%)"
-                        : "#24bbcb",
-                      boxShadow: "0 4px 16px hsl(186 70% 41% / 0.35)",
+                        ? "hsl(184 55% 44%)"
+                        : "linear-gradient(135deg, hsl(184 70% 41%), hsl(184 55% 36%))",
+                      boxShadow: "0 4px 16px hsl(184 70% 41% / 0.35)",
                     }}
                   >
                     {loading ? (
@@ -328,7 +358,7 @@ export default function NotifySection() {
                 <div className="flex flex-col items-center text-center py-6 gap-4">
                   <div
                     className="w-14 h-14 rounded-full flex items-center justify-center"
-                    style={{ background: "hsl(186 70% 94%)", color: "hsl(186 70% 38%)" }}
+                    style={{ background: "hsl(184 70% 94%)", color: "hsl(184 70% 38%)" }}
                   >
                     <CheckIcon />
                   </div>
@@ -352,65 +382,17 @@ export default function NotifySection() {
                   />
                   <p
                     className="text-[10px] tracking-[0.15em] uppercase"
-                    style={{ color: "hsl(186 55% 48%)" }}
+                    style={{ color: "hsl(184 55% 48%)" }}
                   >
                     ✦ New episodes every Sunday
                   </p>
                 </div>
-    <div className="h-full rounded-2xl border border-border bg-card shadow-soft p-6 sm:p-8">
-      {!submitted ? (
-        <>
-          <p className="text-[10px] uppercase tracking-widest text-primary mb-2">Never miss an episode</p>
-          <h3 className="font-display text-2xl leading-snug text-foreground mb-2">
-            Get notified when your guest drops
-          </h3>
-          <p className="text-sm leading-relaxed text-muted-foreground mb-6">
-            New episodes every Sunday, straight to your inbox. No spam, unsubscribe anytime.
-          </p>
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="First name" placeholder="Marie" value={firstName} onChange={setFirstName} required />
-              <Field label="Last name" placeholder="Matteucci" value={lastName} onChange={setLastName} />
-            </div>
-            <Field
-              label="Email address"
-              type="email"
-              placeholder="you@email.com"
-              value={email}
-              onChange={setEmail}
-              required
-            />
-            <button type="submit" disabled={loading} className="btn-primary w-full mt-2 disabled:opacity-70">
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Subscribing…
-                </>
-              ) : (
-                <>
-                  Notify me
-                  <ArrowRight className="w-4 h-4" />
-                </>
               )}
-            </button>
-          </form>
-        </>
-      ) : (
-        <div className="h-full flex flex-col items-center justify-center text-center gap-4 py-8">
-          <div className="w-14 h-14 rounded-full bg-accent text-primary flex items-center justify-center">
-            <Check className="w-6 h-6" />
+            </div>
           </div>
-          <div>
-            <p className="font-display text-lg font-semibold text-foreground mb-1">
-              You&apos;re on the list, {firstName}!
-            </p>
-            <p className="text-sm text-muted-foreground">
-              We&apos;ll let you know the moment a new episode drops.
-            </p>
-          </div>
+
         </div>
-      )}
-    </div>
+      </div>
+    </section>
   );
 }
