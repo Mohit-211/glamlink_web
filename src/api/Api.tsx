@@ -566,6 +566,20 @@ export const contactUs = async (payload: {
   const { data } = await api.post("contactUs", payload);
   return data;
 };
+/* ============================= */
+/* 📌 Partnership Inquiry */
+/* ============================= */
+export const partnershipInquiry = async (payload: {
+  name: string;
+  company_brand: string;
+  email: string;
+  website_instagram: string;
+  interested_in: string[];
+  message: string;
+}) => {
+  const { data } = await api.post("partnership-inquiry", payload);
+  return data;
+};
 export const ShippingRateWithoutTokenApi = async (payload: any) => {
   const { data } = await api.post(
     "businessCard/shipping-rate-public",
