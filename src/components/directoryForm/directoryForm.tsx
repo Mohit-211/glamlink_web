@@ -5,6 +5,7 @@ import { AccessCardToggle } from './Accesscardtoggle'
 import { SuccessModal } from './Successmodal'
 import { SectionCard } from './Sectioncard'
 import { getAllCategories } from '@/api/Api'
+import { apiUrl } from '@/lib/config'
 
 // ── Types ─────────────────────────────────────────────────
 
@@ -540,7 +541,7 @@ console.log(categories,"==")
 
       // ── API CALL ──
       const res = await fetch(
-        "https://node.glamlink.net:5000/api/v1/businessCard",
+        apiUrl("businessCard"),
         {
           method: "POST",
           body: formData, // ✅ DO NOT set Content-Type

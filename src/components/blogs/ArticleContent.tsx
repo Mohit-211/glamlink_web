@@ -1,4 +1,5 @@
 "use client";
+import { SITE_URL } from "@/lib/config";
 
 import { useEffect, useState } from "react";
 import DOMPurify from "dompurify";
@@ -16,7 +17,7 @@ const MENTION_REGEX = /(^|[\s(])@([a-zA-Z0-9_.-]{2,50})/g;
 // whether the handle matches a real business card. Set to false to
 // restore real per-handle existence checks via businessCardExists().
 const TEST_MODE_ALWAYS_LINK = true;
-const TEST_MODE_URL = "https://glamlink.net/access/niki-capobianco";
+const TEST_MODE_URL = `${SITE_URL}/access/niki-capobianco`;
 
 async function businessCardExists(handle: string): Promise<boolean> {
   try {

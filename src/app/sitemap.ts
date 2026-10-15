@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import { MetadataRoute } from "next";
 import fs from "fs";
 import path from "path";
@@ -6,7 +7,7 @@ import { issues2025, issues2026 } from "@/data/issues";
 import { getAllBlogs, getAllTopics } from "@/api/Api";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://glamlink.net";
+  const baseUrl = SITE_URL;
   const appDir = path.join(process.cwd(), "src/app");
 
   /* ----------------------------------

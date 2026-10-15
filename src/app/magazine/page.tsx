@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import Script from "next/script";
 import MagazineHero from "@/components/magazine/MagazineHero";
@@ -7,7 +8,7 @@ import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
    Page Metadata
 -------------------------------- */
 export const metadata: Metadata = {
-  metadataBase: new URL("https://glamlink.net"),
+  metadataBase: new URL(SITE_URL),
 
   title: "Beauty Magazine & Industry Stories | Glamlink",
 
@@ -25,12 +26,12 @@ export const metadata: Metadata = {
   ],
 
   alternates: {
-    canonical: "https://glamlink.net/magazine",
+    canonical: `${SITE_URL}/magazine`,
   },
 
   openGraph: {
     type: "website",
-    url: "https://glamlink.net/magazine", // ✅ FIXED
+    url: `${SITE_URL}/magazine`, // ✅ FIXED
 
     title: "Glamlink Beauty Magazine",
 
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: "https://glamlink.net/assets/magazine-og.png", // ✅ FIXED
+        url: `${SITE_URL}/assets/magazine-og.png`, // ✅ FIXED
         width: 1200,
         height: 630,
         alt: "Glamlink Magazine - Beauty Trends and Industry Insights",
@@ -56,7 +57,7 @@ export const metadata: Metadata = {
     description:
       "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
 
-    images: ["https://glamlink.net/assets/magazine-og.png"], // ✅ FIXED
+    images: [`${SITE_URL}/assets/magazine-og.png`], // ✅ FIXED
   },
   robots: {
     index: true,
@@ -72,11 +73,11 @@ const magazineSchema = {
   name: "Glamlink Magazine",
   description:
     "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
-  url: "https://glamlink.net/magazine",
+  url: `${SITE_URL}/magazine`,
   publisher: {
     "@type": "Organization",
     name: "Glamlink",
-    url: "https://glamlink.net",
+    url: SITE_URL,
   },
 };
 const collectionSchema = {
@@ -85,7 +86,7 @@ const collectionSchema = {
   name: "Glamlink Magazine Issues",
   description:
     "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
-  url: "https://glamlink.net/magazine",
+  url: `${SITE_URL}/magazine`,
 };
 /* --------------------------------
    Page

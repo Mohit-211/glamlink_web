@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import { Metadata } from "next";
 import Script from "next/script";
 import Image from "next/image";
@@ -124,7 +125,7 @@ export async function generateMetadata({
     return { title: "Topic Not Found | Glamlink" };
   }
 
-  const topicUrl = `https://glamlink.net/topics/${topic.slug || topic.id}`;
+  const topicUrl = `${SITE_URL}/topics/${topic.slug || topic.id}`;
   const imageUrl = getTopicImageUrl(topic);
   const description = getTopicSummary(topic);
 
@@ -191,7 +192,7 @@ console.log(realExperts,"realExperts")
       ? (topic.podcasts as FallbackPodcastGuest[])
       : FALLBACK_PODCAST_GUESTS;
 
-  const topicUrl = `https://glamlink.net/topics/${topic.slug || topic.id}`;
+  const topicUrl = `${SITE_URL}/topics/${topic.slug || topic.id}`;
 
   // Real, derived tags: the distinct article categories actually tied to this topic
   const relatedCategories = Array.from(
@@ -213,8 +214,8 @@ console.log(realExperts,"realExperts")
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://glamlink.net" },
-      { "@type": "ListItem", position: 2, name: "Topics", item: "https://glamlink.net/topics" },
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Topics", item: `${SITE_URL}/topics` },
       { "@type": "ListItem", position: 3, name: topic.name, item: topicUrl },
     ],
   };

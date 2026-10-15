@@ -1,4 +1,5 @@
 ﻿"use client";
+import { SITE_URL } from "@/lib/config";
 
 import React, { useRef } from "react";
 import dynamic from "next/dynamic";
@@ -34,7 +35,7 @@ export default function DigitalApplyPage() {
     provider: {
       "@type": "Organization",
       name: "Glamlink",
-      url: "https://glamlink.net",
+      url: SITE_URL,
     },
     areaServed: {
       "@type": "Country",

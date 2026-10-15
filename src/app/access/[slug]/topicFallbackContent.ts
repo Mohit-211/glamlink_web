@@ -1,3 +1,4 @@
+import { API_ORIGIN, SITE_URL } from "@/lib/config";
 /**
  * Fallback content for the Topic Detail page.
  *
@@ -21,7 +22,7 @@ export const FALLBACK_JOURNAL_ARTICLES: TopicJournal[] = [
     title: "Dr. Neil Vranis Advances Aesthetic and Revision Plastic Surgery in Beverly Hills",
     short_description:
       "At the forefront of surgical innovation, Dr. Neil Vranis is helping shape the next generation of plastic surgery, bringing emerging techniques, regenerative medicine, and a deeply individualized approach directly into patient care.",
-    cover_image: "https://node.glamlink.net/images/images-1789272339627.png",
+    cover_image: `${API_ORIGIN}/images/images-1789272339627.png`,
     publish_date: "2026-09-12T21:06:02.000Z",
     journal_category: { title: "Cover Feature" },
     journal_author: { name: "The Glamlink Edit" },
@@ -31,7 +32,7 @@ export const FALLBACK_JOURNAL_ARTICLES: TopicJournal[] = [
     title: "Janna Ronert and IMAGE Skincare: GLP-1 Skin, Retinol, SPF and Professional Treatments",
     short_description:
       "IMAGE Skincare founder Janna Ronert talks GLP-1-related skin changes, simple skincare routines, retinol, sunscreen, and professional treatments worth knowing about.",
-    cover_image: "https://node.glamlink.net/images/images-1789281496393.jpg",
+    cover_image: `${API_ORIGIN}/images/images-1789281496393.jpg`,
     publish_date: "2026-09-12T23:37:48.000Z",
     journal_category: { title: "Professional Skincare" },
     journal_author: { name: "The Glamlink Edit" },
@@ -41,7 +42,7 @@ export const FALLBACK_JOURNAL_ARTICLES: TopicJournal[] = [
     title: "Aesthetic Aftercare and What to Know About Post-Op Care After Plastic Surgery",
     short_description:
       "After years in nursing, including working together in the emergency room, Diana and Kristina created Aesthetic Aftercare to bring personalized recovery support directly to patients.",
-    cover_image: "https://node.glamlink.net/images/images-1789365371586.png",
+    cover_image: `${API_ORIGIN}/images/images-1789365371586.png`,
     publish_date: "2026-09-13T20:20:09.000Z",
     journal_category: { title: "Recovery" },
     journal_author: { name: "The Glamlink Edit" },
@@ -51,7 +52,7 @@ export const FALLBACK_JOURNAL_ARTICLES: TopicJournal[] = [
     title: "Rethinking Recovery: Reshape Body Bar Brings a New Approach to Wellness in Las Vegas",
     short_description:
       "From hyperbaric oxygen and infrared sauna to contrast therapy, compression and float therapy, we explore what today's recovery technologies actually do.",
-    cover_image: "https://node.glamlink.net/images/images-1788823404399.jpg",
+    cover_image: `${API_ORIGIN}/images/images-1788823404399.jpg`,
     publish_date: "2026-09-06T15:19:43.000Z",
     journal_category: { title: "Recovery" },
     journal_author: { name: "The Glamlink Edit" },
@@ -74,7 +75,7 @@ export const FALLBACK_PRODUCTS: FallbackProduct[] = [
     title: "VOL.U.LIFT™ GLP-1 4D Skin Rebound Complex",
     brand: "Image",
     price: "134.00",
-    cover_image: "https://node.glamlink.net/images/images-1788980727778.webp",
+    cover_image: `${API_ORIGIN}/images/images-1788980727778.webp`,
     category: "Skincare",
   },
   {
@@ -82,7 +83,7 @@ export const FALLBACK_PRODUCTS: FallbackProduct[] = [
     title: "DAILY PREVENTION Advanced Smartblend Mineral Moisturizer SPF 75",
     brand: "Image",
     price: "72.00",
-    cover_image: "https://node.glamlink.net/images/images-1789002893561.webp",
+    cover_image: `${API_ORIGIN}/images/images-1789002893561.webp`,
     category: "Skincare",
   },
   {
@@ -90,7 +91,7 @@ export const FALLBACK_PRODUCTS: FallbackProduct[] = [
     title: "VITAL C Hydrating Enzyme Masque",
     brand: "Image",
     price: "46.00",
-    cover_image: "https://node.glamlink.net/images/images-1789003094828.webp",
+    cover_image: `${API_ORIGIN}/images/images-1789003094828.webp`,
     category: "Skincare",
   },
   {
@@ -98,7 +99,7 @@ export const FALLBACK_PRODUCTS: FallbackProduct[] = [
     title: "VITAL C Hydrating Antioxidant A C E Serum",
     brand: "Image",
     price: "84.00",
-    cover_image: "https://node.glamlink.net/images/images-1789003281558.webp",
+    cover_image: `${API_ORIGIN}/images/images-1789003281558.webp`,
     category: "Skincare",
   },
 ];
@@ -170,7 +171,7 @@ export const FALLBACK_PROFESSIONALS: TopicExpert[] = [
       "Mommy Makeover",
     ]),
     locations: [{ city: "Beverly Hills", state: "CA" }],
-    business_card_link: "https://glamlink.net/access/dr-neil-vranis",
+    business_card_link: `${SITE_URL}/access/dr-neil-vranis`,
   },
   {
     id: 133,
@@ -182,7 +183,7 @@ export const FALLBACK_PROFESSIONALS: TopicExpert[] = [
       "Microneedling",
     ]),
     locations: [{ city: "Philadelphia", state: "PA" }],
-    business_card_link: "https://glamlink.net/access/michael-razzano",
+    business_card_link: `${SITE_URL}/access/michael-razzano`,
   },
   {
     id: 100,
@@ -194,6 +195,6 @@ export const FALLBACK_PROFESSIONALS: TopicExpert[] = [
       "Medical Aesthetics Marketing",
     ]),
     locations: [{ city: "Los Angeles", state: "CA" }],
-    business_card_link: "https://glamlink.net/access/joseph-jericho",
+    business_card_link: `${SITE_URL}/access/joseph-jericho`,
   },
 ];

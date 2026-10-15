@@ -1,9 +1,9 @@
-
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Manrope } from "next/font/google";
 
+import { ADSENSE_CLIENT_ID, GTM_ID, SITE_URL } from "@/lib/config";
 import Providers from "./providers";
 import ScrollToTop from "@/components/ScrollToTop";
 import LayoutWrapper from "@/components/LayoutWrapper";
@@ -26,7 +26,7 @@ const manrope = Manrope({
 --------------------------*/
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://glamlink.net"),
+  metadataBase: new URL(SITE_URL),
 
   title: {
     default: "Glamlink | Discover Beauty & Wellness Professionals",
@@ -65,12 +65,12 @@ export const metadata: Metadata = {
     title: "Glamlink | Discover Beauty & Wellness Professionals",
     description:
       "Find trusted beauty and wellness professionals. Explore services, digital business cards, magazines, and insights from Glamlink.",
-    url: "https://glamlink.net",
+    url: SITE_URL,
     siteName: "Glamlink",
 
     images: [
       {
-        url: "https://glamlink.net/oglayout.png",
+        url: `${SITE_URL}/oglayout.png`,
         width: 1200,
         height: 630,
         alt: "Glamlink Beauty & Wellness Platform",
@@ -86,7 +86,7 @@ export const metadata: Metadata = {
     title: "Glamlink | Beauty & Wellness Professionals",
     description:
       "Discover beauty and wellness professionals, services, and industry insights on Glamlink",
-    images: ["https://glamlink.net/oglayout.png"],
+    images: [`${SITE_URL}/oglayout.png`],
   },
 
   icons: {
@@ -96,14 +96,12 @@ export const metadata: Metadata = {
   },
 
   alternates: {
-    canonical: "https://glamlink.net",
+    canonical: SITE_URL,
   },
 
   category: "business",
 
-  other: {
-    "google-adsense-account": "ca-pub-2781788508074958",
-  },
+  other: ADSENSE_CLIENT_ID ? { "google-adsense-account": ADSENSE_CLIENT_ID } : undefined,
 };
 
 /* -------------------------
@@ -130,22 +128,24 @@ export default function RootLayout({
     <html lang="en" className={manrope.variable}>
       <head>
         {/* Google Tag Manager */}
-        <Script
-          id="gtm-script"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(w,d,s,l,i){w[l]=w[l]||[];
-              w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-              var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
-              j.async=true;
-              j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-              f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','GTM-NHQBMN23');
-            `,
-          }}
-        />
+        {GTM_ID && (
+          <Script
+            id="gtm-script"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(w,d,s,l,i){w[l]=w[l]||[];
+                w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer',${JSON.stringify(GTM_ID)});
+              `,
+            }}
+          />
+        )}
 
         {/* Organization Schema */}
         <Script
@@ -157,8 +157,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "Glamlink",
-              url: "https://glamlink.net",
-              logo: "https://glamlink.net/favicon.png",
+              url: SITE_URL,
+              logo: `${SITE_URL}/favicon.png`,
               sameAs: [
                 "https://instagram.com/",
                 "https://facebook.com/",
@@ -171,14 +171,16 @@ export default function RootLayout({
 
       <body className="min-h-screen bg-background" suppressHydrationWarning>
         {/* Google Tag Manager (noscript fallback) */}
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-NHQBMN23"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          />
-        </noscript>
+        {GTM_ID && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${encodeURIComponent(GTM_ID)}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            />
+          </noscript>
+        )}
 
         <ScrollToTop />
 

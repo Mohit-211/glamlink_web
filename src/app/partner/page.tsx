@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import PartnerPage from "@/components/partner/PartnerPage";
 
@@ -10,12 +11,12 @@ export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   alternates: {
-    canonical: "https://glamlink.net/partner",
+    canonical: `${SITE_URL}/partner`,
   },
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
-    url: "https://glamlink.net/partner",
+    url: `${SITE_URL}/partner`,
     siteName: "Glamlink",
     type: "website",
   },

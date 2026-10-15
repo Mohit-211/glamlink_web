@@ -13,6 +13,7 @@ import VerifyOtp from "@/components/AuthPage/VerifyOtp";
 import Register from "@/components/AuthPage/Register";
 import Login from "@/components/AuthPage/Login";
 import { SubscriptionPaymentModal } from "../../Dashboard/SubscriptionPay";
+import { apiUrl } from "@/lib/config";
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
@@ -407,14 +408,13 @@ const GlamCardForm: React.FC<Props> = ({
     }
     try {
       setLoading(true);
-      const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
       const token = localStorage.getItem("GlamlinkaccessToken");
       const endpoint = isEdit
-        ? `${API_URL}/businessCard/updateBusinessCard/${cardId}`
+        ? apiUrl(`businessCard/updateBusinessCard/${cardId}`)
         : token
-          ? `${API_URL}/businessCard/createBusinessCard`
-          : `${API_URL}/businessCard`;
+          ? apiUrl("businessCard/createBusinessCard")
+          : apiUrl("businessCard");
       const res = await fetch(endpoint, {
         method: isEdit ? "PUT" : "POST",
         headers: {

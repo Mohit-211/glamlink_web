@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
@@ -8,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://glamlink.net/sitemap.xml",
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

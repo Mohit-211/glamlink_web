@@ -1,4 +1,5 @@
 "use client";
+import { SITE_URL } from "@/lib/config";
 
 import { useParams } from "next/navigation";
 import { QRCode } from "react-qr-code";
@@ -14,14 +15,14 @@ const PublicCard = () => {
     company: "My Company",
     phone: "9876543210",
     email: "bhavya@email.com",
-    website: "https://glamlink.net",
+    website: SITE_URL,
     theme: {
       from: "#0d9488",
       to: "#0f766e",
     },
   };
 
-  const publicUrl = `https://glamlink.net/card/${username}`;
+  const publicUrl = `${SITE_URL}/card/${username}`;
 
   const initials = user.name
     .split(" ")

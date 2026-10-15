@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { apiUrl } from "@/lib/config";
 
 interface Props {
   open: boolean;
@@ -41,7 +42,7 @@ export default function GuestModal({ open, onClose }: Props) {
 
   try {
     const res = await fetch(
-      "https://node.glamlink.net:5000/api/v1/guest-application/create",
+      apiUrl("guest-application/create"),
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

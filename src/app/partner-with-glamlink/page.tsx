@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import { Metadata } from "next";
 import Script from "next/script";
 
@@ -26,17 +27,17 @@ export const metadata: Metadata = {
     "beauty publication advertising",
   ],
   alternates: {
-    canonical: "https://glamlink.net/media-kit",
+    canonical: `${SITE_URL}/media-kit`,
   },
   openGraph: {
     title: "Partner With Glamlink | The Glamlink Edit",
     description:
       "Feature your brand, clinic, or expertise in The Glamlink Edit — a modern beauty & wellness publication.",
-    url: "https://glamlink.net/media-kit",
+    url: `${SITE_URL}/media-kit`,
     siteName: "Glamlink",
     images: [
       {
-        url: "https://glamlink.net/default-blog.jpg",
+        url: `${SITE_URL}/default-blog.jpg`,
         width: 1200,
         height: 630,
         alt: "The Glamlink Edit Partner With Glamlink",
@@ -49,7 +50,7 @@ export const metadata: Metadata = {
     title: "Partner With Glamlink | The Glamlink Edit",
     description:
       "Advertise and get featured in The Glamlink Edit — built for visibility and real business growth.",
-    images: ["https://glamlink.net/default-blog.jpg"],
+    images: [`${SITE_URL}/default-blog.jpg`],
   },
   robots: {
     index: true,
@@ -66,13 +67,13 @@ const pageSchema = {
   name: "Partner With Glamlink | The Glamlink Edit",
   description:
     "Advertising and feature opportunities in The Glamlink Edit beauty & wellness publication.",
-  url: "https://glamlink.net/media-kit",
+  url: `${SITE_URL}/media-kit`,
   publisher: {
     "@type": "Organization",
     name: "Glamlink",
     logo: {
       "@type": "ImageObject",
-      url: "https://glamlink.net/favicon.png",
+      url: `${SITE_URL}/favicon.png`,
     },
   },
 };
@@ -85,19 +86,19 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       position: 1,
       name: "Home",
-      item: "https://glamlink.net",
+      item: SITE_URL,
     },
     {
       "@type": "ListItem",
       position: 2,
       name: "Magazine",
-      item: "https://glamlink.net/magazine",
+      item: `${SITE_URL}/magazine`,
     },
     {
       "@type": "ListItem",
       position: 3,
       name: "Partner With Glamlink",
-      item: "https://glamlink.net/partner",
+      item: `${SITE_URL}/partner`,
     },
   ],
 };

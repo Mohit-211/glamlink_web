@@ -1,7 +1,8 @@
 "use client";
+import { SITE_URL } from "@/lib/config";
 import React, { useState } from "react";
 import {QRCode} from "react-qr-code";
-const BASE_URL = "https://glamlink.net/card/";
+const BASE_URL = `${SITE_URL}/card/`;
 
 const THEME_COLORS = [
   { name: "Teal", from: "#0d9488", to: "#0f766e" },
@@ -18,7 +19,7 @@ export default function DigitalCard() {
     phone: "9876543210",
     email: "bhavya@email.com",
     company: "My Company",
-    website: "https://glamlink.net",
+    website: SITE_URL,
   });
 
   const [theme, setTheme] = useState(THEME_COLORS[0]);

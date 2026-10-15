@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ShoppingBag, ChevronLeft } from "lucide-react";
@@ -5,7 +6,6 @@ import { getTypeBlogs } from "@/api/Api";
 import { decodeId } from "@/lib/idCodec";
 import ShareProductButton from "@/components/blogs/ShareProductButton";
 
-const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://glamlink.net";
 
 async function getProduct(encodedId: string) {
   const decodedId = decodeId(encodedId);

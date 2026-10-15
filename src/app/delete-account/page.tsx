@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MessageSquareText, FileText, Mail, Trash2 } from "lucide-react";
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "Instructions on how to request deletion of your Glamlink account and data.",
   alternates: {
-    canonical: "https://glamlink.net/delete-account",
+    canonical: `${SITE_URL}/delete-account`,
   },
 };
 

@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import { GripVertical, ImagePlus, X } from "lucide-react";
 import { BOOKING_METHODS, BookingMethod, FeaturedLink, FieldErrors, GlamCardFormData } from "./types";
 import { userSpecialtiesApi } from "@/api/Api";
+import { apiUrl } from "@/lib/config";
 
 interface Props {
   data: GlamCardFormData;
@@ -381,7 +382,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({
     if (mode !== "edit" || !cardId) return;
     try {
       const token = localStorage.getItem("GlamlinkaccessToken");
-      const API_URL = process.env.NEXT_PUBLIC_API_URL;
       // This endpoint only accepts PUT + a real JSON body — it does not
       // parse a multipart "featured_links" field as JSON the way the main
       // create/update endpoint does, and it has no way to accept new image
@@ -391,7 +391,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       // the new file only goes out — via featured_link_images — on the
       // next full "Save Changes" submit (see buildFormData in
       // GlamCardForm.tsx).
-      await fetch(`${API_URL}businessCard/${cardId}/featured-links/reorder`, {
+      await fetch(apiUrl(`businessCard/${cardId}/featured-links/reorder`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

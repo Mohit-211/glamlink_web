@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { issues2025, issues2026 } from "@/data/issues";
@@ -23,7 +24,7 @@ export async function generateMetadata({
     };
   }
 
-  const url = `https://glamlink.net/magazine/${issue.slug}`;
+  const url = `${SITE_URL}/magazine/${issue.slug}`;
 
   return {
     title: issue.title,
@@ -58,7 +59,7 @@ export default function IssuePage({ params }: { params: { slug: string } }) {
     return <div className="p-10">Issue not found</div>;
   }
 
-  const url = `https://glamlink.net/magazine/${issue.slug}`;
+  const url = `${SITE_URL}/magazine/${issue.slug}`;
 
   const publicationSchema = {
     "@context": "https://schema.org",
@@ -69,12 +70,12 @@ export default function IssuePage({ params }: { params: { slug: string } }) {
     isPartOf: {
       "@type": "CreativeWorkSeries",
       name: "Glamlink Magazine",
-      url: "https://glamlink.net/magazine",
+      url: `${SITE_URL}/magazine`,
     },
     publisher: {
       "@type": "Organization",
       name: "Glamlink",
-      url: "https://glamlink.net",
+      url: SITE_URL,
     },
   };
 
@@ -86,13 +87,13 @@ export default function IssuePage({ params }: { params: { slug: string } }) {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://glamlink.net",
+        item: SITE_URL,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Magazine",
-        item: "https://glamlink.net/magazine",
+        item: `${SITE_URL}/magazine`,
       },
       {
         "@type": "ListItem",

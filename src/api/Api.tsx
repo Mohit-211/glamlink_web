@@ -1,12 +1,12 @@
 import axios from "axios";
+import { API_URL } from "@/lib/config";
 import {
   TokenExpiredError,
   handleTokenExpired,
   isTokenNotFoundResponse,
 } from "@/lib/auth";
 const api = axios.create({
-  // baseURL: "https://node.glamlink.net/api/v1/",
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: API_URL,
 });
 /* Global "Token Not Found" handling for every request made through `api`
    (profile, dashboard, business card, ...). The backend may send it as a

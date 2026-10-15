@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import Script from "next/script";
 
@@ -8,7 +9,7 @@ import JournalLandingPage from "@/components/blogs/JournalLandingPage";
 -------------------------------- */
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://glamlink.net"),
+  metadataBase: new URL(SITE_URL),
 
   title: "Beauty Industry Journal & Insights",
 
@@ -23,10 +24,10 @@ export const metadata: Metadata = {
     title: "Beauty Industry Journal & Insights | Glamlink",
     description:
       "Explore beauty industry insights, trends, tips, and expert articles.",
-    url: "https://glamlink.net",
+    url: SITE_URL,
     images: [
       {
-        url: "https://glamlink.net/assets/oglayout.png",
+        url: `${SITE_URL}/assets/oglayout.png`,
         width: 1200,
         height: 630,
         alt: "Glamlink Beauty & Wellness Platform",
@@ -43,10 +44,10 @@ const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Glamlink",
-  url: "https://glamlink.net",
+  url: SITE_URL,
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://glamlink.net/journal/directory?search={search_term_string}",
+    target: `${SITE_URL}/journal/directory?search={search_term_string}`,
     "query-input": "required name=search_term_string",
   },
 };

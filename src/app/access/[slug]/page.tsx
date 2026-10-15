@@ -1,9 +1,10 @@
+import { SITE_URL } from "@/lib/config";
 // pages/access/[slug]/page.tsx
 import type { Metadata } from "next";
 import { getBusinessCardBySlug } from "@/api/Api";
 import BusinessCardPageClient from "./BusinessCardPageClient";
 
-const DEFAULT_OG_IMAGE = "https://glamlink.net/oglayout.png";
+const DEFAULT_OG_IMAGE = `${SITE_URL}/oglayout.png`;
 
 async function getProDataForMetadata(slug: string) {
   try {
@@ -61,7 +62,7 @@ export async function generateMetadata({
     : "Access by Glamlink";
   const description = buildDescription(pro);
   const image = toAbsoluteImageUrl(pro?.profile_image);
-  const url = `https://glamlink.net/access/${slug}`;
+  const url = `${SITE_URL}/access/${slug}`;
 
   console.log("[access metadata]", {
     slug,

@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
@@ -30,11 +31,11 @@ export default async function NotFound() {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: "404 Page Not Found",
-    url: `https://glamlink.net${pathname}`,
+    url: `${SITE_URL}${pathname}`,
     isPartOf: {
       "@type": "WebSite",
       name: "Glamlink",
-      url: "https://glamlink.net",
+      url: SITE_URL,
     },
   };
 

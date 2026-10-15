@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Script from "next/script";
+import AdSenseScript from "@/ads/AdSenseScript";
 
 import JournalClient from "@/components/blogs/JournalClient";
 import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
@@ -19,14 +20,7 @@ export default function JournalLandingPage() {
         }}
       />
 
-      {/* Google AdSense */}
-      <Script
-        id="google-adsense"
-        async
-        strategy="afterInteractive"
-        crossOrigin="anonymous"
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2781788508074958"
-      />
+      <AdSenseScript />
 
       <main className="flex-1">
         {/* 👇 Everything handled inside client now */}

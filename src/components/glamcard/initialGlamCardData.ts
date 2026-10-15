@@ -1,12 +1,13 @@
+import { API_ORIGIN } from "@/lib/config";
 import { nanoid } from "nanoid";
 import { BOOKING_METHODS, GlamCardFormData } from "./GlamCardForm/types";
 
 const profileImgUrl =
-  "https://node.glamlink.net/images/profile_image-1786443475610.jpg";
+  `${API_ORIGIN}/images/profile_image-1786443475610.jpg`;
 const galleryImg1Url =
-  "https://node.glamlink.net/images/images-1786443475619.jpg";
+  `${API_ORIGIN}/images/images-1786443475619.jpg`;
 const galleryImg2Url =
-  "https://node.glamlink.net/images/images-1786443475614.jpg";
+  `${API_ORIGIN}/images/images-1786443475614.jpg`;
 /* ================= HELPER ================= */
 async function urlToFile(
   url: string,

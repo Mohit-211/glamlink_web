@@ -1,5 +1,7 @@
+import { SITE_URL } from "@/lib/config";
 import { Metadata } from "next";
 import Script from "next/script";
+import AdSenseScript from "@/ads/AdSenseScript";
 import Image from "next/image";
 
 import { getBlogsById } from "@/api/Api";
@@ -81,9 +83,9 @@ export async function generateMetadata({
     return { title: "Article Not Found | Glamlink" };
   }
 
-  const articleUrl = `https://glamlink.net/journal/${id}/${title}`;
+  const articleUrl = `${SITE_URL}/journal/${id}/${title}`;
   const imageUrl =
-    article.cover_image || "https://glamlink.net/default-blog.jpg";
+    article.cover_image || `${SITE_URL}/default-blog.jpg`;
 
   const seoTitle = article.seo_title || article.title;
   const seoDescription = article.meta_description || article.short_description;
@@ -135,7 +137,7 @@ export default async function Article({
     return <div className="text-center py-20">Article not found.</div>;
   }
 
-  const articleUrl = `https://glamlink.net/journal/${id}/${title}`;
+  const articleUrl = `${SITE_URL}/journal/${id}/${title}`;
   const imageUrl = article.cover_image || "/assets/fallback-blog.jpg";
 
 const formattedDate = article?.publish_date
@@ -200,7 +202,7 @@ const formattedDate = article?.publish_date
       name: "Glamlink",
       logo: {
         "@type": "ImageObject",
-        url: "https://glamlink.net/favicon.png",
+        url: `${SITE_URL}/favicon.png`,
       },
     },
     datePublished: article?.publish_date,
@@ -215,13 +217,13 @@ const formattedDate = article?.publish_date
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://glamlink.net",
+        item: SITE_URL,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Journal",
-        item: "https://glamlink.net/journal",
+        item: `${SITE_URL}/journal`,
       },
       {
         "@type": "ListItem",
@@ -253,14 +255,7 @@ const formattedDate = article?.publish_date
         />
       )}
 
-      {/* Google AdSense */}
-      <Script
-        id="google-adsense"
-        async
-        strategy="afterInteractive"
-        crossOrigin="anonymous"
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2781788508074958"
-      />
+      <AdSenseScript />
 
       <main className="flex-1">
         {/* ── Left/right rail ads — fixed to the viewport edges, only shown

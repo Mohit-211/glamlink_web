@@ -269,8 +269,6 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         let placeholder: HTMLElement;
 
         if (lat !== null && lng !== null) {
-          const mapUrl = `https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=${w * 2}&height=${h * 2}&center=lonlat:${lng},${lat}&zoom=15&marker=lonlat:${lng},${lat};color:%23e53e3e;size:medium&apiKey=YOUR_GEOAPIFY_KEY`;
-
           // Try fetching the static map as base64
           const base64Map = await toBase64DataUrl(
             `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=15&size=${w}x${h}&markers=${lat},${lng},red`

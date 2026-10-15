@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import Script from "next/script";
 
@@ -8,13 +9,13 @@ export const metadata: Metadata = {
   description:
     "Explore beauty concerns, treatments, skincare, hair, and wellness topics on Glamlink — expert insights, trusted articles, and the professionals behind them.",
   alternates: {
-    canonical: "https://glamlink.net/topics",
+    canonical: `${SITE_URL}/topics`,
   },
   openGraph: {
     title: "Explore Beauty Topics | Glamlink",
     description:
       "Explore beauty concerns, treatments, skincare, hair, and wellness topics on Glamlink.",
-    url: "https://glamlink.net/topics",
+    url: `${SITE_URL}/topics`,
     type: "website",
   },
 };
@@ -30,7 +31,7 @@ export default function TopicsPage() {
             "@context": "https://schema.org",
             "@type": "CollectionPage",
             name: "Glamlink Beauty Topics",
-            url: "https://glamlink.net/topics",
+            url: `${SITE_URL}/topics`,
           }),
         }}
       />

@@ -1,4 +1,5 @@
 "use client";
+import { SITE_URL } from "@/lib/config";
 
 import Script from "next/script";
 import { useParams } from "next/navigation";
@@ -33,11 +34,11 @@ const flipbookUrl =
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     name: issue.title,
-    url: `https://glamlink.net/magazine/${issue.slug}/digital`,
+    url: `${SITE_URL}/magazine/${issue.slug}/digital`,
     isPartOf: {
       "@type": "CreativeWorkSeries",
       name: "Glamlink Magazine",
-      url: "https://glamlink.net/magazine",
+      url: `${SITE_URL}/magazine`,
     },
     publisher: {
       "@type": "Organization",

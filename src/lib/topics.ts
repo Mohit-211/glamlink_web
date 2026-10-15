@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import { cache } from "react";
 import slugify from "slugify";
 import { getAllTopics, getTopicById, getTopicParagraphs, getBlogsById } from "@/api/Api";
@@ -149,7 +150,7 @@ export function getTopicImage(topic: Pick<Topic, "id" | "cover_image">): string 
 /** Absolute URL for OG/Twitter meta images, regardless of whether the image is a real CMS asset or a local fallback. */
 export function getTopicImageUrl(topic: Pick<Topic, "id" | "cover_image">): string {
   const image = getTopicImage(topic);
-  return image.startsWith("http") ? image : `https://glamlink.net${image}`;
+  return image.startsWith("http") ? image : `${SITE_URL}${image}`;
 }
 
 /** Plain-text summary derived from the topic's real rich-text description (for cards/meta), falling back to a generated line only when no description exists. */
