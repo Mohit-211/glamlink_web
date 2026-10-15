@@ -77,6 +77,7 @@ export interface FeaturedProfile {
   title: string;
   city: string;
   state: string;
+  address?: string;
   imageUrl: string;
   featuredIn: FeatureSource;
   href?: string;

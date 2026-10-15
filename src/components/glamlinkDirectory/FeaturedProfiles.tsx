@@ -4,8 +4,48 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import type { FeaturedProfile } from "@/lib/directory";
 import FeaturedProfileCard from "./FeaturedProfileCard";
+import { getAllBusinessCards } from "@/api/Api";
 
-export default function FeaturedProfiles({ profiles }: { profiles: FeaturedProfile[] }) {
+/* Maps a card from `businessCard/getAllBusinessCards` to the featured card shape. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const toFeaturedProfile = (card: any): FeaturedProfile => {
+  const location =
+    card?.locations?.find((loc: { is_primary?: boolean }) => loc?.is_primary) ??
+    card?.locations?.[0] ??
+    {};
+  return {
+    id: String(card?.id ?? card?._id ?? ""),
+    name: card?.name || card?.business_name || "",
+    title: card?.professional_title || card?.primary_specialty || "",
+    city: location?.city ?? card?.city ?? "",
+    state: location?.state || card?.state || "",
+    address: location?.address || card?.address || "",
+    imageUrl: card?.profile_image || "",
+    featuredIn: card?.featured_in || "Editorial",
+    href: card?.business_card_link || undefined,
+  };
+};
+
+export default function FeaturedProfiles({
+  profiles: fallbackProfiles = [],
+}: {
+  profiles?: FeaturedProfile[];
+}) {
+  const [apiProfiles, setApiProfiles] = useState<FeaturedProfile[]>([]);
+  const profiles = apiProfiles.length ? apiProfiles : fallbackProfiles;
+
+  useEffect(() => {
+    let active = true;
+    getAllBusinessCards()
+      .then((res) => {
+        if (active) setApiProfiles((res?.data || []).map(toFeaturedProfile));
+      })
+      .catch((error) => console.log("API error:", error));
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const trackRef = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
