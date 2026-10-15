@@ -144,6 +144,15 @@ export const getBusinessProfile = async () => {
   return data;
 };
 /* ============================= */
+/* 📌 Business Cards */
+/* ============================= */
+export const getAllBusinessCards = async () => {
+  const { data } = await api.get(
+    "businessCard/getAllBusinessCards"
+  );
+  return data;
+};
+/* ============================= */
 /* 📌 Nearby Beauticians */
 /* ============================= */
 export const GetBeauticianListApi = async () => {

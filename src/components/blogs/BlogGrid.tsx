@@ -244,12 +244,19 @@ const BlogGrid: React.FC<Props> = ({
           const category = item?.journal_category?.title || "General";
           const image = item.cover_image || "/assets/fallback.jpg";
           const excerpt = item.short_description || "";
-          const date = new Date("2026-06-01T17:30:29.000Z").toLocaleString("en-US", {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
- 
-});
+          // publish_date may be in seconds or milliseconds
+          const ts = item.publish_date
+            ? item.publish_date < 1e12
+              ? item.publish_date * 1000
+              : item.publish_date
+            : null;
+          const date = ts
+            ? new Date(ts).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : "";
           return (
             <React.Fragment key={item.id}>
               <Link
@@ -339,7 +346,7 @@ const BlogGrid: React.FC<Props> = ({
                   aria-current={p === page ? "page" : undefined}
                   className={`w-8 h-8 rounded-lg text-xs font-medium transition-all duration-150
                     ${p === page
-                      ? "bg-primary text-white border border-primary"
+                      ? "bg-primary text-primary-foreground border border-primary"
                       : "border border-border/40 text-muted-foreground hover:border-primary hover:text-primary"
                     }`}
                 >

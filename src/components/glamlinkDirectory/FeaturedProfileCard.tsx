@@ -2,6 +2,11 @@ import { MapPin, Sparkles } from "lucide-react";
 import type { FeaturedProfile } from "@/lib/directory";
 
 export default function FeaturedProfileCard({ profile }: { profile: FeaturedProfile }) {
+  console.log(profile,"profile")
+  const locationText = [profile.address, profile.city, profile.state]
+    .filter(Boolean)
+    .join(", ");
+
   return (
     <article
       className="group relative shrink-0 snap-start w-[78%] min-[480px]:w-[calc((100%_-_1rem)/2)] md:w-[calc((100%_-_3rem)/3)] lg:w-[calc((100%_-_4.5rem)/4)]"
@@ -35,10 +40,12 @@ export default function FeaturedProfileCard({ profile }: { profile: FeaturedProf
             {profile.name}
           </h3>
           <p className="mt-1 text-sm text-white/85">{profile.title}</p>
-          <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-white/80">
-            <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
-            {profile.city}, {profile.state}
-          </p>
+          {locationText && (
+            <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-white/80">
+              <MapPin className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+              {locationText}
+            </p>
+          )}
         </div>
 
         {profile.href && (
