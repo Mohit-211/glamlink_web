@@ -78,7 +78,7 @@ export default function ContactPage() {
           {submitted ? (
             <div className="card-glamlink flex flex-col items-center text-center py-16">
               <CheckCircle2 className="h-12 w-12 text-primary" />
-              <h1 className="mt-6 text-2xl font-semibold font-display">
+              <h1 className="mt-6 text-2xl font-semibold">
                 Thanks — we&apos;ve got your message
               </h1>
               <p className="mt-3 text-muted-foreground max-w-md">
@@ -95,7 +95,7 @@ export default function ContactPage() {
           ) : (
             <>
               <span className="badge-soft mb-6">Get in touch</span>
-              <h1 className="section-title font-display">Contact us</h1>
+              <h1 className="section-title">Contact us</h1>
               <p className="section-subtitle">
                 Have a question, a problem, or want to close your account?
                 Tell us what&apos;s going on and we&apos;ll get back to you.

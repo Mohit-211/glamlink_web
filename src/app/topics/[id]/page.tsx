@@ -66,7 +66,7 @@ function Band({
   children: React.ReactNode;
 }) {
   return (
-    <div className={tint ? "bg-[#fafafa]" : "bg-white"}>
+    <div className={tint ? "bg-muted" : "bg-card"}>
       <div className="max-w-[1100px] mx-auto px-5 sm:px-6 py-14 md:py-16">
         {children}
       </div>
@@ -89,17 +89,17 @@ function SectionHeader({
     <div className="flex items-end justify-between gap-4 mb-8">
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <Icon className="h-3.5 w-3.5 text-[#24bbcb]" />
-          <p className="text-[10px] tracking-[.15em] uppercase text-gray-400">
+          <Icon className="h-3.5 w-3.5 text-primary" />
+          <p className="text-[10px] tracking-[.15em] uppercase text-muted-foreground/80">
             {eyebrow}
           </p>
         </div>
-        <h2 className="font-serif text-3xl text-gray-900">{title}</h2>
+        <h2 className="text-3xl text-foreground">{title}</h2>
       </div>
       {action && (
         <Link
           href={action.href}
-          className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-[#24bbcb] hover:underline flex-shrink-0 mb-1"
+          className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline flex-shrink-0 mb-1"
         >
           {action.label}
           <ArrowRight className="h-3 w-3" />
@@ -221,7 +221,7 @@ console.log(realExperts,"realExperts")
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-card">
       <Script
         id="topic-breadcrumb-schema"
         type="application/ld+json"
@@ -254,14 +254,14 @@ console.log(realExperts,"realExperts")
           {/* ── HERO ── */}
           <section className="grid md:grid-cols-2 gap-10 md:gap-14 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 text-[10px] tracking-[.2em] uppercase text-[#24bbcb] font-medium mb-5 bg-[#24bbcb]/8 px-3.5 py-1.5 rounded-full">
+              <div className="inline-flex items-center gap-2 text-[10px] tracking-[.2em] uppercase text-primary font-medium mb-5 bg-primary/8 px-3.5 py-1.5 rounded-full">
                 <Sparkles className="h-3 w-3" />
                 Glamlink Topic
               </div>
-              <h1 className="font-serif text-[clamp(32px,5vw,48px)] leading-[1.08] tracking-tight text-gray-900">
+              <h1 className="text-[clamp(32px,5vw,48px)] leading-[1.08] tracking-tight text-foreground">
                 {topic.name}
               </h1>
-              <p className="mt-5 text-[15px] leading-relaxed text-gray-500 font-normal max-w-md">
+              <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground font-normal max-w-md">
                 {getTopicSummary(topic)}
               </p>
 
@@ -270,9 +270,9 @@ console.log(realExperts,"realExperts")
                   {relatedCategories.map((category) => (
                     <span
                       key={category}
-                      className="flex items-center gap-1.5 text-xs font-medium text-gray-600 px-3 py-1.5 rounded-full border border-gray-200 bg-white"
+                      className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground px-3 py-1.5 rounded-full border border-border bg-card"
                     >
-                      <span className="w-1 h-1 rounded-full bg-[#24bbcb]" />
+                      <span className="w-1 h-1 rounded-full bg-primary" />
                       {category}
                     </span>
                   ))}
@@ -280,7 +280,7 @@ console.log(realExperts,"realExperts")
               )}
             </div>
 
-            <div className="relative rounded-[1.75rem] overflow-hidden aspect-[16/9] w-full shadow-[0_20px_50px_-20px_rgba(36,187,203,0.4)]">
+            <div className="relative rounded-[1.75rem] overflow-hidden aspect-[16/9] w-full shadow-primary">
               <Image
                 unoptimized={process.env.NODE_ENV === "development"}
                 src={getTopicImage(topic)}
@@ -304,7 +304,7 @@ console.log(realExperts,"realExperts")
                 <ArticleContent content={topic.description} />
               </div>
             ) : (
-              <p className="text-[15px] leading-[1.8] text-gray-500 font-normal">
+              <p className="text-[15px] leading-[1.8] text-muted-foreground font-normal">
                 {topic.name} is one of the beauty and wellness topics Glamlink
                 tracks across our journal and professional network. Explore
                 the articles and specialists below to learn more, or search
@@ -313,22 +313,22 @@ console.log(realExperts,"realExperts")
             )}
 
             <div className="mt-7 flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-[13px] text-gray-600">
-                <span className="font-serif text-base text-gray-900">
+              <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[13px] text-muted-foreground">
+                <span className="text-base text-foreground">
                   {journals.length}
                 </span>
                 related {journals.length === 1 ? "article" : "articles"}
               </div>
-              <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-[13px] text-gray-600">
-                <span className="font-serif text-base text-gray-900">
+              <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[13px] text-muted-foreground">
+                <span className="text-base text-foreground">
                   {experts.length}
                 </span>
                 {experts.length === 1 ? "professional" : "professionals"} found
               </div>
               {addedDate && (
-                <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-[13px] text-gray-600">
+                <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[13px] text-muted-foreground">
                   Tracked since{" "}
-                  <span className="font-medium text-gray-900">{addedDate}</span>
+                  <span className="font-medium text-foreground">{addedDate}</span>
                 </div>
               )}
             </div>
@@ -398,7 +398,7 @@ console.log(realExperts,"realExperts")
             })}
           </div>
           {usingFallbackJournals && (
-            <p className="text-xs text-gray-400 mt-6">
+            <p className="text-xs text-muted-foreground/80 mt-6">
               We&apos;re still curating articles tagged specifically to{" "}
               {topic.name} — here are some related reads in the meantime.
             </p>
@@ -423,7 +423,7 @@ console.log(realExperts,"realExperts")
                     className="object-cover"
                   />
                 </div>
-                <span className="text-[12px] font-medium text-gray-700 leading-snug">
+                <span className="text-[12px] font-medium text-foreground/80 leading-snug">
                   {option.label}
                 </span>
               </div>
@@ -475,9 +475,9 @@ console.log(realExperts,"realExperts")
                 const href = getParagraphJournalHref(paragraph);
                 const textEl = (
                   <>
-                    <Quote className="h-4 w-4 text-[#24bbcb]/40 mb-3" />
+                    <Quote className="h-4 w-4 text-primary/40 mb-3" />
                     <p
-                      className="text-[15px] leading-[1.8] text-gray-600 font-normal"
+                      className="rich-text text-[15px] leading-[1.8] text-muted-foreground font-normal"
                       dangerouslySetInnerHTML={{ __html: text }}
                     />
                   </>
@@ -485,12 +485,12 @@ console.log(realExperts,"realExperts")
                 return (
                   <div
                     key={paragraph.id}
-                    className="group rounded-2xl border border-gray-100 bg-white p-6 shadow-sm hover:border-[#24bbcb]/40 hover:shadow-md transition-all duration-300"
+                    className="group rounded-2xl border border-border bg-card p-6 shadow-sm hover:border-primary/40 hover:shadow-md transition-all duration-300"
                   >
                     {href ? (
-                      <Link href={href} className="block hover:text-[#24bbcb] transition-colors">
+                      <Link href={href} className="block hover:text-primary transition-colors">
                         {textEl}
-                        <span className="flex items-center gap-1 text-[11px] font-medium text-[#24bbcb] mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <span className="flex items-center gap-1 text-[11px] font-medium text-primary mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                           Read the full article
                           <ArrowRight className="h-3 w-3" />
                         </span>
@@ -508,16 +508,12 @@ console.log(realExperts,"realExperts")
         {/* ── CTA ── */}
         <div className="max-w-[1100px] mx-auto px-5 sm:px-6 pb-20">
           <section
-            className="relative overflow-hidden rounded-[1.75rem] px-6 py-12 md:px-14 md:py-16 text-center"
-            style={{
-              background:
-                "radial-gradient(circle at 15% 20%, rgba(36,187,203,0.16), transparent 55%), radial-gradient(circle at 85% 80%, rgba(36,187,203,0.12), transparent 55%), #0b1416",
-            }}
+            className="relative overflow-hidden rounded-[1.75rem] bg-foreground px-6 py-12 md:px-14 md:py-16 text-center"
           >
-            <p className="text-[10px] tracking-[.2em] uppercase text-[#4fd7e0] font-medium mb-3">
+            <p className="text-[10px] tracking-[.2em] uppercase text-primary font-medium mb-3">
               Glamlink
             </p>
-            <h2 className="font-serif text-2xl md:text-4xl text-white">
+            <h2 className="text-2xl md:text-4xl text-white">
               Continue Exploring Glamlink
             </h2>
             <p className="text-sm text-white/60 font-normal mt-3 max-w-md mx-auto">
@@ -526,19 +522,19 @@ console.log(realExperts,"realExperts")
             <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
               <Link
                 href="/topics"
-                className="inline-flex items-center justify-center rounded-full bg-[#24bbcb] text-white text-sm font-medium px-6 py-2.5 hover:bg-[#1d9aa3] transition-colors duration-200"
+                className="inline-flex items-center justify-center rounded-full bg-primary text-white text-sm font-medium px-6 py-2.5 hover:bg-primary transition-colors duration-200"
               >
                 Explore Topics
               </Link>
               <Link
                 href="/journal/directory"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 text-white text-sm font-medium px-6 py-2.5 hover:border-white/40 hover:bg-white/5 transition-colors duration-200"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 text-white text-sm font-medium px-6 py-2.5 hover:border-white/40 hover:bg-card/5 transition-colors duration-200"
               >
                 Discover Professionals
               </Link>
               <Link
                 href="/journal"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 text-white text-sm font-medium px-6 py-2.5 hover:border-white/40 hover:bg-white/5 transition-colors duration-200"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 text-white text-sm font-medium px-6 py-2.5 hover:border-white/40 hover:bg-card/5 transition-colors duration-200"
               >
                 Explore Journal
               </Link>

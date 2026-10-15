@@ -67,7 +67,7 @@ const ProductCard = ({ product, onSelect, compact = false }: ProductCardProps) =
         />
 
         {product.category && (
-          <span className={`absolute ${c.badge} font-semibold uppercase tracking-wide bg-white/90 text-foreground rounded`}>
+          <span className={`absolute ${c.badge} font-semibold uppercase tracking-wide bg-card/90 text-foreground rounded`}>
             {product.category}
           </span>
         )}
@@ -80,7 +80,7 @@ const ProductCard = ({ product, onSelect, compact = false }: ProductCardProps) =
 
         <h3
           title={compact ? name : undefined}
-          className={`font-display ${c.title} leading-snug group-hover:text-primary transition-colors`}
+          className={`${c.title} leading-snug group-hover:text-primary transition-colors`}
         >
           {name}
         </h3>
@@ -147,7 +147,7 @@ const JournalShopCard = ({ shop,heading, compact = false }: JournalShopCardProps
           Curated Picks
         </p>
 
-        <h2 className="font-display text-2xl md:text-3xl tracking-tight">
+        <h2 className="text-2xl md:text-3xl tracking-tight">
           Shop The Journal
         </h2>
 

@@ -12,7 +12,7 @@ const PromosEmptyState = () => {
             <div className="absolute w-32 h-32 rounded-full border-2 border-dashed border-border animate-[spin_20s_linear_infinite]" />
             
             {/* Inner circle */}
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+            <div className="w-24 h-24 rounded-full bg-accent flex items-center justify-center">
               <Gift className="w-10 h-10 text-primary/60" />
             </div>
 
@@ -22,7 +22,7 @@ const PromosEmptyState = () => {
           </div>
 
           {/* Message */}
-          <h2 className="font-display text-2xl lg:text-3xl font-semibold text-foreground mb-3">
+          <h2 className="text-2xl lg:text-3xl font-semibold text-foreground mb-3">
             No Active Promotions
           </h2>
           

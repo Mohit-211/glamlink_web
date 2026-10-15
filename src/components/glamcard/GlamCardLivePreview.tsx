@@ -151,36 +151,36 @@ const SectionBox: React.FC<{
 }> = ({ title, titleAlign = "left", icon, children }) => (
   <div
     className="rounded-2xl p-[2px]"
-    style={{ background: "linear-gradient(135deg, var(--accent-faint), var(--accent-light))" }}
+    style={{ background: "linear-gradient(135deg, var(--card-accent-faint), var(--card-accent-light))" }}
   >
     <div
       className="rounded-2xl p-3 sm:p-4 h-full"
       style={{
-        background: "linear-gradient(135deg, var(--panel-start) 0%, var(--panel-end) 100%)",
-        boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+        background: "linear-gradient(135deg, var(--card-panel-start) 0%, var(--card-panel-end) 100%)",
+        boxShadow: "var(--shadow-medium)",
       }}
     >
       {titleAlign === "center" ? (
         <div className="flex items-center gap-2 mb-3">
-          <span className="flex-1 h-px bg-gray-400/60" />
+          <span className="flex-1 h-px bg-input/60" />
           <div className="flex items-center gap-1.5">
-            {icon && <span className="text-[var(--accent)]">{icon}</span>}
-            <p className="text-xs font-bold tracking-wider text-gray-700 uppercase whitespace-nowrap">
+            {icon && <span className="text-[var(--card-accent)]">{icon}</span>}
+            <p className="text-xs font-bold tracking-wider text-foreground/80 uppercase whitespace-nowrap">
               {title}
             </p>
           </div>
-          <span className="flex-1 h-px bg-gray-400/60" />
+          <span className="flex-1 h-px bg-input/60" />
         </div>
       ) : (
         <div className="flex items-center gap-1.5 mb-3">
-          {icon && <span className="text-[var(--accent)]">{icon}</span>}
-          <p className="text-xs font-bold tracking-wider text-gray-700 uppercase">
+          {icon && <span className="text-[var(--card-accent)]">{icon}</span>}
+          <p className="text-xs font-bold tracking-wider text-foreground/80 uppercase">
             {title}
           </p>
         </div>
       )}
-      <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm" style={{
-        boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+      <div className="rounded-xl bg-card p-3 sm:p-4 shadow-sm" style={{
+        boxShadow: "var(--shadow-medium)",
       }}>{children}</div>
     </div>
   </div>
@@ -207,7 +207,7 @@ const parseArray = (value: string | string[] | undefined): string[] => {
 };
 const isFile = (v: any): v is File => v instanceof File;
 /** Default Glamlink accent — used whenever the Access Card has no valid color_code. */
-const DEFAULT_ACCENT_COLOR = "#23B9CD";
+const DEFAULT_ACCENT_COLOR = "#24bbcb";
 const isValidHexColor = (value: unknown): value is string =>
   typeof value === "string" &&
   /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value.trim());
@@ -244,14 +244,14 @@ const DotList: React.FC<{ items: any[]; placeholder: string }> = ({
     {items.length ? (
       items.map((item, i) => (
         <li key={i} className="flex items-start gap-2.5">
-          {/* <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--accent)] flex-shrink-0" /> */}
-          <span className="text-gray-700 leading-snug">
+          {/* <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--card-accent)] flex-shrink-0" /> */}
+          <span className="text-foreground/80 leading-snug">
             {typeof item === "string" ? item : item?.note || item?.text || ""}
           </span>
         </li>
       ))
     ) : (
-      <li className="text-gray-400 text-xs italic">{placeholder}</li>
+      <li className="text-muted-foreground/80 text-xs italic">{placeholder}</li>
     )}
   </ul>
 );
@@ -263,7 +263,7 @@ const TagList: React.FC<{ items: any[] }> = ({ items }) => {
       {display.map((item, i) => (
         <span
           key={i}
-          className="rounded-full px-3 py-1.5 text-xs font-medium text-black min-w-[2.5rem] min-h-[1.5rem]"
+          className="rounded-full px-3 py-1.5 text-xs font-medium text-foreground min-w-[2.5rem] min-h-[1.5rem]"
         >
           {typeof item === "string" ? item : item?.note || item?.text || ""}
         </span>
@@ -443,7 +443,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
     if (item?.file_type === "video") {
       const thumbSrc = getVideoThumbSrc(index);
       return (
-        <div className="relative h-full w-full bg-gray-700">
+        <div className="relative h-full w-full bg-foreground">
           {thumbSrc ? (
             <img
               src={thumbSrc}
@@ -669,12 +669,12 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
     socialMedia?.tiktok;
   /* ================= RENDER ================= */
   const socialIconStyle = {
-    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+    boxShadow: "var(--shadow-medium)",
   };
   /* Raised, premium button look for the Connect section icons only. */
   const connectIconStyle = {
     boxShadow:
-      "0 6px 14px rgba(15, 23, 42, 0.12), 0 2px 4px rgba(15, 23, 42, 0.08)",
+      "var(--shadow-medium)",
   };
   /* Every dynamic color used below (including inside the standalone
      SectionBox component, which has no props/access to `cardColor`)
@@ -683,25 +683,25 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
      per-element wiring. Pre-mixing the alpha variants here (rather than
      relying on Tailwind's opacity modifier on a `var(...)` value, which it
      can't compute) keeps every consumer a plain, JIT-safe literal class
-     like `bg-[var(--accent)]`. */
+     like `bg-[var(--card-accent)]`. */
   const cardColorLight = shadeColor(cardColor, 55);
   const cardColorVars = {
-    "--accent": cardColor,
-    "--accent-strong": shadeColor(cardColor, -14),
-    "--accent-deep": shadeColor(cardColor, -25),
-    "--accent-soft": hexToRgba(cardColor, 0.35),
-    "--accent-faint": hexToRgba(cardColor, 0.12),
-    "--accent-border": hexToRgba(cardColor, 0.4),
+    "--card-accent": cardColor,
+    "--card-accent-strong": shadeColor(cardColor, -14),
+    "--card-accent-deep": shadeColor(cardColor, -25),
+    "--card-accent-soft": hexToRgba(cardColor, 0.35),
+    "--card-accent-faint": hexToRgba(cardColor, 0.12),
+    "--card-accent-border": hexToRgba(cardColor, 0.4),
     // Pastel partner for the two-tone gradient borders — a lighter tint of
     // the same accent instead of a fixed mint, so the gradient stays
     // monochromatic no matter which color_code is picked.
-    "--accent-light": hexToRgba(cardColorLight, 0.45),
+    "--card-accent-light": hexToRgba(cardColorLight, 0.45),
     // Panel background (SectionBox, Important Info, Press & Features,
     // Featured Links) — was a fixed blue-gray gradient that clashed with
     // any non-teal color_code; now a near-white tint of the accent itself,
     // so the panel background always matches the chosen theme.
-    "--panel-start": shadeColor(cardColor, 90),
-    "--panel-end": shadeColor(cardColor, 78),
+    "--card-panel-start": shadeColor(cardColor, 90),
+    "--card-panel-end": shadeColor(cardColor, 78),
   } as React.CSSProperties;
   return (
     <div
@@ -710,14 +710,14 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
     >
       {/* ===== MOBILE STICKY TOP BAR (view mode) ===== */}
       {mode === "view" && (
-        <div className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm lg:hidden">
+        <div className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-card/90 backdrop-blur-md border-b border-border shadow-sm lg:hidden">
           <div className="flex items-center gap-2">
             <Image src={Logo} alt="access" width={90} height={28} />
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleSaveContact}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--accent)] text-white text-xs font-semibold shadow transition active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--card-accent)] text-white text-xs font-semibold shadow transition active:scale-95"
             >
               <svg
                 className="w-3.5 h-3.5"
@@ -735,13 +735,13 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
             </button>
              <button
                   onClick={handleShare}
-                  className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-lg hover:bg-[var(--accent-strong)] transition-all duration-200" style={socialIconStyle}
+                  className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-white shadow-lg hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
                 >
                   <Share2 size={12} strokeWidth={2.5} />
                 </button>
             {/* <button
               onClick={() => setIsQrModalOpen(true)}
-              className="h-8 w-8 flex items-center justify-center rounded-full bg-[var(--accent-faint)] text-[var(--accent)] transition active:scale-95"
+              className="h-8 w-8 flex items-center justify-center rounded-full bg-[var(--card-accent-faint)] text-[var(--card-accent)] transition active:scale-95"
             >
               <QrCode size={15} strokeWidth={2.5} />
             </button> */}
@@ -753,10 +753,10 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
           className="w-full max-w-lg lg:max-w-2xl p-[2px] rounded-2xl"
           style={{
             background: `linear-gradient(135deg, ${cardColor}, ${cardColorLight} 50%, ${cardColor})`,
-            boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+            boxShadow: "var(--shadow-medium)",
           }}
         >
-          <div className="rounded-2xl bg-[#FFFFFF] p-4 sm:p-6 shadow-sm">
+          <div className="rounded-2xl bg-card p-4 sm:p-6 shadow-sm">
             {/* ===== LOGO (desktop / non-view) ===== */}
             <div
               className={`mb-5 text-center ${mode === "view" ? "hidden lg:flex justify-center" : "flex justify-center"}`}
@@ -768,7 +768,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
               <div className="hidden lg:flex justify-end gap-2 mb-3">
                 <button
                   onClick={handleSaveContact}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-strong)] text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap" style={socialIconStyle}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap" style={socialIconStyle}
                 >
                   <svg
                     className="w-4 h-4 flex-shrink-0"
@@ -787,7 +787,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                 </button>
                 <button
                   onClick={handleShare}
-                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-lg hover:bg-[var(--accent-strong)] transition-all duration-200" style={socialIconStyle}
+                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-white shadow-lg hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
                 >
                   <Share2 size={18} strokeWidth={2.5} />
                 </button>
@@ -803,8 +803,8 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
               >
                 {/* bg pattern */}
                 <div className="absolute inset-0 opacity-10">
-                  {/* <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white translate-x-8 -translate-y-8" /> */}
-                  {/* <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white -translate-x-6 translate-y-6" /> */}
+                  {/* <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-card translate-x-8 -translate-y-8" /> */}
+                  {/* <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-card -translate-x-6 translate-y-6" /> */}
                 </div>
                 <div className="flex items-center gap-4 p-4">
                   {/* avatar */}
@@ -851,14 +851,14 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                   icon={<span className="text-[10px]">✦</span>}
                 >
                   <div
-                    className="prose prose-sm text-gray-700 text-sm leading-relaxed"
+                    className="rich-text text-foreground/80 text-sm leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: data.bio }}
                   />
                 </SectionBox>
               )}
               {normalizedImages.length > 0 && thumbnailIndex !== null && (
                 <SectionBox title="Gallery" titleAlign="center">
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 shadow-sm">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted shadow-sm">
                     {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
                       <video
                         key={galleryPreviews[thumbnailIndex]}
@@ -918,7 +918,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                             <button
                               key={i}
                               onClick={() => setThumbnailIndex(i)}
-                              className={`rounded-full transition-all ${i === thumbnailIndex ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/60"}`}
+                              className={`rounded-full transition-all ${i === thumbnailIndex ? "w-4 h-1.5 bg-card" : "w-1.5 h-1.5 bg-card/60"}`}
                             />
                           ))}
                         </div>
@@ -941,7 +941,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                             });
                             setThumbnailIndex(index);
                           }}
-                          className={` h-12 w-12 overflow-hidden rounded-lg border flex-shrink-0 snap-start transition-all ${thumbnailIndex === index ? "ring-2 ring-[var(--accent)] border-[var(--accent)]" : "border-gray-200"}`}
+                          className={` h-12 w-12 overflow-hidden rounded-lg border flex-shrink-0 snap-start transition-all ${thumbnailIndex === index ? "ring-2 ring-[var(--card-accent)] border-[var(--card-accent)]" : "border-border"}`}
                         >
                           {renderThumbImage(index, "Thumb")}
                         </button>
@@ -959,7 +959,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                 >
                   {data.locations.length > 1 && (
                     <select
-                      className="mb-3 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-border)] bg-white"
+                      className="mb-3 w-full rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--card-accent-border)] bg-card"
                       value={selectedLocationId || ""}
                       onChange={(e) => setSelectedLocationId(e.target.value)}
                     >
@@ -974,11 +974,11 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     <div className="mb-3 space-y-1">
                      {data.locations.length === 1 &&
                               selectedLocation.label && (
-                                <p className="font-semibold text-gray-800">
+                                <p className="font-semibold text-foreground">
                                   {selectedLocation.label}
                                 </p>
                               )}
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <p className="text-muted-foreground text-sm leading-relaxed">
                         {selectedLocation.location_type === "exact_address"
                           ? selectedLocation.address?.trim() ||
                           "Address not provided"
@@ -992,7 +992,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                       </p>
                       {(data.phone || selectedLocation?.phone) &&
                         data.is_phone_visible && (
-                          <p className="text-gray-600">
+                          <p className="text-muted-foreground">
                             📞 {selectedLocation.phone || data.phone}
                           </p>
                         )}
@@ -1030,7 +1030,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                         }}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white font-medium px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-xs whitespace-nowrap active:scale-95 transition"
+                        className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-primary text-white font-medium px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-xs whitespace-nowrap active:scale-95 transition"
                       >
                         <svg
                           className="w-3.5 h-3.5"
@@ -1043,7 +1043,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                       </a>
                     </div>
                   ) : (
-                    <p className="text-xs text-gray-400 italic">
+                    <p className="text-xs text-muted-foreground/80 italic">
                       Map will appear once location is set
                     </p>
                   )}
@@ -1073,8 +1073,8 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                           key={hour.id ?? index}
                           className="flex items-start gap-2.5"
                         >
-                          <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--accent)] flex-shrink-0" />
-                          <span className="text-gray-700">
+                          <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--card-accent)] flex-shrink-0" />
+                          <span className="text-foreground/80">
                             {hour.note ? hour.note : timeText}
                           </span>
                         </li>
@@ -1084,8 +1084,8 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                 ) : (
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2.5">
-                      <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--accent)] flex-shrink-0" />
-                      <span className="text-gray-700">
+                      <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--card-accent)] flex-shrink-0" />
+                      <span className="text-foreground/80">
                         Appointment on request
                       </span>
                     </li>
@@ -1107,26 +1107,26 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
             <div
               className="rounded-2xl p-[2px] mt-3"
               style={{
-                background: "linear-gradient(135deg, var(--accent-faint), var(--accent-light))",
+                background: "linear-gradient(135deg, var(--card-accent-faint), var(--card-accent-light))",
               }}
             >
               <div
                 className="rounded-2xl p-3 sm:p-4"
                 style={{
                   background:
-                    "linear-gradient(135deg, var(--panel-start) 0%, var(--panel-end) 100%)",
-                  boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                    "linear-gradient(135deg, var(--card-panel-start) 0%, var(--card-panel-end) 100%)",
+                  boxShadow: "var(--shadow-medium)",
                 }}
               >
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="flex-1 h-px bg-gray-400/60" />
-                  <p className="text-xs font-bold tracking-wider text-gray-700 uppercase whitespace-nowrap">
+                  <span className="flex-1 h-px bg-input/60" />
+                  <p className="text-xs font-bold tracking-wider text-foreground/80 uppercase whitespace-nowrap">
                     Important Info
                   </p>
-                  <span className="flex-1 h-px bg-gray-400/60" />
+                  <span className="flex-1 h-px bg-input/60" />
                 </div>
-                <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm" style={{
-                  boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                <div className="rounded-xl bg-card p-3 sm:p-4 shadow-sm" style={{
+                  boxShadow: "var(--shadow-medium)",
                 }}>
                   <DotList items={importantInfoArray}
                     placeholder=""
@@ -1140,26 +1140,26 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
               <div
                 className="rounded-2xl p-[2px] mt-3"
                 style={{
-                  background: "linear-gradient(135deg, var(--accent-faint), var(--accent-light))",
+                  background: "linear-gradient(135deg, var(--card-accent-faint), var(--card-accent-light))",
                 }}
               >
                 <div
                   className="rounded-2xl p-3 sm:p-4"
                   style={{
                     background:
-                      "linear-gradient(135deg, var(--panel-start) 0%, var(--panel-end) 100%)",
-                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                      "linear-gradient(135deg, var(--card-panel-start) 0%, var(--card-panel-end) 100%)",
+                    boxShadow: "var(--shadow-medium)",
                   }}
                 >
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="flex-1 h-px bg-gray-400/60" />
-                    <p className="text-xs font-bold tracking-wider text-gray-700 uppercase whitespace-nowrap">
+                    <span className="flex-1 h-px bg-input/60" />
+                    <p className="text-xs font-bold tracking-wider text-foreground/80 uppercase whitespace-nowrap">
                       Press & Features
                     </p>
-                    <span className="flex-1 h-px bg-gray-400/60" />
+                    <span className="flex-1 h-px bg-input/60" />
                   </div>
-                  <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm space-y-2" style={{
-                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                  <div className="rounded-xl bg-card p-3 sm:p-4 shadow-sm space-y-2" style={{
+                    boxShadow: "var(--shadow-medium)",
                   }}>
                     {otherLinks
                       .filter((link: any) => link?.url)
@@ -1176,9 +1176,9 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                             }
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-700 transition hover:border-[var(--accent)] hover:bg-[var(--accent-faint)] active:scale-[0.98]" style={socialIconStyle}
+                            className="flex items-center gap-2 rounded-lg border border-border px-3 py-2.5 text-sm text-foreground/80 transition hover:border-[var(--card-accent)] hover:bg-[var(--card-accent-faint)] active:scale-[0.98]" style={socialIconStyle}
                           >
-                            <ExternalLink className="h-4 w-4 text-[var(--accent)] flex-shrink-0" />
+                            <ExternalLink className="h-4 w-4 text-[var(--card-accent)] flex-shrink-0" />
                             <span className="truncate font-medium">
                               {link.title}
                             </span>
@@ -1198,23 +1198,23 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
               <div
                 className="rounded-2xl p-[2px] mt-3"
                 style={{
-                  background: "linear-gradient(135deg, var(--accent-faint), var(--accent-light))",
+                  background: "linear-gradient(135deg, var(--card-accent-faint), var(--card-accent-light))",
                 }}
               >
                 <div
                   className="rounded-2xl p-3 sm:p-4"
                   style={{
                     background:
-                      "linear-gradient(135deg, var(--panel-start) 0%, var(--panel-end) 100%)",
-                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                      "linear-gradient(135deg, var(--card-panel-start) 0%, var(--card-panel-end) 100%)",
+                    boxShadow: "var(--shadow-medium)",
                   }}
                 >
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="flex-1 h-px bg-gray-400/60" />
-                    <p className="text-xs font-bold tracking-wider text-gray-700 uppercase whitespace-nowrap">
+                    <span className="flex-1 h-px bg-input/60" />
+                    <p className="text-xs font-bold tracking-wider text-foreground/80 uppercase whitespace-nowrap">
                       Featured Links
                     </p>
-                    <span className="flex-1 h-px bg-gray-400/60" />
+                    <span className="flex-1 h-px bg-input/60" />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-1 gap-3 sm:gap-4">
                     {featuredLinks.map((link: any, index: number) => {
@@ -1239,15 +1239,15 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                           }
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group relative flex items-center gap-3 sm:gap-4 rounded-2xl bg-white p-3.5 sm:p-4 border border-gray-200/70 transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[var(--accent-border)] active:scale-[0.98] active:translate-y-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_1px_rgba(15,23,42,0.04),0_8px_16px_-4px_rgba(15,23,42,0.12),0_20px_40px_-14px_rgba(15,23,42,0.18)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_2px_2px_rgba(15,23,42,0.05),0_14px_24px_-4px_var(--accent-soft),0_28px_56px_-14px_rgba(15,23,42,0.24)]"
+                          className="group relative flex items-center gap-3 sm:gap-4 rounded-2xl bg-card p-3.5 sm:p-4 border border-border/70 transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[var(--card-accent-border)] active:scale-[0.98] active:translate-y-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_1px_rgba(15,23,42,0.04),0_8px_16px_-4px_rgba(15,23,42,0.12),0_20px_40px_-14px_rgba(15,23,42,0.18)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_2px_2px_rgba(15,23,42,0.05),0_14px_24px_-4px_var(--card-accent-soft),0_28px_56px_-14px_rgba(15,23,42,0.24)]"
                         >
                           {/* thumbnail */}
                           <div className="relative flex-shrink-0">
                             <div
                               className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex items-center justify-center"
                               style={{
-                                background: "var(--accent-faint)",
-                                boxShadow: "inset 0 0 0 1px var(--accent-border)",
+                                background: "var(--card-accent-faint)",
+                                boxShadow: "inset 0 0 0 1px var(--card-accent-border)",
                               }}
                             >
                               {thumbSrc ? (
@@ -1257,30 +1257,30 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                                   className="w-full h-full object-cover"
                                 />
                               ) : (
-                                <Link2 className="w-5 h-5 text-[var(--accent)]" />
+                                <Link2 className="w-5 h-5 text-[var(--card-accent)]" />
                               )}
                             </div>
                             {link?.is_featured && (
-                              <span className="absolute -top-1.5 -left-1.5 rounded-full bg-[var(--accent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-sm ring-2 ring-white whitespace-nowrap">
+                              <span className="absolute -top-1.5 -left-1.5 rounded-full bg-[var(--card-accent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-sm ring-2 ring-white whitespace-nowrap">
                                 Featured
                               </span>
                             )}
                           </div>
                           {/* title + description */}
                           <div className="flex-1 min-w-0">
-                            <p className="truncate text-sm sm:text-base font-semibold text-gray-900 leading-snug">
+                            <p className="truncate text-sm sm:text-base font-semibold text-foreground leading-snug">
                               {link.title}
                             </p>
                             {subtext && (
-                              <p className="text-xs sm:text-[13px] text-gray-500 leading-snug mt-1 line-clamp-2">
+                              <p className="text-xs sm:text-[13px] text-muted-foreground leading-snug mt-1 line-clamp-2">
                                 {subtext}
                               </p>
                             )}
                           </div>
                           {/* action */}
-                          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center transition-colors duration-200 group-hover:bg-[var(--accent)]">
+                          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-muted flex items-center justify-center transition-colors duration-200 group-hover:bg-[var(--card-accent)]">
                             <ArrowUpRight
-                              className="w-4 h-4 text-gray-400 transition-colors duration-200 group-hover:text-white"
+                              className="w-4 h-4 text-muted-foreground/80 transition-colors duration-200 group-hover:text-white"
                               strokeWidth={2.25}
                             />
                           </div>
@@ -1293,20 +1293,20 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
             )}
             {/* ===== CONNECT BUTTON ===== */}
             <div className="flex items-center gap-3 mt-5">
-              <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent to-[var(--accent)]" />
+              <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent to-[var(--card-accent)]" />
               <button
                 onClick={() => {
                   track("CONNECT_CLICK");
                   setIsBookingModalOpen(true);
                 }}
-                className="flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-strong)] active:scale-95 text-white px-7 py-2.5 rounded-full text-sm font-bold tracking-widest transition-all whitespace-nowrap uppercase shadow-md" style={{
-                  boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                className="flex items-center gap-2 bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] active:scale-95 text-white px-7 py-2.5 rounded-full text-sm font-bold tracking-widest transition-all whitespace-nowrap uppercase shadow-md" style={{
+                  boxShadow: "var(--shadow-medium)",
                 }}
               >
                 <Send className="w-4 h-4" strokeWidth={2.5} />
                 CONNECT
               </button>
-              <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent to-[var(--accent)]" />
+              <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent to-[var(--card-accent)]" />
             </div>
             {/* ===== SOCIAL ICONS ===== */}
             <div className="flex justify-center flex-wrap gap-4 sm:gap-5 mt-4">
@@ -1318,12 +1318,12 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     title={data.website}
-                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
                     style={connectIconStyle}
                   >
-                    <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--accent)] hover:text-[var(--accent-strong)] transition-colors duration-300" />
+                    <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-gray-500">Website</span>
+                  <span className="text-[11px] font-medium text-muted-foreground">Website</span>
                 </div>
               )}
               {allInstagramHandles.map(({ key, url }, idx) => (
@@ -1334,12 +1334,12 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     title={url}
-                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
                     style={connectIconStyle}
                   >
-                    <Instagram className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--accent)] hover:text-[var(--accent-strong)] transition-colors duration-300" />
+                    <Instagram className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-gray-500">
+                  <span className="text-[11px] font-medium text-muted-foreground">
                     {idx > 0 ? `Instagram ${idx + 1}` : "Instagram"}
                   </span>
                 </div>
@@ -1352,12 +1352,12 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Facebook"
-                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
                     style={connectIconStyle}
                   >
-                    <Facebook className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--accent)] hover:text-[var(--accent-strong)] transition-colors duration-300" />
+                    <Facebook className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-gray-500">Facebook</span>
+                  <span className="text-[11px] font-medium text-muted-foreground">Facebook</span>
                 </div>
               )}
               {socialMedia?.linkedin && (
@@ -1368,12 +1368,12 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     title="LinkedIn"
-                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
                     style={connectIconStyle}
                   >
-                    <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--accent)] hover:text-[var(--accent-strong)] transition-colors duration-300" />
+                    <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-gray-500">LinkedIn</span>
+                  <span className="text-[11px] font-medium text-muted-foreground">LinkedIn</span>
                 </div>
               )}
               {socialMedia?.youtube && (
@@ -1384,12 +1384,12 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     title="YouTube"
-                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
                     style={connectIconStyle}
                   >
-                    <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--accent)] hover:text-[var(--accent-strong)] transition-colors duration-300" />
+                    <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-gray-500">YouTube</span>
+                  <span className="text-[11px] font-medium text-muted-foreground">YouTube</span>
                 </div>
               )}
               {socialMedia?.tiktok && (
@@ -1400,12 +1400,12 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     title="TikTok"
-                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
                     style={connectIconStyle}
                   >
-                    <Music2 className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--accent)] hover:text-[var(--accent-strong)] transition-colors duration-300" />
+                    <Music2 className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-gray-500">TikTok</span>
+                  <span className="text-[11px] font-medium text-muted-foreground">TikTok</span>
                 </div>
               )}
             </div>
@@ -1419,22 +1419,22 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
           onClick={() => setIsBookingModalOpen(false)}
         >
           <div
-            className="bg-white rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-sm sm:mx-4 max-h-[90vh] overflow-y-auto"
+            className="bg-card rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-sm sm:mx-4 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sm:hidden w-10 h-1 rounded-full bg-gray-300 mx-auto mb-4" />
+            <div className="sm:hidden w-10 h-1 rounded-full bg-input mx-auto mb-4" />
             <div className="flex justify-between items-center mb-1">
-              <p className="text-base font-bold text-gray-800">
+              <p className="text-base font-bold text-foreground">
                 How would you like to connect?
               </p>
               <button
                 onClick={() => setIsBookingModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 text-lg leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+                className="text-muted-foreground/80 hover:text-muted-foreground text-lg leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition"
               >
                 ✕
               </button>
             </div>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-muted-foreground mb-4">
               Choose your preferred booking method
             </p>
             <div className="flex flex-col gap-2.5">
@@ -1447,16 +1447,16 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     if (!data.booking_link) e.preventDefault();
                     else track("BOOKING_CLICK", data.booking_link);
                   }}
-                  className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.booking_link ? "border-gray-200 hover:bg-gray-50" : "border-gray-200 opacity-50 cursor-not-allowed"}`}
+                  className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.booking_link ? "border-border hover:bg-muted" : "border-border opacity-50 cursor-not-allowed"}`}
                 >
-                  <div className="w-10 h-10 rounded-full bg-[var(--accent)] flex items-center justify-center flex-shrink-0 text-lg">
+                  <div className="w-10 h-10 rounded-full bg-[var(--card-accent)] flex items-center justify-center flex-shrink-0 text-lg">
                     🔗
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">
+                    <p className="text-sm font-semibold text-foreground">
                       Book via Link
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {data.booking_link
                         ? "Visit booking page"
                         : "Not configured"}
@@ -1471,16 +1471,16 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     if (!data.phone) e.preventDefault();
                     else track("PHONE_CLICK", `tel:${data.phone}`);
                   }}
-                  className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.phone ? "border-gray-200 hover:bg-gray-50" : "border-gray-200 opacity-50 cursor-not-allowed"}`}
+                  className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.phone ? "border-border hover:bg-muted" : "border-border opacity-50 cursor-not-allowed"}`}
                 >
-                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0 text-lg">
+                  <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center flex-shrink-0 text-lg">
                     📞
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">
+                    <p className="text-sm font-semibold text-foreground">
                       Call / Text
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {data.phone || "Not configured"}
                     </p>
                   </div>
@@ -1507,32 +1507,32 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors active:scale-[0.98]"
+                      className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:bg-muted transition-colors active:scale-[0.98]"
                     >
-                      <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0 text-lg">
+                      <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center flex-shrink-0 text-lg">
                         📸
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">
+                        <p className="text-sm font-semibold text-foreground">
                           DM on Instagram
                           {allInstagramHandles.length > 1 ? ` ${idx + 1}` : ""}
                         </p>
-                        <p className="text-xs text-gray-500 truncate max-w-[180px]">
+                        <p className="text-xs text-muted-foreground truncate max-w-[180px]">
                           {url}
                         </p>
                       </div>
                     </a>
                   ))
                 ) : (
-                  <div className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-200 opacity-50 cursor-not-allowed">
-                    <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0 text-lg">
+                  <div className="flex items-center gap-3 p-3.5 rounded-xl border border-border opacity-50 cursor-not-allowed">
+                    <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center flex-shrink-0 text-lg">
                       📸
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-800">
+                      <p className="text-sm font-semibold text-foreground">
                         DM on Instagram
                       </p>
-                      <p className="text-xs text-gray-500">Not configured</p>
+                      <p className="text-xs text-muted-foreground">Not configured</p>
                     </div>
                   </div>
                 ))}
@@ -1553,17 +1553,17 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
           onClick={() => setIsQrModalOpen(false)}
         >
           <div
-            className="bg-white rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-md sm:mx-4"
+            className="bg-card rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-md sm:mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sm:hidden w-10 h-1 rounded-full bg-gray-300 mx-auto mb-4" />
+            <div className="sm:hidden w-10 h-1 rounded-full bg-input mx-auto mb-4" />
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-gray-800">
+              <h3 className="text-base font-bold text-foreground">
                 Business Card QR Code
               </h3>
               <button
                 onClick={() => setIsQrModalOpen(false)}
-                className="text-gray-500 hover:text-gray-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+                className="text-muted-foreground hover:text-foreground/80 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition"
               >
                 ✕
               </button>
@@ -1571,7 +1571,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
             {data?.business_card_qr ? (
               <>
                 <div className="flex justify-center mb-4">
-                  <div className="p-3 rounded-2xl border-2 border-[var(--accent-border)] bg-[#F4F9FF]">
+                  <div className="p-3 rounded-2xl border-2 border-[var(--card-accent-border)] bg-[var(--card-accent-faint)]">
                     <img
                       src={data.business_card_qr}
                       alt="Business Card QR"
@@ -1580,21 +1580,21 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                   </div>
                 </div>
                 <div className="mb-2">
-                  <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
                     Business Card Link
                   </label>
-                  <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 p-2.5">
+                  <div className="flex items-center gap-2 rounded-xl border border-border bg-muted p-2.5">
                     <a
                       href={data.business_card_qr}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 truncate text-sm text-[var(--accent-deep)] hover:underline"
+                      className="flex-1 truncate text-sm text-[var(--card-accent-deep)] hover:underline"
                     >
                       {data.business_card_qr}
                     </a>
                     <button
                       onClick={handleCopyLink}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--accent)] text-white hover:bg-[var(--accent-strong)] active:scale-95 transition-all whitespace-nowrap"
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--card-accent)] text-white hover:bg-[var(--card-accent-strong)] active:scale-95 transition-all whitespace-nowrap"
                     >
                       {copied ? "✓ Copied" : "Copy"}
                     </button>
@@ -1602,7 +1602,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                 </div>
               </>
             ) : (
-              <div className="text-center py-10 text-gray-500">
+              <div className="text-center py-10 text-muted-foreground">
                 QR Code not available
               </div>
             )}

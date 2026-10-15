@@ -15,13 +15,13 @@ interface Props {
   cardId?: string | number;
 }
 
-const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-4 sm:p-6";
-const labelClass = "text-sm font-medium text-gray-700";
+const sectionClass = "space-y-6 rounded-xl border border-border bg-card p-4 sm:p-6";
+const labelClass = "text-sm font-medium text-foreground/80";
 const inputClass =
-  "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm " +
-  "text-gray-900 placeholder-gray-400 transition " +
-  "focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200";
-const errorInputClass = "border-red-500 focus:border-red-500 focus:ring-red-200";
+  "w-full rounded-lg border border-border bg-card px-4 py-2.5 text-sm " +
+  "text-foreground placeholder-muted-foreground/80 transition " +
+  "focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
+const errorInputClass = "border-destructive focus:border-destructive focus:ring-destructive/30";
 
 const INSTAGRAM_KEYS = ["instagram", "instagram1", "instagram2"] as const;
 
@@ -434,7 +434,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
     <section className={sectionClass}>
       <header className="space-y-1">
         <h2 className="text-lg font-semibold">Services & Booking</h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Your specialties and how clients can reach you
         </p>
       </header>
@@ -442,7 +442,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       {/* Additional Specialties */}
       <div id="field-specialties" className="space-y-3">
         <label className={labelClass}>
-          Additional Specialties <span className="text-red-500">*</span>
+          Additional Specialties <span className="text-destructive">*</span>
         </label>
 
         <div className="relative flex gap-2" ref={specialtyWrapperRef}>
@@ -469,9 +469,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             />
 
             {specialtyDropdownOpen && (
-              <div className="absolute z-10 mt-1 w-full max-h-56 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+              <div className="absolute z-10 mt-1 w-full max-h-56 overflow-auto rounded-lg border border-border bg-card shadow-lg">
                 {loadingSpecialties ? (
-                  <div className="px-4 py-2 text-sm text-gray-400">Loading…</div>
+                  <div className="px-4 py-2 text-sm text-muted-foreground/80">Loading…</div>
                 ) : (
                   <>
                     {filteredSpecialtyOptions.map((opt) => (
@@ -480,7 +480,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                         type="button"
                         onClick={() => addSpecialty(opt)}
                         disabled={data.specialties.length >= 5}
-                        className="block w-full text-left px-4 py-2 text-sm hover:bg-[#24bbcb]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="block w-full text-left px-4 py-2 text-sm hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {opt}
                       </button>
@@ -490,14 +490,14 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                       <button
                         type="button"
                         onClick={() => addSpecialty()}
-                        className="block w-full text-left px-4 py-2 text-sm font-medium text-[#24bbcb] hover:bg-[#24bbcb]/10 border-t border-gray-100"
+                        className="block w-full text-left px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 border-t border-border"
                       >
                         + Add &quot;{specialtyInput.trim()}&quot;
                       </button>
                     )}
 
                     {!filteredSpecialtyOptions.length && !canAddCustomSpecialty && (
-                      <div className="px-4 py-2 text-sm text-gray-400">
+                      <div className="px-4 py-2 text-sm text-muted-foreground/80">
                         {specialtyOptions.length === 0 ? "No specialties available" : "No matches"}
                       </div>
                     )}
@@ -524,8 +524,8 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             className={`rounded-lg px-5 text-sm font-medium transition ${data.specialties.length >= 5 ||
                 !specialtyInput.trim() ||
                 isSpecialtyAdded(specialtyInput)
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-[#24bbcb] text-white hover:bg-[#24bbcb]"
+                ? "bg-border text-muted-foreground cursor-not-allowed"
+                : "bg-primary text-white hover:bg-primary"
               }`}
           >
             + Add
@@ -533,22 +533,22 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         </div>
 
         {errors?.specialties ? (
-          <p className="text-sm text-red-500">{errors.specialties}</p>
+          <p className="text-sm text-destructive">{errors.specialties}</p>
         ) : (
-          <p className="text-xs text-gray-500">Max 5 specialties</p>
+          <p className="text-xs text-muted-foreground">Max 5 specialties</p>
         )}
         {data.specialties.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {data.specialties.map((item, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#24bbcb] px-3 py-1 text-xs font-medium text-black"
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-medium text-foreground"
               >
                 {item}
                 <button
                   type="button"
                   onClick={() => removeSpecialty(i)}
-                  className="ml-1 text-teal-800 hover:text-red-600"
+                  className="ml-1 text-primary hover:text-destructive"
                 >
                   ×
                 </button>
@@ -561,8 +561,8 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       {/* Socials & Website */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-sm font-semibold text-gray-800">Socials & Website</h3>
-          <p className="text-xs text-gray-500 mt-1">
+          <h3 className="text-sm font-semibold text-foreground">Socials & Website</h3>
+          <p className="text-xs text-muted-foreground mt-1">
             Add your social profiles, website, press features, or articles
           </p>
         </div>
@@ -589,15 +589,15 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                 <label className={labelClass}>
                   Instagram
                   {data.preferred_booking_methods?.includes(BOOKING_METHODS.INSTAGRAM) && (
-                    <span className="text-red-500"> *</span>
+                    <span className="text-destructive"> *</span>
                   )}
                 </label>
-                <p className="text-xs text-gray-500">Add multiple Instagram handles</p>
+                <p className="text-xs text-muted-foreground">Add multiple Instagram handles</p>
               </div>
               <button
                 type="button"
                 onClick={addInstagramHandle}
-                className="text-xs text-[#24bbcb] hover:underline font-medium"
+                className="text-xs text-primary hover:underline font-medium"
               >
                 + Add Instagram
               </button>
@@ -605,7 +605,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             <div className="space-y-2">
               {getHandles().map((value, idx) => (
                 <div key={idx} className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
-                  <span className="text-xs text-gray-400 w-full sm:w-24 sm:shrink-0">
+                  <span className="text-xs text-muted-foreground/80 w-full sm:w-24 sm:shrink-0">
                     {idx === 0 ? "Instagram" : `Instagram ${idx}`}
                   </span>
                   <input
@@ -624,7 +624,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                     <button
                       type="button"
                       onClick={() => removeInstagramHandle(idx)}
-                      className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 hover:bg-red-100"
+                      className="rounded-lg bg-destructive/5 px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
                     >
                       ×
                     </button>
@@ -633,7 +633,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               ))}
             </div>
             {errors?.instagram && (
-              <p className="mt-1 text-sm text-red-500">{errors.instagram}</p>
+              <p className="mt-1 text-sm text-destructive">{errors.instagram}</p>
             )}
           </div>
 
@@ -715,13 +715,13 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         </div>
 
         {/* Press / Articles / Other Links */}
-        <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-3 sm:p-5">
+        <div className="space-y-4 rounded-xl border border-dashed border-border bg-muted p-3 sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <label className="text-sm font-semibold text-gray-800">
+              <label className="text-sm font-semibold text-foreground">
                 Press / Articles / Other Links
               </label>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Add magazine features, interviews, blog articles, portfolios,
                 press coverage, Behance projects, or any important external links.
               </p>
@@ -729,7 +729,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             <button
               type="button"
               onClick={addOtherLink}
-              className="w-full flex-none rounded-lg bg-[#24bbcb] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3] sm:w-auto"
+              className="w-full flex-none rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary sm:w-auto"
             >
               + Add Link
             </button>
@@ -739,7 +739,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               (link: { title: string; url: string }, index: number) => (
                 <div
                   key={index}
-                  className="flex flex-col gap-2 rounded-lg border border-gray-200 bg-white p-3"
+                  className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3"
                 >
                   <div className="flex items-center gap-2">
                     <input
@@ -752,7 +752,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                     <button
                       type="button"
                       onClick={() => removeOtherLink(index)}
-                      className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+                      className="rounded-lg bg-destructive/5 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10"
                     >
                       Delete
                     </button>
@@ -768,7 +768,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               )
             )}
             {parseOtherLinks(data?.other_links).length === 0 && (
-              <div className="rounded-lg border border-gray-200 bg-white p-4 text-center text-sm text-gray-500">
+              <div className="rounded-lg border border-border bg-card p-4 text-center text-sm text-muted-foreground">
                 No links added yet. Click &quot;Add Link&quot; to get started.
               </div>
             )}
@@ -777,11 +777,11 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       </div>
 
       {/* Featured Links */}
-      <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-3 sm:p-5">
+      <div className="space-y-4 rounded-xl border border-dashed border-border bg-muted p-3 sm:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <label className="text-sm font-semibold text-gray-800">Featured Links</label>
-            <p className="mt-1 text-xs text-gray-500">
+            <label className="text-sm font-semibold text-foreground">Featured Links</label>
+            <p className="mt-1 text-xs text-muted-foreground">
               Shop your favorites, promote a package, or share anything else you want
               clients to find fast — shown as clickable cards on your Access page.
             </p>
@@ -789,7 +789,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           <button
             type="button"
             onClick={addFeaturedLink}
-            className="w-full flex-none rounded-lg bg-[#24bbcb] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3] sm:w-auto"
+            className="w-full flex-none rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary sm:w-auto"
           >
             + Add Featured Link
           </button>
@@ -811,22 +811,22 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                   setDraggedFeaturedLinkIndex(null);
                 }}
                 onDragEnd={() => setDraggedFeaturedLinkIndex(null)}
-                className={`flex flex-col gap-2 rounded-lg border bg-white p-3 ${link.is_featured ? "border-[#24bbcb] ring-1 ring-[#24bbcb]/30" : "border-gray-200"
+                className={`flex flex-col gap-2 rounded-lg border bg-card p-3 ${link.is_featured ? "border-primary ring-1 ring-primary/30" : "border-border"
                   }`}
               >
                 <div className="flex items-start gap-2">
                   <span
-                    className="mt-3 cursor-grab text-gray-400 hover:text-gray-600 active:cursor-grabbing"
+                    className="mt-3 cursor-grab text-muted-foreground/80 hover:text-muted-foreground active:cursor-grabbing"
                     title="Drag to reorder"
                   >
                     <GripVertical className="h-4 w-4" />
                   </span>
 
-                  <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                  <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
                     {previewSrc ? (
                       <img src={previewSrc} alt="" className="h-full w-full object-cover" />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-gray-300">
+                      <div className="flex h-full w-full items-center justify-center text-muted-foreground/60">
                         <ImagePlus className="h-5 w-5" />
                       </div>
                     )}
@@ -848,7 +848,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                         type="button"
                         onClick={() => removeFeaturedLinkThumbnail(index)}
                         title="Remove thumbnail"
-                        className="absolute -right-1 -top-1 rounded-full bg-white p-0.5 text-gray-500 shadow hover:text-red-600"
+                        className="absolute -right-1 -top-1 rounded-full bg-card p-0.5 text-muted-foreground shadow hover:text-destructive"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -870,7 +870,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                       <button
                         type="button"
                         onClick={() => removeFeaturedLink(index)}
-                        className="flex-none rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+                        className="flex-none rounded-lg bg-destructive/5 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10"
                       >
                         Delete
                       </button>
@@ -882,12 +882,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                       value={link.url}
                       onChange={(e) => updateFeaturedLink(index, "url", e.target.value)}
                     />
-                    <label className="flex w-fit cursor-pointer items-center gap-1.5 text-xs font-medium text-gray-600 select-none">
+                    <label className="flex w-fit cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground select-none">
                       <input
                         type="checkbox"
                         checked={!!link.is_featured}
                         onChange={() => toggleFeaturedLinkFeatured(index)}
-                        className="h-3.5 w-3.5 rounded border-gray-300 text-[#24bbcb] focus:ring-[#24bbcb]"
+                        className="h-3.5 w-3.5 rounded border-border text-primary focus:ring-primary"
                       />
                       Feature this link first
                     </label>
@@ -897,7 +897,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             );
           })}
           {parseFeaturedLinks(data?.featured_links).length === 0 && (
-            <div className="rounded-lg border border-gray-200 bg-white p-4 text-center text-sm text-gray-500">
+            <div className="rounded-lg border border-border bg-card p-4 text-center text-sm text-muted-foreground">
               No featured links yet. Click &quot;Add Featured Link&quot; to get started.
             </div>
           )}
@@ -909,12 +909,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       <div id="field-preferred_booking_methods">
         <div className="flex items-center gap-2 relative">
           <label className={labelClass}>
-            Ways To Connects <span className="text-red-500">*</span>
+            Ways To Connects <span className="text-destructive">*</span>
           </label>
         </div>
 
         <div
-          className={`mt-3 rounded-lg p-1 ${errors?.preferred_booking_methods ? "ring-1 ring-red-500" : ""}`}
+          className={`mt-3 rounded-lg p-1 ${errors?.preferred_booking_methods ? "ring-1 ring-destructive" : ""}`}
           style={{ display: "flex", flexWrap: "wrap", gap: "8px 20px" }}
         >
           {[
@@ -951,7 +951,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           ))}
         </div>
         {errors?.preferred_booking_methods && (
-          <p className="mt-1 text-sm text-red-500">
+          <p className="mt-1 text-sm text-destructive">
             {errors.preferred_booking_methods}
           </p>
         )}
@@ -959,7 +959,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         {data.preferred_booking_methods?.includes(BOOKING_METHODS.LINK) && (
           <div id="field-booking_link" className="mt-4">
             <label className={`${labelClass} m-0`}>
-              Booking Link <span className="text-red-500">*</span>
+              Booking Link <span className="text-destructive">*</span>
             </label>
             <input
               type="url"
@@ -975,7 +975,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               }}
             />
             {errors?.booking_link && (
-              <p className="mt-1 text-sm text-red-500">{errors.booking_link}</p>
+              <p className="mt-1 text-sm text-destructive">{errors.booking_link}</p>
             )}
           </div>
         )}
@@ -999,7 +999,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => removeInfo(i)}
-                  className="flex-none px-1 text-red-600 hover:text-red-800 text-xl"
+                  className="flex-none px-1 text-destructive hover:text-destructive text-xl"
                 >
                   ×
                 </button>
@@ -1023,7 +1023,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           <button
             type="button"
             onClick={addInfo}
-            className="flex-none whitespace-nowrap rounded-lg bg-gray-200 px-3 py-1 text-sm font-medium hover:bg-gray-300"
+            className="flex-none whitespace-nowrap rounded-lg bg-border px-3 py-1 text-sm font-medium hover:bg-input"
           >
             + Add
           </button>

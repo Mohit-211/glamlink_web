@@ -35,10 +35,10 @@ const JournalEvent = () => {
     <section className="space-y-8">
       {/* Header */}
       <div className="text-center space-y-2">
-        <p className="text-[11px] uppercase tracking-widest text-[#24bbcb] font-semibold">
+        <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">
           Save The Date
         </p>
-        <h1 className="font-display text-2xl md:text-3xl tracking-tight">
+        <h1 className="text-2xl md:text-3xl tracking-tight">
           Upcoming Events
         </h1>
         <p className="text-sm text-muted-foreground max-w-lg mx-auto">
@@ -52,7 +52,7 @@ const JournalEvent = () => {
           events.map((event: any) => (
             <div
               key={event.id}
-              className="group flex flex-col sm:flex-row gap-5 border border-border/40 rounded-xl overflow-hidden bg-background hover:border-[#24bbcb]/50 hover:shadow-sm transition-all duration-200"
+              className="group flex flex-col sm:flex-row gap-5 border border-border/40 rounded-xl overflow-hidden bg-background hover:border-primary/50 hover:shadow-sm transition-all duration-200"
             >
               <div className="relative sm:w-56 aspect-[16/10] sm:aspect-auto bg-muted/30 flex-shrink-0 overflow-hidden">
                 <img
@@ -63,10 +63,10 @@ const JournalEvent = () => {
               </div>
               <div className="flex-1 p-5 flex flex-col justify-between gap-4">
                 <div className="space-y-2">
-                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wide text-[#24bbcb] bg-[#24bbcb]/10 px-2 py-1 rounded-full">
+                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wide text-primary bg-primary/10 px-2 py-1 rounded-full">
                     {event.type || "Event"}
                   </span>
-                  <h3 className="font-display text-base md:text-lg leading-snug group-hover:text-[#24bbcb] transition-colors">
+                  <h3 className="text-base md:text-lg leading-snug group-hover:text-primary transition-colors">
                     {event.title}
                   </h3>
                   <p className="text-xs text-muted-foreground leading-relaxed max-w-md">
@@ -98,7 +98,7 @@ const JournalEvent = () => {
                   >
                     <Button
                       size="sm"
-                      className="rounded-full bg-[#24bbcb] hover:bg-[#1ea5b4] text-white text-xs cursor-pointer"
+                      className="rounded-full bg-primary hover:bg-primary text-white text-xs cursor-pointer"
                     >
                       Reserve Spot
                     </Button>

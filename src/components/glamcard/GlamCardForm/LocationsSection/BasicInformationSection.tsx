@@ -12,7 +12,7 @@ import { FieldErrors, GlamCardFormData } from "../types";
 const BioEditor = dynamic(() => import("./Bioeditor"), {
   ssr: false,
   loading: () => (
-    <div className="h-32 w-full animate-pulse rounded-lg border border-gray-200 bg-gray-50" />
+    <div className="h-32 w-full animate-pulse rounded-lg border border-border bg-muted" />
   ),
 });
 
@@ -38,14 +38,14 @@ interface SectionProps {
 /* ================= STYLES ================= */
 
 const sectionClass =
-  "space-y-6 rounded-xl border border-gray-200 bg-white p-4 sm:p-6";
+  "space-y-6 rounded-xl border border-border bg-card p-4 sm:p-6";
 
 const inputClass =
-  "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
+  "w-full rounded-lg border border-border bg-card px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
 
-const errorInputClass = "border-red-500 focus:border-red-500 focus:ring-red-200";
+const errorInputClass = "border-destructive focus:border-destructive focus:ring-destructive/30";
 
-const labelClass = "mb-2 mt-2 block text-sm font-medium text-gray-700";
+const labelClass = "mb-2 mt-2 block text-sm font-medium text-foreground/80";
 
 const CHARACTER_LIMIT = 80;
 
@@ -68,7 +68,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         {/* NAME */}
         <div id="field-name">
           <label className={labelClass}>
-            Full Name <span className="text-red-500">*</span>
+            Full Name <span className="text-destructive">*</span>
           </label>
           <input
             className={`${inputClass} ${errors?.name ? errorInputClass : ""}`}
@@ -83,14 +83,14 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             }}
           />
           {errors?.name && (
-            <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.name}</p>
           )}
         </div>
 
         {/* TITLE */}
         <div id="field-professional_title">
           <label className={labelClass}>
-            Professional Title <span className="text-red-500">*</span>
+            Professional Title <span className="text-destructive">*</span>
           </label>
           <input
             className={`${inputClass} ${errors?.professional_title ? errorInputClass : ""}`}
@@ -105,7 +105,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             }}
           />
           {errors?.professional_title && (
-            <p className="mt-1 text-sm text-red-500">{errors.professional_title}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.professional_title}</p>
           )}
         </div>
 
@@ -114,7 +114,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         {/* EMAIL */}
         <div id="field-email">
           <label className={labelClass}>
-            Email <span className="text-red-500">*</span>
+            Email <span className="text-destructive">*</span>
           </label>
           <input
             type="email"
@@ -130,7 +130,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             }}
           />
           {errors?.email && (
-            <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.email}</p>
           )}
         </div>
 
@@ -139,7 +139,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
   <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
     <label className={labelClass}>
       Phone
-      {(data.is_phone_visible ?? true) && <span className="text-red-500"> *</span>}
+      {(data.is_phone_visible ?? true) && <span className="text-destructive"> *</span>}
     </label>
 
     <label className="flex cursor-pointer items-center gap-2">
@@ -152,9 +152,9 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             is_phone_visible: e.target.checked,
           }))
         }
-        className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+        className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
       />
-      <span className="text-xs font-medium text-gray-600">
+      <span className="text-xs font-medium text-muted-foreground">
         Show phone number on card
       </span>
     </label>
@@ -179,10 +179,10 @@ const BasicInformationSection: React.FC<SectionProps> = ({
   />
 
   {errors?.phone ? (
-    <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
+    <p className="mt-1 text-sm text-destructive">{errors.phone}</p>
   ) : (
     data.is_phone_visible && !data.phone?.trim() && (
-      <p className="mt-1 text-sm text-red-500">
+      <p className="mt-1 text-sm text-destructive">
         Phone number is required.
       </p>
     )
@@ -192,12 +192,12 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         {/* BIO */}
         <div id="field-bio" className="md:col-span-2">
           <label className={labelClass}>
-            Professional Bio <span className="text-red-500">*</span>
+            Professional Bio <span className="text-destructive">*</span>
           </label>
 
           <div
             className={
-              errors?.bio ? "rounded-lg ring-1 ring-red-500" : undefined
+              errors?.bio ? "rounded-lg ring-1 ring-destructive" : undefined
             }
           >
             <BioEditor
@@ -219,11 +219,11 @@ const BasicInformationSection: React.FC<SectionProps> = ({
 
           <div className="mt-1 flex items-start justify-between gap-3">
             {errors?.bio ? (
-              <p className="text-sm text-red-500">{errors.bio}</p>
+              <p className="text-sm text-destructive">{errors.bio}</p>
             ) : (
               <span />
             )}
-            <p className="text-right text-xs text-gray-500">
+            <p className="text-right text-xs text-muted-foreground">
               {getCharacterCount(data.bio || "")} / {CHARACTER_LIMIT}
             </p>
           </div>
@@ -232,7 +232,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
       {/* BUSINESS NAME */}
       <div id="field-business_name">
         <label className={labelClass}>
-          Business Name <span className="text-red-500">*</span>
+          Business Name <span className="text-destructive">*</span>
         </label>
         <input
           className={`${inputClass} w-full ${errors?.business_name ? errorInputClass : ""}`}
@@ -247,14 +247,14 @@ const BasicInformationSection: React.FC<SectionProps> = ({
           }}
         />
         {errors?.business_name && (
-          <p className="mt-1 text-sm text-red-500">{errors.business_name}</p>
+          <p className="mt-1 text-sm text-destructive">{errors.business_name}</p>
         )}
       </div>
 
       {/* CARD COLOR */}
       <div id="field-color_code">
         <label className={labelClass}>Card Color</label>
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-muted-foreground">
           Pick an accent color for your Access Card — it themes the Featured
           Links cards, icons, and highlights across your page.
         </p>
@@ -264,18 +264,18 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             value={
               /^#[0-9a-fA-F]{6}$/.test(data.color_code || "")
                 ? (data.color_code as string)
-                : "#23b9cd"
+                : "#24bbcb"
             }
             onChange={(e) =>
               setData((p) => ({ ...p, color_code: e.target.value }))
             }
-            className="h-10 w-14 flex-none cursor-pointer rounded-lg border border-gray-300 bg-white p-1"
+            className="h-10 w-14 flex-none cursor-pointer rounded-lg border border-border bg-card p-1"
             title="Pick a color"
           />
           <input
             type="text"
             className={`${inputClass} min-w-0 max-w-[140px]`}
-            placeholder="#23B9CD"
+            placeholder="#24BBCB"
             value={data.color_code || ""}
             onChange={(e) =>
               setData((p) => ({ ...p, color_code: e.target.value }))

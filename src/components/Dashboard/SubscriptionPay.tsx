@@ -9,6 +9,7 @@ import {
     useStripe,
     useElements,
 } from '@stripe/react-stripe-js';
+import { TOKENS } from "@/lib/designTokens";
 import {
     CreditCard,
     Lock,
@@ -42,11 +43,10 @@ const ELEMENT_STYLE = {
     style: {
         base: {
             fontSize: '14px',
-            color: '#0f172a',
-            fontFamily: 'inherit',
-            '::placeholder': { color: '#94a3b8' },
+            color: TOKENS.foreground,
+            '::placeholder': { color: TOKENS.mutedForeground },
         },
-        invalid: { color: '#ef4444' },
+        invalid: { color: TOKENS.destructive },
     },
 };
 // ── Error helpers ─────────────────────────────────────────────────────────────
@@ -217,9 +217,9 @@ function AddressStep({ businessCardId, editingAddress, onSaved, onCancel }: Addr
                 </p>
             </div>
             {status === 'error' && errorMsg && (
-                <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                    <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-700">{errorMsg}</p>
+                <div className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3">
+                    <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-destructive">{errorMsg}</p>
                 </div>
             )}
             <div className="space-y-1.5">
@@ -472,9 +472,9 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
                     <p className="text-sm text-muted-foreground">Where should we ship your NFC card?</p>
                 </div>
                 {errorMsg && (
-                    <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                        <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-red-700">{errorMsg}</p>
+                    <div className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3">
+                        <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-destructive">{errorMsg}</p>
                     </div>
                 )}
                 <div className="space-y-2.5 max-h-[280px] overflow-y-auto pr-1">
@@ -563,9 +563,9 @@ function ShippingStep({ businessCardId, onContinue, onCancel, onNeedsAddress, on
     if (status === 'error') {
         return (
             <div className="space-y-4">
-                <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                    <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-700">{errorMsg}</p>
+                <div className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3">
+                    <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-destructive">{errorMsg}</p>
                 </div>
                 <button
                     onClick={() => setStatus('select-address')}
@@ -840,9 +840,9 @@ if (status === 'success') {
                 </div>
             </div>
             {status === 'error' && (
-                <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                    <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-700">{errorMsg}</p>
+                <div className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3">
+                    <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-destructive">{errorMsg}</p>
                 </div>
             )}
             <div className="flex gap-3 pt-1">

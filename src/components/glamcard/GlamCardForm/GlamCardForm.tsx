@@ -518,13 +518,7 @@ const GlamCardForm: React.FC<Props> = ({
                   Cancel
                 </button>
               )}
-              <div
-                className="flex-1 rounded-full text-sm font-semibold text-white shadow-lg"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #24bbcb 0%, #53bec6 50%, #5cc2d6 100%)",
-                }}
-              >
+              <div className="flex-1 rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-primary">
                 <button
                   onClick={checkAuthAndSubmit}
                   disabled={loading}

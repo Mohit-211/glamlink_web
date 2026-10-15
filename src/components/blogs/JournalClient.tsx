@@ -67,7 +67,7 @@ const PaginationControls = ({
         onClick={onPrev}
         disabled={page === 1}
         className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground
-          hover:text-[#24bbcb] disabled:opacity-30 disabled:cursor-not-allowed
+          hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed
           transition-colors duration-150"
       >
         <ChevronLeft className="h-3.5 w-3.5" />
@@ -80,7 +80,7 @@ const PaginationControls = ({
         onClick={onNext}
         disabled={page === totalPages}
         className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground
-          hover:text-[#24bbcb] disabled:opacity-30 disabled:cursor-not-allowed
+          hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed
           transition-colors duration-150"
       >
         {!compact && "Next"}
@@ -112,7 +112,7 @@ const TopTabs = ({ path }: { path: string }) => {
               className={`cursor-pointer px-3 sm:px-6 py-2 text-[11px] sm:text-sm font-semibold uppercase tracking-wide
                 rounded-full whitespace-nowrap transition-all duration-200 shrink-0
                 ${isActive
-                  ? "bg-background text-[#24bbcb] shadow-sm"
+                  ? "bg-background text-primary shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
                 }`}
             >
@@ -159,7 +159,7 @@ const MobileMagazineCarousel = ({
               onClick={() => onIssueClick(issue)}
               className="min-w-[100px] flex-shrink-0 cursor-pointer group"
             >
-              <div className="w-full h-[134px] rounded-lg overflow-hidden bg-muted/30 border border-border/30 group-hover:border-[#24bbcb]/50 transition-colors">
+              <div className="w-full h-[134px] rounded-lg overflow-hidden bg-muted/30 border border-border/30 group-hover:border-primary/50 transition-colors">
                 {issue.cover ? (
                   <img
                     src={issue.cover}
@@ -167,12 +167,12 @@ const MobileMagazineCarousel = ({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full text-xs text-[#24bbcb] font-semibold">
+                  <div className="flex items-center justify-center h-full text-xs text-primary font-semibold">
                     #{issueNum}
                   </div>
                 )}
               </div>
-              <p className="text-[11px] mt-1.5 text-center font-medium line-clamp-1 text-foreground group-hover:text-[#24bbcb] transition-colors">
+              <p className="text-[11px] mt-1.5 text-center font-medium line-clamp-1 text-foreground group-hover:text-primary transition-colors">
                 Issue {issueNum}
               </p>
             </div>
@@ -235,7 +235,7 @@ const FlipbookPanel = ({
             </button>
             {issue && (
               <div className="min-w-0">
-                <span className="block text-[11px] font-semibold text-[#24bbcb]">
+                <span className="block text-[11px] font-semibold text-primary">
                   Issue {issueNum}
                 </span>
                 <p className="text-sm font-semibold text-foreground truncate">
@@ -265,7 +265,7 @@ const FlipbookPanel = ({
         <div className="px-4 py-3 border-t border-border/30">
           <Button
             size="sm"
-            className="w-full rounded-full bg-[#24bbcb] text-white text-xs"
+            className="w-full rounded-full bg-primary text-white text-xs"
             onClick={() => router.push(`/magazine/${issue?.slug}/digital`)}
           >
             <Download className="mr-2 h-3.5 w-3.5" />
@@ -300,7 +300,7 @@ const MagazineSidebar = ({
         <h2 className="text-sm font-semibold uppercase tracking-widest text-foreground">
           The Glamlink Edit
         </h2>
-        <p className="text-xs text-[#24bbcb] font-semibold mt-1">
+        <p className="text-xs text-primary font-semibold mt-1">
           Interactive Edition
         </p>
         <p className="text-[11px] text-muted-foreground mt-2">
@@ -319,8 +319,8 @@ const MagazineSidebar = ({
               className={`group flex items-center gap-3 p-2.5 rounded-lg cursor-pointer
                 border transition-all duration-200
                 ${isActive
-                  ? "bg-[#24bbcb]/10 border-[#24bbcb]/40"
-                  : "border-transparent hover:bg-[#24bbcb]/5"
+                  ? "bg-primary/10 border-primary/40"
+                  : "border-transparent hover:bg-primary/5"
                 }`}
             >
               <div className="w-12 h-16 rounded-md overflow-hidden bg-muted/30 flex-shrink-0">
@@ -331,16 +331,16 @@ const MagazineSidebar = ({
                     className="w-full h-full object-cover group-hover:scale-105 transition"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[10px] font-semibold text-[#24bbcb]">
+                  <div className="w-full h-full flex items-center justify-center text-[10px] font-semibold text-primary">
                     #{issueNum}
                   </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <span className="block text-[11px] font-semibold text-[#24bbcb]">
+                <span className="block text-[11px] font-semibold text-primary">
                   Issue {issueNum}
                 </span>
-                <p className="text-xs font-medium line-clamp-2 text-foreground group-hover:text-[#24bbcb] transition-colors">
+                <p className="text-xs font-medium line-clamp-2 text-foreground group-hover:text-primary transition-colors">
                   {issue.title}
                 </p>
               </div>
@@ -363,7 +363,7 @@ const MagazineSidebar = ({
           variant="outline"
           size="sm"
           onClick={() => router.push("/magazine")}
-          className="w-full rounded-full text-xs border-[#24bbcb]/40 hover:border-[#24bbcb] hover:text-[#24bbcb]"
+          className="w-full rounded-full text-xs border-primary/40 hover:border-primary hover:text-primary"
         >
           View All Issues
         </Button>

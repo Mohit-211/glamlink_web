@@ -9,7 +9,7 @@ export default function PartnershipWays() {
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">
             Ways to Partner
           </p>
-          <h2 id="ways-to-partner" className="section-title font-display mt-4">
+          <h2 id="ways-to-partner" className="section-title mt-4">
             Multiple touchpoints. One community.
           </h2>
         </div>

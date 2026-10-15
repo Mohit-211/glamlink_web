@@ -53,7 +53,7 @@ export default function AdSlot({ slotId, ad, hideOnMobile = false }: AdSlotProps
   if (!ad) return null;
 
   const baseClasses =
-    "overflow-hidden flex items-center justify-self-center justify-center rounded bg-gray-100";
+    "overflow-hidden flex items-center justify-self-center justify-center rounded bg-muted";
   const responsiveClasses = hideOnMobile ? "hidden lg:flex" : "flex";
   const behaviourClass = BEHAVIOUR_CLASSES[ad.behaviour] || BEHAVIOUR_CLASSES.static;
 

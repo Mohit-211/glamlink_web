@@ -34,13 +34,13 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
       .toUpperCase() || "P";
 
   const content = (
-    <div className="group relative flex flex-col h-full bg-white rounded-2xl border border-gray-100 p-6 hover:border-[#24bbcb]/40 hover:shadow-lg transition-all duration-300">
+    <div className="group relative flex flex-col h-full bg-card rounded-2xl border border-border p-6 hover:border-primary/40 hover:shadow-lg transition-all duration-300">
       {expert.business_card_qr && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={expert.business_card_qr}
           alt={`${expert.name?.trim()} QR code`}
-          className="absolute top-4 right-4 w-20 h-20 rounded-md border border-gray-100 bg-white p-1"
+          className="absolute top-4 right-4 w-20 h-20 rounded-md border border-border bg-card p-1"
         />
       )}
       <div className="flex items-center gap-3 mb-4 pr-20">
@@ -52,21 +52,21 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
             className="w-11 h-11 rounded-full object-cover flex-shrink-0"
           />
         ) : (
-          <div className="w-11 h-11 rounded-full bg-[#24bbcb]/10 text-[#24bbcb] flex items-center justify-center text-sm font-semibold flex-shrink-0">
+          <div className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold flex-shrink-0">
             {initials}
           </div>
         )}
         <div className="min-w-0">
-          <h3 className="font-serif text-gray-900 text-[15px] leading-snug truncate">
+          <h3 className="text-foreground text-[15px] leading-snug truncate">
             {expert.name?.trim()}
           </h3>
           {(expert.professional_title || expert.business_name) && (
-            <p className="text-[12px] text-gray-400 truncate">
+            <p className="text-[12px] text-muted-foreground/80 truncate">
               {expert.professional_title || expert.business_name}
             </p>
           )}
           {expert.email && (
-            <p className="flex items-center gap-1 text-[11px] text-gray-400 truncate mt-0.5">
+            <p className="flex items-center gap-1 text-[11px] text-muted-foreground/80 truncate mt-0.5">
               <Mail className="h-3 w-3 flex-shrink-0" />
               <span className="truncate">{expert.email}</span>
             </p>
@@ -79,11 +79,7 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
           {specialties.map((item, i) => (
             <span
               key={i}
-              className="text-[10px] font-medium text-[#24bbcb] px-2.5 py-1 rounded-full"
-              style={{
-                background: "rgba(36,187,203,0.08)",
-                border: "1px solid rgba(36,187,203,0.2)",
-              }}
+              className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-medium text-primary"
             >
               {item}
             </span>
@@ -91,9 +87,9 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
         </div>
       )}
 
-      <div className="mt-auto flex items-center justify-between pt-3 border-t border-gray-100">
+      <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">
         {locationLine ? (
-          <span className="flex items-center gap-1 text-[11px] text-gray-400 truncate">
+          <span className="flex items-center gap-1 text-[11px] text-muted-foreground/80 truncate">
             <MapPin className="h-3 w-3 flex-shrink-0" />
             <span className="truncate">{locationLine}</span>
           </span>
@@ -101,7 +97,7 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
           <span />
         )}
         {expert.business_card_link && (
-          <span className="flex items-center gap-1 text-[11px] font-medium text-[#24bbcb] group-hover:gap-1.5 transition-all duration-200">
+          <span className="flex items-center gap-1 text-[11px] font-medium text-primary group-hover:gap-1.5 transition-all duration-200">
             View profile
             <ArrowUpRight className="h-3 w-3" />
           </span>

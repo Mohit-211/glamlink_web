@@ -22,7 +22,7 @@ export function AnalyticsPanel({
   return (
     <section
       className={cn(
-        'min-w-0 rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] sm:p-5',
+        'min-w-0 rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5',
         className
       )}
     >

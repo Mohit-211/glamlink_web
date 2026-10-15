@@ -26,7 +26,7 @@ export default function HeroSection({ service, description }: Props) {
       </div>
 
       {/* RIGHT IMAGE */}
-      <div className="relative w-full h-[320px] md:h-[380px] rounded-2xl overflow-hidden shadow-[var(--shadow-medium)]">
+      <div className="relative w-full h-[320px] md:h-[380px] rounded-2xl overflow-hidden shadow-medium">
         <Image
           src="/assets/microneedling.png"
           alt={`${service} treatment`}

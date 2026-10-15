@@ -15,7 +15,7 @@ export default function StarRating({ value, max = 5 }: { value: number; max?: nu
         ))}
       </span>
       <span
-        className="absolute inset-y-0 left-0 flex overflow-hidden text-[#FBBC04]"
+        className="absolute inset-y-0 left-0 flex overflow-hidden text-warning"
         style={{ width: `${percent}%` }}
         aria-hidden="true"
       >

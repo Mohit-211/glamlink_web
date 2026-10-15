@@ -41,7 +41,7 @@ const HeroSection = () => {
   }, []);
   if (!featured) return null;
   return (
-    <section className="relative bg-[#fafafa] rounded-2xl px-6 md:px-10 py-10 md:py-12">
+    <section className="relative bg-muted rounded-2xl px-6 md:px-10 py-10 md:py-12">
       <Link
         href={`/journal/${featured.id}/${slugify(featured.title, {
           lower: true,
@@ -60,7 +60,7 @@ const HeroSection = () => {
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
-            {/* <span className="absolute top-3 left-3 bg-white/90 text-black text-[10px] px-2.5 py-1 rounded">
+            {/* <span className="absolute top-3 left-3 bg-card/90 text-foreground text-[10px] px-2.5 py-1 rounded">
               {featured?.journal_category?.title}
             </span> */}
           </div>
@@ -69,7 +69,7 @@ const HeroSection = () => {
             <p className="text-[10px] uppercase tracking-widest text-primary mb-1">
               {featured?.journal_category?.title}
             </p>
-            <h1 className="font-display text-xl md:text-2xl leading-snug tracking-tight">
+            <h1 className="text-xl md:text-2xl leading-snug tracking-tight">
               {featured.title}
             </h1>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-sm">
@@ -80,7 +80,7 @@ const HeroSection = () => {
         {/* BOTTOM */}
         <div className="pt-4 border-t border-border/40 space-y-2">
           {/* FEATURE TITLE */}
-          <h2 className="font-display text-lg md:text-xl leading-snug text-primary group-hover:opacity-80 transition">
+          <h2 className="text-lg md:text-xl leading-snug text-primary group-hover:opacity-80 transition">
             {featured.title}
           </h2>
           {/* META */}

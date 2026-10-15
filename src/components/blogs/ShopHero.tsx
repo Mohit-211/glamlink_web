@@ -26,7 +26,7 @@ const ShopHero = () => {
   return (
     <section
       aria-labelledby="shop-hero-heading"
-      className="bg-[#fafafa] rounded-2xl overflow-hidden"
+      className="bg-muted rounded-2xl overflow-hidden"
     >
       <div className="grid md:grid-cols-[1fr_1.1fr] items-center">
         {/* IMAGE (top on mobile, right on desktop) */}
@@ -43,13 +43,13 @@ const ShopHero = () => {
 
         {/* CONTENT */}
         <div className="px-6 py-7 md:px-10 md:py-12 space-y-4 md:space-y-5">
-          <p className="flex items-center gap-2 text-[10px] md:text-[11px] uppercase tracking-widest text-[#137f8a] font-semibold">
-            <span aria-hidden="true" className="h-px w-6 bg-[#24bbcb]" />
+          <p className="flex items-center gap-2 text-[10px] md:text-[11px] uppercase tracking-widest text-primary font-semibold">
+            <span aria-hidden="true" className="h-px w-6 bg-primary" />
             The Glamlink Shop
           </p>
           <h1
             id="shop-hero-heading"
-            className="font-display text-2xl md:text-3xl leading-tight tracking-tight text-foreground text-balance"
+            className="text-2xl md:text-3xl leading-tight tracking-tight text-foreground text-balance"
           >
             Professional Beauty + Wellness Products
           </h1>
@@ -60,7 +60,7 @@ const ShopHero = () => {
           <div className="pt-1">
             <Button
               asChild
-              className="w-full sm:w-auto rounded-full bg-[#137f8a] hover:bg-[#0f6b74] text-white text-sm px-7 focus-visible:ring-2 focus-visible:ring-[#24bbcb] focus-visible:ring-offset-2"
+              className="w-full sm:w-auto rounded-full bg-primary hover:bg-primary text-white text-sm px-7 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               <a href={`#${SHOP_PRODUCTS_ID}`} onClick={scrollToProducts}>
                 Shop Now

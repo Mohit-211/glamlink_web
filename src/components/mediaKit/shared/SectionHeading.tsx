@@ -4,7 +4,7 @@ export default function SectionHeading({
   children: React.ReactNode;
 }) {
   return (
-    <h2 className="section-title font-display mb-6">
+    <h2 className="section-title mb-6">
       {children}
     </h2>
   );

@@ -5,7 +5,7 @@ const PromoBanner = () => {
   return (
     <section className="py-16">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="relative overflow-hidden rounded-3xl shadow-[0_40px_80px_rgba(0,0,0,0.15)]">
+        <div className="relative overflow-hidden rounded-3xl shadow-large">
           {/* Gradient Background */}
           <div
             className="bg-primary
@@ -24,18 +24,18 @@ const PromoBanner = () => {
             </div>
 
             {/* Floating soft glow */}
-            <div className="absolute top-0 left-1/4 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+            <div className="absolute top-0 left-1/4 w-72 h-72 bg-card/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-card/10 rounded-full blur-3xl" />
 
             <div className="relative z-10 flex flex-col items-center">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card/20 backdrop-blur-md text-white text-sm font-medium mb-6">
                 <Clock className="w-4 h-4" />
                 Limited Time Offer
               </div>
 
               {/* Heading */}
-              <h2 className="section-title font-display text-white mb-6">
+              <h2 className="section-title text-white mb-6">
                 Join Now, Pay Less
               </h2>
 
@@ -45,7 +45,7 @@ const PromoBanner = () => {
               </p>
 
               {/* CTA */}
-              <Button className="bg-white text-primary hover:bg-white/90 px-10 py-6 text-lg font-semibold rounded-full shadow-xl gap-2">
+              <Button className="bg-card text-primary hover:bg-card/90 px-10 py-6 text-lg font-semibold rounded-full shadow-xl gap-2">
                 Start Selling
                 <ArrowRight className="w-5 h-5" />
               </Button>

@@ -22,13 +22,13 @@ const EMPTY_VALUES: PartnerInquiry = {
 
 const inputClass = (hasError: boolean) =>
   `mt-4 w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none transition focus:ring-2 focus:ring-ring ${
-    hasError ? "border-red-400" : "border-input"
+    hasError ? "border-destructive" : "border-input"
   }`;
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
   return (
-    <p id={id} className="mt-1.5 text-sm text-red-600">
+    <p id={id} className="mt-1.5 text-sm text-destructive">
       {message}
     </p>
   );
@@ -206,7 +206,7 @@ export default function PartnershipInquiryForm() {
       </div>
 
       {submitError && (
-        <div role="alert" className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div role="alert" className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           {submitError}
         </div>

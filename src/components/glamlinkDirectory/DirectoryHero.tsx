@@ -58,7 +58,7 @@ export default function DirectoryHero({ children }: { children: ReactNode }) {
                   className="h-full w-full object-cover"
                   fetchPriority="high"
                 />
-                <figcaption className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur">
+                <figcaption className="absolute bottom-4 left-4 rounded-full bg-card/90 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur">
                   Hair
                 </figcaption>
               </figure>
@@ -69,7 +69,7 @@ export default function DirectoryHero({ children }: { children: ReactNode }) {
                   alt="Med spa skin treatment"
                   className="h-full w-full object-cover"
                 />
-                <figcaption className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur">
+                <figcaption className="absolute bottom-4 left-4 rounded-full bg-card/90 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur">
                   Skin + Med Spa
                 </figcaption>
               </figure>
@@ -80,7 +80,7 @@ export default function DirectoryHero({ children }: { children: ReactNode }) {
                   alt="Hot stone wellness massage"
                   className="h-full w-full object-cover"
                 />
-                <figcaption className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur">
+                <figcaption className="absolute bottom-4 left-4 rounded-full bg-card/90 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur">
                   Wellness
                 </figcaption>
               </figure>

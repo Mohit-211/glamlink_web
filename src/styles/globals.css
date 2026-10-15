@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
-/* Tell Tailwind to generate utilities from your tokens */
-@theme {
+/* ────────────────────────────────────────────────
+   DESIGN TOKENS — the only colours and font the site uses.
+   Components use the generated utilities (bg-primary, text-muted-foreground,
+   border-border, bg-destructive/10 …), never raw hex, rgb() or Tailwind's
+   palette colours (gray-*, blue-* …).
+───────────────────────────────────────────────── */
+@theme static {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
 
@@ -20,96 +25,73 @@
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
 
-  
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
+
+  /* Status colours — for feedback only (errors, success, warnings), never decoration. */
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+
+  /* Elevation — generates shadow-soft / shadow-medium / shadow-large / shadow-primary */
+  --shadow-soft: 0 2px 8px -2px hsl(220 20% 15% / 0.08);
+  --shadow-medium: 0 4px 16px -4px hsl(220 20% 15% / 0.12);
+  --shadow-large: 0 8px 32px -8px hsl(220 20% 15% / 0.16);
+  --shadow-primary: 0 4px 20px -4px hsl(185.7 69.9% 46.9% / 0.35);
 
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
   /* Manrope (loaded in app/layout.tsx via next/font) is the single Glamlink typeface.
-     --font-serif also points at it so existing font-serif / font-display usages stay consistent. */
+     --font-serif and --font-mono point at it too, so no class can switch typeface. */
   --font-sans: var(--font-manrope), "Manrope", system-ui, -apple-system, sans-serif;
   --font-serif: var(--font-sans);
+  --font-mono: var(--font-sans);
 }
 
-/* ────────────────────────────────────────────────
-   THEME VARIABLES (light + dark mode)
-───────────────────────────────────────────────── */
 :root {
   --radius: 0.75rem;
 
   /* Primary — Glamlink teal #24bbcb */
-  --primary: 186 70% 47%;
+  --primary: 185.7 69.9% 46.9%;
   --primary-foreground: 0 0% 100%;
 
-  /* Surfaces */
-  --background: 0 0% 100%;
+  /* Surfaces — warm off-white rather than pure white, easier on the eyes.
+     Cards sit a shade lighter than the page so they still lift off it. */
+  --background: 40 23% 97%; /* #F9F8F6 */
   --foreground: 220 20% 15%;
 
-  --card: 0 0% 100%;
+  --card: 40 33% 99%; /* #FDFCFB */
   --card-foreground: 220 20% 15%;
 
-  --popover: 0 0% 100%;
+  --popover: 40 33% 99%;
   --popover-foreground: 220 20% 15%;
 
-  --secondary: 220 15% 96%;
+  --secondary: 40 14% 93%;
   --secondary-foreground: 220 20% 25%;
 
-  --muted: 220 15% 96%;
-  --muted-foreground: 220 10% 50%;
+  --muted: 40 14% 93%;
+  --muted-foreground: 220 9% 42%;
 
-  --accent: 186 70% 95%;
-  --accent-foreground: 186 70% 30%;
+  /* Light teal tint for highlights, selected states and soft badges */
+  --accent: 186 55% 93%;
+  --accent-foreground: 186 70% 28%;
 
-  --destructive: 0 84% 60%;
-  --border: 220 15% 90%;
-  --input: 220 15% 90%;
-  --ring: 186 70% 47%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 152 60% 34%;
+  --success-foreground: 0 0% 100%;
+  --warning: 36 92% 46%;
+  --warning-foreground: 26 83% 14%;
 
-  /* Sidebar */
-  --sidebar-background: 0 0% 98%;
-  --sidebar-foreground: 240 5.3% 26.1%;
-  --sidebar-primary: 186 70% 47%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 186 70% 95%;
-  --sidebar-border: 220 15% 90%;
+  --border: 40 10% 87%;
+  --input: 40 8% 82%;
+  --ring: 185.7 69.9% 46.9%;
 
-  /* Shadows */
-  --shadow-soft: 0 2px 8px -2px hsl(220 20% 15% / 0.08);
-  --shadow-medium: 0 4px 16px -4px hsl(220 20% 15% / 0.12);
-  --shadow-large: 0 8px 32px -8px hsl(220 20% 15% / 0.16);
-  --shadow-primary: 0 4px 20px -4px hsl(186 70% 47% / 0.35);
-}
-
-/* Dark mode overrides */
-.dark {
-  --background: 220 20% 8%;
-  --foreground: 220 15% 95%;
-
-  --card: 220 20% 12%;
-  --card-foreground: 220 15% 95%;
-
-  --popover: 220 20% 12%;
-  --popover-foreground: 220 15% 95%;
-
-  --secondary: 220 15% 15%;
-  --secondary-foreground: 220 15% 85%;
-
-  --muted: 220 15% 18%;
-  --muted-foreground: 220 10% 60%;
-
-  --accent: 184 40% 15%;
-  --accent-foreground: 184 68% 70%;
-
-  --border: 220 15% 20%;
-  --input: 220 15% 20%;
-
-  --sidebar-background: 220 20% 10%;
-  --sidebar-foreground: 220 15% 85%;
-  --sidebar-accent: 184 40% 15%;
-  --sidebar-border: 220 15% 20%;
 }
 
 /* ────────────────────────────────────────────────
@@ -132,10 +114,6 @@
   h5,
   h6 {
     @apply font-semibold tracking-tight;
-  }
-
-  .font-display {
-    font-family: var(--font-serif);
   }
 
   button:not(:disabled),
@@ -188,9 +166,26 @@
     transition-all hover:border-primary/50 hover:bg-primary/5;
   }
 
+  /* Form controls — every text input, select and textarea on the site */
+  .label-glamlink {
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground;
+  }
+
+  .input-glamlink {
+    @apply w-full rounded-xl border border-input bg-card px-4 py-3 text-sm text-foreground
+    outline-none transition-[border-color,box-shadow] duration-200
+    placeholder:text-muted-foreground/70
+    focus:border-primary focus:ring-3 focus:ring-primary/15
+    disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .input-glamlink[aria-invalid="true"] {
+    @apply border-destructive focus:ring-destructive/15;
+  }
+
   .card-glamlink {
     @apply rounded-2xl border bg-card p-4 sm:p-6
-    shadow-[var(--shadow-soft)] transition-all duration-300;
+    shadow-soft transition-all duration-300;
 
     transform: translateY(0);
   }
@@ -237,22 +232,6 @@
     @apply my-20 border-t border-border/60;
   }
 
-  /* Shadow utility classes — use these instead of shadow-[var(--shadow-soft|medium|primary)] */
-  .shadow-soft {
-    box-shadow: var(--shadow-soft);
-  }
-
-  .shadow-medium {
-    box-shadow: var(--shadow-medium);
-  }
-
-  .shadow-large {
-    box-shadow: var(--shadow-large);
-  }
-
-  .shadow-primary {
-    box-shadow: var(--shadow-primary);
-  }
 }
 
 /* ────────────────────────────────────────────────
@@ -390,12 +369,37 @@
 }
 
 /* ────────────────────────────────────────────────
+   USER-AUTHORED HTML (articles, bios, topic paragraphs)
+   Rich-text editors save inline font-family declarations (Tahoma, Georgia …);
+   the site has one typeface, so everything inside inherits it.
+───────────────────────────────────────────────── */
+.rich-text *,
+.prose-article * {
+  font-family: inherit !important;
+}
+
+.rich-text ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.rich-text ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+
+.rich-text a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+}
+
+/* ────────────────────────────────────────────────
    ARTICLE CONTENT
 ───────────────────────────────────────────────── */
 .prose-article {
   font-size: 16px;
   line-height: 1.8;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .prose-article h1,
@@ -436,7 +440,7 @@
   line-height: 0.85;
   margin-right: 12px;
   margin-top: 6px;
-  color: #24bbcb;
+  color: hsl(var(--primary));
 }
 
 .prose-article img {
@@ -459,13 +463,13 @@
 }
 
 .prose-article a {
-  color: #6366f1;
+  color: hsl(var(--primary));
   text-decoration: underline;
   transition: 0.2s ease;
 }
 
 .prose-article a.mention-link {
-  color: #24bbcb;
+  color: hsl(var(--primary));
   font-weight: 600;
   text-decoration: none;
 }
@@ -475,17 +479,19 @@
 }
 
 .prose-article a:hover {
-  color: #4f46e5;
+  color: hsl(var(--accent-foreground));
 }
 
 .prose-article blockquote {
-  border-left: 3px solid #bbe8eb;
-  margin: 32px 0;
-  padding-left: 20px;
+  border-left: 3px solid hsl(var(--primary));
+  border-radius: 0 12px 12px 0;
+  background: hsl(var(--accent) / 0.6);
+  margin: 40px 0;
+  padding: 24px 24px 24px 32px;
   font-style: italic;
   font-size: 20px;
   line-height: 1.7;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .prose-article ul,
@@ -511,20 +517,20 @@
 
 .prose-article th,
 .prose-article td {
-  border: 1px solid #e5e7eb;
+  border: 1px solid hsl(var(--border));
   padding: 10px 14px;
   text-align: left;
   vertical-align: top;
 }
 
 .prose-article th {
-  background: rgba(36,187,203, 0.08);
+  background: hsl(var(--accent));
   font-weight: 600;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .prose-article tr:nth-child(even) td {
-  background: #f9fafb;
+  background: hsl(var(--muted) / 0.5);
 }
 
 @media (max-width: 768px) {

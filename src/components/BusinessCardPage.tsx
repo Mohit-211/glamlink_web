@@ -92,7 +92,7 @@ const fetchData = async () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-muted-foreground">
           Loading...
         </p>
       </div>
@@ -101,18 +101,18 @@ const fetchData = async () => {
  if (error) {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg border p-8 text-center">
+      <div className="max-w-md w-full bg-card rounded-2xl shadow-lg border p-8 text-center">
         <div className="text-6xl mb-4">
           {isSubscriptionError ? "💳" : "⚠️"}
         </div>
 
-        <h2 className="text-2xl font-bold mb-3 text-red-600">
+        <h2 className="text-2xl font-bold mb-3 text-destructive">
           {isSubscriptionError
             ? "Subscription Required"
             : "Error"}
         </h2>
 
-        <p className="text-gray-600 mb-6">
+        <p className="text-muted-foreground mb-6">
           {error}
         </p>
 
@@ -121,7 +121,7 @@ const fetchData = async () => {
             onClick={() =>
               (window.location.href = "/pricing")
             }
-            className="px-6 py-3 bg-[#56BFCB] hover:bg-[#4A9EA6] text-white rounded-lg"
+            className="px-6 py-3 bg-primary hover:bg-primary text-white rounded-lg"
           >
             Activate Subscription
           </button>

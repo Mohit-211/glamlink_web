@@ -45,7 +45,7 @@ export default function DirectorySearch({
       onSubmit={handleSubmit}
       className="scroll-mt-28 w-full"
     >
-      <div className="rounded-3xl md:rounded-full border border-border/80 bg-white p-2 shadow-large">
+      <div className="rounded-3xl md:rounded-full border border-border/80 bg-card p-2 shadow-large">
         <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-0">
           {/* PROFESSIONAL TYPE */}
           <div className="md:w-[236px] md:shrink-0">
@@ -118,7 +118,7 @@ export default function DirectorySearch({
       <p
         id="directory-search-error"
         role="alert"
-        className={`px-5 pt-3 text-sm text-red-600 ${error ? "" : "sr-only"}`}
+        className={`px-5 pt-3 text-sm text-destructive ${error ? "" : "sr-only"}`}
       >
         {error}
       </p>

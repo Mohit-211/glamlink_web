@@ -170,7 +170,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
         {/* Form body */}
         <div className="max-h-[65vh] space-y-3.5 overflow-y-auto p-5">
           {error && (
-            <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700">
+            <div className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-xs text-destructive">
               <AlertCircle className="h-3.5 w-3.5 shrink-0" />
               {error}
             </div>
@@ -178,7 +178,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           {/* Address Line 1 */}
           <div>
             <label className={LABEL}>
-              Address Line 1 <span className="text-red-500">*</span>
+              Address Line 1 <span className="text-destructive">*</span>
             </label>
             <input
               value={form.address_line_1}
@@ -192,7 +192,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={LABEL}>
-                State <span className="text-red-500">*</span>
+                State <span className="text-destructive">*</span>
               </label>
               <select
                 value={form.state_id}
@@ -216,7 +216,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
             </div>
             <div>
               <label className={LABEL}>
-                City <span className="text-red-500">*</span>
+                City <span className="text-destructive">*</span>
               </label>
               <select
                 value={form.city_id}
@@ -241,7 +241,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           {/* Zip code */}
           <div>
             <label className={LABEL}>
-              Zip Code <span className="text-red-500">*</span>
+              Zip Code <span className="text-destructive">*</span>
             </label>
             <input
               value={form.postal_code}
@@ -471,7 +471,7 @@ export function AddressTab() {
       </div>
       {/* Fetch error */}
       {fetchError && (
-        <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{fetchError}</span>
           <button onClick={fetchAddresses} className="ml-auto text-xs font-semibold underline underline-offset-2">
@@ -481,7 +481,7 @@ export function AddressTab() {
       )}
       {/* Delete error (surfaced at list level since delete can be triggered from any card) */}
       {deleteError && (
-        <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{deleteError}</span>
           <button onClick={() => setDeleteError(null)} className="ml-auto text-xs font-semibold underline underline-offset-2">
@@ -531,7 +531,7 @@ export function AddressTab() {
             return (
               <div
                 key={addr.id}
-                className={`overflow-hidden rounded-3xl border bg-card shadow-[var(--shadow-soft)] transition-all ${addr.is_default ? 'border-primary/60 ring-1 ring-primary/20' : 'border-border'
+                className={`overflow-hidden rounded-3xl border bg-card shadow-soft transition-all ${addr.is_default ? 'border-primary/60 ring-1 ring-primary/20' : 'border-border'
                   }`}
               >
                 {/* Summary */}
@@ -581,7 +581,7 @@ export function AddressTab() {
                       onClick={() => handleDelete(addr.id)}
                       disabled={isDeleting || (editSaving && isEditing)}
                       aria-label="Delete address"
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-destructive/5 text-destructive transition hover:bg-destructive/10 disabled:opacity-50"
                     >
                       {isDeleting ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -595,7 +595,7 @@ export function AddressTab() {
                 {isEditing && editForm && (
                   <div className="space-y-3.5 border-t border-border bg-secondary/20 px-5 pb-5 pt-4">
                     {editError && (
-                      <p className="flex items-center gap-1.5 text-xs text-red-600">
+                      <p className="flex items-center gap-1.5 text-xs text-destructive">
                         <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {editError}
                       </p>
                     )}
@@ -674,7 +674,7 @@ export function AddressTab() {
                       <button
                         onClick={() => handleDelete(addr.id)}
                         disabled={isDeleting || editSaving}
-                        className="flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 disabled:opacity-60"
+                        className="flex items-center gap-1.5 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-2.5 text-xs font-semibold text-destructive transition hover:bg-destructive/10 disabled:opacity-60"
                       >
                         {isDeleting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
                         {isDeleting ? 'Removing…' : 'Remove'}

@@ -20,7 +20,7 @@ const IssueCard = ({ issue }: IssueCardProps) => {
     issue.title.match(/Issue\s*(\d+)/i)?.[1] || issue.id.toString();
 
   return (
-    <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-muted/10 shadow-md hover:shadow-xl hover:shadow-[#24bbcb]/20 transition-all duration-400 ease-out border border-border/30 hover:border-[#24bbcb]/30">
+    <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-muted/10 shadow-md hover:shadow-xl hover:shadow-primary/20 transition-all duration-400 ease-out border border-border/30 hover:border-primary/30">
 
       <div className="relative aspect-[3/4] overflow-hidden">
         {issue.cover && (
@@ -36,23 +36,21 @@ const IssueCard = ({ issue }: IssueCardProps) => {
 
         <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 text-white">
           <div className="flex items-center gap-3 mb-2 sm:mb-3">
-            <span className="inline-flex px-2.5 py-1 rounded-full text-xs sm:text-sm font-semibold bg-[#24bbcb]/85 text-white backdrop-blur-sm border border-[#24bbcb]/40 shadow-sm">
+            <span className="inline-flex px-2.5 py-1 rounded-full text-xs sm:text-sm font-semibold bg-primary/85 text-white backdrop-blur-sm border border-primary/40 shadow-sm">
               Issue {issueNum}
             </span>
           </div>
 
-          {/* <h3 className="font-serif text-lg sm:text-2xl lg:text-2.5xl leading-tight tracking-tight line-clamp-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] group-hover:drop-shadow-[0_3px_12px_rgba(0,0,0,1)] transition-all duration-400">
+          {/* <h3 className="text-lg sm:text-2xl lg:text-2.5xl leading-tight tracking-tight line-clamp-2 drop-shadow-medium group-hover:drop-shadow-medium transition-all duration-400">
             {issue.title}
           </h3> */}
         </div>
-
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-600 bg-gradient-to-br from-white/15 via-transparent to-transparent pointer-events-none" />
       </div>
 
       <div className="absolute bottom-4 mt-10 left-4 right-4 translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 md:block hidden">
         <Button
           onClick={handleDigitalEdition}
-          className="w-full rounded-full bg-[#24bbcb] hover:bg-[#1ea8b5] text-white shadow-lg shadow-[#24bbcb]/30 hover:shadow-xl hover:shadow-[#24bbcb]/40 transition-all duration-300 font-medium text-sm sm:text-base active:scale-[0.98] cursor-pointer"
+          className="w-full rounded-full bg-primary hover:bg-primary text-white shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all duration-300 font-medium text-sm sm:text-base active:scale-[0.98] cursor-pointer"
         >
           <Download className="mr-2 h-4 w-4" />
           Digital Edition
@@ -62,7 +60,7 @@ const IssueCard = ({ issue }: IssueCardProps) => {
       <div className="p-5 pt-3 md:hidden bg-gradient-to-t from-background/90 to-transparent mt-20 ">
         <Button
           onClick={handleDigitalEdition}
-          className="w-full rounded-full bg-[#24bbcb]/95 hover:bg-[#24bbcb] text-white text-sm cursor-pointer"
+          className="w-full rounded-full bg-primary/95 hover:bg-primary text-white text-sm cursor-pointer"
         >
           <Download className="mr-2 h-4 w-4" />
           Digital Edition
@@ -89,7 +87,7 @@ export default function MagazineIssues() {
         {sections.map(({ year, issues }) => (
           <div key={year} className="mb-16 lg:mb-20">
             <div className="flex items-baseline justify-between gap-4 mb-8 lg:mb-10">
-              <h2 className="section-title font-display">
+              <h2 className="section-title">
                 {year}
               </h2>
               <span className="text-sm sm:text-base font-medium text-muted-foreground tabular-nums">
@@ -111,7 +109,7 @@ export default function MagazineIssues() {
         <div className="mt-12 lg:mt-16 text-center">
           <Button
             variant="outline"
-            className="rounded-full px-8 py-6 text-base border-2 border-[#24bbcb]/50 hover:border-[#24bbcb] hover:bg-[#24bbcb]/5 hover:text-[#24bbcb] transition-all duration-300 group"
+            className="rounded-full px-8 py-6 text-base border-2 border-primary/50 hover:border-primary hover:bg-primary/5 hover:text-primary transition-all duration-300 group"
           >
             Browse Full Archive
             <ChevronRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />

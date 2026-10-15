@@ -36,22 +36,22 @@ const LocationCard: React.FC<CardProps> = ({
       "Not configured";
 
   return (
-    <div className="rounded-lg border border-gray-200 overflow-hidden bg-white shadow-sm">
+    <div className="rounded-lg border border-border overflow-hidden bg-card shadow-sm">
       {/* Header */}
       <div
         className={`flex items-center justify-between gap-3 px-3 sm:px-5 py-3.5 border-b ${isPrimary
-            ? "bg-yellow-50/80 border-yellow-200"
-            : "bg-gray-50/70 border-gray-200"
+            ? "bg-warning/4 border-warning/30"
+            : "bg-muted/70 border-border"
           }`}
       >
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-            <span className="font-medium text-gray-900 break-words">
+            <span className="font-medium text-foreground break-words">
               {location.label || "Location"}
             </span>
 
             {isPrimary && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-200 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/20 px-2.5 py-0.5 text-xs font-medium text-warning">
                 <svg
                   className="h-3.5 w-3.5"
                   viewBox="0 0 20 20"
@@ -64,13 +64,13 @@ const LocationCard: React.FC<CardProps> = ({
             )}
           </div>
 
-          <p className="mt-0.5 text-xs text-gray-600 break-words">
+          <p className="mt-0.5 text-xs text-muted-foreground break-words">
             {locationSummary}
           </p>
 
           {/* ✅ Optional coordinate display */}
           {location && (
-            <p className="text-[11px] text-gray-400 mt-1">
+            <p className="text-[11px] text-muted-foreground/80 mt-1">
               {Number(location?.latitude ?? 0).toFixed(6)},{' '}
               {Number(location?.longitude ?? 0).toFixed(6)}
             </p>
@@ -82,7 +82,7 @@ const LocationCard: React.FC<CardProps> = ({
             <button
               type="button"
               onClick={handleMakePrimary}
-              className="flex items-center gap-1.5 text-sm text-amber-700 hover:text-amber-900 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-warning hover:text-warning transition-colors"
               title="Set as primary location"
             >
               <svg
@@ -101,7 +101,7 @@ const LocationCard: React.FC<CardProps> = ({
           <button
             type="button"
             onClick={onRemove}
-            className="flex items-center gap-1.5 text-sm text-red-600 hover:text-red-800 transition-colors"
+            className="flex items-center gap-1.5 text-sm text-destructive hover:text-destructive transition-colors"
             title="Remove location"
           >
             <svg
@@ -123,7 +123,7 @@ const LocationCard: React.FC<CardProps> = ({
           <button
             type="button"
             onClick={handleToggle}
-            className="text-xl leading-none text-gray-600 hover:text-gray-900"
+            className="text-xl leading-none text-muted-foreground hover:text-foreground"
             aria-label={
               location.isOpen ? "Collapse" : "Expand"
             }

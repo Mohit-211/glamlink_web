@@ -19,31 +19,25 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
   onChange,
 }) => (
   <div className="
-    bg-gradient-to-br from-[#E8F9FD] to-white
-    border-2 border-[#24bbcb] rounded-2xl p-7
+    bg-accent
+    border-2 border-primary rounded-2xl p-7
     flex gap-5 items-start relative overflow-hidden mb-6
   ">
-    {/* decorative glow */}
-    <div className="
-      absolute -top-10 -right-10 w-32 h-32 rounded-full
-      bg-[radial-gradient(circle,rgba(36,187,203,0.1)_0%,transparent_70%)]
-      pointer-events-none
-    " />
 
     {/* icon */}
     <div className="
-      w-[50px] h-[50px] bg-[#24bbcb] rounded-[13px]
+      w-[50px] h-[50px] bg-primary rounded-[13px]
       flex items-center justify-center text-2xl shrink-0
-      shadow-[0_4px_14px_rgba(36,187,203,0.3)]
+      shadow-primary
     ">
       ✦
     </div>
 
     <div className="flex-1 min-w-0">
-      <h3 className="font-poppins text-[17px] font-semibold text-[#1A3A42] mb-1.5">
+      <h3 className="text-[17px] font-semibold text-foreground mb-1.5">
         Your Access Digital Business Card{' '}
         {/* <span className="
-          inline-block bg-[#24bbcb] text-white
+          inline-block bg-primary text-white
           text-[10px] font-semibold tracking-widest uppercase
           px-2.5 py-0.5 rounded-full align-middle ml-1
         ">
@@ -51,9 +45,9 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
         </span> */}
       </h3>
 
-      <p className="text-[13px] text-[#4A7A88] leading-[1.65] mb-3.5">
+      <p className="text-[13px] text-muted-foreground leading-[1.65] mb-3.5">
         A beautiful digital business card at{' '}
-        <strong className="text-[#1A3A42]">glamlink.net/pro/[yourname]</strong> —
+        <strong className="text-foreground">glamlink.net/pro/[yourname]</strong> —
         shareable via link, QR code, Apple Wallet & Google Pay. Delivered in your
         approval email and included in GlamLink email marketing campaigns.
       </p>
@@ -63,8 +57,8 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
           <span
             key={perk}
             className="
-              text-[11px] font-semibold bg-[rgba(36,187,203,0.1)]
-              text-[#2A9BB5] border border-[rgba(36,187,203,0.25)]
+              text-[11px] font-semibold bg-primary/10
+              text-primary border border-primary/25
               rounded-full px-3 py-1
             "
           >
@@ -81,23 +75,23 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
         <div
           className={`
             w-12 h-[26px] rounded-full relative transition-colors duration-250 shrink-0
-            ${enabled ? 'bg-[#24bbcb]' : 'bg-[#B4DCE9]'}
+            ${enabled ? 'bg-primary' : 'bg-accent'}
           `}
         >
           <div
             className={`
-              absolute w-5 h-5 bg-white rounded-full top-[3px]
-              shadow-[0_1px_5px_rgba(0,0,0,0.18)]
+              absolute w-5 h-5 bg-card rounded-full top-[3px]
+              shadow-soft
               transition-transform duration-250
               ${enabled ? 'translate-x-[22px]' : 'translate-x-[3px]'}
             `}
           />
         </div>
         <div>
-          <p className="text-sm font-semibold text-[#1A3A42]">
+          <p className="text-sm font-semibold text-foreground">
             Yes — create my Access digital business card & map listing
           </p>
-          <p className="text-[11px] text-[#7AAAB8] mt-0.5">
+          <p className="text-[11px] text-muted-foreground mt-0.5">
             No credit card · Activates instantly on approval
           </p>
         </div>

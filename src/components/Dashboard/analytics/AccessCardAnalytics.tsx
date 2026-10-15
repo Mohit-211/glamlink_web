@@ -130,7 +130,7 @@ export default function AccessCardAnalytics({ cards }: { cards: CardOption[] }) 
           )}
           {cardLink && (
             <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
-              <span className="min-w-0 max-w-full truncate rounded-md bg-secondary px-2 py-1 font-mono text-[11px] text-muted-foreground">
+              <span className="min-w-0 max-w-full truncate rounded-md bg-secondary px-2 py-1 tabular-nums text-[11px] text-muted-foreground">
                 {prettyUrl(cardLink)}
               </span>
               <a

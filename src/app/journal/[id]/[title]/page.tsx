@@ -235,7 +235,7 @@ const formattedDate = article?.publish_date
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-card">
       {/* Structured Data */}
       <Script
         id="article-schema"
@@ -277,10 +277,9 @@ const formattedDate = article?.publish_date
             {/* Category pill */}
             <div className="mb-6 mt-6">
               <span
-                className="inline-flex items-center gap-1.5 text-[10px] font-medium tracking-widest uppercase text-[#24bbcb] px-3 py-1.5 rounded-full"
-                style={{ background: "rgba(36,187,203,0.08)", border: "1px solid rgba(36,187,203,0.25)" }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest text-primary"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#24bbcb]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 {article?.journal_category?.title ?? "From the Treatment Room"}
               </span>
             </div>
@@ -289,7 +288,7 @@ const formattedDate = article?.publish_date
             <div className="grid md:grid-cols-2 gap-8 items-center mb-7">
 
               {/* Title only */}
-              <h1 className="font-serif text-[clamp(30px,4vw,44px)] leading-[1.08] tracking-tight text-gray-900">
+              <h1 className="text-[clamp(30px,4vw,44px)] leading-[1.08] tracking-tight text-foreground">
                 {article.title}
               </h1>
 
@@ -305,8 +304,7 @@ const formattedDate = article?.publish_date
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
                   <div
-                    className="absolute bottom-0 left-0 right-0 px-4 py-3"
-                    style={{ background: "rgba(0,0,0,0.48)" }}
+                    className="absolute bottom-0 left-0 right-0 bg-black/50 px-4 py-3"
                   >
 
                     <p className="text-[13px] text-white font-medium">
@@ -318,28 +316,28 @@ const formattedDate = article?.publish_date
             </div>
 
             {/* BOTTOM — Description + Author */}
-            <div className="flex flex-col md:flex-row md:items-start gap-6 pt-6 border-t border-gray-100">
+            <div className="flex flex-col md:flex-row md:items-start gap-6 pt-6 border-t border-border">
 
               {/* Description */}
-              <p className="flex-1 text-[15px] leading-[1.75] text-gray-500 font-normal">
+              <p className="flex-1 text-[15px] leading-[1.75] text-muted-foreground font-normal">
                 {article.short_description}
               </p>
 
               {/* Author */}
-              <div className="flex items-center gap-3 md:pl-6 md:border-l md:border-gray-100 flex-shrink-0">
-                <div className="w-9 h-9 rounded-full bg-[#24bbcb] text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
+              <div className="flex items-center gap-3 md:pl-6 md:border-l md:border-border flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
                   {article?.journal_author?.name?.charAt(0) ?? "A"}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-800 whitespace-nowrap">
+                  <p className="text-sm font-medium text-foreground whitespace-nowrap">
                     {article?.journal_author?.name}
                   </p>
-                  <p className="text-xs text-gray-400 mt-0.5">{formattedDate}</p>
+                  <p className="text-xs text-muted-foreground/80 mt-0.5">{formattedDate}</p>
                 </div>
               </div>
 
               {/* Share */}
-              <div className="flex items-center md:pl-6 md:border-l md:border-gray-100 flex-shrink-0">
+              <div className="flex items-center md:pl-6 md:border-l md:border-border flex-shrink-0">
                 <ShareProductButton url={articleUrl} title={article.title} />
               </div>
 
@@ -351,7 +349,7 @@ const formattedDate = article?.publish_date
                 {topics.map((topic) => (
                   <span
                     key={topic.id}
-                    className="text-xs font-medium text-gray-500 px-3 py-1 rounded-full border border-gray-200 hover:border-[#24bbcb]/40 hover:text-[#24bbcb] transition-colors duration-200"
+                    className="text-xs font-medium text-muted-foreground px-3 py-1 rounded-full border border-border hover:border-primary/40 hover:text-primary transition-colors duration-200"
                   >
                     {topic.name}
                   </span>
@@ -361,36 +359,14 @@ const formattedDate = article?.publish_date
           </section>
 
           {/* ── DIVIDER ── */}
-          <div className="border-t border-gray-100 my-12" />
+          <div className="border-t border-border my-12" />
 
           {/* ── IN-ARTICLE AD (top of body) ── */}
           <ArticleAdSlot slotId="journal-article-top" />
 
           {/* ── BODY CONTENT ── */}
           <section className="mx-auto">
-            <div
-              className="
-                prose prose-lg max-w-none
-                prose-p:text-gray-500 prose-p:font-normal prose-p:leading-[1.8]
-                prose-headings:font-serif prose-headings:text-gray-900
-                prose-h2:text-3xl prose-h2:mt-10 prose-h2:mb-4
-                prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3
-                prose-a:text-[#24bbcb] prose-a:no-underline hover:prose-a:underline
-                prose-strong:text-gray-800 prose-strong:font-medium
-                prose-img:rounded-xl prose-img:shadow-md
-                prose-ul:text-gray-500 prose-ol:text-gray-500
-                prose-li:leading-[1.8]
-                prose-blockquote:not-italic
-                prose-blockquote:border-l-[3px] prose-blockquote:border-[#24bbcb]
-                prose-blockquote:rounded-r-xl
-                prose-blockquote:pl-8 prose-blockquote:pr-6
-                prose-blockquote:py-6 prose-blockquote:my-10
-                [&_blockquote]:bg-[rgba(36,187,203,0.08)]
-                [&_blockquote_p]:font-serif [&_blockquote_p]:italic
-                [&_blockquote_p]:text-gray-800 [&_blockquote_p]:text-xl
-                [&_blockquote_p]:leading-snug
-              "
-            >
+            <div>
               <ArticleContent content={article.content ?? ""} />
 
             </div>
@@ -400,7 +376,7 @@ const formattedDate = article?.publish_date
           <ArticleAdSlot slotId="journal-article-mid-rectangle" />
 
           {/* ── SHOP THE JOURNAL ── */}
-          <div className="border-t border-gray-100 my-14" />
+          <div className="border-t border-border my-14" />
 
           <section>
             <JournalShopCard shop={article.shops} heading="no" />
@@ -409,14 +385,14 @@ const formattedDate = article?.publish_date
           {/* ── DOWNLOADS ── */}
           {downloads.length > 0 && (
             <>
-              <div className="border-t border-gray-100 my-14" />
+              <div className="border-t border-border my-14" />
 
               <section>
                 <div className="mb-8">
-                  <p className="text-[10px] tracking-[.15em] uppercase text-gray-400 mb-2">
+                  <p className="text-[10px] tracking-[.15em] uppercase text-muted-foreground/80 mb-2">
                     Resources
                   </p>
-                  <h2 className="font-serif text-3xl text-gray-900">
+                  <h2 className="text-3xl text-foreground">
                     Downloads
                   </h2>
                 </div>
@@ -425,27 +401,22 @@ const formattedDate = article?.publish_date
                   {downloads.map((item) => (
                     <div
                       key={item.id}
-                      className="flex flex-col justify-between rounded-2xl border border-gray-100 p-6 hover:border-[#24bbcb]/40 hover:shadow-sm transition-all duration-300"
-                      style={{ background: "rgba(36,187,203,0.03)" }}
+                      className="flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-soft"
                     >
                       <div>
                         <div className="flex items-start justify-between gap-3 mb-2">
-                          <h3 className="font-serif text-lg text-gray-900 leading-snug">
+                          <h3 className="text-lg text-foreground leading-snug">
                             {item.title}
                           </h3>
                           {getFileExt(item.file_name) && (
                             <span
-                              className="flex-shrink-0 text-[10px] font-medium tracking-wider uppercase text-[#24bbcb] px-2 py-1 rounded-md"
-                              style={{
-                                background: "rgba(36,187,203,0.1)",
-                                border: "1px solid rgba(36,187,203,0.25)",
-                              }}
+                              className="shrink-0 rounded-md border border-primary/25 bg-primary/10 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-primary"
                             >
                               {getFileExt(item.file_name)}
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 font-normal leading-relaxed">
+                        <p className="text-sm text-muted-foreground font-normal leading-relaxed">
                           {item.description}
                         </p>
                       </div>
@@ -453,7 +424,7 @@ const formattedDate = article?.publish_date
                       <DownloadButton
                         fileUrl={item.file_name}
                         label={item.button_text || "Download"}
-                        className="mt-5 inline-flex items-center justify-center gap-2 text-sm font-medium text-white px-4 py-2.5 rounded-full bg-[#24bbcb] hover:bg-[#1d9aa3] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                        className="mt-5 inline-flex items-center justify-center gap-2 text-sm font-medium text-white px-4 py-2.5 rounded-full bg-primary hover:bg-primary transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                       />
                     </div>
                   ))}
@@ -465,14 +436,14 @@ const formattedDate = article?.publish_date
           {/* ── FAQ ── */}
           {faqs.length > 0 && (
             <>
-              <div className="border-t border-gray-100 my-14" />
+              <div className="border-t border-border my-14" />
 
               <section>
                 <div className="mb-8">
-                  <p className="text-[10px] tracking-[.15em] uppercase text-gray-400 mb-2">
+                  <p className="text-[10px] tracking-[.15em] uppercase text-muted-foreground/80 mb-2">
                     Questions
                   </p>
-                  <h2 className="font-serif text-3xl text-gray-900">
+                  <h2 className="text-3xl text-foreground">
                     Frequently asked questions
                   </h2>
                 </div>
@@ -481,16 +452,15 @@ const formattedDate = article?.publish_date
                   {faqs.map((faq) => (
                     <details
                       key={faq.id}
-                      className="group rounded-2xl border border-gray-100 px-6 py-5 open:border-[#24bbcb]/40"
-                      style={{ background: "rgba(36,187,203,0.03)" }}
+                      className="group rounded-2xl border border-border bg-card px-6 py-5 open:border-primary/40"
                     >
-                      <summary className="flex items-center justify-between gap-4 cursor-pointer list-none font-serif text-lg text-gray-900">
+                      <summary className="flex items-center justify-between gap-4 cursor-pointer list-none text-lg text-foreground">
                         {faq.question}
-                        <span className="flex-shrink-0 text-[#24bbcb] text-xl leading-none transition-transform duration-200 group-open:rotate-45">
+                        <span className="flex-shrink-0 text-primary text-xl leading-none transition-transform duration-200 group-open:rotate-45">
                           +
                         </span>
                       </summary>
-                      <p className="mt-3 text-sm text-gray-500 font-normal leading-relaxed">
+                      <p className="mt-3 text-sm text-muted-foreground font-normal leading-relaxed">
                         {faq.answer}
                       </p>
                     </details>
@@ -501,7 +471,7 @@ const formattedDate = article?.publish_date
           )}
 
           {/* ── DIVIDER ── */}
-          <div className="border-t border-gray-100 my-14 mx-auto" />
+          <div className="border-t border-border my-14 mx-auto" />
 
           {/* ── IN-ARTICLE AD (before related articles) ── */}
           <ArticleAdSlot slotId="journal-article-bottom" />
@@ -509,10 +479,10 @@ const formattedDate = article?.publish_date
           {/* ── RELATED ARTICLES ── */}
           <section style={{ justifyItems: "center" }}>
             <div className="text-center mb-8 mx-auto max-w-2xl">
-              <p className="text-[10px] tracking-[.15em] uppercase text-gray-400 mb-2">
+              <p className="text-[10px] tracking-[.15em] uppercase text-muted-foreground/80 mb-2">
                 Continue reading
               </p>
-              <h2 className="font-serif text-3xl text-gray-900">
+              <h2 className="text-3xl text-foreground">
                 Related articles
               </h2>
             </div>

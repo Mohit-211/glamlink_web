@@ -56,15 +56,15 @@ const FeaturesGrid = () => {
       <div className="container-glamlink px-5 md:px-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-16 md:mb-20">
-          <h2 className="section-title font-display mb-5">
+          <h2 className="section-title mb-5">
             Your Link To
             <br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-[#24bbcb] via-[#1ea8b5] to-[#24bbcb] bg-clip-text text-transparent">
+            <span className="text-primary">
               Everything Beauty
             </span>
           </h2>
 
-          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             One platform connecting you to professionals, products, and
             personalized experiences that transform the way you discover beauty.
           </p>
@@ -76,8 +76,8 @@ const FeaturesGrid = () => {
             <div
               key={feature.title}
               className={`
-                group relative rounded-2xl border border-gray-100 bg-white p-8 shadow-sm
-                transition-all duration-500 hover:shadow-xl hover:shadow-[#24bbcb]/15
+                group relative rounded-2xl border border-border bg-card p-8 shadow-sm
+                transition-all duration-500 hover:shadow-xl hover:shadow-primary/15
                 hover:-translate-y-2 animate-fade-up
               `}
               style={{ animationDelay: `${index * 0.08}s` }}
@@ -85,28 +85,28 @@ const FeaturesGrid = () => {
               {/* Coming Soon Badge */}
               {feature.comingSoon && (
                 <div className="absolute top-5 right-5 z-10">
-                  <span className="px-4 py-1.5 rounded-full bg-[#24bbcb]/10 text-[#24bbcb] text-xs font-semibold tracking-wide uppercase">
+                  <span className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase">
                     Coming Soon
                   </span>
                 </div>
               )}
 
               {/* Icon */}
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#24bbcb]/10 text-[#24bbcb] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
                 <feature.icon className="h-7 w-7" />
               </div>
 
               {/* Title & Description */}
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-3 group-hover:text-[#24bbcb] transition-colors">
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
                 {feature.title}
               </h3>
 
-              <p className="text-gray-600 leading-relaxed text-base">
+              <p className="text-muted-foreground leading-relaxed text-base">
                 {feature.description}
               </p>
 
               {/* Subtle bottom accent line on hover */}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#24bbcb]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
           ))}
         </div>

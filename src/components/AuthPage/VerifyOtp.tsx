@@ -122,7 +122,7 @@ export default function VerifyOtp({
             <span className="font-medium text-foreground">{email}</span>
           </p>
         </div>
-        <div className="rounded-2xl border bg-card p-8 shadow-[var(--shadow-medium)]">
+        <div className="rounded-2xl border bg-card p-8 shadow-medium">
           <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
             Verify your email
           </h1>
@@ -140,10 +140,10 @@ export default function VerifyOtp({
                 }}
                 aria-invalid={!!error}
                 className={`w-full rounded-xl border bg-background px-4 py-2.5 text-center text-lg tracking-[0.3em] text-sm ${
-                  error ? "border-red-500" : "border-input"
+                  error ? "border-destructive" : "border-input"
                 }`}
               />
-              {error && <p className="text-xs text-red-500 text-center">{error}</p>}
+              {error && <p className="text-xs text-destructive text-center">{error}</p>}
             </div>
             <button
               type="submit"

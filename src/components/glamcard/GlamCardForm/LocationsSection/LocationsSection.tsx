@@ -10,7 +10,7 @@ interface SectionProps {
   clearError?: (key: string) => void;
 }
 
-const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-4 sm:p-6";
+const sectionClass = "space-y-6 rounded-xl border border-border bg-card p-4 sm:p-6";
 
 const createEmptyLocation = (index: number): Location => ({
   id: nanoid(),
@@ -76,13 +76,13 @@ const LocationsSection: React.FC<SectionProps> = ({
   return (
     <section
       id="field-locations"
-      className={`${sectionClass} ${errors?.locations ? "border-red-500" : ""}`}
+      className={`${sectionClass} ${errors?.locations ? "border-destructive" : ""}`}
     >
       <h3 className="text-lg font-semibold">
-        Business Locations <span className="text-red-500">*</span>
+        Business Locations <span className="text-destructive">*</span>
       </h3>
       {errors?.locations && (
-        <p className="text-sm text-red-500">{errors.locations}</p>
+        <p className="text-sm text-destructive">{errors.locations}</p>
       )}
       <div className="space-y-5">
         {data.locations?.map((loc) => (
@@ -97,7 +97,7 @@ const LocationsSection: React.FC<SectionProps> = ({
       <button
         type="button"
         onClick={addLocation}
-        className="mt-6 w-full rounded-lg border border-dashed border-gray-400 py-3 text-sm font-medium text-gray-600 hover:border-gray-500 hover:text-gray-800 transition-colors"
+        className="mt-6 w-full rounded-lg border border-dashed border-input py-3 text-sm font-medium text-muted-foreground hover:border-input hover:text-foreground transition-colors"
       >
         + Add Another Location
       </button>

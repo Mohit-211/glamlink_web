@@ -96,10 +96,10 @@ export default function MyAccessCard({
     if (error === "Business card not found." || cards.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center sm:py-16">
-                <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
+                <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
                     Create Your Business Card
                 </h2>
-                <p className="mt-2 text-sm text-gray-500 max-w-md">
+                <p className="mt-2 text-sm text-muted-foreground max-w-md">
                     You haven&apos;t created a business card yet.
                 </p>
                 <button
@@ -218,7 +218,7 @@ export default function MyAccessCard({
                                 {/* Card switches to a 3-up row at lg (1024px) instead of sm (640px) —
                                     at sm/tablet widths, three fixed-min-width columns side by side
                                     overflowed and forced horizontal scroll. */}
-                                <div className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-[var(--shadow-medium)]">
+                                <div className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-all duration-300 hover:shadow-medium">
                                     <div className="flex flex-col lg:flex-row min-h-[200px]">
                                         <div className="h-1.5 w-full lg:h-auto lg:w-1.5 flex-shrink-0 bg-primary" />
                                         <div className="flex flex-col items-center justify-center gap-3 border-b border-border px-6 py-6 lg:w-[180px] lg:flex-shrink-0 lg:border-b-0 lg:border-r lg:px-8">
@@ -245,7 +245,7 @@ export default function MyAccessCard({
                                             <div>
                                                 <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">About</p>
                                                 <div
-                                                    className="text-[13px] leading-relaxed text-foreground/80 break-words"
+                                                    className="rich-text text-[13px] leading-relaxed text-foreground/80 break-words"
                                                     dangerouslySetInnerHTML={{ __html: bioSummary || "" }}
                                                 />
                                             </div>
@@ -287,7 +287,7 @@ export default function MyAccessCard({
                                                                 rel="noopener noreferrer"
                                                                 className="flex items-center gap-2"
                                                             >
-                                                                <Instagram className="h-5 w-5 text-pink-500" />
+                                                                <Instagram className="h-5 w-5 text-primary" />
                                                             </a>
                                                         )}
                                                         {socialMedia.tiktok && (
@@ -307,20 +307,20 @@ export default function MyAccessCard({
                                     </div>
                                     <div className="flex flex-col gap-3 border-t border-border bg-secondary/40 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                                         {isRejected ? (
-                                            <div className="flex flex-1 items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5">
-                                                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
+                                            <div className="flex flex-1 items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5">
+                                                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-destructive" />
                                                 <div className="min-w-0">
-                                                    <p className="text-sm font-semibold text-red-700">
+                                                    <p className="text-sm font-semibold text-destructive">
                                                         Your access card has been rejected.
                                                     </p>
-                                                    <p className="mt-1 text-xs text-red-600">
+                                                    <p className="mt-1 text-xs text-destructive">
                                                         Please update your details and submit your access card again. It will remain unavailable until it is approved.
                                                     </p>
                                                 </div>
                                             </div>
                                         ) : (
                                             <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
-                                                <span className="min-w-0 flex-1 truncate font-mono text-[12px] text-muted-foreground">
+                                                <span className="min-w-0 flex-1 truncate tabular-nums text-[12px] text-muted-foreground">
                                                     {card?.business_card_link}
                                                 </span>
                                                 <button
@@ -329,7 +329,7 @@ export default function MyAccessCard({
                                                     aria-label="Copy link"
                                                 >
                                                     {copiedKey === key ? (
-                                                        <Check className="h-3.5 w-3.5 text-green-600" />
+                                                        <Check className="h-3.5 w-3.5 text-success" />
                                                     ) : (
                                                         <Copy className="h-3.5 w-3.5 text-muted-foreground" />
                                                     )}
@@ -420,7 +420,7 @@ export default function MyAccessCard({
                                 <X className="h-4 w-4 text-muted-foreground" />
                             </button>
                         </div>
-                        <div className="flex justify-center rounded-xl bg-white p-5">
+                        <div className="flex justify-center rounded-xl bg-card p-5">
                             {qrCard?.business_card_qr ? (
                                 <img src={qrCard?.business_card_qr} alt="QR Code" className="h-48 w-48 object-contain" />
                             ) : (
@@ -434,12 +434,12 @@ export default function MyAccessCard({
                             <p className="text-[11px] text-muted-foreground">{qrCard?.professional_title}</p>
                         </div>
                         <div className="mt-4 flex min-w-0 items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2">
-                            <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-muted-foreground">{qrCard?.business_card_link}</span>
+                            <span className="min-w-0 flex-1 truncate tabular-nums text-[11px] text-muted-foreground">{qrCard?.business_card_link}</span>
                             <button
                                 onClick={() => handleCopy(qrCard, qrKey as CardKey)}
                                 className="flex-shrink-0 rounded-md p-1 hover:bg-accent transition-colors"
                             >
-                                {copiedKey === qrKey ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
+                                {copiedKey === qrKey ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
                             </button>
                         </div>
                         <a

@@ -4,7 +4,6 @@ import { createElement } from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, LayoutGrid, Scissors, Sparkles, Syringe, type LucideIcon } from "lucide-react";
 import type { ProfessionalType, ProfessionalTypeId } from "@/lib/directory";
-import { directoryThemeStyle } from "./directoryTheme";
 
 /** Radix Select can't use "" as an item value, so "all" stands in for no filter. */
 const ALL_VALUE = "all";
@@ -37,7 +36,7 @@ function Option({ value, label, description, icon: Icon }: OptionProps) {
       value={value}
       className="group relative flex cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2.5 pr-10 outline-none transition-colors data-[highlighted]:bg-primary/[0.07] data-[state=checked]:bg-primary/10"
     >
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground transition-colors group-data-[highlighted]:bg-white group-data-[highlighted]:text-primary group-data-[state=checked]:bg-primary group-data-[state=checked]:text-white">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground transition-colors group-data-[highlighted]:bg-card group-data-[highlighted]:text-primary group-data-[state=checked]:bg-primary group-data-[state=checked]:text-white">
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
       <span className="min-w-0">
@@ -99,8 +98,7 @@ export default function ProfessionalTypeSelect({
           align="start"
           sideOffset={14}
           collisionPadding={16}
-          style={directoryThemeStyle}
-          className="z-[60] w-[max(var(--radix-select-trigger-width),20rem)] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border bg-white shadow-large data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+          className="z-[60] w-[max(var(--radix-select-trigger-width),20rem)] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border bg-card shadow-large data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
         >
           <SelectPrimitive.Viewport className="p-2">
             <Option

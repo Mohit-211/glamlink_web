@@ -106,7 +106,6 @@ export default function NewsletterPopup({
       <div className="absolute inset-0 flex items-center justify-center p-4">
         <div className="relative w-full max-w-lg rounded-3xl bg-card shadow-2xl overflow-hidden border border-border/30">
           {/* Background gradient decoration */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-primary/10 to-transparent rounded-full blur-3xl -z-10" />
 
           <div className="relative p-8 md:p-10">
             {

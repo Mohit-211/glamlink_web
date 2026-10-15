@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { toast } from "sonner";
 import { apiUrl } from "@/lib/config";
 
 interface Props {
@@ -37,216 +39,104 @@ export default function GuestModal({ open, onClose }: Props) {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const res = await fetch(
-      apiUrl("guest-application/create"),
-      {
+    try {
+      const res = await fetch(apiUrl("guest-application/create"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (res.ok) {
+        clearForm();
+        toast.success(data?.message || "Application sent. We'll be in touch.");
+        onClose();
+      } else {
+        toast.error(data?.message || "Could not send your application. Please try again.");
       }
-    );
-
-    const data = await res.json();
-
-    if (res.ok) {
-      clearForm();
-      // message.success(data?.message);
-      onClose();
-    } else {
-      // message.error(data?.message);
+    } catch (err) {
+      console.error(err);
+      toast.error("Server error. Please try again.");
     }
-  } catch (err) {
-    console.error(err);
-    // message.error("Server error. Please try again.");
-  }
 
-  setLoading(false);
-};
+    setLoading(false);
+  };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.65)" }}
-    >
-      <div
-        className="bg-white w-full relative"
-        style={{ maxWidth: 460, borderRadius: 20, overflow: "hidden" }}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 p-4">
+      <div className="relative w-full max-w-[460px] overflow-hidden rounded-2xl bg-card shadow-large">
         {/* Header */}
-        <div className="px-7 pt-7 pb-0">
-          <div className="flex items-start justify-between mb-1">
+        <div className="px-7 pt-7">
+          <div className="mb-1 flex items-start justify-between">
             <div>
-              <p
-                className="text-gray-400 font-medium mb-1"
-                style={{ fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase" }}
-              >
-                Be on the show
-              </p>
-              <h2 className="text-gray-900 font-medium" style={{ fontSize: 22, lineHeight: 1.2 }}>
-                Guest application
-              </h2>
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-primary">Be on the show</p>
+              <h2 className="text-[22px] font-semibold leading-tight text-foreground">Guest application</h2>
             </div>
             <button
+              type="button"
+              aria-label="Close"
               onClick={() => { clearForm(); onClose(); }}
-              className="flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition"
-              style={{
-                width: 32, height: 32, borderRadius: "50%",
-                border: "0.5px solid #e5e7eb", fontSize: 13, flexShrink: 0, marginTop: 2,
-              }}
+              className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
-              ✕
+              <X className="h-4 w-4" />
             </button>
           </div>
-          <p className="text-gray-500 mt-2 mb-6" style={{ fontSize: 13, lineHeight: 1.5 }}>
+          <p className="mb-6 mt-2 text-[13px] leading-normal text-muted-foreground">
             Tell us about yourself. We&apos;ll be in touch if it&apos;s a great fit.
           </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="px-7 pb-7" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-
-          {/* Row 1: Name + Business */}
-          <div className="grid grid-cols-2 gap-2.5">
-            <div>
-              <FieldLabel>Name *</FieldLabel>
-              <input
-                name="name"
-                placeholder="Jane Smith"
-                value={form.name}
-                onChange={handleChange}
-                required
-                style={inputStyle}
-              />
-            </div>
-            <div>
-              <FieldLabel>Business</FieldLabel>
-              <input
-                name="businessName"
-                placeholder="Acme Inc."
-                value={form.businessName}
-                onChange={handleChange}
-                style={inputStyle}
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 px-7 pb-7">
+          <div className="grid grid-cols-2 gap-3">
+            <label>
+              <span className="label-glamlink">Name *</span>
+              <input name="name" placeholder="Jane Smith" value={form.name} onChange={handleChange} required className="input-glamlink" />
+            </label>
+            <label>
+              <span className="label-glamlink">Business</span>
+              <input name="businessName" placeholder="Acme Inc." value={form.businessName} onChange={handleChange} className="input-glamlink" />
+            </label>
           </div>
 
-          {/* Row 2: Email + Phone */}
-          <div className="grid grid-cols-2 gap-2.5">
-            <div>
-              <FieldLabel>Email *</FieldLabel>
-              <input
-                type="email"
-                name="email"
-                placeholder="jane@acme.com"
-                value={form.email}
-                onChange={handleChange}
-                required
-                style={inputStyle}
-              />
-            </div>
-            <div>
-              <FieldLabel>Phone</FieldLabel>
-              <input
-                name="phone"
-                placeholder="+1 (555) 000-0000"
-                value={form.phone}
-                onChange={handleChange}
-                style={inputStyle}
-              />
-            </div>
+          <div className="grid grid-cols-2 gap-3">
+            <label>
+              <span className="label-glamlink">Email *</span>
+              <input type="email" name="email" placeholder="jane@acme.com" value={form.email} onChange={handleChange} required className="input-glamlink" />
+            </label>
+            <label>
+              <span className="label-glamlink">Phone</span>
+              <input name="phone" placeholder="+1 (555) 000-0000" value={form.phone} onChange={handleChange} className="input-glamlink" />
+            </label>
           </div>
 
-          {/* Website */}
-          <div>
-            <FieldLabel>Website</FieldLabel>
-            <div className="relative">
-             
-              <input
-                name="website"
-                placeholder="yourwebsite.com"
-                value={form.website}
-                onChange={handleChange}
-                style={{ ...inputStyle, paddingLeft: 10 }}
-              />
-            </div>
-          </div>
+          <label>
+            <span className="label-glamlink">Website</span>
+            <input name="website" placeholder="yourwebsite.com" value={form.website} onChange={handleChange} className="input-glamlink" />
+          </label>
 
-          {/* Instagram */}
-          <div>
-            <FieldLabel>Instagram</FieldLabel>
-            <div className="relative">
-              <span
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-                style={{ fontSize: 13 }}
-              >
-                @
-              </span>
-              <input
-                name="instagram"
-                placeholder="yourhandle"
-                value={form.instagram}
-                onChange={handleChange}
-                style={{ ...inputStyle, paddingLeft: 28 }}
-              />
-            </div>
-          </div>
+          <label>
+            <span className="label-glamlink">Instagram</span>
+            <span className="relative block">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">@</span>
+              <input name="instagram" placeholder="yourhandle" value={form.instagram} onChange={handleChange} className="input-glamlink pl-8" />
+            </span>
+          </label>
 
-          {/* Buttons */}
-          <div className="flex gap-2.5 mt-1.5">
-            <button
-              type="button"
-              onClick={clearForm}
-              className="text-gray-500 hover:bg-gray-50 transition"
-              style={{
-                flex: 1, padding: "10px 0", borderRadius: 999,
-                border: "0.5px solid #d1d5db", fontSize: 14, background: "transparent",
-              }}
-            >
+          <div className="mt-2 flex gap-3">
+            <button type="button" onClick={clearForm} className="btn-outline flex-1">
               Clear
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="text-white font-medium transition"
-              style={{
-                flex: 2, padding: "10px 0", borderRadius: 999,
-                background: loading ? "hsl(184, 40%, 60%)" : "hsl(184, 70%, 41%)",
-                fontSize: 14, border: "none",
-              }}
-            >
+            <button type="submit" disabled={loading} className="btn-primary flex-[2] disabled:opacity-70">
               {loading ? "Submitting…" : "Submit application"}
             </button>
           </div>
-
         </form>
       </div>
     </div>
   );
 }
-
-function FieldLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p
-      className="text-gray-400 font-medium mb-1.5"
-      style={{ fontSize: 11, letterSpacing: "0.06em", textTransform: "uppercase" }}
-    >
-      {children}
-    </p>
-  );
-}
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  boxSizing: "border-box",
-  background: "#f9fafb",
-  border: "0.5px solid #e5e7eb",
-  borderRadius: 8,
-  padding: "9px 12px",
-  fontSize: 14,
-  color: "#111827",
-  outline: "none",
-};

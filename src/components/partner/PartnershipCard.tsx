@@ -17,7 +17,7 @@ export default function PartnershipCard({ way, index }: { way: PartnershipWay; i
         <span className="text-xs font-semibold tracking-[0.2em] text-primary">
           {String(index + 1).padStart(2, "0")}
         </span>
-        <h3 className="font-display mt-2 text-2xl font-semibold leading-tight text-foreground">
+        <h3 className="mt-2 text-2xl font-semibold leading-tight text-foreground">
           {way.title}
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{way.description}</p>

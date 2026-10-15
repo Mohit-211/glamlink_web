@@ -49,7 +49,7 @@ export default function FeaturedProfiles({ profiles }: { profiles: FeaturedProfi
               <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
               Curated by Glamlink
             </span>
-            <h2 id="featured-on-glamlink" className="section-title font-display mt-4">
+            <h2 id="featured-on-glamlink" className="section-title mt-4">
               Featured on Glamlink
             </h2>
             <p className="section-subtitle">
@@ -65,7 +65,7 @@ export default function FeaturedProfiles({ profiles }: { profiles: FeaturedProfi
               disabled={!canPrev}
               aria-label="Previous featured profiles"
               aria-controls="featured-track"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border bg-white text-foreground shadow-soft transition hover:border-primary/50 hover:text-primary disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border bg-card text-foreground shadow-soft transition hover:border-primary/50 hover:text-primary disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground"
             >
               <ChevronLeft className="w-5 h-5" aria-hidden="true" />
             </button>
@@ -75,7 +75,7 @@ export default function FeaturedProfiles({ profiles }: { profiles: FeaturedProfi
               disabled={!canNext}
               aria-label="Next featured profiles"
               aria-controls="featured-track"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border bg-white text-foreground shadow-soft transition hover:border-primary/50 hover:text-primary disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border bg-card text-foreground shadow-soft transition hover:border-primary/50 hover:text-primary disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground"
             >
               <ChevronRight className="w-5 h-5" aria-hidden="true" />
             </button>

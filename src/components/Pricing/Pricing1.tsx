@@ -12,6 +12,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { TOKENS } from "@/lib/designTokens";
 import {
   ArrowRight,
   Loader2,
@@ -43,11 +44,10 @@ const ELEMENT_STYLE = {
   style: {
     base: {
       fontSize: "14px",
-      color: "#0f172a",
-      fontFamily: "inherit",
-      "::placeholder": { color: "#94a3b8" },
+      color: TOKENS.foreground,
+      "::placeholder": { color: TOKENS.mutedForeground },
     },
-    invalid: { color: "#ef4444" },
+    invalid: { color: TOKENS.destructive },
   },
 };
 
@@ -302,7 +302,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
           {step === "plan" && (
             <>
               <div className="mb-10">
-                <h1 className="font-display mt-1 text-[26px] leading-tight text-foreground sm:text-[30px]">
+                <h1 className="mt-1 text-[26px] leading-tight text-foreground sm:text-[30px]">
                   Choose your plan
                 </h1>
                 <p className="section-subtitle mt-2 max-w-md text-[15px] leading-6">
@@ -368,7 +368,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
                   <MapPin className="h-4.5 w-4.5 text-primary" />
                 </span>
                 <div>
-                  <h2 className="font-display text-xl text-foreground">Delivery address</h2>
+                  <h2 className="text-xl text-foreground">Delivery address</h2>
                   <p className="text-sm text-muted-foreground">
                     Where should we ship your {plan.name} keychain?
                   </p>
@@ -377,7 +377,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
 
               <div className="card-glamlink space-y-3.5">
                 {addressError && (
-                  <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700">
+                  <div className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-xs text-destructive">
                     <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                     {addressError}
                   </div>
@@ -385,7 +385,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
 
                 <div>
                   <label className={LABEL}>
-                    Address Line 1 <span className="text-red-500">*</span>
+                    Address Line 1 <span className="text-destructive">*</span>
                   </label>
                   <input
                     value={address.address_line_1}
@@ -399,7 +399,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className={LABEL}>
-                      State <span className="text-red-500">*</span>
+                      State <span className="text-destructive">*</span>
                     </label>
                     <select
                       value={address.state_id}
@@ -417,7 +417,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
                   </div>
                   <div>
                     <label className={LABEL}>
-                      City <span className="text-red-500">*</span>
+                      City <span className="text-destructive">*</span>
                     </label>
                     <select
                       value={address.city_id}
@@ -437,7 +437,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
 
                 <div>
                   <label className={LABEL}>
-                    Zip Code <span className="text-red-500">*</span>
+                    Zip Code <span className="text-destructive">*</span>
                   </label>
                   <input
                     value={address.postal_code}
@@ -488,7 +488,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
                   <Truck className="h-4.5 w-4.5 text-primary" />
                 </span>
                 <div>
-                  <h2 className="font-display text-xl text-foreground">Shipping</h2>
+                  <h2 className="text-xl text-foreground">Shipping</h2>
                   <p className="text-sm text-muted-foreground">
                     Review your delivery cost before payment.
                   </p>
@@ -496,7 +496,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
               </div>
 
               {shippingError && (
-                <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700">
+                <div className="mb-4 flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-xs text-destructive">
                   <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                   {shippingError}
                 </div>
@@ -576,7 +576,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent">
               <CheckCircle className="h-7 w-7 text-primary" />
             </div>
-            <h2 className="font-display mt-4 text-xl text-foreground">Welcome to Glamlink!</h2>
+            <h2 className="mt-4 text-xl text-foreground">Welcome to Glamlink!</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Your {plan.name} plan is now active. You&apos;re ready to get started.
             </p>
@@ -673,7 +673,7 @@ function GuestPaymentStep({
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent">
             <CheckCircle className="h-7 w-7 text-primary" />
           </div>
-          <h2 className="font-display mt-4 text-xl text-foreground">Payment successful!</h2>
+          <h2 className="mt-4 text-xl text-foreground">Payment successful!</h2>
           <p className="mt-2 text-sm text-muted-foreground">Your order has been confirmed.</p>
           <button
             type="button"
@@ -704,7 +704,7 @@ function GuestPaymentStep({
           <CreditCard className="h-4.5 w-4.5 text-primary" />
         </span>
         <div>
-          <h2 className="font-display text-xl text-foreground">Payment</h2>
+          <h2 className="text-xl text-foreground">Payment</h2>
           <p className="text-sm text-muted-foreground">Complete your {planLabel} purchase.</p>
         </div>
       </div>
@@ -718,7 +718,7 @@ function GuestPaymentStep({
         </div>
 
         {errorMsg && (
-          <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700">
+          <div className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-xs text-destructive">
             <AlertCircle className="h-3.5 w-3.5 shrink-0" />
             {errorMsg}
           </div>

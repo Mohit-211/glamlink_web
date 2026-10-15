@@ -66,7 +66,7 @@ function PasswordInput({
           onChange={onChange}
           aria-invalid={!!error}
           className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-            error ? "border-red-500" : "border-input"
+            error ? "border-destructive" : "border-input"
           }`}
         />
         <button
@@ -78,7 +78,7 @@ function PasswordInput({
           {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
       </div>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }
@@ -328,7 +328,7 @@ export default function ForgotPasswordClient() {
           </p>
         </div>
 
-        <div className="card-glamlink !hover:transform-none rounded-2xl border bg-card p-8 shadow-[var(--shadow-medium)]">
+        <div className="card-glamlink !hover:transform-none rounded-2xl border bg-card p-8 shadow-medium">
           {step === "request" && (
             <div className="space-y-5">
               <div className="space-y-1.5">
@@ -346,10 +346,10 @@ export default function ForgotPasswordClient() {
                   }}
                   aria-invalid={!!errors.email}
                   className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                    errors.email ? "border-red-500" : "border-input"
+                    errors.email ? "border-destructive" : "border-input"
                   }`}
                 />
-                {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
+                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
               </div>
               <button
                 type="button"
@@ -389,10 +389,10 @@ export default function ForgotPasswordClient() {
                   }}
                   aria-invalid={!!otpError}
                   className={`w-full rounded-xl border bg-background px-4 py-2.5 text-center text-lg tracking-[0.3em] outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                    otpError ? "border-red-500" : "border-input"
+                    otpError ? "border-destructive" : "border-input"
                   }`}
                 />
-                {otpError && <p className="text-xs text-red-500 text-center">{otpError}</p>}
+                {otpError && <p className="text-xs text-destructive text-center">{otpError}</p>}
               </div>
               <button
                 type="button"
@@ -449,7 +449,7 @@ export default function ForgotPasswordClient() {
               )}
 
               {mismatch && !errors.confirm && (
-                <p className="text-xs text-red-500">Passwords do not match</p>
+                <p className="text-xs text-destructive">Passwords do not match</p>
               )}
 
               <button

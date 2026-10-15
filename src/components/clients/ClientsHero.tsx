@@ -56,15 +56,15 @@ const ClientsHero = () => {
           {/* Trust signals */}
           <div className="mt-10 md:mt-12 flex flex-wrap justify-center gap-6 md:gap-10 text-sm md:text-base text-muted-foreground animate-fade-up animation-delay-700">
             <div className="flex items-center gap-2">
-              <span className="text-[#24bbcb] text-xl">★</span> Verified
+              <span className="text-primary text-xl">★</span> Verified
               Professionals
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[#24bbcb] text-xl">✓</span> Real
+              <span className="text-primary text-xl">✓</span> Real
               Transformations
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[#24bbcb] text-xl">🛍️</span> Expert-Approved
+              <span className="text-primary text-xl">🛍️</span> Expert-Approved
               Products
             </div>
           </div>

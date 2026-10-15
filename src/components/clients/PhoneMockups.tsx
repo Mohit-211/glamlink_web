@@ -20,14 +20,14 @@ const PhoneMockups = () => {
       <div className="container-glamlink px-5 md:px-8">
         {/* Header – compact */}
         <div className="text-center mb-10 md:mb-14">
-          <h2 className="section-title font-display mb-4">
+          <h2 className="section-title mb-4">
             Your All-In-One
             <br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-[#24bbcb] via-[#1ea8b5] to-[#24bbcb] bg-clip-text text-transparent">
+            <span className="text-primary">
               Beauty Platform
             </span>
           </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Discover professionals, browse transformations, book instantly, and
             shop expert-curated products — all in one beautifully designed
             experience.
@@ -70,7 +70,7 @@ const PhoneMockups = () => {
                       relative w-[160px] xs:w-[180px] sm:w-[200px] md:w-[240px] lg:w-[280px]
                       aspect-[9/19] rounded-[1.8rem] md:rounded-[2.2rem] overflow-hidden
                       border-[8px] md:border-[12px] border-black/90 shadow-lg shadow-black/20
-                      transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-[0_20px_50px_rgba(34,188,203,0.2)]
+                      transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-primary
                     `}
                   >
                     <Image
@@ -83,7 +83,7 @@ const PhoneMockups = () => {
                     />
 
                     {/* Light screen overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-white/5 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-card/5 pointer-events-none" />
                   </div>
                 </div>
               );
@@ -95,7 +95,7 @@ const PhoneMockups = () => {
         <div className="text-center">
           <Button
             size="lg"
-            className="group px-7 md:px-9 py-5 md:py-6 bg-[#24bbcb] hover:bg-[#1ea8b5] text-white font-semibold text-base md:text-lg rounded-full shadow-lg shadow-[#24bbcb]/25 hover:shadow-xl hover:shadow-[#24bbcb]/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2.5 mx-auto"
+            className="group px-7 md:px-9 py-5 md:py-6 bg-primary hover:bg-primary text-white font-semibold text-base md:text-lg rounded-full shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2.5 mx-auto"
               onClick={() => setIsModalOpen(true)}
           
           >
@@ -104,7 +104,7 @@ const PhoneMockups = () => {
             <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
           </Button>
 
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-sm text-muted-foreground">
             Free on iOS & Android • No credit card needed
           </p>
         </div>

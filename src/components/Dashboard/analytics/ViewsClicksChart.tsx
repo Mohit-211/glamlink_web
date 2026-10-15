@@ -5,12 +5,12 @@ import type { ChartPoint } from './analyticsHelpers';
 import { formatNumber, formatShortDate, parseApiDate } from './analyticsHelpers';
 import { format } from 'date-fns';
 import { AnalyticsEmptyState, AnalyticsPanel } from './AnalyticsStates';
+import { TOKENS } from '@/lib/designTokens';
 
-// Teal is the brand primary nudged darker for 3:1 contrast on white; the blue
-// shares the theme's 220° slate hue. Pair validated for CVD separation.
+// Brand primary and its deep accent shade: same hue, clearly separated by lightness.
 const SERIES = [
-  { key: 'views', label: 'Views', color: '#1f9aa3' },
-  { key: 'clicks', label: 'Clicks', color: '#3d5ba8' },
+  { key: 'views', label: 'Views', color: TOKENS.primary },
+  { key: 'clicks', label: 'Clicks', color: TOKENS.accentForeground },
 ] as const;
 
 const MARGIN = { top: 12, right: 12, bottom: 28, left: 36 };
@@ -240,7 +240,7 @@ export default function ViewsClicksChart({
 
             {hovered && (
               <div
-                className="pointer-events-none absolute z-10 min-w-[150px] rounded-xl border border-border bg-card px-3 py-2.5 text-xs shadow-[var(--shadow-soft)]"
+                className="pointer-events-none absolute z-10 min-w-[150px] rounded-xl border border-border bg-card px-3 py-2.5 text-xs shadow-soft"
                 style={{
                   top: MARGIN.top,
                   left: flip ? undefined : tooltipLeft + 12,

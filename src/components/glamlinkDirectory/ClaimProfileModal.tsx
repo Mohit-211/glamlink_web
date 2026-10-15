@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { getProfessionalType, type DirectoryBusiness } from "@/lib/directory";
-import { directoryThemeStyle } from "./directoryTheme";
 
 interface ClaimProfileModalProps {
   business: DirectoryBusiness | null;
@@ -21,7 +20,6 @@ export default function ClaimProfileModal({ business, onOpenChange, onConfirm }:
     <Dialog open={!!business} onOpenChange={onOpenChange}>
       <DialogContent
         className="sm:max-w-md rounded-3xl p-0 overflow-hidden gap-0"
-        style={directoryThemeStyle}
       >
         {business && (
           <>
@@ -42,7 +40,7 @@ export default function ClaimProfileModal({ business, onOpenChange, onConfirm }:
               <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <BadgeCheck className="w-7 h-7" aria-hidden="true" />
               </span>
-              <DialogTitle className="font-display mt-5 text-2xl sm:text-3xl font-semibold">
+              <DialogTitle className="mt-5 text-2xl sm:text-3xl font-semibold">
                 Is this your business?
               </DialogTitle>
               <DialogDescription className="mt-3 text-muted-foreground">

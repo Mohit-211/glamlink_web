@@ -89,7 +89,7 @@ export default function FeaturedComponent() {
               key={i}
               className={`card-glamlink p-6 relative group ${
                 item.highlight
-                  ? "border-primary/40 shadow-[var(--shadow-medium)]"
+                  ? "border-primary/40 shadow-medium"
                   : ""
               }`}
             >

@@ -67,13 +67,13 @@ export default function MediaKitHero() {
               />
               {/* Premium cover border + shine */}
               <div className="absolute inset-0 ring-1 ring-white/30 rounded-2xl" />
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-br from-card/10 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
 
             {/* Center card - main focus, elevated */}
             <div
               onClick={() => handleDigitalEdition(issues2026[1].slug)}
-              className="absolute left-1/2 -translate-x-1/2 top-0 z-20 w-[195px] md:w-[235px] h-[275px] md:h-[330px] rounded-2xl overflow-hidden shadow-2xl cursor-pointer group transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_35px_60px_-15px_rgb(0,0,0,0.3)]"
+              className="absolute left-1/2 -translate-x-1/2 top-0 z-20 w-[195px] md:w-[235px] h-[275px] md:h-[330px] rounded-2xl overflow-hidden shadow-2xl cursor-pointer group transition-all duration-500 hover:-translate-y-3 hover:shadow-large"
             >
               <img
                 src={issues2026[1].cover}
@@ -82,7 +82,7 @@ export default function MediaKitHero() {
               />
               <div className="absolute inset-0 ring-1 ring-white/20 rounded-2xl" />
               {/* Subtle inner highlight */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-white/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-card/10" />
             </div>
 
             {/* Right card - positive rotation */}
@@ -96,7 +96,7 @@ export default function MediaKitHero() {
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 ring-1 ring-white/30 rounded-2xl" />
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-br from-card/10 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </div>
         </div>

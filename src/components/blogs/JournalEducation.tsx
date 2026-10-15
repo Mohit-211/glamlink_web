@@ -7,9 +7,9 @@ import { getTypeBlogs } from "@/api/Api";
 import Link from "next/link";
 
 const levelColor: Record<string, string> = {
-  Beginner: "bg-emerald-500/10 text-emerald-600",
-  Intermediate: "bg-amber-500/10 text-amber-600",
-  Advanced: "bg-rose-500/10 text-rose-600",
+  Beginner: "bg-success/10 text-success",
+  Intermediate: "bg-warning/10 text-warning",
+  Advanced: "bg-destructive/10 text-destructive",
 };
 
 const JournalEducation = () => {
@@ -49,11 +49,11 @@ const JournalEducation = () => {
     <section className="space-y-8">
       {/* Header */}
       <div className="text-center space-y-2">
-        <p className="text-[11px] uppercase tracking-widest text-[#24bbcb] font-semibold">
+        <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">
           Learn &amp; Grow
         </p>
 
-        <h1 className="font-display text-2xl md:text-3xl tracking-tight">
+        <h1 className="text-2xl md:text-3xl tracking-tight">
           Beauty Education Hub
         </h1>
 
@@ -74,7 +74,7 @@ const JournalEducation = () => {
               rel="noopener noreferrer"
             >
               <div
-                className="group border border-border/40 rounded-xl overflow-hidden bg-background hover:border-[#24bbcb]/50 hover:shadow-sm transition-all duration-200 cursor-pointer"
+                className="group border border-border/40 rounded-xl overflow-hidden bg-background hover:border-primary/50 hover:shadow-sm transition-all duration-200 cursor-pointer"
               >
                 <div className="relative aspect-[16/10] bg-muted/30 overflow-hidden">
                   <img
@@ -92,11 +92,11 @@ const JournalEducation = () => {
                 </div>
 
                 <div className="p-4 space-y-2">
-                  <p className="text-[10px] uppercase tracking-widest text-[#24bbcb] font-semibold">
+                  <p className="text-[10px] uppercase tracking-widest text-primary font-semibold">
                     {item.category || item.type || "Education"}
                   </p>
 
-                  <h3 className="font-display text-sm md:text-base leading-snug group-hover:text-[#24bbcb] transition-colors">
+                  <h3 className="text-sm md:text-base leading-snug group-hover:text-primary transition-colors">
                     {item.title}
                   </h3>
 

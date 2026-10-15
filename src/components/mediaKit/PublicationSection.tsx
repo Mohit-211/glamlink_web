@@ -4,12 +4,12 @@ export default function PublicationSection() {
   return (
     <section className="section-glamlink container-glamlink relative">
       {/* SUBTLE DIVIDER */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="absolute top-0 left-0 w-full h-px bg-border" />
 
       <div className="grid md:grid-cols-2 gap-16 items-center">
         {/* LEFT — STORY */}
         <div className="max-w-xl">
-          <h2 className="section-title font-display mb-6">
+          <h2 className="section-title mb-6">
             More than a magazine.
             <br />
             <span className="text-primary">

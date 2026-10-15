@@ -22,7 +22,7 @@ export default function FeaturedProfileCard({ profile }: { profile: FeaturedProf
         />
 
         {/* Featured indicator */}
-        <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary shadow-sm">
+        <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-card/95 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary shadow-sm">
           <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
           Featured
         </span>
@@ -31,7 +31,7 @@ export default function FeaturedProfileCard({ profile }: { profile: FeaturedProf
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/75">
             {profile.featuredIn}
           </p>
-          <h3 className="font-display mt-1.5 text-2xl leading-tight font-semibold text-white">
+          <h3 className="mt-1.5 text-2xl leading-tight font-semibold text-white">
             {profile.name}
           </h3>
           <p className="mt-1 text-sm text-white/85">{profile.title}</p>

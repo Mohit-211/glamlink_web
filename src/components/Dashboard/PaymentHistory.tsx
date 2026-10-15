@@ -46,22 +46,22 @@ export default function PaymentHistory({
       case 'SUCCESS':
         return {
           label: 'Success',
-          cls: 'bg-green-100 text-green-700 border-green-200',
+          cls: 'bg-success/10 text-success border-success/30',
         };
       case 'PENDING':
         return {
           label: 'Pending',
-          cls: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+          cls: 'bg-warning/10 text-warning border-warning/30',
         };
       case 'FAILED':
         return {
           label: 'Failed',
-          cls: 'bg-red-100 text-red-700 border-red-200',
+          cls: 'bg-destructive/10 text-destructive border-destructive/30',
         };
       default:
         return {
           label: status || 'Unknown',
-          cls: 'bg-gray-100 text-gray-700 border-gray-200',
+          cls: 'bg-muted text-foreground/80 border-border',
         };
     }
   };
@@ -128,7 +128,7 @@ export default function PaymentHistory({
             return (
               <div
                 key={payment.id}
-                className="rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden"
+                className="rounded-2xl border border-border bg-card shadow-soft overflow-hidden"
               >
                 <div className="flex items-center gap-3 px-3 py-3 sm:gap-4 sm:px-5 sm:py-4">
                   <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-accent">
@@ -148,7 +148,7 @@ export default function PaymentHistory({
                       </span>
 
                       {cancelledIds.has(payment.id) && (
-                        <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold bg-gray-100 text-gray-500 border-gray-200">
+                        <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold bg-muted text-muted-foreground border-border">
                           Cancelled
                         </span>
                       )}
@@ -197,7 +197,7 @@ export default function PaymentHistory({
                           Transaction ID
                         </p>
 
-                        <p className="font-mono text-foreground break-all">
+                        <p className="tabular-nums text-foreground break-all">
                           {payment.transaction_id}
                         </p>
                       </div> */}
@@ -278,7 +278,7 @@ export default function PaymentHistory({
                       {payment.payment_status !== "CANCELLED" && canCancel && !isConfirming && (
                         <button
                           onClick={() => setConfirmingId(payment.id)}
-                          className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+                          className="inline-flex items-center gap-2 rounded-lg border border-destructive/30 bg-card px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/5"
                         >
                           <XCircle className="h-4 w-4" />
                           Cancel Subscription
@@ -294,7 +294,7 @@ export default function PaymentHistory({
                           <button
                             onClick={() => handleCancelSubscription(payment)}
                             disabled={isCancelling}
-                            className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                            className="inline-flex items-center gap-2 rounded-lg bg-destructive px-3 py-1.5 text-xs font-medium text-white hover:bg-destructive disabled:opacity-60"
                           >
                             {isCancelling ? (
                               <>
@@ -318,7 +318,7 @@ export default function PaymentHistory({
                     </div>
 
                     {hasError && (
-                      <p className="mt-2 text-xs text-red-600">{errorMsg}</p>
+                      <p className="mt-2 text-xs text-destructive">{errorMsg}</p>
                     )}
                   </div>
                 )}

@@ -15,8 +15,8 @@ const TopicCard = ({ topic, compact = false }: TopicCardProps) => {
   return (
     <Link
       href={href}
-      className="group flex flex-col h-full bg-white rounded-[1.5rem] overflow-hidden border border-gray-100
-        hover:border-transparent hover:shadow-[0_20px_45px_-15px_rgba(36,187,203,0.35)] hover:-translate-y-1
+      className="group flex flex-col h-full bg-card rounded-[1.5rem] overflow-hidden border border-border
+        hover:border-transparent hover:shadow-primary hover:-translate-y-1
         transition-all duration-300"
     >
       <div
@@ -33,7 +33,7 @@ const TopicCard = ({ topic, compact = false }: TopicCardProps) => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5">
-          <h3 className="font-serif text-white text-xl leading-snug drop-shadow-sm">
+          <h3 className="text-white text-xl leading-snug drop-shadow-sm">
             {topic.name}
           </h3>
         </div>
@@ -41,10 +41,10 @@ const TopicCard = ({ topic, compact = false }: TopicCardProps) => {
 
       {!compact && (
         <div className="flex flex-col flex-1 p-5">
-          <p className="text-[13px] leading-relaxed text-gray-500 font-normal line-clamp-2 flex-1">
+          <p className="text-[13px] leading-relaxed text-muted-foreground font-normal line-clamp-2 flex-1">
             {blurb}
           </p>
-          <div className="flex items-center gap-1.5 pt-4 mt-4 border-t border-gray-100 text-[12px] font-medium text-[#24bbcb] group-hover:gap-2.5 transition-all duration-200">
+          <div className="flex items-center gap-1.5 pt-4 mt-4 border-t border-border text-[12px] font-medium text-primary group-hover:gap-2.5 transition-all duration-200">
             Explore topic
             <ArrowUpRight className="h-3.5 w-3.5" />
           </div>

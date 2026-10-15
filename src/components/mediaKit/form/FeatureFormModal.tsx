@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { X } from "lucide-react";
 
 interface Props {
     onClose: () => void;
@@ -75,310 +76,105 @@ export default function FeatureFormModal({ onClose }: Props) {
         setStep(2);
     };
 
+    const textFields: { key: Exclude<FieldKey, "interest">; label: string; placeholder: string; type?: string; error: string }[] = [
+        { key: "name", label: "Name as you'd like it to appear", placeholder: "Your answer", error: "This field is required." },
+        { key: "specialty", label: "Specialty", placeholder: "Nurse Injector, Esthetician…", error: "This field is required." },
+        { key: "email", label: "Email", placeholder: "jane@example.com", type: "email", error: "Please enter a valid email." },
+        { key: "phone", label: "Phone Number", placeholder: "+1 555 000 0000", type: "tel", error: "This field is required." },
+        { key: "city", label: "City", placeholder: "Los Angeles, CA", error: "This field is required." },
+    ];
+
     return (
-        <div style={{
-            position: "fixed", inset: 0, zIndex: 50,
-            background: "rgba(0,0,0,0.4)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            padding: 16,
-        }}>
-            <div style={{
-                background: "#fff",
-                width: "100%",
-                maxWidth: 620,
-                borderRadius: 16,
-                boxShadow: "0 8px 40px rgba(0,0,0,0.18)",
-                maxHeight: "90vh",
-                display: "flex",
-                flexDirection: "column",
-            }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4">
+            <div className="flex max-h-[90vh] w-full max-w-[620px] flex-col overflow-hidden rounded-2xl bg-card shadow-large">
 
                 {/* HEADER */}
-                <div style={{
-                    padding: "16px 24px",
-                    borderBottom: "1px solid #f0efe8",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    position: "sticky",
-                    top: 0,
-                    background: "#fff",
-                    zIndex: 10,
-                    borderRadius: "16px 16px 0 0",
-                }}>
-                    <h2 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>
-                        FEATURE IN THE GLAMLINK EDIT
-                    </h2>
+                <div className="flex items-center justify-between border-b border-border px-6 py-4">
+                    <h2 className="text-base font-semibold">Feature in The Glamlink Edit</h2>
                     <button
                         onClick={onClose}
                         aria-label="Close"
-                        style={{
-                            background: "none", border: "none",
-                            fontSize: 18, cursor: "pointer", color: "#555",
-                            lineHeight: 1, padding: 4,
-                        }}
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     >
-                        ✕
+                        <X className="h-4 w-4" />
                     </button>
                 </div>
 
                 {/* STEP 1 — Form */}
                 {step === 1 && (
-                    <div style={{
-                        flex: 1, overflowY: "auto", padding: "20px 24px",
-                        display: "flex", flexDirection: "column", gap: 10,
-                    }}>
-                        <p style={{ fontSize: 13, color: "#444", lineHeight: 1.6, marginBottom: 4 }}>
+                    <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
+                        <p className="text-[13px] leading-relaxed text-muted-foreground">
                             Apply to be featured in The Glamlink Edit, our editorial platform highlighting
                             standout beauty and wellness professionals. Select the type of feature you&apos;d
                             like to be considered for — from Cover Feature and expert interviews to
                             trending Treatments, or powerful client impact moments.
                         </p>
 
-                        <p style={{ fontSize: 12, color: "#d93025", marginBottom: 4 }}>
-                            * Indicates required question
-                        </p>
+                        <p className="text-xs text-destructive">* Indicates required question</p>
 
-                        {/* Name + Specialty */}
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                            <QuestionCard
-                                label="Name as you'd like it to appear"
-                                required
-                                error={showError("name") ? "This field is required." : undefined}
-                            >
-                                <AutoTextarea
-                                    value={form.name}
-                                    onChange={(v) => handleChange("name", v)}
-                                    onBlur={() => handleBlur("name")}
-                                    hasError={showError("name")}
-                                />
-                            </QuestionCard>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            {textFields.map(({ key, label, placeholder, type, error }) => (
+                                <label key={key} className={key === "city" ? "sm:col-span-2" : undefined}>
+                                    <span className="label-glamlink">
+                                        {label} <span className="text-destructive">*</span>
+                                    </span>
+                                    <input
+                                        type={type ?? "text"}
+                                        value={form[key]}
+                                        placeholder={placeholder}
+                                        onChange={(e) => handleChange(key, e.target.value)}
+                                        onBlur={() => handleBlur(key)}
+                                        aria-invalid={showError(key)}
+                                        className="input-glamlink"
+                                    />
+                                    {showError(key) && <span className="mt-1.5 block text-xs text-destructive">{error}</span>}
+                                </label>
+                            ))}
 
-                            <QuestionCard
-                                label="Specialty"
-                                required
-                                error={showError("specialty") ? "This field is required." : undefined}
-                            >
-                                <AutoTextarea
-                                    value={form.specialty}
-                                    placeholder="Nurse Injector, Esthetician…"
-                                    onChange={(v) => handleChange("specialty", v)}
-                                    onBlur={() => handleBlur("specialty")}
-                                    hasError={showError("specialty")}
-                                />
-                            </QuestionCard>
+                            <label className="sm:col-span-2">
+                                <span className="label-glamlink">
+                                    What are you interested in? <span className="text-destructive">*</span>
+                                </span>
+                                <select
+                                    value={form.interest}
+                                    onChange={(e) => {
+                                        handleChange("interest", e.target.value);
+                                        handleBlur("interest");
+                                    }}
+                                    onBlur={() => handleBlur("interest")}
+                                    aria-invalid={showError("interest")}
+                                    className={`input-glamlink cursor-pointer ${form.interest ? "" : "text-muted-foreground"}`}
+                                >
+                                    <option value="" disabled>Select a feature type…</option>
+                                    {INTEREST_OPTIONS.map((opt) => (
+                                        <option key={opt} value={opt}>{opt}</option>
+                                    ))}
+                                </select>
+                                {showError("interest") && (
+                                    <span className="mt-1.5 block text-xs text-destructive">Please select a feature type.</span>
+                                )}
+                            </label>
                         </div>
-
-                        {/* Email + Phone */}
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                            <QuestionCard
-                                label="Email"
-                                required
-                                error={showError("email") ? "Please enter a valid email." : undefined}
-                            >
-                                <AutoTextarea
-                                    value={form.email}
-                                    placeholder="jane@example.com"
-                                    onChange={(v) => handleChange("email", v)}
-                                    onBlur={() => handleBlur("email")}
-                                    hasError={showError("email")}
-                                />
-                            </QuestionCard>
-
-                            <QuestionCard
-                                label="Phone Number"
-                                required
-                                error={showError("phone") ? "This field is required." : undefined}
-                            >
-                                <AutoTextarea
-                                    value={form.phone}
-                                    placeholder="+1 555 000 0000"
-                                    onChange={(v) => handleChange("phone", v)}
-                                    onBlur={() => handleBlur("phone")}
-                                    hasError={showError("phone")}
-                                />
-                            </QuestionCard>
-                        </div>
-
-                        {/* City */}
-                        <QuestionCard
-                            label="City"
-                            required
-                            error={showError("city") ? "This field is required." : undefined}
-                        >
-                            <AutoTextarea
-                                value={form.city}
-                                placeholder="Los Angeles, CA"
-                                onChange={(v) => handleChange("city", v)}
-                                onBlur={() => handleBlur("city")}
-                                hasError={showError("city")}
-                            />
-                        </QuestionCard>
-
-                        {/* Interest dropdown */}
-                        <QuestionCard
-                            label="What are you interested in?"
-                            required
-                            error={showError("interest") ? "Please select a feature type." : undefined}
-                        >
-                            <select
-                                value={form.interest}
-                                onChange={(e) => {
-                                    handleChange("interest", e.target.value);
-                                    handleBlur("interest");
-                                }}
-                                onBlur={() => handleBlur("interest")}
-                                style={{
-                                    width: "100%",
-                                    border: "none",
-                                    borderBottom: `1.5px solid ${showError("interest") ? "#d93025" : "#c8c7c0"}`,
-                                    borderRadius: 0,
-                                    padding: "5px 0",
-                                    fontSize: 14,
-                                    color: form.interest ? "#1a1a1a" : "#999",
-                                    background: "transparent",
-                                    outline: "none",
-                                    fontFamily: "inherit",
-                                    cursor: "pointer",
-                                    appearance: "auto",
-                                }}
-                            >
-                                <option value="" disabled>Select a feature type…</option>
-                                {INTEREST_OPTIONS.map((opt) => (
-                                    <option key={opt} value={opt}>{opt}</option>
-                                ))}
-                            </select>
-                        </QuestionCard>
 
                         {/* Actions */}
-                        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
-                            <button onClick={handleSubmit} style={primaryBtnStyle}>
-                                Submit
+                        <div className="mt-2 flex items-center gap-3">
+                            <button onClick={handleSubmit} className="btn-primary">Submit</button>
+                            <button onClick={handleClear} className="text-sm font-medium text-primary hover:underline">
+                                Clear form
                             </button>
-                            <button onClick={handleClear} style={clearBtnStyle}>Clear form</button>
                         </div>
                     </div>
                 )}
 
                 {/* STEP 2 — Thank You */}
                 {step === 2 && (
-                    <div style={{
-                        flex: 1, overflowY: "auto", padding: 40,
-                        textAlign: "center", display: "flex", flexDirection: "column",
-                        alignItems: "center", justifyContent: "center", gap: 16,
-                    }}>
-                        <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>
-                            Thank You! ✨
-                        </h3>
-                        <p style={{ fontSize: 14, color: "#888", margin: 0 }}>
-                            We&apos;ll review your submission and reach out shortly.
-                        </p>
-                        <button onClick={onClose} style={{ ...primaryBtnStyle, marginTop: 8 }}>
-                            Close
-                        </button>
+                    <div className="flex flex-1 flex-col items-center justify-center gap-4 overflow-y-auto p-10 text-center">
+                        <h3 className="text-lg font-semibold">Thank You! ✨</h3>
+                        <p className="text-sm text-muted-foreground">We&apos;ll review your submission and reach out shortly.</p>
+                        <button onClick={onClose} className="btn-primary mt-2">Close</button>
                     </div>
                 )}
             </div>
         </div>
     );
 }
-
-/* ── Sub-components ── */
-
-function QuestionCard({
-    label,
-    required,
-    error,
-    children,
-}: {
-    label: React.ReactNode;
-    required?: boolean;
-    error?: string;
-    children: React.ReactNode;
-}) {
-    return (
-        <div style={{
-            background: "#fff",
-            border: `0.5px solid ${error ? "#d93025" : "#e0dfd8"}`,
-            borderRadius: 12,
-            padding: "20px 22px",
-        }}>
-            <p style={{ fontSize: 14, color: "#1a1a1a", lineHeight: 1.6, marginBottom: 10 }}>
-                {label}
-                {required && <span style={{ color: "#d93025", marginLeft: 2 }}>*</span>}
-            </p>
-            {children}
-            {error && (
-                <p style={{ fontSize: 12, color: "#d93025", marginTop: 6, marginBottom: 0 }}>
-                    {error}
-                </p>
-            )}
-        </div>
-    );
-}
-
-function AutoTextarea({
-    value,
-    onChange,
-    onBlur,
-    hasError,
-    placeholder,
-}: {
-    value: string;
-    onChange: (v: string) => void;
-    onBlur?: () => void;
-    hasError?: boolean;
-    placeholder?: string;
-}) {
-    return (
-        <textarea
-            value={value}
-            placeholder={placeholder ?? "Your answer"}
-            rows={1}
-            onChange={(e) => onChange(e.target.value)}
-            onBlur={onBlur}
-            onInput={(e) => {
-                const el = e.currentTarget;
-                el.style.height = "auto";
-                el.style.height = el.scrollHeight + "px";
-            }}
-            onFocus={(e) => (e.currentTarget.style.borderBottomColor = "#5b4bb5")}
-            style={{
-                width: "100%",
-                border: "none",
-                borderBottom: `1.5px solid ${hasError ? "#d93025" : "#c8c7c0"}`,
-                borderRadius: 0,
-                padding: "5px 0",
-                fontSize: 14,
-                color: "#1a1a1a",
-                background: "transparent",
-                outline: "none",
-                resize: "none",
-                overflow: "hidden",
-                lineHeight: 1.6,
-                minHeight: 32,
-                fontFamily: "inherit",
-            }}
-        />
-    );
-}
-
-const primaryBtnStyle: React.CSSProperties = {
-    background: "#5b4bb5",
-    color: "#fff",
-    border: "none",
-    borderRadius: 4,
-    padding: "10px 28px",
-    fontSize: 14,
-    fontFamily: "inherit",
-    cursor: "pointer",
-};
-
-const clearBtnStyle: React.CSSProperties = {
-    background: "none",
-    color: "#5b4bb5",
-    border: "none",
-    fontSize: 14,
-    fontFamily: "inherit",
-    cursor: "pointer",
-};

@@ -155,7 +155,7 @@ export default function Login({ onSuccess }: LoginProps = {}) {
           </p>
         </div>
 
-        <div className="card-glamlink !hover:transform-none rounded-2xl border bg-card p-8 shadow-[var(--shadow-medium)]">
+        <div className="card-glamlink !hover:transform-none rounded-2xl border bg-card p-8 shadow-medium">
           <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
             Sign in
           </h1>
@@ -177,11 +177,11 @@ export default function Login({ onSuccess }: LoginProps = {}) {
                 onChange={(e) => updateField("email", e.target.value)}
                 aria-invalid={!!errors.email}
                 className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                  errors.email ? "border-red-500" : "border-input"
+                  errors.email ? "border-destructive" : "border-input"
                 }`}
               />
               {errors.email && (
-                <p className="text-xs text-red-500">{errors.email}</p>
+                <p className="text-xs text-destructive">{errors.email}</p>
               )}
             </div>
             {/* Password */}
@@ -210,7 +210,7 @@ export default function Login({ onSuccess }: LoginProps = {}) {
                   onChange={(e) => updateField("password", e.target.value)}
                   aria-invalid={!!errors.password}
                   className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                    errors.password ? "border-red-500" : "border-input"
+                    errors.password ? "border-destructive" : "border-input"
                   }`}
                 />
                 <button
@@ -227,7 +227,7 @@ export default function Login({ onSuccess }: LoginProps = {}) {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-xs text-red-500">{errors.password}</p>
+                <p className="text-xs text-destructive">{errors.password}</p>
               )}
             </div>
             {/* Submit */}

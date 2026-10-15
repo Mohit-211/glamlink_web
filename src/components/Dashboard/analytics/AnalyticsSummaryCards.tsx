@@ -32,7 +32,7 @@ export default function AnalyticsSummaryCards({ summary }: { summary: AnalyticsS
         <div
           key={key}
           className={cn(
-            'relative min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] sm:p-5',
+            'relative min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5',
             // Third card spans the row on tablet so the 2-col grid has no gap.
             i === 2 && 'sm:col-span-2 xl:col-span-1'
           )}

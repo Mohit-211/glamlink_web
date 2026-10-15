@@ -2,8 +2,8 @@ import React from "react";
 
 const CsamPolicy: React.FC = () => {
   return (
-    <div className="bg-[#f5f5f5] py-10 px-4 mt-20">
-      <div className="max-w-[900px] mx-auto text-[#333] leading-7 text-[15px]">
+    <div className="bg-muted py-10 px-4 mt-20">
+      <div className="max-w-[900px] mx-auto text-foreground leading-7 text-[15px]">
         
         <h2 className="text-[22px] font-semibold mb-2">
           GlamLink CSAE (Child Sexual Abuse and Exploitation) Policy
@@ -122,7 +122,7 @@ const CsamPolicy: React.FC = () => {
             Or contact us directly at:{" "}
             <a
               href="mailto:support@glamlink.com"
-              className="text-blue-600 underline"
+              className="text-primary underline"
             >
               support@glamlink.com
             </a>

@@ -13,12 +13,12 @@ const UserDownloadDialog = ({ isOpen, onClose }: DownloadModalProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-md bg-card rounded-2xl shadow-2xl p-8 animate-in fade-in zoom-in-95 duration-200">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition"
         >
           <X className="w-5 h-5" />
         </button>
@@ -27,17 +27,17 @@ const UserDownloadDialog = ({ isOpen, onClose }: DownloadModalProps) => {
         <div className="text-5xl text-center mb-4">👩‍🦰</div>
 
         {/* Title */}
-        <h2 className="text-2xl font-semibold text-center text-gray-900 mb-4">
+        <h2 className="text-2xl font-semibold text-center text-foreground mb-4">
           Welcome to Glamlink - your new favorite beauty app
         </h2>
 
         {/* Description */}
-        <p className="text-gray-600 text-center mb-6 leading-relaxed">
+        <p className="text-muted-foreground text-center mb-6 leading-relaxed">
           Discover trusted beauty professionals near you. Book with ease, and
           shop expert-approved products - all in one place.
         </p>
 
-        <p className="text-gray-800 font-medium text-center mb-6">
+        <p className="text-foreground font-medium text-center mb-6">
           Get the full experience — download the app:
         </p>
 

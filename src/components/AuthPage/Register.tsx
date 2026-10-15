@@ -128,10 +128,10 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
   const strengthLabel = ["", "Weak", "Fair", "Good", "Strong"][passwordStrength];
   const strengthColor = [
     "",
-    "bg-red-400",
-    "bg-yellow-400",
-    "bg-emerald-400",
-    "bg-emerald-500",
+    "bg-destructive",
+    "bg-warning",
+    "bg-success",
+    "bg-success",
   ][passwordStrength];
 
   // Live (pre-submit) checks — recomputed on every keystroke so the user
@@ -364,7 +364,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
       </div>
       <div className="relative w-full max-w-md">
         {/* Card */}
-        <div className="rounded-2xl border bg-card p-8 shadow-[var(--shadow-medium)]">
+        <div className="rounded-2xl border bg-card p-8 shadow-medium">
           <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
             Create Your Access Account
           </h1>
@@ -379,11 +379,11 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                   value={form.name}
                   onChange={(e) => updateField("name", e.target.value)}
                   aria-invalid={!!errors.name}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.name ? "border-red-500" : "border-input"
+                  className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.name ? "border-destructive" : "border-input"
                     }`}
                 />
                 {errors.name && (
-                  <p className="text-xs text-red-500">{errors.name}</p>
+                  <p className="text-xs text-destructive">{errors.name}</p>
                 )}
               </div>
             </div>
@@ -396,11 +396,11 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                 value={form.email}
                 onChange={(e) => updateField("email", e.target.value)}
                 aria-invalid={!!errors.email}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.email ? "border-red-500" : "border-input"
+                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.email ? "border-destructive" : "border-input"
                   }`}
               />
               {errors.email && (
-                <p className="text-xs text-red-500">{errors.email}</p>
+                <p className="text-xs text-destructive">{errors.email}</p>
               )}
             </div>
             {/* Mobile */}
@@ -415,11 +415,11 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                   updateField("mobile", e.target.value.replace(/\D/g, ""))
                 }
                 aria-invalid={!!errors.mobile}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.mobile ? "border-red-500" : "border-input"
+                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.mobile ? "border-destructive" : "border-input"
                   }`}
               />
               {errors.mobile && (
-                <p className="text-xs text-red-500">{errors.mobile}</p>
+                <p className="text-xs text-destructive">{errors.mobile}</p>
               )}
             </div>
             {/* Password */}
@@ -433,7 +433,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                   value={form.password}
                   onChange={(e) => updateField("password", e.target.value)}
                   aria-invalid={!!passwordError}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm ${passwordError ? "border-red-500" : "border-input"
+                  className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm ${passwordError ? "border-destructive" : "border-input"
                     }`}
                 />
                 <button
@@ -445,7 +445,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                 </button>
               </div>
               {passwordError && (
-                <p className="text-xs text-red-500">{passwordError}</p>
+                <p className="text-xs text-destructive">{passwordError}</p>
               )}
               {form.password.length > 0 && (
                 <>
@@ -476,11 +476,11 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                 value={form.confirm_password}
                 onChange={(e) => updateField("confirm_password", e.target.value)}
                 aria-invalid={!!confirmPasswordError}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${confirmPasswordError ? "border-red-500" : "border-input"
+                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${confirmPasswordError ? "border-destructive" : "border-input"
                   }`}
               />
               {confirmPasswordError && (
-                <p className="text-xs text-red-500">{confirmPasswordError}</p>
+                <p className="text-xs text-destructive">{confirmPasswordError}</p>
               )}
             </div>
             {/* Submit */}

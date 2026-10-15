@@ -37,15 +37,15 @@ const MagazineHero = () => {
               >
                 {/* Input wrapper */}
                 <div className="relative flex-1 min-w-0">
-                  <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/80 pointer-events-none" />
                   <input
                     type="email"
                     placeholder="Your email address"
                     className="
                     w-full h-14 pl-14 pr-6 rounded-full 
-                    border border-gray-200 bg-white text-gray-900 
-                    placeholder:text-gray-400 
-                    outline-none focus:border-[#24bbcb] focus:ring-4 focus:ring-[#24bbcb]/15 
+                    border border-border bg-card text-foreground 
+                    placeholder:text-muted-foreground/80 
+                    outline-none focus:border-primary focus:ring-4 focus:ring-primary/15 
                     transition-all duration-300 shadow-sm hover:shadow
                   "
                   />
@@ -56,9 +56,9 @@ const MagazineHero = () => {
                   type="submit"
                   className="
                   h-14 px-8 min-w-[160px] 
-                  bg-[#24bbcb] hover:bg-[#1ea8b5] 
+                  bg-primary hover:bg-primary 
                   text-white font-medium rounded-full 
-                  shadow-md hover:shadow-lg shadow-[#24bbcb]/20 hover:shadow-[#24bbcb]/30 
+                  shadow-md hover:shadow-lg shadow-primary/20 hover:shadow-primary/30 
                   transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
                   flex items-center gap-2
                 "
@@ -68,7 +68,7 @@ const MagazineHero = () => {
                 </Button>
               </form>
 
-              <p className="mt-5 text-sm text-gray-500">
+              <p className="mt-5 text-sm text-muted-foreground">
                 Join beauty enthusiasts • Unsubscribe anytime
               </p>
             </div>

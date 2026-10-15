@@ -58,7 +58,7 @@ export default function DeleteAccountPage() {
         <div className="container-glamlink max-w-3xl">
           <span className="badge-soft mb-6">Account settings</span>
 
-          <h1 className="section-title font-display">
+          <h1 className="section-title">
             How to delete your Glamlink account
           </h1>
 

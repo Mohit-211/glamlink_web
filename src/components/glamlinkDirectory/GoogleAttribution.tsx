@@ -26,7 +26,7 @@ export function GoogleWordmark({ className = "" }: { className?: string }) {
 export default function GoogleAttribution({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border bg-white px-3.5 py-1.5 text-xs text-muted-foreground shadow-soft ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border bg-card px-3.5 py-1.5 text-xs text-muted-foreground shadow-soft ${className}`}
     >
       Powered by <GoogleWordmark className="text-sm" />
     </span>

@@ -55,7 +55,7 @@ const SalesSection = () => {
             <DollarSign className="w-4 h-4" />
             Revenue Engine
           </span>
-          <h2 className="section-title font-display mb-4">
+          <h2 className="section-title mb-4">
             Turn Your Expertise Into{" "}
             <span className="gradient-text">Unstoppable Sales</span>
           </h2>
@@ -67,9 +67,8 @@ const SalesSection = () => {
 
         {/* Video Placeholder */}
         <div className="relative max-w-4xl mx-auto mb-16">
-          <div className="aspect-video rounded-3xl bg-gradient-to-br from-secondary via-secondary/50 to-primary/10 border border-border overflow-hidden relative group cursor-pointer">
+          <div className="aspect-video rounded-3xl bg-secondary border border-border overflow-hidden relative group cursor-pointer">
             {/* Decorative elements */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
 
             {/* Play button */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -86,7 +85,7 @@ const SalesSection = () => {
                 <div className="absolute top-6 left-6">
                   <span
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full 
-        bg-white/15 backdrop-blur-md 
+        bg-card/15 backdrop-blur-md 
         text-white text-sm font-medium 
         border border-white/30 shadow-lg"
                   >
@@ -99,14 +98,14 @@ const SalesSection = () => {
                 <div className="flex justify-center mb-6">
                   <div
                     className="w-16 h-16 flex items-center justify-center rounded-full 
-        bg-white/20 backdrop-blur-md"
+        bg-card/20 backdrop-blur-md"
                   >
                     <Play className="w-8 h-8 text-white ml-1" />
                   </div>
                 </div>
 
                 {/* Heading */}
-                <h2 className="section-title font-display mb-4">
+                <h2 className="section-title mb-4">
                   Professional Video Coming Soon
                 </h2>
 

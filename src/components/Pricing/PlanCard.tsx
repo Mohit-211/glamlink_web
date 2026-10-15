@@ -105,7 +105,7 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
       <h3 className="relative mt-4 text-base font-semibold text-foreground">{plan.name}</h3>
 
       <p className="relative mt-2.5 flex flex-wrap items-baseline gap-1">
-        <span className="font-display text-2xl text-foreground">{plan.priceLabel}</span>
+        <span className="text-2xl text-foreground">{plan.priceLabel}</span>
         {plan.priceSuffix && <span className="text-xs text-muted-foreground">{plan.priceSuffix}</span>}
       </p>
 

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function TopicsPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-card">
       <Script
         id="topics-schema"
         type="application/ld+json"

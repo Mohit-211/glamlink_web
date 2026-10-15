@@ -123,7 +123,7 @@ export default function IssuePage({ params }: { params: { slug: string } }) {
       />
 
       <div className="container-glamlink max-w-4xl">
-        <h1 className="text-3xl font-serif mb-2">{issue.title}</h1>
+        <h1 className="text-3xl mb-2">{issue.title}</h1>
 
         <p className="text-muted-foreground mb-8"></p>
 

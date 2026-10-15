@@ -82,14 +82,14 @@ const RelatedArticles: React.FC<Props> = ({ category_id }) => {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="animate-pulse rounded-2xl overflow-hidden border border-gray-100"
+            className="animate-pulse rounded-2xl overflow-hidden border border-border"
           >
-            <div className="w-full aspect-[16/10] bg-gray-100" />
+            <div className="w-full aspect-[16/10] bg-muted" />
             <div className="p-5 space-y-3">
-              <div className="h-4 bg-gray-100 rounded w-1/3" />
-              <div className="h-5 bg-gray-100 rounded w-full" />
-              <div className="h-5 bg-gray-100 rounded w-3/4" />
-              <div className="h-3 bg-gray-100 rounded w-1/2 mt-4" />
+              <div className="h-4 bg-muted rounded w-1/3" />
+              <div className="h-5 bg-muted rounded w-full" />
+              <div className="h-5 bg-muted rounded w-3/4" />
+              <div className="h-3 bg-muted rounded w-1/2 mt-4" />
             </div>
           </div>
         ))}
@@ -161,7 +161,7 @@ const RelatedArticles: React.FC<Props> = ({ category_id }) => {
               disabled={page === 1}
               aria-label="Previous page"
               className="flex items-center justify-center w-8 h-8 rounded-lg border border-border/40
-                text-muted-foreground hover:border-[#24bbcb] hover:text-[#24bbcb]
+                text-muted-foreground hover:border-primary hover:text-primary
                 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-150"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
@@ -184,8 +184,8 @@ const RelatedArticles: React.FC<Props> = ({ category_id }) => {
                   className={`w-8 h-8 rounded-lg text-xs font-medium transition-all duration-150
                     ${
                       p === page
-                        ? 'bg-[#24bbcb] text-white border border-[#24bbcb]'
-                        : 'border border-border/40 text-muted-foreground hover:border-[#24bbcb] hover:text-[#24bbcb]'
+                        ? 'bg-primary text-white border border-primary'
+                        : 'border border-border/40 text-muted-foreground hover:border-primary hover:text-primary'
                     }`}
                 >
                   {p}
@@ -199,7 +199,7 @@ const RelatedArticles: React.FC<Props> = ({ category_id }) => {
               disabled={page === totalPages}
               aria-label="Next page"
               className="flex items-center justify-center w-8 h-8 rounded-lg border border-border/40
-                text-muted-foreground hover:border-[#24bbcb] hover:text-[#24bbcb]
+                text-muted-foreground hover:border-primary hover:text-primary
                 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-150"
             >
               <ChevronRight className="h-3.5 w-3.5" />

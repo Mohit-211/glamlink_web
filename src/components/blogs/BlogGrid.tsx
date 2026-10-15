@@ -210,7 +210,7 @@ const BlogGrid: React.FC<Props> = ({
             {normalizedQuery && onClearSearch && (
               <button
                 onClick={onClearSearch}
-                className="text-xs font-medium text-[#24bbcb] hover:underline"
+                className="text-xs font-medium text-primary hover:underline"
               >
                 Clear search
               </button>
@@ -218,7 +218,7 @@ const BlogGrid: React.FC<Props> = ({
             {hasActiveCategory && onResetCategory && (
               <button
                 onClick={onResetCategory}
-                className="text-xs font-medium text-[#24bbcb] hover:underline"
+                className="text-xs font-medium text-primary hover:underline"
               >
                 View all categories
               </button>
@@ -317,7 +317,7 @@ const BlogGrid: React.FC<Props> = ({
               disabled={page === 1}
               aria-label="Previous page"
               className="flex items-center justify-center w-8 h-8 rounded-lg border border-border/40
-                text-muted-foreground hover:border-[#24bbcb] hover:text-[#24bbcb]
+                text-muted-foreground hover:border-primary hover:text-primary
                 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-150"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
@@ -339,8 +339,8 @@ const BlogGrid: React.FC<Props> = ({
                   aria-current={p === page ? "page" : undefined}
                   className={`w-8 h-8 rounded-lg text-xs font-medium transition-all duration-150
                     ${p === page
-                      ? "bg-[#24bbcb] text-white border border-[#24bbcb]"
-                      : "border border-border/40 text-muted-foreground hover:border-[#24bbcb] hover:text-[#24bbcb]"
+                      ? "bg-primary text-white border border-primary"
+                      : "border border-border/40 text-muted-foreground hover:border-primary hover:text-primary"
                     }`}
                 >
                   {p}
@@ -354,7 +354,7 @@ const BlogGrid: React.FC<Props> = ({
               disabled={page === totalPages}
               aria-label="Next page"
               className="flex items-center justify-center w-8 h-8 rounded-lg border border-border/40
-                text-muted-foreground hover:border-[#24bbcb] hover:text-[#24bbcb]
+                text-muted-foreground hover:border-primary hover:text-primary
                 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-150"
             >
               <ChevronRight className="h-3.5 w-3.5" />

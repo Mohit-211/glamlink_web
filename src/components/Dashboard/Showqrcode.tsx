@@ -39,13 +39,13 @@ function StatusPill({ isPaid, large }: { isPaid: boolean; large?: boolean }) {
         large ? 'text-[11px]' : 'text-[10px]'
       } ${
         isPaid
-          ? 'border-green-600/30 bg-green-600/10 text-green-700'
+          ? 'border-success/30 bg-success/10 text-success'
           : 'border-border bg-secondary text-muted-foreground'
       }`}
     >
       <span
         className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${
-          isPaid ? 'bg-green-600' : 'bg-muted-foreground'
+          isPaid ? 'bg-success' : 'bg-muted-foreground'
         }`}
       />
       {isPaid ? 'Paid' : 'Unpaid'}
@@ -181,7 +181,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                   </span>
                   <span
                     className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${
-                      isPaidCard(card) ? 'bg-green-600' : 'bg-muted-foreground'
+                      isPaidCard(card) ? 'bg-success' : 'bg-muted-foreground'
                     }`}
                   />
                 </button>
@@ -235,7 +235,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                       </span>
                       <span
                         className={`block truncate text-[10px] leading-tight ${
-                          cardPaid ? 'text-green-600' : 'text-muted-foreground'
+                          cardPaid ? 'text-success' : 'text-muted-foreground'
                         }`}
                       >
                         {cardPaid ? 'Paid' : 'Unpaid'}
@@ -263,7 +263,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                   </p>
                   <p
                     className={`truncate text-[11px] leading-tight ${
-                      paid ? 'text-green-600' : 'text-muted-foreground'
+                      paid ? 'text-success' : 'text-muted-foreground'
                     }`}
                   >
                     {paid ? 'Ready to share' : 'Locked until payment is complete'}
@@ -274,7 +274,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                 </span>
               </div>
 
-              <div className="relative flex justify-center overflow-hidden rounded-xl border border-border bg-white p-4 sm:p-6">
+              <div className="relative flex justify-center overflow-hidden rounded-xl border border-border bg-card p-4 sm:p-6">
                 {selectedCard.business_card_qr ? (
                   <>
                     <img
@@ -284,10 +284,10 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                     />
                     {/* {!paid && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/30 p-4">
-                        <div className="max-w-[220px] rounded-xl bg-white p-4 text-center shadow-xl">
+                        <div className="max-w-[220px] rounded-xl bg-card p-4 text-center shadow-xl">
                           <p className="text-lg">🔒</p>
-                          <p className="text-sm font-semibold text-gray-900">QR code locked</p>
-                          <p className="mt-1 text-xs text-gray-600">
+                          <p className="text-sm font-semibold text-foreground">QR code locked</p>
+                          <p className="mt-1 text-xs text-muted-foreground">
                             Complete payment for this card to unlock its QR code.
                           </p>
                           {onPayNow && (
@@ -316,7 +316,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                     className="btn-outline flex min-h-11 flex-1 items-center justify-center gap-1.5 !py-2 !text-xs cursor-pointer sm:min-h-0"
                   >
                     {copied ? (
-                      <Check className="h-3.5 w-3.5 text-green-600" />
+                      <Check className="h-3.5 w-3.5 text-success" />
                     ) : (
                       <Copy className="h-3.5 w-3.5" />
                     )}
@@ -363,7 +363,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                       Card link
                     </p>
                     <div className="flex min-w-0 items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2">
-                      <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-muted-foreground">
+                      <span className="min-w-0 flex-1 truncate tabular-nums text-[11px] text-muted-foreground">
                         {/* {paid
                           ? selectedCard.business_card_link
                           : '••••••••••••••••••••••••••••••'} */}
@@ -376,7 +376,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                         className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md transition-colors hover:bg-accent cursor-pointer"
                       >
                         {copied ? (
-                          <Check className="h-3.5 w-3.5 text-green-600" />
+                          <Check className="h-3.5 w-3.5 text-success" />
                         ) : (
                           <Copy className="h-3.5 w-3.5 text-muted-foreground" />
                         )}

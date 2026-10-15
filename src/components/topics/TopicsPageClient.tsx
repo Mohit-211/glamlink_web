@@ -58,7 +58,7 @@ const TopicsPageClient = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-card">
       {/* ── HERO ── */}
       <section className="hero-glamlink relative overflow-hidden bg-background">
         <div className="container-glamlink relative">
@@ -82,11 +82,11 @@ const TopicsPageClient = () => {
               {/* Search */}
               <div className="mt-9 max-w-lg">
                 <div
-                  className="relative flex items-center rounded-full bg-white border border-gray-200
-                    shadow-sm transition-colors duration-200 focus-within:border-[#24bbcb]
-                    focus-within:ring-2 focus-within:ring-[#24bbcb]/15"
+                  className="relative flex items-center rounded-full bg-card border border-border
+                    shadow-sm transition-colors duration-200 focus-within:border-primary
+                    focus-within:ring-2 focus-within:ring-primary/15"
                 >
-                  <Search className="absolute left-5 h-4 w-4 text-gray-400 pointer-events-none" />
+                  <Search className="absolute left-5 h-4 w-4 text-muted-foreground/80 pointer-events-none" />
                   <input
                     type="text"
                     role="searchbox"
@@ -94,18 +94,18 @@ const TopicsPageClient = () => {
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     placeholder="Search topics, concerns, treatments..."
-                    className="w-full bg-transparent pl-13 pr-12 py-4 text-[15px] text-gray-900
-                      placeholder:text-gray-400 focus:outline-none rounded-full"
+                    className="w-full bg-transparent pl-13 pr-12 py-4 text-[15px] text-foreground
+                      placeholder:text-muted-foreground/80 focus:outline-none rounded-full"
                   />
                   <div className="absolute right-4 flex items-center">
                     {isSearching ? (
-                      <Loader2 className="h-4 w-4 text-[#24bbcb] animate-spin" />
+                      <Loader2 className="h-4 w-4 text-primary animate-spin" />
                     ) : searchInput ? (
                       <button
                         type="button"
                         onClick={() => setSearchInput("")}
                         aria-label="Clear search"
-                        className="p-1 rounded-full text-gray-400 hover:text-[#24bbcb] hover:bg-gray-50 transition-colors"
+                        className="p-1 rounded-full text-muted-foreground/80 hover:text-primary hover:bg-muted transition-colors"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -116,15 +116,15 @@ const TopicsPageClient = () => {
                 {/* Popular topic chips */}
                 {!loading && popularTopics.length > 0 && !searchInput && (
                   <div className="flex flex-wrap items-center gap-2 mt-4">
-                    <span className="text-[11px] uppercase tracking-widest text-gray-400 mr-1">
+                    <span className="text-[11px] uppercase tracking-widest text-muted-foreground/80 mr-1">
                       Popular
                     </span>
                     {popularTopics.map((topic) => (
                       <a
                         key={topic.id}
                         href={`/topics/${topic.slug || topic.id}`}
-                        className="text-[13px] font-medium text-gray-600 bg-white px-3.5 py-1.5 rounded-full
-                          border border-gray-200 hover:border-[#24bbcb]/50 hover:text-[#24bbcb] transition-colors duration-150"
+                        className="text-[13px] font-medium text-muted-foreground bg-card px-3.5 py-1.5 rounded-full
+                          border border-border hover:border-primary/50 hover:text-primary transition-colors duration-150"
                       >
                         {topic.name}
                       </a>
@@ -136,7 +136,7 @@ const TopicsPageClient = () => {
 
             {/* Editorial image panel */}
             <div className="relative hidden lg:block">
-              <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-[0_20px_60px_-15px_rgba(36,187,203,0.35)]">
+              <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-primary">
                 <Image
                   src="/assets/blog-featured.jpg"
                   alt="Glamlink beauty editorial"
@@ -149,15 +149,15 @@ const TopicsPageClient = () => {
               </div>
 
               {/* Floating stat card */}
-              <div className="absolute -bottom-6 -left-8 bg-white rounded-2xl shadow-xl border border-gray-100 px-5 py-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-[#24bbcb]/10 flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="h-4 w-4 text-[#24bbcb]" />
+              <div className="absolute -bottom-6 -left-8 bg-card rounded-2xl shadow-xl border border-border px-5 py-4 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <p className="font-serif text-lg text-gray-900 leading-none">
+                  <p className="text-lg text-foreground leading-none">
                     {topics.length || "—"}
                   </p>
-                  <p className="text-[11px] text-gray-400 mt-1">
+                  <p className="text-[11px] text-muted-foreground/80 mt-1">
                     {topics.length === 1 ? "topic" : "topics"} covered
                   </p>
                 </div>
@@ -171,14 +171,14 @@ const TopicsPageClient = () => {
       <section className="max-w-[1200px] mx-auto px-5 sm:px-6 py-16 md:py-20">
         <div className="flex items-end justify-between mb-10 gap-4">
           <div>
-            <p className="text-[10px] tracking-[.15em] uppercase text-gray-400 mb-2">
+            <p className="text-[10px] tracking-[.15em] uppercase text-muted-foreground/80 mb-2">
               {normalizedQuery ? "Search results" : "Browse"}
             </p>
-            <h2 className="section-title font-display">
+            <h2 className="section-title">
               {normalizedQuery ? `Topics matching "${searchQuery}"` : "All Topics"}
             </h2>
             {!normalizedQuery && (
-              <p className="text-sm text-gray-500 font-normal mt-2 max-w-md">
+              <p className="text-sm text-muted-foreground font-normal mt-2 max-w-md">
                 Every concern, treatment, and specialty Glamlink covers —
                 pick one to dive into expert insights, articles, and trusted
                 professionals.
@@ -186,7 +186,7 @@ const TopicsPageClient = () => {
             )}
           </div>
           {!loading && (
-            <p className="text-[12px] text-gray-400 hidden sm:block">
+            <p className="text-[12px] text-muted-foreground/80 hidden sm:block">
               {filteredTopics.length}{" "}
               {filteredTopics.length === 1 ? "topic" : "topics"}
             </p>
@@ -198,13 +198,13 @@ const TopicsPageClient = () => {
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className="animate-pulse rounded-2xl overflow-hidden border border-gray-100"
+                className="animate-pulse rounded-2xl overflow-hidden border border-border"
               >
-                <div className="w-full aspect-[16/9] bg-gray-100" />
+                <div className="w-full aspect-[16/9] bg-muted" />
                 <div className="p-5 space-y-3">
-                  <div className="h-4 bg-gray-100 rounded w-3/4" />
-                  <div className="h-3 bg-gray-100 rounded w-full" />
-                  <div className="h-3 bg-gray-100 rounded w-2/3" />
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-3 bg-muted rounded w-full" />
+                  <div className="h-3 bg-muted rounded w-2/3" />
                 </div>
               </div>
             ))}
@@ -212,16 +212,16 @@ const TopicsPageClient = () => {
         ) : filteredTopics.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-20 text-center">
             {normalizedQuery ? (
-              <SearchX className="h-8 w-8 text-gray-300" />
+              <SearchX className="h-8 w-8 text-muted-foreground/60" />
             ) : (
-              <Compass className="h-8 w-8 text-gray-300" />
+              <Compass className="h-8 w-8 text-muted-foreground/60" />
             )}
-            <p className="text-sm font-medium text-gray-800">
+            <p className="text-sm font-medium text-foreground">
               {normalizedQuery
                 ? `No topics match "${searchQuery}"`
                 : "No topics available yet."}
             </p>
-            <p className="max-w-sm text-xs text-gray-400">
+            <p className="max-w-sm text-xs text-muted-foreground/80">
               {normalizedQuery
                 ? "Try a different keyword, or browse everything we currently cover."
                 : "Check back soon — we're building out topic coverage."}
@@ -229,7 +229,7 @@ const TopicsPageClient = () => {
             {normalizedQuery && (
               <button
                 onClick={() => setSearchInput("")}
-                className="text-xs font-medium text-[#24bbcb] hover:underline mt-1"
+                className="text-xs font-medium text-primary hover:underline mt-1"
               >
                 Clear search
               </button>

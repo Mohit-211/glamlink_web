@@ -63,7 +63,7 @@ export default async function ProductDetailsPage({
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center">
-        <h1 className="font-display text-2xl">Product not found</h1>
+        <h1 className="text-2xl">Product not found</h1>
         <p className="text-sm text-muted-foreground">
           This product may have been removed or the link is invalid.
         </p>
@@ -99,7 +99,7 @@ export default async function ProductDetailsPage({
             />
 
             {product.category && (
-              <span className="absolute top-4 left-4 text-[10px] font-semibold uppercase tracking-wide bg-white/90 text-foreground px-2.5 py-1 rounded">
+              <span className="absolute top-4 left-4 text-[10px] font-semibold uppercase tracking-wide bg-card/90 text-foreground px-2.5 py-1 rounded">
                 {product.category}
               </span>
             )}
@@ -111,7 +111,7 @@ export default async function ProductDetailsPage({
               {product.brand}
             </p>
 
-            <h1 className="font-display text-3xl leading-snug mt-2 text-foreground">
+            <h1 className="text-3xl leading-snug mt-2 text-foreground">
               {product.title || product.name}
             </h1>
 

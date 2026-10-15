@@ -18,7 +18,7 @@ export default function PartnerPage() {
         <div className="container-glamlink">
           <div className="mx-auto w-full max-w-160">
             <div className="text-center">
-              <h2 id="partner-inquiry-heading" className="section-title font-display">
+              <h2 id="partner-inquiry-heading" className="section-title">
                 Interested in partnering with us?
               </h2>
               <p className="section-subtitle mx-auto leading-relaxed">

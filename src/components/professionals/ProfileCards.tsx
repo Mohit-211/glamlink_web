@@ -61,7 +61,7 @@ const ProfileCards = () => {
           </div>
 
           {/* Founding Member Card */}
-          <div className="bg-gradient-to-br from-primary/5 via-card to-primary/10 rounded-3xl p-8 lg:p-10 border border-primary/20 relative overflow-hidden group">
+          <div className="bg-accent/50 rounded-3xl p-8 lg:p-10 border border-primary/20 relative overflow-hidden group">
             {/* Decorative badge */}
             <div className="absolute top-6 right-6">
               <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">

@@ -72,7 +72,7 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
 
           {/* Right */}
           <div className="flex justify-center lg:justify-end">
-            <div className="w-full max-w-md overflow-hidden rounded-3xl border border-border bg-card shadow-[var(--shadow-large)]">
+            <div className="w-full max-w-md overflow-hidden rounded-3xl border border-border bg-card shadow-large">
               <video
                 className="aspect-[9/16] w-full object-cover"
                 autoPlay
@@ -111,7 +111,7 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
               ONE TAP CAN OPEN THE DOOR TO NEW CONNECTIONS.
             </p>
 
-            <p className="mt-8 font-display text-3xl uppercase tracking-[0.2em] text-foreground">
+            <p className="mt-8 text-3xl uppercase tracking-[0.2em] text-foreground">
               ACCESS BY <span className="text-primary">GLAMLINK</span>
             </p>
           </div>

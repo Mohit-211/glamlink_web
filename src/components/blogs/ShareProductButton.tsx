@@ -38,7 +38,7 @@ const ShareProductButton = ({ url, title }: ShareProductButtonProps) => {
     >
       {copied ? (
         <>
-          <Check className="h-4 w-4 text-green-600" />
+          <Check className="h-4 w-4 text-success" />
           Copied!
         </>
       ) : (

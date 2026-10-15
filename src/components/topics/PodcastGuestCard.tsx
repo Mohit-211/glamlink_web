@@ -7,13 +7,6 @@ interface PodcastGuestCardProps {
   index?: number;
 }
 
-const PALETTES = [
-  { bg: "rgba(36,187,203,0.12)", text: "#1d8b93" },
-  { bg: "rgba(147,51,234,0.10)", text: "#7e22ce" },
-  { bg: "rgba(217,119,6,0.10)", text: "#b45309" },
-  { bg: "rgba(219,39,119,0.10)", text: "#be185d" },
-];
-
 const getInitials = (name: string) =>
   name
     .trim()
@@ -31,27 +24,25 @@ const formatDate = (date?: string) => {
 };
 
 const PodcastGuestCard = ({ name, role, date, index = 0 }: PodcastGuestCardProps) => {
-  const palette = PALETTES[index % PALETTES.length];
   const formattedDate = formatDate(date);
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl border border-gray-100 p-5 hover:border-[#24bbcb]/40 hover:shadow-lg transition-all duration-300">
+    <div className="flex flex-col h-full bg-card rounded-2xl border border-border p-5 hover:border-primary/40 hover:shadow-lg transition-all duration-300">
       <div className="flex items-start justify-between mb-4">
         <div
-          className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0"
-          style={{ background: palette.bg, color: palette.text }}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground"
         >
           {getInitials(name)}
         </div>
-        <span className="flex items-center gap-1 text-[10px] font-medium tracking-wide uppercase text-gray-400">
+        <span className="flex items-center gap-1 text-[10px] font-medium tracking-wide uppercase text-muted-foreground/80">
           <Mic className="h-3 w-3" />
           Podcast
         </span>
       </div>
-      <h3 className="font-serif text-gray-900 text-[15px] leading-snug">{name}</h3>
-      <p className="text-[12px] text-gray-500 font-normal mt-1 flex-1">{role}</p>
+      <h3 className="text-foreground text-[15px] leading-snug">{name}</h3>
+      <p className="text-[12px] text-muted-foreground font-normal mt-1 flex-1">{role}</p>
       {formattedDate && (
-        <p className="text-[11px] text-gray-400 mt-3 pt-3 border-t border-gray-100">
+        <p className="text-[11px] text-muted-foreground/80 mt-3 pt-3 border-t border-border">
           Episode airing {formattedDate}
         </p>
       )}

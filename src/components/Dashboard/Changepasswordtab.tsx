@@ -118,13 +118,13 @@ export default function ChangePasswordTab() {
                 </p>
             </div>
             {success && (
-                <div className="mb-4 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+                <div className="mb-4 flex items-center gap-2 rounded-xl border border-success/30 bg-success/5 px-4 py-3 text-sm font-medium text-success">
                     <CheckCircle className="h-4 w-4 flex-shrink-0" />
                     Password changed successfully.
                 </div>
             )}
             {error && (
-                <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                <div className="mb-4 flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm font-medium text-destructive">
                     <AlertCircle className="h-4 w-4 flex-shrink-0" />
                     {error}
                 </div>

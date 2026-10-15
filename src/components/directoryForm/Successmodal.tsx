@@ -15,43 +15,43 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
 
   return (
     <div className="
-      fixed inset-0 bg-[rgba(26,58,66,0.55)] backdrop-blur-md
+      fixed inset-0 bg-foreground/55 backdrop-blur-md
       z-50 flex items-center justify-center p-4
     ">
       <div className="
-        bg-white rounded-[22px] p-12 text-center max-w-[430px] w-full
-        border-t-4 border-[#24bbcb]
+        bg-card rounded-[22px] p-12 text-center max-w-[430px] w-full
+        border-t-4 border-primary
         animate-[popIn_0.42s_cubic-bezier(0.34,1.56,0.64,1)]
       ">
         <div className="text-5xl mb-3.5">🎉</div>
-        <h2 className="font-poppins text-2xl font-semibold text-[#1A3A42] mb-2.5">
+        <h2 className="text-2xl font-semibold text-foreground mb-2.5">
           Application Submitted!
         </h2>
-        <p className="text-sm text-[#4A7A88] leading-[1.7] mb-5">
+        <p className="text-sm text-muted-foreground leading-[1.7] mb-5">
           Thank you for joining GlamLink! Our team will review your listing within
           2–3 business days. Check your inbox for confirmation
           {accessCard && ' — and your free Access card on approval'}.
         </p>
         <div className="flex flex-wrap gap-2 justify-center mb-7">
-          <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-[#EDFAF4] border-[#A8E5C8] text-[#2E8A5A]">
+          <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-success/10 border-success/30 text-success">
             ✓ Application Received
           </span>
           {accessCard && (
-            <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-[#EEF9FC] border-[#D6F2F8] text-[#2A9BB5]">
+            <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-accent border-border text-primary">
               ✦ Access Card Queued
             </span>
           )}
-          <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-[#EEF9FC] border-[#D6F2F8] text-[#2A9BB5]">
+          <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-accent border-border text-primary">
             🗺️ Map Listing Pending
           </span>
         </div>
         <button
           onClick={onClose}
           className="
-            bg-[#24bbcb] hover:bg-[#2A9BB5] text-white border-none rounded-full
-            px-10 py-3.5 font-poppins text-sm font-semibold
+            bg-primary hover:bg-primary text-white border-none rounded-full
+            px-10 py-3.5 text-sm font-semibold
             transition-colors duration-200
-            shadow-[0_4px_14px_rgba(36,187,203,0.3)]
+            shadow-primary
           "
         >
           Got it, thanks!

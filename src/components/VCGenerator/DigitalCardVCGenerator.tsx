@@ -38,12 +38,12 @@ export default function DigitalCard() {
     .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-background">
       
       {/* HEADER */}
-      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur border-b px-6 py-4 flex justify-between items-center">
+      <div className="sticky top-0 z-20 bg-card/80 backdrop-blur border-b px-6 py-4 flex justify-between items-center">
         <h1 className="text-lg font-semibold">Digital Card Builder</h1>
-        <span className="text-xs bg-gray-100 px-3 py-1 rounded-full">
+        <span className="text-xs bg-muted px-3 py-1 rounded-full">
           Live Preview
         </span>
       </div>
@@ -55,7 +55,7 @@ export default function DigitalCard() {
         <div className="space-y-6">
           
           {/* CARD SETTINGS */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border">
+          <div className="bg-card p-6 rounded-2xl shadow-sm border">
             <h2 className="text-lg font-semibold mb-4">Profile Info</h2>
 
             <div className="grid grid-cols-2 gap-4">
@@ -69,12 +69,12 @@ export default function DigitalCard() {
                 { name: "website", label: "Website" },
               ].map((f) => (
                 <div key={f.name} className="col-span-2">
-                  <label className="text-xs text-gray-500">{f.label}</label>
+                  <label className="text-xs text-muted-foreground">{f.label}</label>
                   <input
                     name={f.name}
                     value={(form as any)[f.name]}
                     onChange={handleChange}
-                    className="w-full mt-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-black/10 outline-none transition"
+                    className="w-full mt-1 border border-border rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-black/10 outline-none transition"
                   />
                 </div>
               ))}
@@ -89,7 +89,7 @@ export default function DigitalCard() {
         <div className="flex justify-center">
           <div className="sticky top-24 w-full max-w-sm">
 
-            <div className="bg-white rounded-3xl shadow-xl overflow-hidden transition-all hover:shadow-2xl">
+            <div className="bg-card rounded-3xl shadow-xl overflow-hidden transition-all hover:shadow-2xl">
               
               {/* Banner */}
               <div
@@ -112,7 +112,7 @@ export default function DigitalCard() {
                     {initials}
                   </div>
 
-                  <div className="bg-white p-2 rounded-xl shadow">
+                  <div className="bg-card p-2 rounded-xl shadow">
                     <QRCode value={publicUrl} size={70} />
                   </div>
                 </div>
@@ -122,7 +122,7 @@ export default function DigitalCard() {
                   {form.name}
                 </h2>
 
-                <p className="text-gray-500 text-sm">
+                <p className="text-muted-foreground text-sm">
                   {form.title} · {form.company}
                 </p>
 
@@ -143,13 +143,13 @@ export default function DigitalCard() {
                 {/* <div className="mt-6 grid grid-cols-2 gap-3">
                   <a
                     href={`tel:${form.phone}`}
-                    className="text-center py-2.5 rounded-xl border hover:bg-gray-50 transition"
+                    className="text-center py-2.5 rounded-xl border hover:bg-muted transition"
                   >
                     Call
                   </a>
                   <a
                     href={`mailto:${form.email}`}
-                    className="text-center py-2.5 rounded-xl border hover:bg-gray-50 transition"
+                    className="text-center py-2.5 rounded-xl border hover:bg-muted transition"
                   >
                     Email
                   </a>

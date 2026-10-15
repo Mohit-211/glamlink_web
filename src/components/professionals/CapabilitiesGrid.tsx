@@ -110,7 +110,7 @@ const CapabilitiesGrid = () => {
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
             Complete Toolkit
           </span>
-          <h2 className="section-title font-display mb-4">
+          <h2 className="section-title mb-4">
             Everything You Need To{" "}
             <span className="gradient-text">Create, Build & Dominate</span>
           </h2>
@@ -127,7 +127,7 @@ const CapabilitiesGrid = () => {
               key={index}
               className={`relative bg-card rounded-2xl p-6 border transition-all hover:-translate-y-1 group ${
                 cap.highlight
-                  ? "border-primary/30 bg-gradient-to-br from-primary/5 to-transparent"
+                  ? "border-primary/30 bg-primary/5"
                   : "border-border hover:border-primary/30"
               }`}
             >

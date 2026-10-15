@@ -21,7 +21,7 @@ export default function DirectoryBusinessCard({ business, onClaim }: DirectoryBu
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
-        <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
+        <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
           {category}
         </span>
       </div>

@@ -25,12 +25,12 @@ interface FieldsProps {
 }
 
 const inputClass =
-  "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
+  "w-full rounded-lg border border-border bg-card px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
 
-const labelClass = "text-sm font-medium text-gray-700 block mb-1.5";
+const labelClass = "text-sm font-medium text-foreground/80 block mb-1.5";
 
 const buttonClass =
-  "min-w-[120px] rounded-lg bg-[#24bbcb] px-5 py-2.5 text-sm font-medium text-white transition";
+  "min-w-[120px] rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white transition";
 
 // Helper: Convert state name/abbreviation to numeric ID
 const findStateId = (stateValue: string | undefined, statesArray: any[]): string | undefined => {
@@ -371,10 +371,10 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                 ))}
               </select>
               {location.city && cityCoordsLoading && (
-                <p className="mt-1 text-xs text-gray-400">Resolving coordinates…</p>
+                <p className="mt-1 text-xs text-muted-foreground/80">Resolving coordinates…</p>
               )}
               {location.city && !cityCoordsLoading && !cityCoords && (
-                <p className="mt-1 text-xs text-red-500">
+                <p className="mt-1 text-xs text-destructive">
                   Couldn&apos;t resolve coordinates for this city.
                 </p>
               )}
@@ -387,15 +387,15 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
               disabled={!canSetCity}
               className={`w-full ${
                 canSetCity
-                  ? "bg-[#24bbcb] text-white hover:bg-[#1f9ba3]"
-                  : "cursor-not-allowed bg-gray-300 text-white"
+                  ? "bg-primary text-white hover:bg-primary"
+                  : "cursor-not-allowed bg-input text-white"
               } ${buttonClass}`}
               onClick={handleSetCity}
             >
               {citiesLoading || cityCoordsLoading ? "Loading..." : "Set Location"}
             </button>
             {location.isSet && (
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-success/10 text-success">
                 ✓
               </span>
             )}
@@ -423,15 +423,15 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                 disabled={!canConfirmExact}
                 className={`flex-1 sm:flex-none ${buttonClass} ${
                   canConfirmExact
-                    ? "bg-[#24bbcb] hover:bg-[#1F9CA5]"
-                    : "cursor-not-allowed bg-gray-300"
+                    ? "bg-primary hover:bg-primary"
+                    : "cursor-not-allowed bg-input"
                 }`}
                 onClick={handleConfirmExact}
               >
                 Confirm
               </button>
               {location.isSet && (
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-success/10 text-success">
                   ✓
                 </span>
               )}

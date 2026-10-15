@@ -254,7 +254,7 @@ export default function DashboardPage() {
               (1024px) — at `md` there wasn't enough room for a 256px rail
               next to the card, so it now stacks through tablet widths too. */}
           <aside className="w-full lg:w-64 flex-shrink-0">
-            <nav className="rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden">
+            <nav className="rounded-2xl border border-border bg-card shadow-soft overflow-hidden">
               <div className="px-4 py-4 border-b border-border bg-secondary/30 sm:px-5">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground ring-2 ring-primary/20">

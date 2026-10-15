@@ -35,7 +35,7 @@ const PublicCard = () => {
     <div className="min-h-screen flex items-center justify-center pt-20">
       
       {/* CARD */}
-      <div className="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden animate-fadeIn">
+      <div className="w-full max-w-sm bg-card rounded-3xl shadow-2xl overflow-hidden animate-fadeIn">
         
         {/* BANNER */}
         <div
@@ -58,22 +58,22 @@ const PublicCard = () => {
               {initials}
             </div>
 
-            <div className="bg-white p-2 rounded-xl shadow">
+            <div className="bg-card p-2 rounded-xl shadow">
               <QRCode value={publicUrl} size={70} />
             </div>
           </div>
 
           {/* NAME */}
-          <h1 className="text-2xl font-semibold text-gray-900 mt-4">
+          <h1 className="text-2xl font-semibold text-foreground mt-4">
             {user.name}
           </h1>
 
-          <p className="text-gray-500 text-sm">
+          <p className="text-muted-foreground text-sm">
             {user.title} · {user.company}
           </p>
 
           {/* INFO */}
-          <div className="mt-5 space-y-3 text-sm text-gray-700">
+          <div className="mt-5 space-y-3 text-sm text-foreground/80">
             <div className="flex items-center gap-2">
               📱 <span>{user.phone}</span>
             </div>
@@ -89,14 +89,14 @@ const PublicCard = () => {
           <div className="mt-6 grid grid-cols-2 gap-3">
             <a
               href={`tel:${user.phone}`}
-              className="text-center py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition font-medium"
+              className="text-center py-2.5 rounded-xl border border-border hover:bg-muted transition font-medium"
             >
               📞 Call
             </a>
 
             <a
               href={`mailto:${user.email}`}
-              className="text-center py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition font-medium"
+              className="text-center py-2.5 rounded-xl border border-border hover:bg-muted transition font-medium"
             >
               📧 Email
             </a>
@@ -123,7 +123,7 @@ const PublicCard = () => {
       </div>
 
       {/* OPTIONAL FOOTER */}
-      <div className="absolute bottom-4 text-xs text-gray-500">
+      <div className="absolute bottom-4 text-xs text-muted-foreground">
         Powered by <span className="font-semibold text-white">Glamlink</span>
       </div>
     </div>

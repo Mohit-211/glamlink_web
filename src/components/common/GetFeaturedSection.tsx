@@ -23,7 +23,7 @@ const GetFeaturedSection = () => {
           <SectionLabel>Get Featured</SectionLabel>
 
           {/* HEADING */}
-          <h2 className="section-title font-display mb-4">
+          <h2 className="section-title mb-4">
             Step into the spotlight
           </h2>
 

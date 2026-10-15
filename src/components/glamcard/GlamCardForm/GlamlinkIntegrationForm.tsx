@@ -7,9 +7,9 @@ interface Props {
 }
 
 const sectionClass =
-  "space-y-6 rounded-xl border border-gray-200 bg-white p-4 sm:p-6";
+  "space-y-6 rounded-xl border border-border bg-card p-4 sm:p-6";
 
-const labelClass = "text-sm font-medium text-gray-700";
+const labelClass = "text-sm font-medium text-foreground/80";
 
 const excitementOptions = [
   "Clients ability to discover pros nearby and check out their services, work, reviews, etc",
@@ -53,7 +53,7 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
     <section className={sectionClass}>
       <header className="space-y-1">
         <h2 className="text-lg font-semibold">Glamlink Integration</h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Help us understand your needs and how we can best support your business
         </p>
       </header>
@@ -62,14 +62,14 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
       <div className="space-y-3">
         <label className={labelClass}>
           What excites you about Glamlink? *
-          <span className="ml-1 text-xs text-gray-400">(Select at least 1)</span>
+          <span className="ml-1 text-xs text-muted-foreground/80">(Select at least 1)</span>
         </label>
 
         <div className="space-y-2">
           {excitementOptions.map(item => (
             <label
               key={item}
-              className="flex items-start gap-2 text-sm text-gray-700"
+              className="flex items-start gap-2 text-sm text-foreground/80"
             >
               <input
                 type="checkbox"
@@ -84,7 +84,7 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
         </div>
 
         {data?.excites_about_glamlink?.length === 0 && (
-          <div className="rounded-md bg-yellow-50 px-3 py-2 text-xs text-yellow-700">
+          <div className="rounded-md bg-warning/5 px-3 py-2 text-xs text-warning">
             Minimum 1 selection required
           </div>
         )}
@@ -94,14 +94,14 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
       <div className="space-y-3">
         <label className={labelClass}>
           Biggest pain points *
-          <span className="ml-1 text-xs text-gray-400">(Select at least 1)</span>
+          <span className="ml-1 text-xs text-muted-foreground/80">(Select at least 1)</span>
         </label>
 
         <div className="grid gap-2 sm:grid-cols-2">
           {painPointOptions.map(item => (
             <label
               key={item}
-              className="flex items-start gap-2 text-sm text-gray-700"
+              className="flex items-start gap-2 text-sm text-foreground/80"
             >
               <input
                 type="checkbox"
@@ -116,7 +116,7 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
         </div>
 
         {data?.biggest_pain_points?.length === 0 && (
-          <div className="rounded-md bg-yellow-50 px-3 py-2 text-xs text-yellow-700">
+          <div className="rounded-md bg-warning/5 px-3 py-2 text-xs text-warning">
             Minimum 1 selection required
           </div>
         )}
@@ -158,7 +158,7 @@ const GlamlinkIntegrationForm: React.FC<Props> = ({ data, setData }) => {
 )}
 
       {/* ================= ELITE SETUP ================= */}
-      {/* <label className="flex items-start gap-2 rounded-lg border border-gray-300 p-4 text-sm">
+      {/* <label className="flex items-start gap-2 rounded-lg border border-border p-4 text-sm">
         <input
           type="checkbox"
           checked={data.elite_setup}

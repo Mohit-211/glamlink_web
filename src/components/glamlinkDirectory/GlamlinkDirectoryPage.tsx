@@ -18,7 +18,6 @@ import FeaturedProfiles from "./FeaturedProfiles";
 import DirectoryResults from "./DirectoryResults";
 import ClaimProfileModal from "./ClaimProfileModal";
 import DirectoryCTA, { CLAIM_PROFILE_HREF } from "./DirectoryCTA";
-import { directoryThemeStyle } from "./directoryTheme";
 
 export default function GlamlinkDirectoryPage() {
   const router = useRouter();
@@ -152,7 +151,7 @@ export default function GlamlinkDirectoryPage() {
       : "Top-rated beauty + wellness businesses";
 
   return (
-    <div className="overflow-x-clip" style={directoryThemeStyle}>
+    <div className="overflow-x-clip">
       <DirectoryHero>
         <DirectorySearch
           professionalTypes={PROFESSIONAL_TYPES}

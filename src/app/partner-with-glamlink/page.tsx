@@ -121,7 +121,7 @@ export default function MediaKitPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <main className="bg-white">
+      <main className="bg-card">
         <MediaKitHero />
         <PublicationSection />
         <DistributionSection />

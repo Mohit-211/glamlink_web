@@ -95,7 +95,7 @@ export default function ProviderCard({ data, pagetype }: Props) {
         {data?.opening_hours && (
           <div className="mt-3 text-xs">
             {data.opening_hours.open_now ? (
-              <span className="text-green-600 font-medium">Open Now</span>
+              <span className="text-success font-medium">Open Now</span>
             ) : (
               <span className="text-muted-foreground">Closed Now</span>
             )}

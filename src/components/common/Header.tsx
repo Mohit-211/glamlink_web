@@ -90,7 +90,7 @@ export default function Header({ activeRoute }: any) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
       <div className="container-glamlink">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* LOGO */}
@@ -138,25 +138,21 @@ export default function Header({ activeRoute }: any) {
                   {/* Dropdown Menu */}
                   {profileDropdownOpen && (
                     <div
-                      className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50"
-                      style={{
-                        boxShadow:
-                          "0 10px 25px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(36,187,203, 0.1)",
-                      }}
+                      className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-card shadow-medium"
                     >
                       {/* Dashboard Option */}
                       <button
                         onClick={handleDashboard}
-                        className="w-full px-4 py-3 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                        className="w-full px-4 py-3 flex items-center gap-3 text-foreground/80 hover:bg-muted transition-colors border-b border-border"
                       >
-                        <LayoutDashboard className="w-5 h-5 text-teal-600" />
+                        <LayoutDashboard className="w-5 h-5 text-primary" />
                         <span className="font-medium">Dashboard</span>
                       </button>
 
                       {/* Logout Option */}
                       <button
                         onClick={handleLogout}
-                        className="w-full px-4 py-3 flex items-center gap-3 text-red-600 hover:bg-red-50 transition-colors"
+                        className="w-full px-4 py-3 flex items-center gap-3 text-destructive hover:bg-destructive/5 transition-colors"
                       >
                         <LogOut className="w-5 h-5" />
                         <span className="font-medium">Logout</span>
@@ -192,7 +188,7 @@ export default function Header({ activeRoute }: any) {
 
       {/* MOBILE MENU */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-white shadow-lg max-h-[calc(100dvh-4rem)] overflow-y-auto">
+        <div className="lg:hidden border-t border-border bg-card shadow-lg max-h-[calc(100dvh-4rem)] overflow-y-auto">
           <div className="container-glamlink py-6 flex flex-col gap-2">
             {navLinks.map((link) => (
               <Link
@@ -222,7 +218,7 @@ export default function Header({ activeRoute }: any) {
                     <Button
                       onClick={handleLogout}
                       variant="outline"
-                      className="w-full rounded-full py-6 flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50"
+                      className="w-full rounded-full py-6 flex items-center gap-2 border-destructive/30 text-destructive hover:bg-destructive/5"
                     >
                       <LogOut className="w-5 h-5" />
                       Logout

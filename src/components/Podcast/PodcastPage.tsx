@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowRight, Play, X } from "lucide-react";
 import GuestModal from "./GuestModal";
 import NotifySection from "./Notifysection";
 import UpcomingSchedule from "./UpcomingSchedule";
@@ -19,15 +20,6 @@ const YOUTUBE_PLAYLIST_ID = "PLJPmuOJKw5YbrNAxnyi7SuQx9gNisadgY";
 const YOUTUBE_PLAYLIST_URL = `https://www.youtube.com/playlist?list=${YOUTUBE_PLAYLIST_ID}`;
 const SPOTIFY_URL = "https://open.spotify.com/show/0GEWcvRT3PFalAaN2faX4z?si=OWqOPcyZSZqNn7ATTnGJng";
 const APPLE_PODCASTS_URL = "https://podcasts.apple.com/us/podcast/the-beauty-vault/id1885669168";
-
-const PLACEHOLDER_PALETTE = [
-  { bg: "linear-gradient(135deg,#e8f5f2 0%,#d0ede8 100%)", text: "#5bbfb0" },
-  { bg: "linear-gradient(135deg,#f5f0eb 0%,#ede4d8 100%)", text: "#b8997a" },
-  { bg: "linear-gradient(135deg,#eef1f7 0%,#dde4f0 100%)", text: "#7a95c0" },
-  { bg: "linear-gradient(135deg,#f5eef7 0%,#ead8f0 100%)", text: "#a870c0" },
-  { bg: "linear-gradient(135deg,#faf0ee 0%,#f0dbd7 100%)", text: "#c47a6e" },
-  { bg: "linear-gradient(135deg,#eef5e8 0%,#d8eccc 100%)", text: "#6da855" },
-];
 
 // ─── Slug helpers ─────────────────────────────────────────────────────────────
 function slugify(text: string): string {
@@ -50,23 +42,29 @@ function extractIdFromSlug(slug: string): string {
   return match ? match[1] : slug;
 }
 
-const YouTubeIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: "16px", height: "16px" }}>
+const YouTubeIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
   </svg>
 );
 
-const SpotifyIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: "16px", height: "16px" }}>
-    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+const SpotifyIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.020 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
   </svg>
 );
 
-const ApplePodcastsIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: "16px", height: "16px" }}>
-    <path d="M5.34 0A5.328 5.328 0 0 0 0 5.34v13.32A5.328 5.328 0 0 0 5.34 24h13.32A5.328 5.328 0 0 0 24 18.66V5.34A5.328 5.328 0 0 0 18.66 0zm7.006 2.06c3.106 0 5.633 1.02 7.585 3.026 1.773 1.802 2.7 4.198 2.7 6.942 0 5.747-3.9 9.847-9.378 9.847-5.478 0-9.385-4.1-9.385-9.847 0-2.744.927-5.14 2.7-6.942 1.958-2.006 4.477-3.026 7.583-3.026zm0 1.99c-2.617 0-4.73.882-6.228 2.55-1.397 1.558-2.13 3.64-2.13 5.993 0 4.835 3.136 7.96 7.758 7.96 4.623 0 7.752-3.125 7.752-7.96 0-2.354-.733-4.435-2.13-5.993-1.498-1.668-3.61-2.55-6.22-2.55zm.008 3.08c1.65 0 2.99 1.34 2.99 2.99s-1.34 2.99-2.99 2.99-2.99-1.34-2.99-2.99 1.34-2.99 2.99-2.99zm0 1.5a1.49 1.49 0 1 0 0 2.98 1.49 1.49 0 0 0 0-2.98zm0 4.79c2.26 0 4.09 1.83 4.09 4.09h-1.5a2.59 2.59 0 0 0-2.59-2.59 2.59 2.59 0 0 0-2.59 2.59H9.264c0-2.26 1.83-4.09 4.09-4.09z" />
+const ApplePodcastsIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+    <path d="M5.34 0A5.328 5.328 0 0 0 0 5.34v13.32A5.328 5.328 0 0 0 5.34 24h13.32A5.328 5.328 0 0 0 24 18.66V5.34A5.328 5.328 0 0 0 18.66 0zm7.006 2.06c3.106 0 5.633 1.02 7.585 3.026 1.773 1.802 2.7 4.198 2.7 6.942 0 5.747-3.9 9.847-9.378 9.847-5.478 0-9.385-4.1-9.385-9.847 0-2.744.927-5.14 2.7-6.942 1.958-2.006 4.477-3.026 7.583-3.026zm0 1.99c-2.617 0-4.73.882-6.228 2.55-1.397 1.558-2.13 3.64-2.13 5.993 0 4.835 3.136 7.960 7.758 7.960 4.623 0 7.752-3.125 7.752-7.960 0-2.354-.733-4.435-2.13-5.993-1.498-1.668-3.61-2.55-6.22-2.55zm.008 3.08c1.65 0 2.99 1.34 2.99 2.99s-1.34 2.99-2.99 2.99-2.99-1.34-2.99-2.99 1.34-2.99 2.99-2.99zm0 1.5a1.49 1.49 0 1 0 0 2.98 1.49 1.49 0 0 0 0-2.98zm0 4.79c2.26 0 4.09 1.83 4.09 4.09h-1.5a2.59 2.59 0 0 0-2.59-2.59 2.59 2.59 0 0 0-2.59 2.59H9.264c0-2.26 1.83-4.09 4.09-4.09z" />
   </svg>
 );
+
+const PLATFORMS: { label: string; href: string; icon: ComponentType<{ className?: string }> }[] = [
+  { label: "YouTube", href: YOUTUBE_PLAYLIST_URL, icon: YouTubeIcon },
+  { label: "Spotify", href: SPOTIFY_URL, icon: SpotifyIcon },
+  { label: "Apple Podcasts", href: APPLE_PODCASTS_URL, icon: ApplePodcastsIcon },
+];
 
 const FALLBACK_EPISODES: Video[] = [
   { id: "fallback-1", title: "Behind the Glam: A Raiderettes Makeup Artist's Journey", thumbnail: "", publishedAt: "2025-01-01" },
@@ -99,6 +97,8 @@ async function fetchPlaylistVideos(playlistId: string): Promise<{ videos: Video[
   return { videos: [...allItems], totalCount: allItems.length };
 }
 
+const eyebrow = "text-[10px] font-semibold uppercase tracking-[0.25em] text-primary";
+
 // ─── Video Modal ──────────────────────────────────────────────────────────────
 function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
   useEffect(() => {
@@ -110,62 +110,29 @@ function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
 
   return (
     <div
-      style={{
-        position: "fixed", inset: 0, zIndex: 50,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "clamp(1rem, 4vw, 2rem)",
-        background: "rgba(4,20,18,0.96)", backdropFilter: "blur(8px)",
-      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/95 p-4 backdrop-blur-sm sm:p-8"
       onClick={onClose}
     >
-      <div
-        style={{ position: "relative", width: "100%", maxWidth: "1030px" ,marginTop:"20px"}}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="relative mt-5 w-full max-w-[1030px]" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          style={{
-            position: "absolute", top: "-48px", right: 0,
-            display: "flex", alignItems: "center", gap: "8px",
-            color: "rgba(255,255,255,0.6)",
-            background: "none", border: "none", cursor: "pointer",
-            fontSize: "11px", letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 500,
-            transition: "color 0.2s",
-          }}
-          onMouseEnter={e => (e.currentTarget.style.color = "white")}
-          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
+          className="absolute -top-12 right-0 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-white/60 transition-colors hover:text-white"
         >
-          <span
-            style={{
-              width: "28px", height: "28px", borderRadius: "50%",
-              border: "1px solid rgba(255,255,255,0.2)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: "14px", height: "14px" }}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+          <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/20">
+            <X className="h-3.5 w-3.5" />
           </span>
           Close
         </button>
-        <div
-          style={{
-            position: "relative", width: "100%", borderRadius: "16px",
-            overflow: "hidden", paddingTop: "56.25%",
-            boxShadow: "0 40px 80px -20px rgba(0,0,0,0.8)",
-          }}
-        >
+        <div className="relative aspect-video w-full overflow-hidden rounded-2xl shadow-large">
           <iframe
             src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
             title={video.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
+            className="absolute inset-0 h-full w-full border-0"
           />
         </div>
-        <p style={{ marginTop: "20px", fontSize: "13px", fontWeight: 500, color: "rgba(255,255,255,0.7)", textAlign: "center", lineHeight: 1.4 }}>
-          {video.title}
-        </p>
+        <p className="mt-5 text-center text-[13px] font-medium leading-snug text-white/70">{video.title}</p>
       </div>
     </div>
   );
@@ -173,126 +140,58 @@ function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
 
 // ─── Episode Card ─────────────────────────────────────────────────────────────
 function EpisodeCard({
-  video, index, episodeNumber, onPlay, placeholderStyle,
+  video, index, episodeNumber, onPlay,
 }: {
-  video: Video; index: number; episodeNumber?: number; onPlay: (video: Video) => void; placeholderStyle?: { bg: string; text: string };
+  video: Video; index: number; episodeNumber?: number; onPlay: (video: Video) => void;
 }) {
   const episodeNum = String(Math.max(1, episodeNumber ?? index + 1)).padStart(2, "0");
   const isFallback = video.id.startsWith("fallback");
-  const ph = placeholderStyle ?? { bg: "linear-gradient(135deg,#e8f5f2,#d0ede8)", text: "#5bbfb0" };
-  const date = new Date(video.publishedAt);
-  const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  const [hovered, setHovered] = useState(false);
+  const formattedDate = new Date(video.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
+    <div className="group flex flex-col">
       {/* Thumbnail */}
       <div
-        style={{
-          position: "relative", aspectRatio: "16/9", borderRadius: "16px",
-          overflow: "hidden", marginBottom: "16px",
-          border: "1px solid rgba(0,0,0,0.06)",
-          boxShadow: hovered
-            ? "0 20px 48px -12px rgba(0,0,0,0.18), 0 4px 12px -4px rgba(0,0,0,0.08)"
-            : "0 2px 12px -4px rgba(0,0,0,0.08), 0 1px 3px -1px rgba(0,0,0,0.05)",
-          transform: hovered ? "translateY(-3px)" : "none",
-          transition: "box-shadow 0.4s ease, transform 0.4s ease",
-          cursor: isFallback ? "default" : "pointer",
-        }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        className={`relative mb-4 aspect-video overflow-hidden rounded-2xl border border-border shadow-soft transition-all duration-300 ${
+          isFallback ? "cursor-default" : "cursor-pointer group-hover:-translate-y-0.5 group-hover:shadow-medium"
+        }`}
         onClick={() => !isFallback && onPlay(video)}
       >
         {video.thumbnail ? (
           <img
             src={video.thumbnail}
             alt={video.title}
-            style={{
-              width: "100%", height: "100%", objectFit: "cover",
-              transform: hovered ? "scale(1.05)" : "scale(1)",
-              transition: "transform 0.7s ease",
-            }}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div
-            style={{
-              width: "100%", height: "100%", display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center", background: ph.bg,
-            }}
-          >
-            <span style={{ fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 300, lineHeight: 1, marginBottom: "4px", fontFamily: "inherit", color: ph.text, opacity: 0.9 }}>
-              {episodeNum}
-            </span>
-            <span style={{ fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 600, color: ph.text, opacity: 0.6 }}>
-              Episode
-            </span>
+          <div className="flex h-full w-full flex-col items-center justify-center bg-accent text-primary">
+            <span className="mb-1 text-4xl font-light leading-none sm:text-5xl">{episodeNum}</span>
+            <span className="text-[9px] font-semibold uppercase tracking-[0.3em] opacity-70">Episode</span>
           </div>
         )}
 
-        {/* Gradient overlay */}
-        <div
-          style={{
-            position: "absolute", inset: 0,
-            background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%)",
-            opacity: hovered ? 1 : 0, transition: "opacity 0.3s",
-          }}
-        />
-
         {/* Episode badge */}
-        <div style={{ position: "absolute", top: "12px", left: "12px" }}>
-          <span style={{
-            fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase",
-            fontWeight: 600, padding: "4px 10px", borderRadius: "100px",
-            background: "rgba(255,255,255,0.92)", color: "hsl(184 70% 32%)", backdropFilter: "blur(4px)",
-          }}>
-            EP. {episodeNum}
-          </span>
-        </div>
+        <span className="absolute left-3 top-3 rounded-full bg-card/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-accent-foreground backdrop-blur-sm">
+          EP. {episodeNum}
+        </span>
 
         {/* Play overlay */}
         {!isFallback && (
-          <div
-            style={{
-              position: "absolute", inset: 0,
-              display: "flex", alignItems: "flex-end", justifyContent: "space-between",
-              padding: "16px", opacity: hovered ? 1 : 0, transition: "opacity 0.3s",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <div
-                style={{
-                  width: "40px", height: "40px", borderRadius: "50%",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  background: "hsl(184 70% 41%)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
-                  flexShrink: 0,
-                }}
-              >
-                <svg viewBox="0 0 24 24" fill="white" style={{ width: "20px", height: "20px", marginLeft: "2px" }}>
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
-              <span style={{ color: "white", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 600 }}>
-                Watch Now
+          <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/55 to-transparent to-55% p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary shadow-medium">
+                <Play className="ml-0.5 h-5 w-5 fill-primary-foreground text-primary-foreground" />
               </span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white">Watch Now</span>
             </div>
           </div>
         )}
       </div>
 
       {/* Meta */}
-      <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-        <h3 style={{
-          fontSize: "clamp(13px, 1.5vw, 14px)", lineHeight: 1.4, fontWeight: 600, marginBottom: "8px",
-          color: "hsl(210 30% 10%)", fontFamily: "inherit",
-          display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
-        }}>
-          {video.title}
-        </h3>
-        {!isFallback && (
-          <p style={{ fontSize: "11px", marginTop: "auto", color: "hsl(210 12% 58%)" }}>
-            {formattedDate}
-          </p>
-        )}
+      <div className="flex flex-1 flex-col">
+        <h3 className="mb-2 line-clamp-2 text-sm font-semibold leading-snug text-foreground">{video.title}</h3>
+        {!isFallback && <p className="mt-auto text-[11px] text-muted-foreground">{formattedDate}</p>}
       </div>
     </div>
   );
@@ -301,12 +200,22 @@ function EpisodeCard({
 // ─── Listen On Card ───────────────────────────────────────────────────────────
 function ListenOnCard() {
   return (
-    <div style={{ borderRadius: "16px", overflow: "hidden", background: "white", border: "1px solid hsl(204 14% 88%)", boxShadow: "0 2px 12px -4px rgba(0,0,0,0.06)" }}>
-      <div style={{ padding: "20px" }}>
-        <p style={{ fontSize: "10px", letterSpacing: "0.25em", textTransform: "uppercase", fontWeight: 600, marginBottom: "4px", color: "hsl(184 70% 38%)" }}>
-          Listen On
-        </p>
-        <p style={{ fontSize: "12px", marginBottom: "16px", color: "hsl(210 12% 55%)" }}>Available on all major platforms</p>
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+      <p className={`${eyebrow} mb-1`}>Listen On</p>
+      <p className="mb-4 text-xs text-muted-foreground">Available on all major platforms</p>
+      <div className="flex flex-col gap-2">
+        {PLATFORMS.map(({ label, href, icon: Icon }) => (
+          <a
+            key={label}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-accent"
+          >
+            <Icon className="h-4 w-4 text-primary" />
+            {label}
+          </a>
+        ))}
       </div>
     </div>
   );
@@ -321,16 +230,12 @@ function StatsBar({ episodeCount }: { episodeCount: number }) {
     { value: "Top 10%", label: "Beauty Pods" },
   ];
   return (
-    <div style={{
-      borderRadius: "16px", padding: "20px", marginBottom: "24px",
-      background: "linear-gradient(135deg, hsl(184 70% 41%) 0%, hsl(184 60% 34%) 100%)",
-      boxShadow: "0 4px 20px -4px hsl(184 70% 35% / 0.35)",
-    }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+    <div className="rounded-2xl bg-primary p-5 shadow-primary">
+      <div className="grid grid-cols-2 gap-4">
         {stats.map(({ value, label }) => (
-          <div key={label} style={{ textAlign: "center" }}>
-            <p style={{ fontSize: "20px", fontWeight: 600, lineHeight: 1, color: "white" }}>{value}</p>
-            <p style={{ fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase", marginTop: "2px", color: "rgba(255,255,255,0.6)" }}>{label}</p>
+          <div key={label} className="text-center">
+            <p className="text-xl font-semibold leading-none text-primary-foreground">{value}</p>
+            <p className="mt-0.5 text-[9px] uppercase tracking-[0.2em] text-primary-foreground/70">{label}</p>
           </div>
         ))}
       </div>
@@ -340,7 +245,6 @@ function StatsBar({ episodeCount }: { episodeCount: number }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function PodcastMain({ initialSlug }: { initialSlug?: string } = {}) {
-  console.log(initialSlug, "initialSlug")
   const router = useRouter();
   const [videos, setVideos] = useState<Video[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
@@ -382,114 +286,34 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
   };
 
   return (
-    <main style={{ minHeight: "100vh", color: "hsl(210 30% 10%)", background: "hsl(204 20% 96%)", fontFamily: "inherit" }}>
-
-      {/* Responsive styles */}
-      <style>{`
-        .podcast-layout {
-          display: grid;
-          grid-template-columns: 1fr 292px;
-          gap: 40px;
-          align-items: start;
-        }
-        .sidebar {
-          position: sticky;
-          top: 24px;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-        .episodes-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
-        }
-        .about-stats {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 48px;
-          flex-wrap: wrap;
-        }
-
-        @media (max-width: 1024px) {
-          .podcast-layout {
-            grid-template-columns: 1fr;
-          }
-          .sidebar {
-            position: static;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-          }
-          .episodes-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        @media (max-width: 768px) {
-          .sidebar {
-            grid-template-columns: 1fr;
-          }
-          .episodes-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-          }
-          .section-header {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 16px !important;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .episodes-grid {
-            grid-template-columns: 1fr;
-          }
-          .about-stats {
-            gap: 24px;
-          }
-        }
-      `}</style>
-
+    <main className="min-h-screen bg-background text-foreground">
       {/* Hero */}
       <HeroSection onGuestClick={() => setGuestModalOpen(true)} />
 
       {/* Main Content */}
-      <section style={{ padding: "clamp(2.5rem, 6vw, 4rem) clamp(1rem, 4vw, 1.5rem)", maxWidth: "1240px", margin: "0 auto" }}>
-        <div className="podcast-layout">
+      <section className="mx-auto max-w-[1240px] px-4 py-10 sm:px-6 md:py-16">
+        <div className="grid items-start gap-10 lg:grid-cols-[1fr_292px]">
 
           {/* LEFT — Episodes */}
           <div>
             {/* Section header */}
-            <div
-              className="section-header"
-              style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "32px" }}
-            >
+            <div className="mb-8 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
               <div>
-                <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 600, marginBottom: "6px", color: "hsl(184 70% 38%)" }}>
-                  ✦ Now Streaming
-                </p>
-                <h2 style={{ fontSize: "clamp(22px, 4vw, 30px)", fontWeight: 600, lineHeight: 1.1, color: "hsl(210 30% 8%)", letterSpacing: "-0.02em" }}>
-                  Latest Episodes
-                </h2>
+                <p className={`${eyebrow} mb-1.5`}>✦ Now Streaming</p>
+                <h2 className="text-2xl font-semibold leading-tight tracking-tight md:text-3xl">Latest Episodes</h2>
               </div>
 
               {/* Filter pills */}
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", padding: "4px", borderRadius: "100px", background: "hsl(204 14% 88%)", flexShrink: 0 }}>
+              <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-muted p-1">
                 {(["all", "recent"] as const).map((f) => (
                   <button
                     key={f}
                     onClick={() => setFilter(f)}
-                    style={{
-                      padding: "6px 16px", borderRadius: "100px", fontSize: "11px", fontWeight: 600,
-                      letterSpacing: "0.05em", textTransform: "capitalize", cursor: "pointer", border: "none",
-                      background: filter === f ? "white" : "transparent",
-                      color: filter === f ? "hsl(184 70% 35%)" : "hsl(210 12% 50%)",
-                      boxShadow: filter === f ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
-                      transition: "all 0.2s",
-                      whiteSpace: "nowrap",
-                    }}
+                    className={`whitespace-nowrap rounded-full px-4 py-1.5 text-[11px] font-semibold tracking-wide transition-all ${
+                      filter === f
+                        ? "bg-card text-accent-foreground shadow-soft"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
                   >
                     {f === "all" ? "All Episodes" : "Recent"}
                   </button>
@@ -499,24 +323,23 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
 
             {/* Episode grid */}
             {loading ? (
-              <div className="episodes-grid">
+              <div className="grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
                 {[...Array(6)].map((_, i) => (
                   <div key={i}>
-                    <div style={{ aspectRatio: "16/9", borderRadius: "16px", marginBottom: "16px", background: "hsl(204 14% 88%)", animation: "pulse 1.5s ease-in-out infinite" }} />
-                    <div style={{ height: "12px", borderRadius: "8px", marginBottom: "10px", background: "hsl(204 14% 88%)", width: "60%" }} />
-                    <div style={{ height: "16px", borderRadius: "8px", background: "hsl(204 14% 88%)", width: "90%" }} />
+                    <div className="mb-4 aspect-video animate-pulse rounded-2xl bg-muted" />
+                    <div className="mb-2.5 h-3 w-3/5 rounded-lg bg-muted" />
+                    <div className="h-4 w-11/12 rounded-lg bg-muted" />
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="episodes-grid">
+              <div className="grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
                 {displayedVideos.map((video, i) => (
                   <EpisodeCard
                     key={video.id}
                     video={video}
                     index={i}
                     episodeNumber={episodeCount - i}
-                    placeholderStyle={PLACEHOLDER_PALETTE[i % PLACEHOLDER_PALETTE.length]}
                     onPlay={playVideo}
                   />
                 ))}
@@ -524,52 +347,29 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
             )}
 
             {/* View All */}
-            <div style={{ marginTop: "48px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
-              <a
-                href={YOUTUBE_PLAYLIST_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: "12px",
-                  padding: "14px 32px", borderRadius: "100px",
-                  fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase",
-                  fontWeight: 600, color: "white", textDecoration: "none",
-                  background: "linear-gradient(135deg, hsl(184 70% 41%) 0%, hsl(184 60% 34%) 100%)",
-                  boxShadow: "0 4px 16px hsl(184 70% 35% / 0.3)",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.filter = "brightness(1.1)"; el.style.transform = "translateY(-1px)"; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.filter = "none"; el.style.transform = "none"; }}
-              >
+            <div className="mt-12 flex flex-wrap items-center gap-4">
+              <a href={YOUTUBE_PLAYLIST_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
                 View All Episodes
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: "14px", height: "14px" }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                </svg>
+                <ArrowRight className="h-4 w-4" />
               </a>
-              <span style={{ fontSize: "11px", color: "hsl(210 12% 55%)" }}>
-                {episodeCount} episodes total
-              </span>
+              <span className="text-[11px] text-muted-foreground">{episodeCount} episodes total</span>
             </div>
           </div>
 
           {/* RIGHT — Sidebar */}
-          <div className="sidebar">
+          <div className="grid gap-4 md:grid-cols-3 lg:sticky lg:top-24 lg:flex lg:flex-col lg:gap-5">
             <StatsBar episodeCount={episodeCount} />
 
             {/* Upcoming Schedule card */}
-            <div style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid hsl(204 14% 86%)", boxShadow: "0 2px 12px -4px rgba(0,0,0,0.06)" }}>
-              <div style={{ padding: "16px 20px", background: "linear-gradient(135deg, hsl(184 70% 41%) 0%, hsl(184 60% 34%) 100%)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
-                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "white", opacity: 0.7 }} />
-                  <p style={{ fontSize: "9px", letterSpacing: "0.28em", textTransform: "uppercase", fontWeight: 600, color: "rgba(255,255,255,0.65)" }}>
-                    Coming Up
-                  </p>
+            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+              <div className="bg-primary px-5 py-4">
+                <div className="mb-0.5 flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground/70" />
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-primary-foreground/70">Coming Up</p>
                 </div>
-                <h3 style={{ fontSize: "17px", fontWeight: 600, color: "white", letterSpacing: "-0.01em" }}>Upcoming Schedule</h3>
+                <h3 className="text-[17px] font-semibold tracking-tight text-primary-foreground">Upcoming Schedule</h3>
               </div>
-              <div style={{ background: "white" }}>
-                <UpcomingSchedule />
-              </div>
+              <UpcomingSchedule />
             </div>
 
             <ListenOnCard />
@@ -581,31 +381,24 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
       <NotifySection />
 
       {/* About Strip */}
-      <section style={{ padding: "clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 1.5rem)", background: "hsl(184 60% 34%)" }}>
-        <div style={{ maxWidth: "768px", margin: "0 auto", textAlign: "center" }}>
-          <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", fontWeight: 600, marginBottom: "16px", color: "rgba(255,255,255,0.5)" }}>
-            About the Show
-          </p>
-          <p style={{
-            fontSize: "clamp(17px, 3vw, 22px)", lineHeight: 1.6, fontWeight: 400, marginBottom: "40px", color: "white",
-            fontFamily: "inherit", letterSpacing: "0.01em",
-          }}>
+      <section className="bg-primary px-4 py-12 sm:px-6 md:py-20">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-primary-foreground/70">About the Show</p>
+          <p className="mb-10 text-lg leading-relaxed text-primary-foreground md:text-[22px]">
             Unfiltered conversations with the professionals, founders, and innovators actively shaping the future of beauty and wellness.
           </p>
-          <div className="about-stats">
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12">
             {[
               { value: `${episodeCount}+`, label: "Episodes" },
               { value: "Weekly", label: "New Episodes" },
               { value: "3+", label: "Platforms" },
             ].map(({ value, label }, i, arr) => (
-              <div key={label} style={{ display: "flex", alignItems: "center", gap: "48px" }}>
-                <div style={{ textAlign: "center" }}>
-                  <p style={{ fontSize: "clamp(28px, 5vw, 36px)", fontWeight: 600, color: "white", lineHeight: 1, letterSpacing: "-0.02em" }}>{value}</p>
-                  <p style={{ fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", marginTop: "8px", color: "rgba(255,255,255,0.5)" }}>{label}</p>
+              <div key={label} className="flex items-center gap-6 sm:gap-12">
+                <div className="text-center">
+                  <p className="text-3xl font-semibold leading-none tracking-tight text-primary-foreground md:text-4xl">{value}</p>
+                  <p className="mt-2 text-[10px] uppercase tracking-[0.2em] text-primary-foreground/70">{label}</p>
                 </div>
-                {i < arr.length - 1 && (
-                  <div style={{ width: "1px", height: "48px", background: "rgba(255,255,255,0.15)" }} />
-                )}
+                {i < arr.length - 1 && <div className="h-12 w-px bg-primary-foreground/20" />}
               </div>
             ))}
           </div>

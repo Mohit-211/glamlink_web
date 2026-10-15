@@ -63,7 +63,7 @@ export default function DirectoryResults({
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
           <div>
-            <h2 id="directory-results-heading" className="section-title font-display">
+            <h2 id="directory-results-heading" className="section-title">
               Directory Results
             </h2>
             <p className="section-subtitle">Discover beauty and wellness professionals near you.</p>
@@ -89,7 +89,7 @@ export default function DirectoryResults({
             <button
               type="button"
               onClick={onModifySearch}
-              className="inline-flex items-center gap-1.5 rounded-full border bg-white px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary/50 hover:text-primary"
+              className="inline-flex items-center gap-1.5 rounded-full border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary/50 hover:text-primary"
             >
               <Pencil className="w-3.5 h-3.5" aria-hidden="true" />
               {isSearch ? "Modify" : "Search near you"}
@@ -98,7 +98,7 @@ export default function DirectoryResults({
               <button
                 type="button"
                 onClick={onClearSearch}
-                className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition hover:bg-white hover:text-foreground"
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition hover:bg-card hover:text-foreground"
               >
                 <X className="w-3.5 h-3.5" aria-hidden="true" />
                 Clear
@@ -119,7 +119,7 @@ export default function DirectoryResults({
 
           {status === "error" && (
             <div className="flex flex-col items-center rounded-3xl border bg-card px-6 py-14 text-center">
-              <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
+              <AlertCircle className="w-8 h-8 text-destructive" aria-hidden="true" />
               <h3 className="mt-4 text-xl font-semibold">Something went wrong</h3>
               <p className="mt-2 text-muted-foreground">We couldn&apos;t load results right now.</p>
               <button type="button" onClick={onRetry} className="btn-outline mt-6">

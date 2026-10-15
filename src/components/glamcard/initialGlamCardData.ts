@@ -70,7 +70,7 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     },
     other_links: [{ title: "My Portfolio", url: "https://example.com/portfolio" }],
     featured_links: [],
-    color_code: "#23B9CD",
+    color_code: "#24bbcb",
     preferred_booking_methods: [BOOKING_METHODS.LINK, BOOKING_METHODS.CALL],
     booking_link: "https://example.com/book",
     important_info: [

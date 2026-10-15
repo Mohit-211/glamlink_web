@@ -16,7 +16,7 @@ export default function DirectoryCTA() {
         </p>
 
         {/* HEADING */}
-        <h2 id="directory-cta-heading" className="section-title font-display mb-4">
+        <h2 id="directory-cta-heading" className="section-title mb-4">
           Are you a beauty or wellness professional?
         </h2>
 
