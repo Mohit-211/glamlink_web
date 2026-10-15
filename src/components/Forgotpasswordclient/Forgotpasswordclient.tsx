@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { message } from "antd";
+import { toast } from "sonner";
 import { forgotPasswordApi, sendOtp, verifyOtp } from "@/api/Api";
 
 type Step = "request" | "otp" | "reset";
@@ -129,7 +129,7 @@ export default function ForgotPasswordClient() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setErrors({ email: "Please enter a valid email address" });
-      message.error("Please enter a valid email address");
+      toast.error("Please enter a valid email address");
       return;
     }
     setErrors({});
@@ -139,16 +139,16 @@ export default function ForgotPasswordClient() {
       // type must match what the backend expects for a password-reset OTP
       const response = await sendOtp({ email, type: "forgot_password" });
       if (response?.success === false) {
-        message.error(response?.message || "Failed to send code");
+        toast.error(response?.message || "Failed to send code");
         return;
       }
-      message.success(response?.message || "Verification code sent");
+      toast.success(response?.message || "Verification code sent");
       setStep("otp");
       startCooldown();
     } catch (error: any) {
       const errorMessage =
         error?.response?.data?.message || error?.message || "Something went wrong";
-      message.error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -159,7 +159,7 @@ export default function ForgotPasswordClient() {
     const trimmed = otp.trim();
     if (!/^\d{4,8}$/.test(trimmed)) {
       setOtpError("Please enter a valid verification code");
-      message.error("Please enter a valid verification code");
+      toast.error("Please enter a valid verification code");
       return;
     }
     setOtpError(null);
@@ -173,7 +173,7 @@ export default function ForgotPasswordClient() {
       });
 
       if (response?.success === false) {
-        message.error(response?.message || "Invalid or expired code");
+        toast.error(response?.message || "Invalid or expired code");
         return;
       }
 
@@ -183,17 +183,17 @@ export default function ForgotPasswordClient() {
         response?.token || response?.data?.token || response?.reset_token;
 
       if (!receivedToken) {
-        message.error("Verification succeeded but no reset token was returned");
+        toast.error("Verification succeeded but no reset token was returned");
         return;
       }
 
-      message.success(response?.message || "Code verified");
+      toast.success(response?.message || "Code verified");
       setToken(receivedToken);
       setStep("reset");
     } catch (error: any) {
       const errorMessage =
         error?.response?.data?.message || error?.message || "Something went wrong";
-      message.error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -204,12 +204,12 @@ export default function ForgotPasswordClient() {
     try {
       setResending(true);
       await sendOtp({ email, type: "forgot_password" });
-      message.success("Verification code resent");
+      toast.success("Verification code resent");
       startCooldown();
     } catch (error: any) {
       const errorMessage =
         error?.response?.data?.message || error?.message || "Failed to resend code";
-      message.error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setResending(false);
     }
@@ -248,12 +248,12 @@ export default function ForgotPasswordClient() {
     setErrors(fieldErrors);
     if (Object.keys(fieldErrors).length > 0) {
       const firstError = Object.values(fieldErrors)[0];
-      if (firstError) message.error(firstError);
+      if (firstError) toast.error(firstError);
       return;
     }
 
     if (!token) {
-      message.error("Reset session expired. Please request a new code.");
+      toast.error("Reset session expired. Please request a new code.");
       setStep("request");
       return;
     }
@@ -266,7 +266,7 @@ export default function ForgotPasswordClient() {
         finalToken = atob(token);
       } catch (err) {
         console.error("Failed to decode reset token:", err);
-        message.error("Reset link is invalid or expired. Please request a new one.");
+        toast.error("Reset link is invalid or expired. Please request a new one.");
         return;
       }
     }
@@ -284,18 +284,18 @@ export default function ForgotPasswordClient() {
       const response = await forgotPasswordApi(payload);
 
       if (response?.success) {
-        message.success(response?.message || "Password reset successful");
+        toast.success(response?.message || "Password reset successful");
         setTimeout(() => {
           router.push("/login");
         }, 1200);
       } else {
-        message.error(response?.message || "Reset failed");
+        toast.error(response?.message || "Reset failed");
       }
     } catch (error: any) {
       console.error(error);
       const errorMessage =
         error?.response?.data?.message || error?.message || "Something went wrong";
-      message.error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

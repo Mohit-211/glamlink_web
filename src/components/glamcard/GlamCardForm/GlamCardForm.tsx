@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, message } from "antd";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import SuccessModal from "@/components/SuccessModal";
 import { BOOKING_METHODS, FieldErrors, GlamCardFormData } from "./types";
@@ -176,7 +176,7 @@ const GlamCardForm: React.FC<Props> = ({
 
     setErrors(newErrors);
     if (firstMessage) {
-      message.info(firstMessage);
+      toast.info(firstMessage);
       document
         .getElementById(`field-${firstKey}`)
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -436,7 +436,7 @@ const GlamCardForm: React.FC<Props> = ({
 }
       const result = await res.json();
       if (isEdit) {
-        message.success(result?.message || "Access Successfully Updated!");
+        toast.success(result?.message || "Access Successfully Updated!");
         onSuccess?.(result?.data ?? result);
       } else {
         // New user -> straight to plan selection with the new card's id.
@@ -452,10 +452,10 @@ const GlamCardForm: React.FC<Props> = ({
       }
     } catch (error) {
       console.error("ERROR 👉", error);
-      // message.error(
+      // toast.error(
       //   isEdit ? "Failed to update Business Card" : "Failed to create Business Card"
       // );
-      message.error(error instanceof Error ? error.message : "An unexpected error occurred.");
+      toast.error(error instanceof Error ? error.message : "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }

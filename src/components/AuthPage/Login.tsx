@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { loginUser } from "@/api/Api";
-import { message } from "antd";
+import { toast } from "sonner";
 import {
   getFormDataFromSession,
   clearFormDataFromSession,
@@ -73,7 +73,7 @@ export default function Login({ onSuccess }: LoginProps = {}) {
     setErrors(fieldErrors);
     if (Object.keys(fieldErrors).length > 0) {
       const firstError = Object.values(fieldErrors)[0];
-      if (firstError) message.error(firstError);
+      if (firstError) toast.error(firstError);
       return;
     }
 
@@ -100,7 +100,7 @@ export default function Login({ onSuccess }: LoginProps = {}) {
           console.error("Failed to persist auth tokens:", storageError);
         }
 
-        message.success(response?.message || "Login successful");
+        toast.success(response?.message || "Login successful");
         window.dispatchEvent(new Event("auth-change"));
         clearFormDataFromSession();
 
@@ -119,12 +119,12 @@ export default function Login({ onSuccess }: LoginProps = {}) {
         return;
       }
 
-      message.error(response?.message || "Login failed");
+      toast.error(response?.message || "Login failed");
     } catch (error: any) {
       console.error(error);
       const errorMessage =
         error?.response?.data?.message || error?.message || "Something went wrong";
-      message.error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

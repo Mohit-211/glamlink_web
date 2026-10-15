@@ -5,7 +5,6 @@ import {
   Search,
   Filter,
   MapPin,
-  Instagram,
   CalendarDays,
   BadgeCheck,
   X,
@@ -14,6 +13,7 @@ import {
   ChevronsUpDown,
   ChevronDown,
 } from "lucide-react";
+import { Instagram } from "@/components/icons/BrandIcons";
 import { Button } from "@/components/ui/button";
 import { getBusinessProfile } from "@/api/Api";
 import GlamCardLivePreview from "../glamcard/GlamCardLivePreview";

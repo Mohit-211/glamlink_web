@@ -5,11 +5,10 @@ import dynamic from "next/dynamic";
 
 import { FieldErrors, GlamCardFormData } from "../types";
 
-/* ================= SSR SAFE CKEDITOR ================= */
-// The editor and its build are isolated in their own client-only file.
-// dynamic() only skips SSR if the import itself is deferred like this —
-// importing CKEditor/ClassicEditor directly in this file (even if unused
-// afterwards) would still evaluate them on the server and crash.
+/* ================= CLIENT-ONLY BIO EDITOR ================= */
+// The rich-text editor lives in its own file and is loaded only in the
+// browser, which keeps it (and its editor engine) out of the server render
+// and the initial bundle.
 const BioEditor = dynamic(() => import("./Bioeditor"), {
   ssr: false,
   loading: () => (

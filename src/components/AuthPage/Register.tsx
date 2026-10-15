@@ -5,7 +5,7 @@ import Script from "next/script";
 import { Eye, EyeOff, Sparkles } from "lucide-react";
 import { registerUser, sendOtp } from "@/api/Api";
 import { useRouter } from "next/navigation";
-import { message } from "antd";
+import { toast } from "sonner";
 import { getFormDataFromSession } from "../glamcard/GlamCardForm/Formdatasessionstorage";
 
 // Site key comes from the Cloudflare Turnstile dashboard.
@@ -197,7 +197,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
     }
 
     if (!window.turnstile || !turnstileContainerRef.current) {
-      message.error("Captcha failed to load. Please refresh and try again.");
+      toast.error("Captcha failed to load. Please refresh and try again.");
       return null;
     }
 
@@ -223,7 +223,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
       return token;
     } catch (err) {
       console.error("Turnstile execute failed:", err);
-      message.error("Captcha verification failed. Please try again.");
+      toast.error("Captcha verification failed. Please try again.");
       return null;
     }
   };
@@ -238,7 +238,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
       // Surface the first error as a toast too, so it's noticeable even if
       // the field is off-screen.
       const firstError = Object.values(fieldErrors)[0];
-      if (firstError) message.error(firstError);
+      if (firstError) toast.error(firstError);
       return;
     }
 
@@ -266,11 +266,11 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
       console.log("Register Response:", response);
 
       if (response?.success === false) {
-        message.error(response?.message || "Something went wrong");
+        toast.error(response?.message || "Something went wrong");
         return;
       }
 
-      message.success(response?.message || "Account created successfully");
+      toast.success(response?.message || "Account created successfully");
 
       if (onSuccess) {
         onSuccess(form.email);
@@ -291,7 +291,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
         // Account exists but isn't verified. Route into the same OTP step
         // either way (modal callback or real page) since both paths lead
         // to email verification.
-        message.warning(errorMessage);
+        toast.warning(errorMessage);
         if (onSuccess) {
           onSuccess(form.email);
         } else {
@@ -304,7 +304,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
 
       // Previously this fell through silently with no user-facing error.
       // Always surface something so the user knows the submit failed.
-      message.error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
       // Reset the widget so the next submit attempt gets a fresh token

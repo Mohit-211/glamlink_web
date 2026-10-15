@@ -2,12 +2,9 @@
 import { GlamCardFormData } from "./GlamCardForm/types";
 import Logo from "../../../public/assets/ACCESS-3.png";
 import Image from "next/image";
+import { Instagram, Linkedin, Youtube, Facebook } from "@/components/icons/BrandIcons";
 import {
-  Instagram,
   Globe,
-  Linkedin,
-  Youtube,
-  Facebook,
   Music2,
   ExternalLink,
   Download,

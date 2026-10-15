@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { message } from "antd";
+import { toast } from "sonner";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -167,7 +167,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
   async function handlePrimaryContinue() {
     console.log(plan.planType, "plan.planType")
     if (!businessCardId) {
-      message.error("Missing business card reference. Please try again.");
+      toast.error("Missing business card reference. Please try again.");
       return;
     }
 
@@ -204,7 +204,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
       }
     } catch (error) {
       console.error("SELECT PLAN ERROR 👉", error);
-      message.error("Failed to select plan. Please try again.");
+      toast.error("Failed to select plan. Please try again.");
     } finally {
       setSubmitting(false);
     }

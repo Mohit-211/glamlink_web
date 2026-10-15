@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { verifyOtp, sendOtp } from "@/api/Api"; // NOTE: verify this export exists — guessed signature
-import { message } from "antd";
+import { toast } from "sonner";
 
 interface VerifyOtpProps {
   email: string;
@@ -53,7 +53,7 @@ export default function VerifyOtp({
     const validationError = validateOtp();
     if (validationError) {
       setError(validationError);
-      message.error(validationError);
+      toast.error(validationError);
       return;
     }
     setError(null);
@@ -70,11 +70,11 @@ export default function VerifyOtp({
       console.log("Verify OTP Response:", response);
 
       if (response?.success === false) {
-        message.error(response?.message || "Invalid or expired code");
+        toast.error(response?.message || "Invalid or expired code");
         return;
       }
 
-      message.success(response?.message || "Verified successfully");
+      toast.success(response?.message || "Verified successfully");
 
       if (onSuccess) {
         onSuccess();
@@ -84,7 +84,7 @@ export default function VerifyOtp({
     } catch (error: any) {
       const errorMessage =
         error?.response?.data?.message || error?.message || "Something went wrong";
-      message.error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -95,12 +95,12 @@ export default function VerifyOtp({
     try {
       setResending(true);
       await sendOtp({ email, type });
-      message.success("Verification code resent");
+      toast.success("Verification code resent");
       setResendCooldown(RESEND_SECONDS);
     } catch (error: any) {
       const errorMessage =
         error?.response?.data?.message || error?.message || "Failed to resend code";
-      message.error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setResending(false);
     }

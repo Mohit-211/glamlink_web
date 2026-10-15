@@ -12,6 +12,7 @@ import {
   MapPin,
   Monitor,
   MousePointerClick,
+  Music2,
   Phone,
   Share2,
   Smartphone,
@@ -20,7 +21,7 @@ import {
   Tag,
   UserPlus,
 } from 'lucide-react';
-import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTiktok, FaYoutube } from 'react-icons/fa';
+import { Facebook, Instagram, Linkedin, Youtube } from '@/components/icons/BrandIcons';
 import type { AnalyticsEventType } from './types';
 import { capitalize } from './analyticsHelpers';
 
@@ -43,11 +44,11 @@ export const EVENT_CONFIG: Record<AnalyticsEventType, EventConfig> = {
   SHARE_CLICK: { label: 'Share', activityLabel: 'Share Click', icon: Share2 },
   SAVE_CONTACT_CLICK: { label: 'Save Contact', activityLabel: 'Save Contact', icon: UserPlus },
   CONNECT_CLICK: { label: 'Connect', activityLabel: 'Connect Click', icon: Link2 },
-  INSTAGRAM_CLICK: { label: 'Instagram', activityLabel: 'Instagram Click', icon: FaInstagram },
-  TIKTOK_CLICK: { label: 'TikTok', activityLabel: 'TikTok Click', icon: FaTiktok },
-  FACEBOOK_CLICK: { label: 'Facebook', activityLabel: 'Facebook Click', icon: FaFacebookF },
-  LINKEDIN_CLICK: { label: 'LinkedIn', activityLabel: 'LinkedIn Click', icon: FaLinkedinIn },
-  YOUTUBE_CLICK: { label: 'YouTube', activityLabel: 'YouTube Click', icon: FaYoutube },
+  INSTAGRAM_CLICK: { label: 'Instagram', activityLabel: 'Instagram Click', icon: Instagram },
+  TIKTOK_CLICK: { label: 'TikTok', activityLabel: 'TikTok Click', icon: Music2 },
+  FACEBOOK_CLICK: { label: 'Facebook', activityLabel: 'Facebook Click', icon: Facebook },
+  LINKEDIN_CLICK: { label: 'LinkedIn', activityLabel: 'LinkedIn Click', icon: Linkedin },
+  YOUTUBE_CLICK: { label: 'YouTube', activityLabel: 'YouTube Click', icon: Youtube },
   OTHER_LINK_CLICK: { label: 'Other Links', activityLabel: 'Other Link Click', icon: ExternalLink },
   FEATURED_LINK_CLICK: { label: 'Featured Links', activityLabel: 'Featured Link Click', icon: Star },
   JOURNAL_CLICK: { label: 'Journal', activityLabel: 'Journal Click', icon: BookOpen },

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../../public/header_logo.png";
-import { Instagram, Twitter, Facebook, Linkedin, Youtube } from "lucide-react";
+import { Instagram, Twitter, Facebook, Linkedin, Youtube } from "@/components/icons/BrandIcons";
 
 const footerLinks = {
   navigation: [

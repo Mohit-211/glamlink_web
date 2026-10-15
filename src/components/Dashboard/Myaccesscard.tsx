@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FaInstagram } from "react-icons/fa";
+import { Instagram } from "@/components/icons/BrandIcons";
 import {
     Globe,
     Copy,
@@ -287,7 +287,7 @@ export default function MyAccessCard({
                                                                 rel="noopener noreferrer"
                                                                 className="flex items-center gap-2"
                                                             >
-                                                                <FaInstagram className="h-5 w-5 text-pink-500" />
+                                                                <Instagram className="h-5 w-5 text-pink-500" />
                                                             </a>
                                                         )}
                                                         {socialMedia.tiktok && (

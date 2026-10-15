@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { Home, Plus, Trash2, Loader2, AlertCircle, X, MapPin, Pencil, CheckCircle2 } from 'lucide-react';
-import { message } from "antd";
+import { toast } from "sonner";
 import {
   addNewAddress,
   getAllUserAddress,
@@ -127,7 +127,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
         );
         return;
       }
-      message.success("Address added successfully.");
+      toast.success("Address added successfully.");
       await onSaved();
       onClose();
     } catch (error: any) {
@@ -388,7 +388,7 @@ export function AddressTab() {
         );
         return;
       }
-      message.success("Address updated successfully.");
+      toast.success("Address updated successfully.");
       setAddresses((prev) =>
         prev.map((a) =>
           a.id === addressId
@@ -432,7 +432,7 @@ export function AddressTab() {
           setEditing(null);
           setEditForm(null);
         }
-        message.success("Address deleted successfully.");
+        toast.success("Address deleted successfully.");
       } else {
         setDeleteError(res?.message || "Failed to delete address.");
       }
