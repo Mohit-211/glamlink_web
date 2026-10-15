@@ -442,9 +442,14 @@ console.log(categories,"==")
   }
 
   const handleGalleryRemove = (idx: number) => {
-    let next = form.gallery.filter((_, i) => i !== idx)
-    if (!next.some((g) => g.is_thumbnail) && next.length > 0) next[0].is_thumbnail = true
-    set('gallery', next.map((g, i) => ({ ...g, sort_order: i + 1 })))
+    const next = form.gallery.filter((_, i) => i !== idx)
+    // If the thumbnail was removed, promote the first remaining image (without mutating state).
+    const hasThumbnail = next.some((g) => g.is_thumbnail)
+    set('gallery', next.map((g, i) => ({
+      ...g,
+      is_thumbnail: hasThumbnail ? g.is_thumbnail : i === 0,
+      sort_order: i + 1,
+    })))
   }
 
   const handleGalleryCaption = (idx: number, caption: string) => {
@@ -1147,7 +1152,7 @@ const removeLocation = (index: number) => {
                     <span className="text-[11px] text-[#24bbcb] font-semibold">(Recommended)</span>
                   </p>
                   <p className="text-xs text-[#7AAAB8] mt-1 leading-relaxed">
-                    I agree to let the Glamlink Concierge Team build my professional profile and digital business card using my existing public social media content. We'll curate your first clips, photo albums, and service menu so you can launch instantly.
+                    I agree to let the Glamlink Concierge Team build my professional profile and digital business card using my existing public social media content. We&apos;ll curate your first clips, photo albums, and service menu so you can launch instantly.
                   </p>
                 </div>
               </div>
@@ -1164,7 +1169,7 @@ const removeLocation = (index: number) => {
               Submit My Application →
             </button>
             <p className="text-xs text-[#7AAAB8] mt-3.5 leading-[1.7]">
-              By submitting you agree to GlamLink's{' '}
+              By submitting you agree to GlamLink&apos;s{' '}
               <a href="#" className="text-[#24bbcb] font-semibold hover:underline">Terms of Service</a>{' '}and{' '}
               <a href="#" className="text-[#24bbcb] font-semibold hover:underline">Directory Guidelines</a>.
               <br />Applications are reviewed within 2–3 business days. Confirmation email sent immediately.

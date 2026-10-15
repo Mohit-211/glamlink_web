@@ -104,18 +104,27 @@ const ServicesAndBookingForm: React.FC<Props> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  /* ================= FEATURED LINK PREVIEWS ================= */
+  // Object-URL previews for pending (not-yet-uploaded) thumbnail files, keyed
+  // by link id. Regenerated/revoked whenever the featured_links array changes
+  // so blob URLs don't leak as thumbnails are added, replaced, or removed.
+  const [featuredLinkPreviews, setFeaturedLinkPreviews] = useState<Record<string, string>>({});
+  const featuredLinks = data?.featured_links;
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        specialtyWrapperRef.current &&
-        !specialtyWrapperRef.current.contains(e.target as Node)
-      ) {
-        setSpecialtyDropdownOpen(false);
+    const links = parseFeaturedLinks(featuredLinks);
+    const next: Record<string, string> = {};
+    links.forEach((link) => {
+      if (link.thumbnail_file instanceof File) {
+        next[link.id] = URL.createObjectURL(link.thumbnail_file);
       }
+    });
+    setFeaturedLinkPreviews(next);
+    return () => {
+      Object.values(next).forEach((url) => URL.revokeObjectURL(url));
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [featuredLinks]);
+
+  const [draggedFeaturedLinkIndex, setDraggedFeaturedLinkIndex] = useState<number | null>(null);
 
   if (!data) return null;
 
@@ -296,27 +305,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({
   };
 
   /* ================= FEATURED LINKS ================= */
-  // Object-URL previews for pending (not-yet-uploaded) thumbnail files, keyed
-  // by link id. Regenerated/revoked whenever the featured_links array changes
-  // so blob URLs don't leak as thumbnails are added, replaced, or removed.
-  const [featuredLinkPreviews, setFeaturedLinkPreviews] = useState<Record<string, string>>({});
-  useEffect(() => {
-    const links = parseFeaturedLinks(data.featured_links);
-    const next: Record<string, string> = {};
-    links.forEach((link) => {
-      if (link.thumbnail_file instanceof File) {
-        next[link.id] = URL.createObjectURL(link.thumbnail_file);
-      }
-    });
-    setFeaturedLinkPreviews(next);
-    return () => {
-      Object.values(next).forEach((url) => URL.revokeObjectURL(url));
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.featured_links]);
-
-  const [draggedFeaturedLinkIndex, setDraggedFeaturedLinkIndex] = useState<number | null>(null);
-
   const addFeaturedLink = () => {
     setData((prev) => {
       const links = parseFeaturedLinks(prev.featured_links);
@@ -504,7 +492,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                         onClick={() => addSpecialty()}
                         className="block w-full text-left px-4 py-2 text-sm font-medium text-[#24bbcb] hover:bg-[#24bbcb]/10 border-t border-gray-100"
                       >
-                        + Add "{specialtyInput.trim()}"
+                        + Add &quot;{specialtyInput.trim()}&quot;
                       </button>
                     )}
 
@@ -781,7 +769,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             )}
             {parseOtherLinks(data?.other_links).length === 0 && (
               <div className="rounded-lg border border-gray-200 bg-white p-4 text-center text-sm text-gray-500">
-                No links added yet. Click "Add Link" to get started.
+                No links added yet. Click &quot;Add Link&quot; to get started.
               </div>
             )}
           </div>
@@ -910,7 +898,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           })}
           {parseFeaturedLinks(data?.featured_links).length === 0 && (
             <div className="rounded-lg border border-gray-200 bg-white p-4 text-center text-sm text-gray-500">
-              No featured links yet. Click "Add Featured Link" to get started.
+              No featured links yet. Click &quot;Add Featured Link&quot; to get started.
             </div>
           )}
         </div>

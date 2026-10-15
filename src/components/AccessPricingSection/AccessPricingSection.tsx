@@ -32,7 +32,7 @@ export default function AccessPricingSection() {
 
         {/* Features */}
         <div className="card-glamlink mt-16">
-          <h2 className="text-2xl font-semibold">What's Included</h2>
+          <h2 className="text-2xl font-semibold">What&apos;s Included</h2>
 
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             {features.map((feature) => (

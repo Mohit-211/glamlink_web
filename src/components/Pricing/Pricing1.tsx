@@ -578,7 +578,7 @@ export default function PricingStep({ businessCardId, hasToken = true }: Pricing
             </div>
             <h2 className="font-display mt-4 text-xl text-foreground">Welcome to Glamlink!</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Your {plan.name} plan is now active. You're ready to get started.
+              Your {plan.name} plan is now active. You&apos;re ready to get started.
             </p>
             <button
               type="button"

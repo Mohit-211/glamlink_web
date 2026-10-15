@@ -62,7 +62,7 @@ export default function DeleteAccountPage() {
           </h1>
 
           <p className="section-subtitle">
-            We're sorry to see you go. Deleting your account removes your
+            We&apos;re sorry to see you go. Deleting your account removes your
             profile, saved data, and access to Glamlink. Follow the steps
             below to submit your request.
           </p>
@@ -97,7 +97,7 @@ export default function DeleteAccountPage() {
             <p className="mt-2 text-muted-foreground">
               Account deletion is permanent and cannot be undone. This
               includes your profile, bookings, saved professionals, and
-              messages. If you'd rather take a break, consider reaching out
+              messages. If you&apos;d rather take a break, consider reaching out
               to our team about temporarily deactivating your account
               instead.
             </p>

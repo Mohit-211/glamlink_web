@@ -31,16 +31,6 @@ export default function DirectoryPage() {
 
   const [activeService, setActiveService] = useState(serviceParam || "All");
 
-  /* =====================
-     INITIAL LOAD
-  ====================== */
-
-  useEffect(() => {
-    fetchProviders();
-    fetchProfessionals();
-    fetchCategories();
-  }, []);
-
   useEffect(() => {
     if (serviceParam) {
       setActiveService(serviceParam);
@@ -110,6 +100,16 @@ export default function DirectoryPage() {
       setProvidersLoading(false);
     }
   };
+
+  /* =====================
+     INITIAL LOAD
+  ====================== */
+
+  useEffect(() => {
+    fetchProviders();
+    fetchProfessionals();
+    fetchCategories();
+  }, []);
 
   /* =====================
      CATEGORY CLICK

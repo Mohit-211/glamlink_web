@@ -1,5 +1,6 @@
 "use client";
 
+import { createElement } from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, LayoutGrid, Scissors, Sparkles, Syringe, type LucideIcon } from "lucide-react";
 import type { ProfessionalType, ProfessionalTypeId } from "@/lib/directory";
@@ -58,7 +59,6 @@ export default function ProfessionalTypeSelect({
   onChange,
 }: ProfessionalTypeSelectProps) {
   const selected = professionalTypes.find((type) => type.id === value);
-  const TriggerIcon = iconFor(value);
 
   return (
     <SelectPrimitive.Root
@@ -70,7 +70,7 @@ export default function ProfessionalTypeSelect({
         className="group flex w-full items-center gap-3 rounded-2xl md:rounded-full px-4 py-2.5 md:py-2 text-left outline-none transition-colors hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:ring-2 focus-visible:ring-primary/30 data-[state=open]:bg-muted/60"
       >
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <TriggerIcon className="h-[18px] w-[18px]" aria-hidden="true" />
+          {createElement(iconFor(value), { className: "h-[18px] w-[18px]", "aria-hidden": true })}
         </span>
         <span className="min-w-0 flex-1">
           <span className="block whitespace-nowrap text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">

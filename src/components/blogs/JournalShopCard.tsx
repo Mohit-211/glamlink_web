@@ -95,7 +95,7 @@ const ProductCard = ({ product, onSelect, compact = false }: ProductCardProps) =
             variant="outline"
             onClick={(e) => {
               e.stopPropagation();
-              product.link && window.open(product.link, "_blank");
+              if (product.link) window.open(product.link, "_blank");
             }}
             className={`rounded-full ${c.button} border-primary/40 hover:border-primary hover:text-primary hover:bg-primary/5 cursor-pointer`}
           >

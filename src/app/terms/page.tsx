@@ -122,17 +122,17 @@ export default function TermsOfUsePage() {
               {/* Introduction */}
               <div className="prose prose-lg max-w-none mb-12">
                 <p className="text-gray-700 leading-relaxed mb-6">
-                  Glamlink Inc, a Nevada limited liability company ("Glamlink") provides the Glamlink and Glamlink Pro app, the glamlink.net site, and related goods and services, including any and all mobile applications, online software, and other services (collectively, the "Glamlink
-                  Service") subject to your compliance with the terms and conditions set forth below. Your use of the Glamlink Service signifies your acknowledgement of and agreement to these Terms of Use.
+                  Glamlink Inc, a Nevada limited liability company (&quot;Glamlink&quot;) provides the Glamlink and Glamlink Pro app, the glamlink.net site, and related goods and services, including any and all mobile applications, online software, and other services (collectively, the &quot;Glamlink
+                  Service&quot;) subject to your compliance with the terms and conditions set forth below. Your use of the Glamlink Service signifies your acknowledgement of and agreement to these Terms of Use.
                 </p>
                 <p className="text-gray-700 leading-relaxed">
-                  These Terms of Use apply to all users of the Glamlink Service. The term "users" includes both registered members of the Glamlink Service and any other person that accesses or uses the Glamlink Service at any point for any amount of time.
+                  These Terms of Use apply to all users of the Glamlink Service. The term &quot;users&quot; includes both registered members of the Glamlink Service and any other person that accesses or uses the Glamlink Service at any point for any amount of time.
                 </p>
               </div>
               {/* Section 1: Service Providers */}
               <div id="service-providers" className="mb-16 scroll-mt-24">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-6">1. SERVICE PROVIDERS</h3>
-                <p className="text-gray-700 leading-relaxed mb-8">If you are a beauty professional or use the Glamlink Service for commercial or promotional purposes (collectively, "Beauty Professional"), the following provisions will apply in addition to the other Terms of Use.</p>
+                <p className="text-gray-700 leading-relaxed mb-8">If you are a beauty professional or use the Glamlink Service for commercial or promotional purposes (collectively, &quot;Beauty Professional&quot;), the following provisions will apply in addition to the other Terms of Use.</p>
 
                 {/* Subsections */}
                 <div className="space-y-8">
@@ -146,7 +146,7 @@ export default function TermsOfUsePage() {
                     <p className="text-gray-700 leading-relaxed mb-4">If you promote your goods or services using the Glamlink Service, you are responsible for:</p>
                     <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-6">
                       <li>the content of all promotions</li>
-                      <li>landing pages and other destinations users are sent, such as mobile applications, along with all related URLs, waypoints, and redirects (collectively, "Landing Pages")</li>
+                      <li>landing pages and other destinations users are sent, such as mobile applications, along with all related URLs, waypoints, and redirects (collectively, &quot;Landing Pages&quot;)</li>
                       <li>all goods and services promoted on the Glamlink Service and on destinations where your promotions direct users</li>
                     </ul>
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">1.3. Responding to Client Inquiries</h4>
@@ -157,7 +157,7 @@ export default function TermsOfUsePage() {
                       including without limitation the Computer Fraud and Abuse Act (18 U.S.C. § 1030 et seq.).
                     </p>
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">1.5. Promotional Guidelines</h4>
-                    <p className="text-gray-700 leading-relaxed mb-4">Any promotions for your goods and services in any form, including business pages, posts, and interactions with Glamlink users (collectively, "Promotional Content") must follow these promotional guidelines:</p>
+                    <p className="text-gray-700 leading-relaxed mb-4">Any promotions for your goods and services in any form, including business pages, posts, and interactions with Glamlink users (collectively, &quot;Promotional Content&quot;) must follow these promotional guidelines:</p>
 
                     <div className="space-y-4 ml-4 mb-6">
                       <div className="bg-gray-50 p-4 rounded-lg">
@@ -170,8 +170,8 @@ export default function TermsOfUsePage() {
                         <ul className="list-disc pl-6 space-y-1 text-gray-700">
                           <li>Promotional Content that contains a URL or domain must link to that same URL or domain</li>
                           <li>All users must be sent to the same landing page when a link in Promotional Content is clicked</li>
-                          <li>Landing Pages that generate a pop-up (including "pop-overs" and "pop-unders") when a user enters or leaves the page are not allowed</li>
-                          <li>Landing Pages cannot utilize "mouse trapping" or "fake" page close behavior whereby the advertiser does not allow users to use their browser "back button" or "close" button in the standard manner</li>
+                          <li>Landing Pages that generate a pop-up (including &quot;pop-overs&quot; and &quot;pop-unders&quot;) when a user enters or leaves the page are not allowed</li>
+                          <li>Landing Pages cannot utilize &quot;mouse trapping&quot; or &quot;fake&quot; page close behavior whereby the advertiser does not allow users to use their browser &quot;back button&quot; or &quot;close&quot; button in the standard manner</li>
                           <li>Landing Pages may not contain Glamlink trademarks or logos, or otherwise reference Glamlink in the content of the landing page</li>
                         </ul>
                       </div>
@@ -202,8 +202,8 @@ export default function TermsOfUsePage() {
                       <div className="bg-gray-50 p-4 rounded-lg">
                         <h5 className="font-semibold text-gray-900 mb-2">(f) Prices, discounts, and free offers</h5>
                         <p className="text-gray-700">
-                          Promotional Content may not be deceptive or fraudulent about any offer it makes. If an ad includes a price, discount, or "free" offer, the Landing Page must link to a page that clearly and accurately offers the exact deal the Promotional Content has displayed. If
-                          Promotional Content includes a price, discount, or "free" offer, the Promotional Content must clearly state what action or set of actions is required to qualify for the offer.
+                          Promotional Content may not be deceptive or fraudulent about any offer it makes. If an ad includes a price, discount, or &quot;free&quot; offer, the Landing Page must link to a page that clearly and accurately offers the exact deal the Promotional Content has displayed. If
+                          Promotional Content includes a price, discount, or &quot;free&quot; offer, the Promotional Content must clearly state what action or set of actions is required to qualify for the offer.
                         </p>
                       </div>
 
@@ -215,7 +215,7 @@ export default function TermsOfUsePage() {
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">1.6. Legal Responsibility</h4>
                     <p className="text-gray-700 leading-relaxed mb-6">
                       You are legally and solely responsible for the Promotional Content and Booking Listings you post and your interactions with any users or Beauty Professionals. By posting Promotional Content and using the Booking Service, you warrant that all aspects of the content comply with
-                      Glamlink's published policies and that you may legally sell or offer for sale the goods or services promoted.
+                      Glamlink&apos;s published policies and that you may legally sell or offer for sale the goods or services promoted.
                     </p>
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">1.7. Payments / Fees</h4>
                     <p className="text-gray-700 leading-relaxed mb-6">
@@ -268,13 +268,13 @@ export default function TermsOfUsePage() {
                   <div className="border-l-4 border-primary pl-6">
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">2.1. Booking Services</h4>
                     <p className="text-gray-700 leading-relaxed mb-6">
-                      The Glamlink Service may allow users to book appointments or request other goods and services with Beauty Professionals ("Booking Service"). Glamlink is not involved in the actual transactions between Beauty Professionals and their clients. Rather, Glamlink merely allows Beauty
+                      The Glamlink Service may allow users to book appointments or request other goods and services with Beauty Professionals (&quot;Booking Service&quot;). Glamlink is not involved in the actual transactions between Beauty Professionals and their clients. Rather, Glamlink merely allows Beauty
                       Professionals to promote their own goods and services through the Booking Service and Promotional Content. The transactions regarding any Beauty Professional goods or services is directly between the Beauty Professionals and their clients. Glamlink may charge Beauty
-                      Professionals fees for the Booking Service which may be updated from time to time in Glamlink's sole discretion.
+                      Professionals fees for the Booking Service which may be updated from time to time in Glamlink&apos;s sole discretion.
                     </p>
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">2.2. No Control Over Listings</h4>
                     <p className="text-gray-700 leading-relaxed mb-6">
-                      Glamlink has no control over and does not guarantee the existence, quality, safety or legality of goods or services advertised through the Booking Service; the truth or accuracy of Beauty Professionals' content or listings; the ability of Beauty Professionals to offer any goods
+                      Glamlink has no control over and does not guarantee the existence, quality, safety or legality of goods or services advertised through the Booking Service; the truth or accuracy of Beauty Professionals&apos; content or listings; the ability of Beauty Professionals to offer any goods
                       or services; the ability of users to pay for items offered by Beauty Professionals; or that a Beauty Professional and user will actually complete a transaction or show up for an appointment.
                     </p>
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">2.3. Legal Compliance</h4>
@@ -293,7 +293,7 @@ export default function TermsOfUsePage() {
                     </ul>
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">2.5. Responding to Listings</h4>
                     <p className="text-gray-700 leading-relaxed mb-6">
-                      If you request goods or services through the Booking Service, you are legally responsible for your interactions with any sellers. You further warrant that you are in compliance with Glamlink's published policies. You are responsible for reading the full item or service listing
+                      If you request goods or services through the Booking Service, you are legally responsible for your interactions with any sellers. You further warrant that you are in compliance with Glamlink&apos;s published policies. You are responsible for reading the full item or service listing
                       before using the Booking Service. When you use the Booking Service you are entering into an agreement directly with the Beauty Professional, not with Glamlink.
                     </p>
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">2.6. Scams</h4>
@@ -308,7 +308,7 @@ export default function TermsOfUsePage() {
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">2.8. Limitation of Liability</h4>
                     <p className="text-gray-700 leading-relaxed mb-6">
                       You agree that Glamlink is not responsible or liable for any goods or services from any Beauty Professionals you purchase which do not meet your expectations, are lost, stolen or damages, or any damages or injuries you incur from the use of any goods or services provided by any
-                      user or Beauty Professional. You further agree that in the event that a court or arbitrator determines that Glamlink has any liability to you for any goods or services from any user or Beauty Professional, Glamlink's maximum liability are limited to the fees paid to Glamlink
+                      user or Beauty Professional. You further agree that in the event that a court or arbitrator determines that Glamlink has any liability to you for any goods or services from any user or Beauty Professional, Glamlink&apos;s maximum liability are limited to the fees paid to Glamlink
                       for the specific transaction or the promotion of the Beauty Professional or Promotional Content related to those goods or services.
                     </p>
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">2.9. Additional Policies</h4>
@@ -384,7 +384,7 @@ export default function TermsOfUsePage() {
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">4.1. Submission of Third-Party Content</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
                     The Glamlink Service may permit the submission, hosting, sharing, and/or publishing of text, photographs, audio, videos, reviews, or other content, including as part of Promotional Content and Booking Services, by you, other users, and other third parties such as our partners or
-                    affiliates ("Third-Party Content").
+                    affiliates (&quot;Third-Party Content&quot;).
                   </p>
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">4.2. Interactive Areas</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">Third-Party Content also includes, but is not limited to, direct messaging between users, profile submissions, and any other interactive area of the Glamlink Service.</p>
@@ -447,7 +447,7 @@ export default function TermsOfUsePage() {
                   </ul>
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">4.6. No Posting Agents</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
-                    When posting Third-Party Content, you agree never to use a third-party agent, service, or intermediary that offers to post Third-Party Content to the Glamlink Service on your behalf ("Posting Agent"). Posting Agents are not permitted to post Third-Party Content on behalf of
+                    When posting Third-Party Content, you agree never to use a third-party agent, service, or intermediary that offers to post Third-Party Content to the Glamlink Service on your behalf (&quot;Posting Agent&quot;). Posting Agents are not permitted to post Third-Party Content on behalf of
                     others without express written permission from Glamlink.
                   </p>
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">4.7. Description and Keywords</h4>
@@ -481,8 +481,8 @@ export default function TermsOfUsePage() {
                 <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">5.1. Ownership</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
-                    Other than Third-Party Content, all content on the Glamlink Service, including without limitation, the text, software, scripts, tools, graphics, photos, sounds, music, videos, and interactive features ("Glamlink Content") and the trademarks, service marks and logos contained
-                    therein ("Marks"), are owned by or licensed to Glamlink. The Glamlink Content and Marks are protected to the maximum extent permitted by intellectual property laws and international treaties. The Glamlink Service is protected by copyright law, including as a collective work
+                    Other than Third-Party Content, all content on the Glamlink Service, including without limitation, the text, software, scripts, tools, graphics, photos, sounds, music, videos, and interactive features (&quot;Glamlink Content&quot;) and the trademarks, service marks and logos contained
+                    therein (&quot;Marks&quot;), are owned by or licensed to Glamlink. The Glamlink Content and Marks are protected to the maximum extent permitted by intellectual property laws and international treaties. The Glamlink Service is protected by copyright law, including as a collective work
                     and/or compilation, pursuant to copyright laws and international conventions.
                   </p>
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">5.2. Derivative Works / Redistribution Prohibited</h4>
@@ -568,7 +568,7 @@ export default function TermsOfUsePage() {
                 <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">9.1. Your Obligations</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
-                    You agree to defend, indemnify and hold harmless Glamlink, its affiliated companies, officers, directors, employees and agents, from and against any and all claims, damages, obligations, losses, liabilities, costs or debt, and expenses (including but not limited to attorney's
+                    You agree to defend, indemnify and hold harmless Glamlink, its affiliated companies, officers, directors, employees and agents, from and against any and all claims, damages, obligations, losses, liabilities, costs or debt, and expenses (including but not limited to attorney&apos;s
                     fees) arising from:
                   </p>
                   <ul className="ml-6 mt-2 space-y-2">
@@ -608,7 +608,7 @@ export default function TermsOfUsePage() {
                       <span className="text-gray-700">(k) any claim that Third-Party Content posted by you or using your account caused damage to another party; and</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-gray-700">(l) any other party's access and use of the Glamlink Service with your account.</span>
+                      <span className="text-gray-700">(l) any other party&apos;s access and use of the Glamlink Service with your account.</span>
                     </li>
                   </ul>
                   <h4 className="text-lg font-semibold text-gray-900 mb-3 mt-6">9.2. Survival of Obligation</h4>
@@ -621,7 +621,7 @@ export default function TermsOfUsePage() {
                 <div className="border-l-4 border-primary pl-6 mt-8">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">10.1. Infringement Not Permitted</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
-                    Glamlink does not permit copyright infringing activities and infringement of intellectual property rights on the Glamlink Services will remove any content if properly notified that such content infringes on another's intellectual property rights. Glamlink reserves the right to
+                    Glamlink does not permit copyright infringing activities and infringement of intellectual property rights on the Glamlink Services will remove any content if properly notified that such content infringes on another&apos;s intellectual property rights. Glamlink reserves the right to
                     remove any content without prior notice.
                   </p>
 
@@ -652,7 +652,7 @@ export default function TermsOfUsePage() {
                       <span className="text-gray-700">(f) A statement that the information in the notification is accurate, and under penalty of perjury, that you are authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.</span>
                     </li>
                   </ul>
-                  <p className="text-gray-700 leading-relaxed mb-6 mt-4">Glamlink's designated Copyright Agent to receive notifications of claimed infringement is:</p>
+                  <p className="text-gray-700 leading-relaxed mb-6 mt-4">Glamlink&apos;s designated Copyright Agent to receive notifications of claimed infringement is:</p>
                   <div className="bg-gray-50 p-4 rounded-lg mb-6">
                     <strong>Glamlink Inc</strong>
                     <br />
@@ -671,7 +671,7 @@ export default function TermsOfUsePage() {
 
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">10.3. Counter-Notice</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
-                    If you believe that your Third-Party Content that was removed (or to which access was disabled) is not infringing, or that you have the authorization from the copyright owner, the copyright owner's agent, or pursuant to the law, to post and use the content in your Third-Party
+                    If you believe that your Third-Party Content that was removed (or to which access was disabled) is not infringing, or that you have the authorization from the copyright owner, the copyright owner&apos;s agent, or pursuant to the law, to post and use the content in your Third-Party
                     Content, you may send a counter-notice containing the following information to the Copyright Agent:
                   </p>
                   <ul className="ml-6 mt-2 space-y-2">
@@ -695,7 +695,7 @@ export default function TermsOfUsePage() {
                   <h4 className="text-lg font-semibold text-gray-900 mb-3 mt-6">10.4. Effect of Counter-Notice</h4>
                   <p className="text-gray-700 leading-relaxed mb-6">
                     If a counter-notice is received by the Copyright Agent, the Glamlink Service may send a copy of the counter-notice to the original complaining party informing that person that it may replace the removed content or cease disabling it in 10 business days. Unless the copyright owner
-                    files an action seeking a court order against the content provider, member or user, the removed content may be replaced, or access to it restored, in 10 to 14 business days or more after receipt of the counter-notice, at the Glamlink Service's sole discretion.
+                    files an action seeking a court order against the content provider, member or user, the removed content may be replaced, or access to it restored, in 10 to 14 business days or more after receipt of the counter-notice, at the Glamlink Service&apos;s sole discretion.
                   </p>
                 </div>
               </div>
@@ -742,7 +742,7 @@ export default function TermsOfUsePage() {
                     determined by arbitration in Las Vegas, Nevada, before one arbitrator. At the option of the first to commence an arbitration, the arbitration shall be administered either by JAMS pursuant to its Streamlined Arbitration Rules and Procedures, or by the American Arbitration
                     Association pursuant to its Commercial Arbitration Rules. The arbitrator may not award any consequential, indirect, exemplary, special or incidental damages arising from or relating to your use of the Glamlink Service (including, without limitation, damages for loss of business
                     profits, business interruption, loss of business information, or other pecuniary loss). Judgment on the Award may be entered in any court having jurisdiction. You and we will each pay one-half of the costs and expenses of such arbitration, and each of the parties will separately
-                    pay their counsel fees and expenses. Notwithstanding the parties' decision to resolve all disputes through arbitration, either party may bring an action in state or federal court in Clark County, Nevada to protect its intellectual property rights ("intellectual property rights"
+                    pay their counsel fees and expenses. Notwithstanding the parties&apos; decision to resolve all disputes through arbitration, either party may bring an action in state or federal court in Clark County, Nevada to protect its intellectual property rights (&quot;intellectual property rights&quot;
                     means patents, copyrights, trademarks, and trade secrets, but not privacy or publicity rights). For any actions brought in court, You and Glamlink consent to the sole and exclusive jurisdiction of the courts located in Clark County, Nevada, including for acts occurring outside of
                     the United States.
                   </p>
@@ -780,7 +780,7 @@ export default function TermsOfUsePage() {
                   <p className="text-gray-700 leading-relaxed">
                     You hereby declare, represent and warrant that you (either personally or through parental or guardian consent) are fully able and competent to legally bind yourself to and abide by all of the terms, conditions, obligations, declarations, affirmations, representations, and
                     warranties set forth in these Terms of Use. The Glamlink Service is not directed to persons under 18. If you become aware that your child has provided us with personal information without your consent, please contact us. We do not knowingly collect personal information from
-                    children under 13. If we become aware that a child under 13 has provided us with personal information, we take steps to remove such information and terminate the child's account.
+                    children under 13. If we become aware that a child under 13 has provided us with personal information, we take steps to remove such information and terminate the child&apos;s account.
                   </p>
                 </div>
               </div>
@@ -805,7 +805,7 @@ export default function TermsOfUsePage() {
         <div className="container-glamlink">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl font-semibold text-gray-900 mb-4">Questions About Our Terms?</h2>
-            <p className="text-lg text-gray-600 mb-8">If you have any questions about these Terms of Use, please don't hesitate to contact us.</p>
+            <p className="text-lg text-gray-600 mb-8">If you have any questions about these Terms of Use, please don&apos;t hesitate to contact us.</p>
             <div className="bg-white rounded-lg p-8 shadow-sm border">
               <div className="space-y-4">
                 <div className="flex items-center justify-center space-x-2">

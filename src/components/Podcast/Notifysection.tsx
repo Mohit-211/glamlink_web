@@ -370,10 +370,10 @@ export default function NotifySection() {
                         color: "hsl(210 30% 10%)",
                       }}
                     >
-                      You're on the list, {firstName}!
+                      You&apos;re on the list, {firstName}!
                     </p>
                     <p className="text-[12px] leading-relaxed" style={{ color: "hsl(210 12% 52%)" }}>
-                      We'll ping you the moment a new episode drops. See you Sunday.
+                      We&apos;ll ping you the moment a new episode drops. See you Sunday.
                     </p>
                   </div>
                   <div

@@ -79,7 +79,7 @@ export default function ContactPage() {
             <div className="card-glamlink flex flex-col items-center text-center py-16">
               <CheckCircle2 className="h-12 w-12 text-primary" />
               <h1 className="mt-6 text-2xl font-semibold font-display">
-                Thanks — we've got your message
+                Thanks — we&apos;ve got your message
               </h1>
               <p className="mt-3 text-muted-foreground max-w-md">
                 Our team will look into it and reach out to the email you
@@ -98,7 +98,7 @@ export default function ContactPage() {
               <h1 className="section-title font-display">Contact us</h1>
               <p className="section-subtitle">
                 Have a question, a problem, or want to close your account?
-                Tell us what's going on and we'll get back to you.
+                Tell us what&apos;s going on and we&apos;ll get back to you.
               </p>
 
               <form
@@ -170,7 +170,7 @@ export default function ContactPage() {
                 {/* Subject */}
                 <div>
                   <label htmlFor="subject" className="text-sm font-medium">
-                    What's this about?
+                    What&apos;s this about?
                   </label>
                   <select
                     id="subject"

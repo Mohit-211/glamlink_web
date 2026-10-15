@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { createElement, useMemo, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { AnalyticsEvent } from './types';
@@ -54,10 +54,9 @@ function EventTarget({ event }: { event: AnalyticsEvent }) {
 }
 
 function DeviceCell({ type }: { type: string | null }) {
-  const Icon = getDeviceIcon(type);
   return (
     <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-      <Icon className="h-3.5 w-3.5" />
+      {createElement(getDeviceIcon(type), { className: "h-3.5 w-3.5" })}
       {getDeviceLabel(type)}
     </span>
   );

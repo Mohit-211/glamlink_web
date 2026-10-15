@@ -204,7 +204,6 @@ export const resolveTopic = cache(
 
     try {
       const res = await getTopicById(topicId);
-      console.log(res,"res===>")
       if (res?.data?.id) return res.data as Topic;
     } catch (error) {
       console.error("Failed to load topic detail:", error);
@@ -263,18 +262,7 @@ export const getTopicParagraphsList = cache(
           ? res.data.rows
           : [];
 
-      // eslint-disable-next-line no-console
-      console.log(`[getTopicParagraphsList] topic ${topicId} — raw rows:`, rows);
-
-      const withText = rows.filter((p) => !!getParagraphText(p));
-
-      // eslint-disable-next-line no-console
-      console.log(
-        `[getTopicParagraphsList] topic ${topicId} — ${withText.length}/${rows.length} rows had extractable text`,
-        withText
-      );
-
-      return withText;
+      return rows.filter((p) => !!getParagraphText(p));
     } catch (error) {
       console.error("Failed to load topic paragraphs:", error);
       return [];

@@ -106,17 +106,17 @@ export default function PrivacyPolicyPage() {
             <div className="bg-white rounded-lg shadow-sm border p-8 md:p-12">
               {/* Introduction */}
               <div className="prose prose-lg max-w-none mb-12">
-                <p className="text-gray-700 leading-relaxed mb-6">Glamlink Inc, a Nevada limited liability company ("Glamlink" "us" or "we") are dedicated to protecting your privacy and handling any personally identifiable information we obtain from you with care and respect.</p>
+                <p className="text-gray-700 leading-relaxed mb-6">Glamlink Inc, a Nevada limited liability company (&quot;Glamlink&quot; &quot;us&quot; or &quot;we&quot;) are dedicated to protecting your privacy and handling any personally identifiable information we obtain from you with care and respect.</p>
                 <p className="text-gray-700 leading-relaxed mb-6">
                   This Privacy Policy sets forth our policy with respect to information, including personally identifiable information that is collected from users of and/or visitors to glamlink.net, as well as any other websites, online software, or mobile applications operated by Glamlink
-                  (collectively, the "Glamlink Service").
+                  (collectively, the &quot;Glamlink Service&quot;).
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-6">This Privacy Policy applies to personally identifiable information collected through the Glamlink Service and does not apply to any other information collected by Glamlink through any other means.</p>
                 <p className="text-gray-700 leading-relaxed mb-6">
-                  When this Privacy Policy uses the term "personally identifiable information," we mean information that identifies a particular individual, such as the individual's name, address, e-mail, and phone number. Personally identifiable information is also referred to in this Privacy
-                  Policy as "Personal Information."
+                  When this Privacy Policy uses the term &quot;personally identifiable information,&quot; we mean information that identifies a particular individual, such as the individual&apos;s name, address, e-mail, and phone number. Personally identifiable information is also referred to in this Privacy
+                  Policy as &quot;Personal Information.&quot;
                 </p>
-                <p className="text-gray-700 leading-relaxed mb-6">As used in this Privacy Policy, Glamlink includes all of its subsidiary and affiliated entities. Glamlink is referred to in this Privacy Policy as "we," "us," "our," and "ourselves."</p>
+                <p className="text-gray-700 leading-relaxed mb-6">As used in this Privacy Policy, Glamlink includes all of its subsidiary and affiliated entities. Glamlink is referred to in this Privacy Policy as &quot;we,&quot; &quot;us,&quot; &quot;our,&quot; and &quot;ourselves.&quot;</p>
                 <p className="text-gray-700 leading-relaxed mb-6">This Privacy Policy does not cover the information practices of other companies and organizations who advertise our services, and who may use cookies, web beacons (pixel tags), and other methodologies to serve personalized ads.</p>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
                   <p className="text-blue-800 font-medium">BY USING THE GLAMLINK SERVICE, AND WHEN COMMUNICATE WITH US, YOU UNDERSTAND AND ACKNOWLEDGE THAT WE WILL COLLECT AND USE YOUR PERSONAL INFORMATION IN ACCORDANCE WITH THIS PRIVACY POLICY.</p>
@@ -299,7 +299,7 @@ export default function PrivacyPolicyPage() {
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary mr-3 mt-1">•</span>
-                    <span className="text-gray-700">If you send us a resume or curriculum vitae ("CV") to apply online for a position with Glamlink, we will use the Personal Information that you provide to match you with available Glamlink job opportunities.</span>
+                    <span className="text-gray-700">If you send us a resume or curriculum vitae (&quot;CV&quot;) to apply online for a position with Glamlink, we will use the Personal Information that you provide to match you with available Glamlink job opportunities.</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary mr-3 mt-1">•</span>
@@ -451,7 +451,7 @@ export default function PrivacyPolicyPage() {
 
               {/* Section 13: Children's Information */}
               <div id="children" className="mb-16 scroll-mt-24">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-6">13. Children's Information</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">13. Children&apos;s Information</h3>
 
                 <p className="text-gray-700 leading-relaxed">
                   We do not knowingly collect any information from, or sell to, children under the age of 13. If you are a parent or guardian who has discovered that your child under the age of 13 has submitted his or her personally identifiable information without your permission or consent, please
@@ -473,7 +473,7 @@ export default function PrivacyPolicyPage() {
               {/* Section 15: Do Not Track */}
               <div id="do-not-track" className="mb-16 scroll-mt-24">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-6">15. Do Not Track</h3>
-                <p className="text-gray-700 leading-relaxed">We currently do not participate in any "Do Not Track" frameworks that would allow us to respond to signals or other mechanisms from you regarding the collection of data.</p>
+                <p className="text-gray-700 leading-relaxed">We currently do not participate in any &quot;Do Not Track&quot; frameworks that would allow us to respond to signals or other mechanisms from you regarding the collection of data.</p>
               </div>
 
               {/* Section 16: Your State Privacy Rights */}
@@ -496,7 +496,7 @@ export default function PrivacyPolicyPage() {
                     </li>
                     <li className="flex items-start">
                       <span className="text-primary mr-3 mt-1">•</span>
-                      <span className="text-gray-700">Correct inaccuracies in their personal information, taking into account the information's nature and processing purpose (excluding Iowa and Utah)</span>
+                      <span className="text-gray-700">Correct inaccuracies in their personal information, taking into account the information&apos;s nature and processing purpose (excluding Iowa and Utah)</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-primary mr-3 mt-1">•</span>
@@ -584,7 +584,7 @@ export default function PrivacyPolicyPage() {
               <div className="mt-16 pt-8 border-t">
                 <div className="text-center">
                   <h4 className="text-lg font-semibold text-gray-900 mb-4">Thank You for Reading</h4>
-                  <p className="text-gray-600 mb-6">We are committed to protecting your privacy and handling your personal information with care and respect. If you have any questions about this Privacy Policy, please don't hesitate to contact us.</p>
+                  <p className="text-gray-600 mb-6">We are committed to protecting your privacy and handling your personal information with care and respect. If you have any questions about this Privacy Policy, please don&apos;t hesitate to contact us.</p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button onClick={scrollToTop} className="px-6 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary-dark transition-colors">
                       Back to Top

@@ -138,20 +138,6 @@ const ProfessionalsMarketplace = () => {
   const sortRef = useRef<HTMLDivElement>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
-  /* Close dropdowns on outside click using refs */
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
-        setSortOpen(false);
-      }
-      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
-        setFilterOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, []);
-
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -166,6 +152,20 @@ const ProfessionalsMarketplace = () => {
 
   /* GlamCardLivePreview state */
   const [selectedPro, setSelectedPro] = useState<Professional | null>(null);
+
+  /* Close dropdowns on outside click using refs */
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+        setSortOpen(false);
+      }
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setFilterOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
 /* ================= MAPPER ================= */
 
 const mapProToGlamCardData = (pro: Professional): any => ({

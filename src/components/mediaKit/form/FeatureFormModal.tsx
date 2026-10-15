@@ -130,7 +130,7 @@ export default function FeatureFormModal({ onClose }: Props) {
                     }}>
                         <p style={{ fontSize: 13, color: "#444", lineHeight: 1.6, marginBottom: 4 }}>
                             Apply to be featured in The Glamlink Edit, our editorial platform highlighting
-                            standout beauty and wellness professionals. Select the type of feature you'd
+                            standout beauty and wellness professionals. Select the type of feature you&apos;d
                             like to be considered for — from Cover Feature and expert interviews to
                             trending Treatments, or powerful client impact moments.
                         </p>
@@ -271,7 +271,7 @@ export default function FeatureFormModal({ onClose }: Props) {
                             Thank You! ✨
                         </h3>
                         <p style={{ fontSize: 14, color: "#888", margin: 0 }}>
-                            We'll review your submission and reach out shortly.
+                            We&apos;ll review your submission and reach out shortly.
                         </p>
                         <button onClick={onClose} style={{ ...primaryBtnStyle, marginTop: 8 }}>
                             Close

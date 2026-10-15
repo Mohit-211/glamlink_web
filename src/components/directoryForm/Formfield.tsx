@@ -27,7 +27,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   </div>
 )
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+type InputProps = React.InputHTMLAttributes<HTMLInputElement>
 
 export const Input: React.FC<InputProps> = ({ className = '', ...props }) => (
   <input
@@ -43,7 +43,7 @@ export const Input: React.FC<InputProps> = ({ className = '', ...props }) => (
   />
 )
 
-interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+type TextAreaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
 
 export const TextArea: React.FC<TextAreaProps> = ({ className = '', ...props }) => (
   <textarea

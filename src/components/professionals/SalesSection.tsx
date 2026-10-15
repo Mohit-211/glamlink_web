@@ -60,7 +60,7 @@ const SalesSection = () => {
             <span className="gradient-text">Unstoppable Sales</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Glamlink isn't just a directory — it's a complete business platform
+            Glamlink isn&apos;t just a directory — it&apos;s a complete business platform
             designed to maximize your income.
           </p>
         </div>

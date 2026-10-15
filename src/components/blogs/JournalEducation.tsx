@@ -68,12 +68,12 @@ const JournalEducation = () => {
         {educationItems.length > 0 ? (
           educationItems.map((item: any) => (
             <Link
+              key={item.id}
               href={item.link}
               target="_blank"
               rel="noopener noreferrer"
             >
               <div
-                key={item.id}
                 className="group border border-border/40 rounded-xl overflow-hidden bg-background hover:border-[#24bbcb]/50 hover:shadow-sm transition-all duration-200 cursor-pointer"
               >
                 <div className="relative aspect-[16/10] bg-muted/30 overflow-hidden">

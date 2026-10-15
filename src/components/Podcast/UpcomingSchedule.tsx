@@ -85,16 +85,11 @@ export default function UpcomingSchedule() {
   const shownItems = schedule.slice(0, visibleCount);
   const hasMore = visibleCount < schedule.length;
 
-  useEffect(() => {
-    fetchPodcast();
-  }, []);
-
   const fetchPodcast = async () => {
     try {
       setLoading(true);
 
       const response = await getAllPodcast();
-console.log(response,"response=====")
       setSchedule(response?.data || []);
     } catch (error) {
       console.error("Podcast fetch error:", error);
@@ -102,6 +97,10 @@ console.log(response,"response=====")
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchPodcast();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

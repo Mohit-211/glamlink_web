@@ -101,7 +101,7 @@ export default function GuestModal({ open, onClose }: Props) {
             </button>
           </div>
           <p className="text-gray-500 mt-2 mb-6" style={{ fontSize: 13, lineHeight: 1.5 }}>
-            Tell us about yourself. We'll be in touch if it's a great fit.
+            Tell us about yourself. We&apos;ll be in touch if it&apos;s a great fit.
           </p>
         </div>
 

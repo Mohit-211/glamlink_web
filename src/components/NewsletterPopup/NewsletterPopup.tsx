@@ -194,7 +194,7 @@ export default function NewsletterPopup({
                 </h3>
 
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  Thank you for subscribing. You'll be the first to
+                  Thank you for subscribing. You&apos;ll be the first to
                   receive new articles, magazine releases, podcast
                   episodes and industry updates from Glamlink.
                 </p>

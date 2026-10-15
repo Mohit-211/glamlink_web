@@ -32,6 +32,40 @@ const TIPS = [
   'Share the link on WhatsApp, Instagram, Facebook, or anywhere else.',
 ];
 
+function StatusPill({ isPaid, large }: { isPaid: boolean; large?: boolean }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 leading-tight ${
+        large ? 'text-[11px]' : 'text-[10px]'
+      } ${
+        isPaid
+          ? 'border-green-600/30 bg-green-600/10 text-green-700'
+          : 'border-border bg-secondary text-muted-foreground'
+      }`}
+    >
+      <span
+        className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${
+          isPaid ? 'bg-green-600' : 'bg-muted-foreground'
+        }`}
+      />
+      {isPaid ? 'Paid' : 'Unpaid'}
+    </span>
+  );
+}
+
+function TipList() {
+  return (
+    <ul className="space-y-1.5 text-xs text-foreground/70">
+      {TIPS.map((tip) => (
+        <li key={tip} className="flex items-start gap-2">
+          <span className="mt-[5px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
+          {tip}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
   const [copied, setCopied] = useState(false);
 
@@ -99,36 +133,6 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
 
   const paid = isPaidCard(selectedCard || undefined);
   const multi = cards.length > 1;
-
-  const StatusPill = ({ isPaid, large }: { isPaid: boolean; large?: boolean }) => (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 leading-tight ${
-        large ? 'text-[11px]' : 'text-[10px]'
-      } ${
-        isPaid
-          ? 'border-green-600/30 bg-green-600/10 text-green-700'
-          : 'border-border bg-secondary text-muted-foreground'
-      }`}
-    >
-      <span
-        className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${
-          isPaid ? 'bg-green-600' : 'bg-muted-foreground'
-        }`}
-      />
-      {isPaid ? 'Paid' : 'Unpaid'}
-    </span>
-  );
-
-  const TipList = () => (
-    <ul className="space-y-1.5 text-xs text-foreground/70">
-      {TIPS.map((tip) => (
-        <li key={tip} className="flex items-start gap-2">
-          <span className="mt-[5px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
-          {tip}
-        </li>
-      ))}
-    </ul>
-  );
 
   return (
     <div className="w-full min-w-0">

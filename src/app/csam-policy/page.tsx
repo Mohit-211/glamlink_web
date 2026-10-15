@@ -117,7 +117,7 @@ const CsamPolicy: React.FC = () => {
           If you encounter any content you believe may involve child exploitation:
         </p>
         <ul className="list-disc ml-5 mt-2 space-y-1">
-          <li>Use the in-app "Report" feature available on each post</li>
+          <li>Use the in-app &quot;Report&quot; feature available on each post</li>
           <li>
             Or contact us directly at:{" "}
             <a

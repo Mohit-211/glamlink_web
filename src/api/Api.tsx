@@ -64,7 +64,7 @@ export const getAllBlogs = async () => {
   const { data } = await api.get("journal");
   return data;
 };
-export const getTypeBlogs = async (type: String) => {
+export const getTypeBlogs = async (type: string) => {
   const { data } = await api.get(`discover/${type}`);
   return data;
 };

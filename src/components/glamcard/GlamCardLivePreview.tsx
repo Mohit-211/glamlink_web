@@ -272,7 +272,14 @@ const TagList: React.FC<{ items: any[] }> = ({ items }) => {
   );
 };
 /* ================= COMPONENT ================= */
-const GlamCardLivePreview: React.FC<Props> = ({
+// Callers can pass no data while a card is still loading. The guard lives in
+// its own component so the hooks below always run in the same order.
+const GlamCardLivePreview: React.FC<Props> = (props) => {
+  if (!props.data) return null;
+  return <GlamCardLivePreviewContent {...props} />;
+};
+
+const GlamCardLivePreviewContent: React.FC<Props> = ({
   data,
   sticky = false,
   mode,
@@ -281,8 +288,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
   onDownload,
   onCopyLink,
 }) => {
-  if (!data) return null;
-  console.log(data, "datata")
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(0);
@@ -292,17 +297,16 @@ const GlamCardLivePreview: React.FC<Props> = ({
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const specialtiesArray = parseArray(data.specialties);
-  console.log(specialtiesArray, "specialtiesArray");
   const importantInfoArray = parseArray(data.important_info);
-  console.log(importantInfoArray,"importantInfoArray")
   /* ================= PROFILE IMAGE ================= */
+  const profileImage = data.profile_image;
   const profileImageUrl = useMemo(() => {
-    if (!data?.profile_image) return "";
-    if (mode === "live" && isFile(data.profile_image))
-      return URL.createObjectURL(data.profile_image);
-    if (typeof data.profile_image === "string") return data.profile_image;
+    if (!profileImage) return "";
+    if (mode === "live" && isFile(profileImage))
+      return URL.createObjectURL(profileImage);
+    if (typeof profileImage === "string") return profileImage;
     return "";
-  }, [data?.profile_image, mode]);
+  }, [profileImage, mode]);
   useEffect(() => {
     return () => {
       if (profileImageUrl?.startsWith("blob:"))
@@ -310,8 +314,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
     };
   }, [profileImageUrl]);
   /* ================= IMAGE NORMALIZATION ================= */
+  const images = data.images;
   const normalizedImages = useMemo(() => {
-    const rawImages = data?.images || [];
+    const rawImages = images || [];
     return rawImages?.map((item: any, index: number) => {
       if (typeof item === "string")
         return {
@@ -338,7 +343,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
         sort_order: item.sort_order ?? index,
       };
     });
-  }, [data?.images]);
+  }, [images]);
   /* ================= DEDUPLICATE ================= */
   const deduplicatedImages = useMemo(() => {
     const properVideoUrls = new Set(
@@ -361,11 +366,11 @@ const GlamCardLivePreview: React.FC<Props> = ({
     () =>
       mode === "live"
         ? normalizedImages?.map((item, idx) => {
-          const raw = data?.images?.[idx];
+          const raw = images?.[idx];
           return isFile(raw) ? URL.createObjectURL(raw) : item.url;
         })
         : normalizedImages?.map((item) => item.url),
-    [mode, normalizedImages, data?.images],
+    [mode, normalizedImages, images],
   );
   /* ================= THUMBNAIL PREVIEWS ================= */
   const thumbnailPreviews = useMemo(
@@ -561,12 +566,13 @@ const GlamCardLivePreview: React.FC<Props> = ({
      every section below (including the standalone SectionBox component)
      as CSS custom properties on the outermost wrapper, so nothing in this
      file hardcodes a color — see `cardColorVars` near the JSX return. */
+  const colorCode = data.color_code;
   const cardColor = useMemo(
     () =>
-      isValidHexColor(data?.color_code)
-        ? data.color_code.trim()
+      isValidHexColor(colorCode)
+        ? colorCode.trim()
         : DEFAULT_ACCENT_COLOR,
-    [data?.color_code],
+    [colorCode],
   );
   /* Resolves a thumbnail for both a persisted URL and a pending File (this
      component doubles as the live preview during editing, where a newly
@@ -594,8 +600,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
     link?.image_url ||
     undefined;
   /* ================= PREFERRED BOOKING METHODS ================= */
+  const rawPreferredBookingMethod = (data as any)?.preferred_booking_method;
   const preferredBookingMethods = useMemo(() => {
-    const val = (data as any)?.preferred_booking_method;
+    const val = rawPreferredBookingMethod;
     if (Array.isArray(val)) return val;
     if (typeof val === "string" && val) {
       try {
@@ -608,7 +615,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
       }
     }
     return [];
-  }, [(data as any)?.preferred_booking_method]);
+  }, [rawPreferredBookingMethod]);
   const handleCopyLink = async () => {
     const link = data?.business_card_qr;
     try {

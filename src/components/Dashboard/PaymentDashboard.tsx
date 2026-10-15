@@ -146,14 +146,6 @@ export default function DashboardPage() {
   const [payModalPurchaseType, setPayModalPurchaseType] = useState<PurchaseType>(
 
   );
-  useEffect(() => {
-    const token = localStorage.getItem('GlamlinkaccessToken');
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-    fetchDashboardData();
-  }, []);
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -171,6 +163,14 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    const token = localStorage.getItem('GlamlinkaccessToken');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+    fetchDashboardData();
+  }, []);
   const handleSignOut = async () => {
     try {
       setSigningOut(true);

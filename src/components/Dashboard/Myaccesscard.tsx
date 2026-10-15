@@ -100,7 +100,7 @@ export default function MyAccessCard({
                     Create Your Business Card
                 </h2>
                 <p className="mt-2 text-sm text-gray-500 max-w-md">
-                    You haven't created a business card yet.
+                    You haven&apos;t created a business card yet.
                 </p>
                 <button
                     onClick={() => (window.location.href = "/access")}
@@ -471,12 +471,12 @@ export default function MyAccessCard({
                             <div className="min-w-0">
                                 <h3 className="text-sm font-semibold text-foreground">Subscribe to edit this card</h3>
                                 <p className="text-[11px] text-muted-foreground mt-0.5">
-                                    {(subscriptionPromptCard?.business_name || subscriptionPromptCard?.name || 'This card')}'s
+                                    {(subscriptionPromptCard?.business_name || subscriptionPromptCard?.name || 'This card')}&apos;s
                                     subscription is inactive. Choose a plan to unlock editing.
                                 </p>
                                 {disabledPlanIds.length > 0 && (
                                     <p className="text-[11px] text-muted-foreground mt-1">
-                                        You've already paid for an NFC card on this card, so NFC plans are unavailable.
+                                        You&apos;ve already paid for an NFC card on this card, so NFC plans are unavailable.
                                     </p>
                                 )}
                             </div>

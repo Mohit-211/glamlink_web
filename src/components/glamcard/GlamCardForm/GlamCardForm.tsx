@@ -107,7 +107,6 @@ const GlamCardForm: React.FC<Props> = ({
     // draft or redirect flag lingering around for next time.
     localStorage.removeItem(FORM_STORAGE_KEY);
     localStorage.removeItem("postLoginRedirect");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setData, isEdit]);
   /* ================= REQUIRED VALIDATION =================
      Pulled out so it can run before we even check for login,

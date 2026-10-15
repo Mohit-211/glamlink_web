@@ -403,7 +403,7 @@ export default function ForgotPasswordClient() {
                 {loading ? "Verifying..." : "Verify"}
               </button>
               <p className="text-center text-sm text-muted-foreground">
-                Didn't get a code?{" "}
+                Didn&apos;t get a code?{" "}
                 <button
                   type="button"
                   onClick={handleResend}
