@@ -1,6 +1,7 @@
 // next.config.ts
 import type { NextConfig } from "next";
 import { PHASE_PRODUCTION_BUILD } from "next/constants";
+import { indexingAllowed } from "./src/lib/indexing";
 
 type RemotePattern = NonNullable<NonNullable<NextConfig["images"]>["remotePatterns"]>[number];
 
@@ -32,6 +33,17 @@ export default function nextConfig(phase: string): NextConfig {
   }
 
   return {
+    // Test and staging builds (SITE_INDEXING=off, or any address other than
+    // glamlink.net): every response tells crawlers not to index or follow.
+    async headers() {
+      if (indexingAllowed()) return [];
+      return [
+        {
+          source: "/:path*",
+          headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+        },
+      ];
+    },
     images: {
       remotePatterns: [
         // The site itself and the backend (uploaded images live under its /images path).

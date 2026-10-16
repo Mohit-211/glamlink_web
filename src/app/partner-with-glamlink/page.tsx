@@ -10,6 +10,7 @@ import FeatureOpportunitiesSection from "@/components/mediaKit/FeatureOpportunit
 import CommunitySection from "@/components/mediaKit/CommunitySection";
 import WhySection from "@/components/mediaKit/WhySection";
 import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
+import { pageRobots } from "@/lib/indexing";
 
 /* ─────────────────────────────────────────────
    METADATA (SEO)
@@ -52,10 +53,10 @@ export const metadata: Metadata = {
       "Advertise and get featured in The Glamlink Edit — built for visibility and real business growth.",
     images: [`${SITE_URL}/default-blog.jpg`],
   },
-  robots: {
+  robots: pageRobots({
     index: true,
     follow: true,
-  },
+  }),
 };
 
 /* ─────────────────────────────────────────────

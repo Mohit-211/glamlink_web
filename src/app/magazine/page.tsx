@@ -4,6 +4,7 @@ import Script from "next/script";
 import MagazineHero from "@/components/magazine/MagazineHero";
 import MagazineIssues from "@/components/magazine/MagazineIssues";
 import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
+import { pageRobots } from "@/lib/indexing";
 /* --------------------------------
    Page Metadata
 -------------------------------- */
@@ -59,10 +60,10 @@ export const metadata: Metadata = {
 
     images: [`${SITE_URL}/assets/magazine-og.png`], // ✅ FIXED
   },
-  robots: {
+  robots: pageRobots({
     index: true,
     follow: true,
-  },
+  }),
 };
 /* --------------------------------
    Structured Data

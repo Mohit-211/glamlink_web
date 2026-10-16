@@ -5,8 +5,11 @@ import path from "path";
 
 import { issues2025, issues2026 } from "@/data/issues";
 import { getAllBlogs, getAllTopics } from "@/api/Api";
+import { ALLOW_INDEXING } from "@/lib/indexing";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Test and staging builds list nothing.
+  if (!ALLOW_INDEXING) return [];
   const baseUrl = SITE_URL;
   const appDir = path.join(process.cwd(), "src/app");
 

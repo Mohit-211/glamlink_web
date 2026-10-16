@@ -7,6 +7,7 @@ import { ADSENSE_CLIENT_ID, GTM_ID, SITE_URL } from "@/lib/config";
 import Providers from "./providers";
 import ScrollToTop from "@/components/ScrollToTop";
 import LayoutWrapper from "@/components/LayoutWrapper";
+import { pageRobots } from "@/lib/indexing";
 
 import "../styles/globals.css"
 
@@ -49,7 +50,8 @@ export const metadata: Metadata = {
   creator: "Glamlink",
   publisher: "Glamlink",
 
-  robots: {
+  // Production only; test and staging builds stay out of search engines (lib/indexing).
+  robots: pageRobots({
     index: true,
     follow: true,
     googleBot: {
@@ -59,7 +61,7 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
+  }),
 
   openGraph: {
     title: "Glamlink | Discover Beauty & Wellness Professionals",
