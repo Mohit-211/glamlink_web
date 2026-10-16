@@ -77,6 +77,9 @@ export interface PlanDef {
   personal: boolean;
   dueTodayCents: number;
   monthlyCents: number | null;
+  /** What this plan charges now for each product it includes (cents). */
+  proCents: number | null;
+  keychainCents: number | null;
 }
 
 /** Cents to "$4.99"; whole amounts keep their cents except zero ("$0"). */
@@ -110,8 +113,22 @@ export function toPlanDef(p: ApiPlan): PlanDef {
     personal: p.lines.some((l) => l.personal),
     dueTodayCents: p.due_today,
     monthlyCents: p.monthly,
+    proCents: pro?.amount ?? null,
+    keychainCents: keychain?.amount ?? null,
   };
 }
+
+// Several price labels on one page share one request: anonymous answers are
+// cached briefly (personal prices depend on the card or sign-in, so not those).
+let publicCache: { at: number; promise: Promise<any> } | null = null;
+const loadPlans = (businessCardId?: string | number | null) => {
+  if (businessCardId) return getAccessPlans(businessCardId);
+  if (!publicCache || Date.now() - publicCache.at > 60_000) {
+    publicCache = { at: Date.now(), promise: getAccessPlans() };
+    publicCache.promise.catch(() => (publicCache = null));
+  }
+  return publicCache.promise;
+};
 
 export interface PlansState {
   plans: PlanDef[];
@@ -143,7 +160,7 @@ export function usePlans(businessCardId?: string | number | null, enabled = true
     if (!enabled) return;
     let active = true;
     setState((s) => ({ ...s, loading: true, error: null }));
-    getAccessPlans(businessCardId)
+    loadPlans(businessCardId)
       .then((res) => {
         if (!active) return;
         const data = res?.data ?? res;

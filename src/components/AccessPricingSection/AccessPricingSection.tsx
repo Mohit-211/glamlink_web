@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import PlanPrice from "@/components/Pricing/PlanPrice";
 
 export default function AccessPricingSection() {
   const features = [
@@ -61,7 +62,7 @@ export default function AccessPricingSection() {
             </h3>
 
             <div className="gradient-text mt-4 text-5xl font-bold">
-              $39.99
+              <PlanPrice product="keychain" />
             </div>
 
             <p className="mt-6 text-muted-foreground">
@@ -78,7 +79,7 @@ export default function AccessPricingSection() {
             </h3>
 
             <div className="mt-4">
-              <span className="text-5xl font-bold">$4.99</span>
+              <span className="text-5xl font-bold"><PlanPrice product="pro" /></span>
               <span className="ml-2 text-lg text-muted-foreground">
                 /month
               </span>

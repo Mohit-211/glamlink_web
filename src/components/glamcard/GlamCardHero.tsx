@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import PlanPrice from "@/components/Pricing/PlanPrice";
 
 interface GlamCardHeroProps {
   onApplyClick: () => void;
@@ -53,9 +54,9 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
             </p>
 
             <div className="mt-8 flex items-center gap-4 text-xl font-semibold text-foreground">
-              <span>$39.99 SETUP</span>
+              <span><PlanPrice product="keychain" /> SETUP</span>
               <span className="text-primary">•</span>
-              <span>$4.99/MONTH</span>
+              <span><PlanPrice product="pro" />/MONTH</span>
             </div>
 
             <button

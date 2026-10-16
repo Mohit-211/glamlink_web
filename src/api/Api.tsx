@@ -294,10 +294,6 @@ export const claimCard = async (cardId: string | number, replace = false) => {
   );
   return data;
 };
-export const deleteCard = async (cardId: string | number) => {
-  const { data } = await api.delete(`access/cards/${cardId}`, { requireAuth: true });
-  return data;
-};
 export const getMyBusinessCardForDashboard = async () => {
   const { data } = await api.get("businessCard/getMyBusinessCard", { requireAuth: true });
   return data;
