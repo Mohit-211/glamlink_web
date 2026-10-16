@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import type { FeaturedProfile } from "@/lib/directory";
 import FeaturedProfileCard from "./FeaturedProfileCard";
-import { getAllBusinessCards } from "@/api/Api";
+import { getBusinessProfile } from "@/api/Api";
 
-/* Maps a card from `businessCard/getAllBusinessCards` to the featured card shape. */
+/* Maps a public card (`businessCard/getAllProfiles`: accepted cards only) to the featured card shape. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const toFeaturedProfile = (card: any): FeaturedProfile => {
   const location =
@@ -36,8 +36,8 @@ export default function FeaturedProfiles({
 
   useEffect(() => {
     let active = true;
-    getAllBusinessCards()
-      .then((res) => {
+    getBusinessProfile()
+      .then((res: any) => {
         if (active) setApiProfiles((res?.data || []).map(toFeaturedProfile));
       })
       .catch((error) => console.log("API error:", error));

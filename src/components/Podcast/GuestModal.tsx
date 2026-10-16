@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { apiUrl } from "@/lib/config";
+import { submitGuestApplication } from "@/api/Api";
+import { readApiError } from "@/lib/apiError";
 
 interface Props {
   open: boolean;
@@ -43,24 +44,12 @@ export default function GuestModal({ open, onClose }: Props) {
     setLoading(true);
 
     try {
-      const res = await fetch(apiUrl("guest-application/create"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json().catch(() => null);
-
-      if (res.ok) {
-        clearForm();
-        toast.success(data?.message || "Application sent. We'll be in touch.");
-        onClose();
-      } else {
-        toast.error(data?.message || "Could not send your application. Please try again.");
-      }
+      const data = await submitGuestApplication(form);
+      clearForm();
+      toast.success(data?.message || "Application sent. We'll be in touch.");
+      onClose();
     } catch (err) {
-      console.error(err);
-      toast.error("Server error. Please try again.");
+      toast.error(readApiError(err, "Could not send your application. Please try again.").message);
     }
 
     setLoading(false);

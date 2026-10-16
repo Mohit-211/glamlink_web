@@ -7,10 +7,7 @@ import {
   ChevronUp,
   CreditCard,
   ExternalLink,
-  XCircle,
-  Loader2,
 } from 'lucide-react';
-import { CancelSubscription } from '@/api/Api';
 
 interface Payment {
   id: number;
@@ -29,17 +26,11 @@ interface PaymentHistoryProps {
   payments?: Payment[];
 }
 
-const CANCELABLE_TYPES = ['SUBSCRIPTION_ONLY', 'NFC_WITH_SUBSCRIPTION'];
 
 export default function PaymentHistory({
   payments = [],
 }: PaymentHistoryProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [confirmingId, setConfirmingId] = useState<number | null>(null);
-  const [cancellingId, setCancellingId] = useState<number | null>(null);
-  const [cancelledIds, setCancelledIds] = useState<Set<number>>(new Set());
-  const [errorId, setErrorId] = useState<number | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string>('');
 
   const getStatusConfig = (status: string) => {
     switch (status?.toUpperCase()) {
@@ -66,26 +57,6 @@ export default function PaymentHistory({
     }
   };
 
-  const handleCancelSubscription = async (payment: Payment) => {
-    setCancellingId(payment.id);
-    setErrorId(null);
-    setErrorMsg('');
-
-    try {
-      await CancelSubscription({}); // no payload needed, token is read internally
-      setCancelledIds((prev) => new Set(prev).add(payment.id));
-      setConfirmingId(null);
-    } catch (err: any) {
-      setErrorId(payment.id);
-      setErrorMsg(
-        err?.response?.data?.message ||
-        err?.message ||
-        'Failed to cancel subscription. Please try again.'
-      );
-    } finally {
-      setCancellingId(null);
-    }
-  };
 
   return (
     <div className="space-y-4">
@@ -118,12 +89,6 @@ export default function PaymentHistory({
           {payments.map((payment) => {
             const config = getStatusConfig(payment.payment_status);
             const isExpanded = expandedId === payment.id;
-            const canCancel =
-              CANCELABLE_TYPES.includes(payment.payment_type || '') &&
-              !cancelledIds.has(payment.id);
-            const isConfirming = confirmingId === payment.id;
-            const isCancelling = cancellingId === payment.id;
-            const hasError = errorId === payment.id;
 
             return (
               <div
@@ -147,17 +112,12 @@ export default function PaymentHistory({
                         {config.label}
                       </span>
 
-                      {cancelledIds.has(payment.id) && (
-                        <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold bg-muted text-muted-foreground border-border">
-                          Cancelled
-                        </span>
-                      )}
                     </div>
 
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {/* {payment.transaction_id} ·{' '} */}
                       {new Date(payment.created_at).toLocaleDateString(
-                        'en-IN',
+                        'en-US',
                         {
                           day: '2-digit',
                           month: 'short',
@@ -209,7 +169,7 @@ export default function PaymentHistory({
 
                         <p className="text-foreground">
                           {new Date(payment.created_at).toLocaleDateString(
-                            'en-IN',
+                            'en-US',
                             {
                               day: '2-digit',
                               month: 'long',
@@ -275,51 +235,8 @@ export default function PaymentHistory({
                         </a>
                       )}
 
-                      {payment.payment_status !== "CANCELLED" && canCancel && !isConfirming && (
-                        <button
-                          onClick={() => setConfirmingId(payment.id)}
-                          className="inline-flex items-center gap-2 rounded-lg border border-destructive/30 bg-card px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/5"
-                        >
-                          <XCircle className="h-4 w-4" />
-                          Cancel Subscription
-                        </button>
-                      )}
-
-                      {canCancel && isConfirming && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">
-                            Are you sure?
-                          </span>
-
-                          <button
-                            onClick={() => handleCancelSubscription(payment)}
-                            disabled={isCancelling}
-                            className="inline-flex items-center gap-2 rounded-lg bg-destructive px-3 py-1.5 text-xs font-medium text-white hover:bg-destructive disabled:opacity-60"
-                          >
-                            {isCancelling ? (
-                              <>
-                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                Cancelling...
-                              </>
-                            ) : (
-                              'Yes, cancel'
-                            )}
-                          </button>
-
-                          <button
-                            onClick={() => setConfirmingId(null)}
-                            disabled={isCancelling}
-                            className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-secondary disabled:opacity-60"
-                          >
-                            Keep it
-                          </button>
-                        </div>
-                      )}
                     </div>
 
-                    {hasError && (
-                      <p className="mt-2 text-xs text-destructive">{errorMsg}</p>
-                    )}
                   </div>
                 )}
               </div>

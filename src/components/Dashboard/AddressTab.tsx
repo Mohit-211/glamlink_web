@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Home, Plus, Trash2, Loader2, AlertCircle, X, MapPin, Pencil, CheckCircle2 } from 'lucide-react';
 import { toast } from "sonner";
+import { readApiError } from "@/lib/apiError";
 import {
   addNewAddress,
   getAllUserAddress,
@@ -16,6 +17,7 @@ interface Address {
   user_city?: { id: number; name: string };
   id: string | number;
   address_line_1: string;
+  address_line_2?: string | null;
   address_lat?: number;
   address_long?: number;
   state_id: number;
@@ -27,6 +29,7 @@ interface Address {
 }
 interface NewFormState {
   address_line_1: string;
+  address_line_2: string;
   address_lat: string;
   address_long: string;
   state_id: string;
@@ -35,12 +38,27 @@ interface NewFormState {
 }
 const EMPTY_FORM: NewFormState = {
   address_line_1: '',
+  address_line_2: '',
   address_lat: '',
   address_long: '',
   state_id: '',
   city_id: '',
   postal_code: '',
 };
+/** Shippo checks every address before it is saved and may correct it. */
+function correctionNote(saved: any): string | null {
+  if (!saved?.corrected) return null;
+  const line = [saved.address_line_1, saved.address_line_2, saved.postal_code].filter(Boolean).join(", ");
+  return line ? `We corrected your address for delivery to ${line}.` : null;
+}
+
+function addressError(error: unknown): string {
+  const { code, message } = readApiError(error, "Couldn't save the address. Please try again.");
+  if (code === "ADDRESS_INVALID") return message.replace(/^Address validation failed:\s*/i, "");
+  if (code === "ADDRESS_CHECK_UNAVAILABLE") return "We couldn't check the address just now. Please try again.";
+  return message;
+}
+
 interface StateItem {
   id: number;
   name: string;
@@ -109,6 +127,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
     try {
       const payload = {
         address_line_1: form.address_line_1.trim(),
+        ...(form.address_line_2.trim() && { address_line_2: form.address_line_2.trim() }),
         ...(form.address_lat && {
           address_lat: parseFloat(form.address_lat),
         }),
@@ -120,22 +139,11 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
         postal_code: form.postal_code.trim(),
       };
       const response = await addNewAddress(payload);
-      if (response?.success === false) {
-        setError(
-          response?.message ||
-          "Please enter a valid address, city, state and PIN code."
-        );
-        return;
-      }
-      toast.success("Address added successfully.");
+      toast.success(correctionNote(response?.data) ?? "Address added.");
       await onSaved();
       onClose();
     } catch (error: any) {
-      const errorMsg =
-        error?.response?.data?.message === "Address validation failed: Unable to find a valid city, state or 5-digit zip. Please check the accuracy of the submitted address."
-          ? "Please enter a valid address, city, state and Postal Code"
-          : error?.response?.data?.message;
-      setError(errorMsg);
+      setError(addressError(error));
     } finally {
       setSaving(false);
     }
@@ -184,6 +192,16 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
               value={form.address_line_1}
               onChange={set('address_line_1')}
               placeholder="e.g. 3730 S Las Vegas Blvd"
+              disabled={saving}
+              className={INPUT}
+            />
+          </div>
+          <div>
+            <label className={LABEL}>Apartment, suite (optional)</label>
+            <input
+              value={form.address_line_2}
+              onChange={set('address_line_2')}
+              placeholder="e.g. Suite 5"
               disabled={saving}
               className={INPUT}
             />
@@ -318,6 +336,7 @@ export function AddressTab() {
     setEditError(null);
     setEditForm({
       address_line_1: addr.address_line_1,
+      address_line_2: addr.address_line_2 ?? '',
       address_lat: addr.address_lat?.toString() ?? '',
       address_long: addr.address_long?.toString() ?? '',
       state_id: addr.state_id.toString(),
@@ -370,6 +389,7 @@ export function AddressTab() {
     try {
       const payload = {
         address_line_1: editForm.address_line_1,
+        ...(editForm.address_line_2?.trim() && { address_line_2: editForm.address_line_2.trim() }),
         ...(editForm.address_lat && {
           address_lat: parseFloat(editForm.address_lat),
         }),
@@ -381,20 +401,16 @@ export function AddressTab() {
         postal_code: editForm.postal_code,
       };
       const response = await editAddress(addressId, payload);
-      if (response?.success === false) {
-        setEditError(
-          response?.message ||
-          "Please enter a valid address, city, state and PIN code."
-        );
-        return;
-      }
-      toast.success("Address updated successfully.");
+      // The saved address is Shippo's corrected one.
+      const saved = response?.data ?? {};
+      toast.success(correctionNote(saved) ?? "Address updated.");
       setAddresses((prev) =>
         prev.map((a) =>
           a.id === addressId
             ? {
               ...a,
               ...payload,
+              ...(saved?.address_line_1 ? saved : {}),
             }
             : a
         )
@@ -405,7 +421,7 @@ export function AddressTab() {
       setEditError(
         error?.response?.data?.message ||
         error?.message ||
-        "Please enter a valid address, city, state and PIN code."
+        "Please enter a valid address, city, state and ZIP code."
       );
     } finally {
       setEditSaving(false);
@@ -545,7 +561,10 @@ export function AddressTab() {
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-bold text-foreground">{addr.address_line_1}</p>
+                      <p className="text-sm font-bold text-foreground">
+                        {addr.address_line_1}
+                        {addr.address_line_2 ? `, ${addr.address_line_2}` : ""}
+                      </p>
                       {addr.is_default && (
                         <span className="flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-primary">
                           <CheckCircle2 className="h-3 w-3" /> Default
@@ -605,6 +624,16 @@ export function AddressTab() {
                         value={editForm.address_line_1 ?? ''}
                         onChange={e => setEditForm(f => f && ({ ...f, address_line_1: e.target.value }))}
                         placeholder="Address Line 1"
+                        disabled={editSaving}
+                        className={INPUT}
+                      />
+                    </div>
+                    <div>
+                      <label className={LABEL}>Apartment, suite (optional)</label>
+                      <input
+                        value={editForm.address_line_2 ?? ''}
+                        onChange={e => setEditForm(f => f && ({ ...f, address_line_2: e.target.value }))}
+                        placeholder="e.g. Suite 5"
                         disabled={editSaving}
                         className={INPUT}
                       />

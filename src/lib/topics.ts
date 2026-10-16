@@ -32,7 +32,6 @@ export interface TopicExpertLocation {
 export interface TopicExpert {
   id: number;
   name: string;
-  email?: string;
   business_name?: string;
   professional_title?: string | null;
   profile_image?: string | null;
@@ -44,17 +43,14 @@ export interface TopicExpert {
 }
 
 /**
- * The raw row `journal/topic/:id`'s `professionals` relation actually
- * returns is a full internal user account record — password hash, Stripe/
- * Square customer ids, FCM/remember tokens, and more. None of that should
- * ever reach a Server/Client boundary, get logged, or get spread into a
- * component prop. This allowlists only what the UI is meant to show.
+ * `journal/topic/:id`'s `professionals` relation: the API now returns only the
+ * id and profile name publicly (it used to return full account rows). This
+ * allowlists what the UI shows, so nothing else can reach a component prop.
  */
 interface RawTopicProfessional {
   id: number;
   name?: string;
   user_name?: string;
-  email?: string;
   business_card?: {
     name?: string;
     business_name?: string;
@@ -72,7 +68,6 @@ function toSafeTopicExpert(raw: RawTopicProfessional): TopicExpert {
   return {
     id: raw.id,
     name: card?.name || raw.name || raw.user_name || "Glamlink Professional",
-    email: raw.email,
     business_name: card?.business_name,
     professional_title: card?.professional_title,
     profile_image: card?.profile_image,

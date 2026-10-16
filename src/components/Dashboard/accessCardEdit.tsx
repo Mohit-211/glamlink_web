@@ -18,6 +18,8 @@ interface Props {
   cardData: AccessCardData | null | undefined;
   onSave: (updated: AccessCardData) => void;
   onCancel: () => void;
+  /** Whether photos, video and offers can change (see GlamCardForm). */
+  proAccess?: boolean;
 }
 
 /**
@@ -271,7 +273,7 @@ const normalize = (raw: AccessCardData | null | undefined): GlamCardFormData => 
   } as GlamCardFormData;
 };
 
-export default function EditAccessCard({ cardId, cardData, onSave, onCancel }: Props) {
+export default function EditAccessCard({ cardId, cardData, onSave, onCancel, proAccess = true }: Props) {
   const [data, setData] = useState<GlamCardFormData>(() => normalize(cardData));
 
   // Re-populate the form whenever a fresh API record arrives (dashboard
@@ -297,6 +299,7 @@ export default function EditAccessCard({ cardId, cardData, onSave, onCancel }: P
         setData={setData}
         mode="edit"
         cardId={cardId}
+        proAccess={proAccess}
         onCancel={onCancel}
         onSuccess={(result) => onSave(result ?? (data as unknown as AccessCardData))}
       />

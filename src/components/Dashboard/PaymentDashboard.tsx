@@ -9,24 +9,22 @@ import {
   QrCode,
   MapPin,
   ChevronRight,
-  CheckCircle,
   LayoutDashboard,
   Loader2,
   LogOut,
   Lock,
-  Nfc,
   Sparkles,
 } from 'lucide-react';
-import { getMyBusinessCardForDashboard, getPaymenthistory, LogoutUser, userProfile } from '../../api/Api';
+import { getAccessSubscription, getMyBusinessCardForDashboard, getPaymenthistory, LogoutUser, userProfile } from '../../api/Api';
+import { useSession } from '@/lib/useSession';
+import { loginHref } from '@/lib/auth';
 import MyAccessCard from './Myaccesscard';
 import ShowQRCode from './Showqrcode';
 import { AddressTab } from './AddressTab';
-import { SubscriptionPaymentModal } from './SubscriptionPay';
 import PaymentHistory from './PaymentHistory';
 import EditAccessCard from './accessCardEdit';
 import ChangePasswordTab from './Changepasswordtab';
-import { PurchaseType } from './Purchasetypes';
-import SubscriptionPlansTab, { PlanId } from '../Pricing/SubscriptionPlansTab';
+import SubscriptionPlansTab, { type AccessSubscription } from '../Pricing/SubscriptionPlansTab';
 import AccessCardAnalytics from './analytics/AccessCardAnalytics';
 type TabId =
   | 'my-card'
@@ -87,8 +85,10 @@ const NAV_ITEMS = [
     icon: <Lock className="h-5 w-5" />,
   },
 ] as const;
-const isSubscriptionActive = (card: any): boolean =>
-  ((card?.business_user?.subscription_status || '') as string).toLowerCase() === 'active';
+// A card that is not live yet (draft, waiting for review, rejected) can always be
+// edited in full; a live card's photos, video and offer need Access Pro.
+const isLiveCard = (card: any): boolean => (card?.status || '').toLowerCase() === 'accepted';
+const TAB_IDS = NAV_ITEMS.map((n) => n.id) as readonly string[];
 class TabErrorBoundary extends React.Component<
   { children: React.ReactNode; onReset: () => void },
   { hasError: boolean; message: string }
@@ -130,22 +130,20 @@ class TabErrorBoundary extends React.Component<
 }
 export default function DashboardPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabId>('my-card');
+  const session = useSession();
+  const [activeTab, setActiveTab] = useState<TabId>(() => {
+    // Links such as "See plans" open a tab with ?tab=.
+    const tab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null;
+    return tab && TAB_IDS.includes(tab) ? (tab as TabId) : 'my-card';
+  });
   const [businessCard, setBusinessCard] = useState<any>(null);
   const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [payOpen, setPayOpen] = useState(false);
   const [userdata, setUserData] = useState<any>(null);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [createdCardId, setCreatedCardId] = useState<string | null>(null);
   const [signingOut, setSigningOut] = useState(false);
-  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [editCardId, setEditCardId] = useState<string | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
-  const [payModalPurchaseType, setPayModalPurchaseType] = useState<PurchaseType>(
-
-  );
+  const [subscription, setSubscription] = useState<AccessSubscription | null>(null);
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -153,6 +151,8 @@ export default function DashboardPage() {
       setBusinessCard(cardRes?.data || cardRes);
       const paymentRes = await getPaymenthistory();
       setPaymentHistory(paymentRes?.data ?? []);
+      const subscriptionRes = await getAccessSubscription().catch(() => null);
+      setSubscription((subscriptionRes?.data ?? null) as AccessSubscription | null);
     } catch (error: any) {
       setError(
         error?.response?.data?.message ||
@@ -163,30 +163,15 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+  // Wait for the session to be restored from the refresh cookie, then load
+  // the dashboard, or send a signed-out visitor to sign in and back.
   useEffect(() => {
-    const token = localStorage.getItem('GlamlinkaccessToken');
-    if (!token) {
-      router.push('/login');
+    if (session.status === 'loading') return;
+    if (session.status === 'signed-out') {
+      router.replace(loginHref('/dashboard'));
       return;
     }
     fetchDashboardData();
-  }, []);
-  const handleSignOut = async () => {
-    try {
-      setSigningOut(true);
-      await LogoutUser();
-      localStorage.removeItem('GlamlinkaccessToken');
-      localStorage.removeItem('GlamlinkrefreshToken');
-      localStorage.removeItem('postLoginRedirect');
-      window.dispatchEvent(new Event('auth-change'));
-      router.push('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      setSigningOut(false);
-    }
-  };
-  useEffect(() => {
     userProfile()
       .then((res) => {
         setUserData(res?.data?.user_profile);
@@ -194,7 +179,19 @@ export default function DashboardPage() {
       .catch((error) => {
         console.error(error);
       });
-  }, []);
+  }, [session.status, router]);
+  const handleSignOut = async () => {
+    try {
+      setSigningOut(true);
+      // Clears the session locally even if the API call fails.
+      await LogoutUser();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      setSigningOut(false);
+      router.push('/login');
+    }
+  };
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -208,22 +205,19 @@ export default function DashboardPage() {
     : businessCard
       ? [businessCard]
       : [];
-  const effectivePaymentCardId = String(
-    selectedCardId ?? createdCardId ?? cardsArray[0]?.id ?? ''
-  );
-  const hasValidPaymentCardId = effectivePaymentCardId !== '';
+  const effectivePaymentCardId = String(cardsArray[0]?.id ?? '');
+  // One checkout for every purchase: the pricing page, signed in.
+  const goToCheckout = (cardId: string | number, plan?: string | null) =>
+    router.push(`/pricing?businessCardId=${cardId}${plan ? `&plan=${plan}` : ''}`);
   const effectiveEditCardId = String(editCardId ?? cardsArray[0]?.id ?? '');
   const hasValidEditCardId = effectiveEditCardId !== '';
   const editingCard =
     cardsArray.find((c) => String(c?.id) === effectiveEditCardId) ??
     cardsArray[0] ??
     null;
-  const editCardEnabled = !!editingCard && isSubscriptionActive(editingCard);
-  const handleSelectNfcPlan = (type: PurchaseType, businessId: string | number) => {
-    setSelectedCardId(String(businessId ?? cardsArray[0]?.id ?? ''));
-    setPayModalPurchaseType(type);
-    setPayOpen(true);
-  };
+  // Every owner can keep their details current; media and offers follow the plan.
+  const editCardEnabled = !!editingCard;
+  const proAccess = !isLiveCard(editingCard) || Boolean(subscription?.pro);
   const PLAN_TYPE_LABELS: Record<string, string> = {
     free: "Free",
     pro: "Pro",
@@ -278,7 +272,7 @@ export default function DashboardPage() {
                     <button
                       key={item.id}
                       disabled={isDisabled}
-                      title={isDisabled ? 'Subscribe to unlock editing' : undefined}
+                      title={isDisabled ? 'Create a card first' : undefined}
                       onClick={() => {
                         if (isDisabled) return;
                         if (item.id === 'edit-card') {
@@ -331,25 +325,6 @@ export default function DashboardPage() {
               <ChevronRight className="h-3 w-3 flex-shrink-0" />
               <span className="truncate font-medium text-foreground">{activeItem.label}</span>
             </div>
-            {showSuccess && (
-              <div className="mb-4 flex flex-col gap-3 rounded-xl border border-primary/30 bg-accent px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-accent-foreground">
-                  <CheckCircle className="h-4 w-4 flex-shrink-0" />
-                  Business card created successfully! Complete payment to activate it.
-                </div>
-                <button
-                  onClick={() => {
-                    setSelectedCardId(createdCardId);
-                    setPayModalPurchaseType('SUBSCRIPTION_ONLY');
-                    setPayOpen(true);
-                  }}
-                  disabled={!hasValidPaymentCardId}
-                  className="w-full flex-shrink-0 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
-                >
-                  Pay Now
-                </button>
-              </div>
-            )}
             {/* Content card: min-height scales with viewport instead of
                 pinning to 100dvh on every breakpoint from `md` up, which
                 added a full extra screen of empty space below short tabs
@@ -361,17 +336,7 @@ export default function DashboardPage() {
                     cardData={businessCard}
                     user={userdata}
                     error={error}
-                    onPayNow={(card: any, plan?: PlanId | null) => {
-                      setSelectedCardId(String(card?.id ?? ''));
-                      setPayModalPurchaseType(
-                        plan === 'nfc_with_subscription'
-                          ? 'NFC_WITH_SUBSCRIPTION'
-                          : plan === 'nfc_only'
-                            ? 'NFC_ONLY'
-                            : 'SUBSCRIPTION_ONLY'
-                      );
-                      setPayOpen(true);
-                    }}
+                    onPayNow={(card: any, plan?: string | null) => goToCheckout(card?.id ?? effectivePaymentCardId, plan)}
                     onEdit={(card: any) => {
                       setEditCardId(String(card?.id ?? ''));
                       setActiveTab('edit-card');
@@ -383,18 +348,7 @@ export default function DashboardPage() {
                 {activeTab === 'payment-history' && <PaymentHistory payments={paymentHistory} />}
                 {activeTab === 'qr-code' && <ShowQRCode cardData={businessCard} error={error} />}
                 {activeTab === 'subscription-plans' && (
-                  <SubscriptionPlansTab
-                    selectedPlan={selectedPlan}
-                    onSelectPlan={setSelectedPlan}
-                    canContinue={!!selectedPlan}
-                    businessCard={cardsArray[0]}
-                    businessCardId={cardsArray[0]?.id}
-                    onContinue={(effectivePlanType: string) => {
-                      setSelectedCardId(String(cardsArray[0]?.id ?? ''));
-                      setPayModalPurchaseType(effectivePlanType.toUpperCase() as PurchaseType);
-                      setPayOpen(true);
-                    }}
-                  />
+                  <SubscriptionPlansTab businessCardId={cardsArray[0]?.id} onChanged={fetchDashboardData} />
                 )}
                 {activeTab === 'addresses' && <AddressTab />}
                 {activeTab === 'change-password' && <ChangePasswordTab />}
@@ -402,6 +356,7 @@ export default function DashboardPage() {
                   <EditAccessCard
                     cardId={effectiveEditCardId}
                     cardData={editingCard}
+                    proAccess={proAccess}
                     onCancel={() => {
                       setEditCardId(null);
                       setActiveTab('my-card');
@@ -429,7 +384,7 @@ export default function DashboardPage() {
                     <div className="p-6 text-sm text-muted-foreground">
                       {!hasValidEditCardId || !editingCard
                         ? 'No business card found to edit yet.'
-                        : 'Your subscription is inactive. Subscribe to unlock editing.'}
+                        : 'This card cannot be edited.'}
                     </div>
                   )}
               </TabErrorBoundary>
@@ -437,23 +392,6 @@ export default function DashboardPage() {
           </main>
         </div>
       </div>
-      <SubscriptionPaymentModal
-        open={payOpen}
-        onClose={() => setPayOpen(false)}
-        onSuccess={() => {
-          setShowSuccess(false);
-          setCreatedCardId(null);
-          setSelectedCardId(null);
-          setSelectedPlan(null);
-          fetchDashboardData();
-        }}
-        businessCardId={effectivePaymentCardId}
-        allowedPurchaseType={payModalPurchaseType}
-        onGoToAddresses={() => {
-          setPayOpen(false);
-          setActiveTab('addresses');
-        }}
-      />
     </div>
   );
 }

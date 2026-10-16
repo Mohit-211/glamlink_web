@@ -2,8 +2,7 @@
 import { nanoid } from "nanoid";
 import { GripVertical, ImagePlus, X } from "lucide-react";
 import { BOOKING_METHODS, BookingMethod, FeaturedLink, FieldErrors, GlamCardFormData } from "./types";
-import { userSpecialtiesApi } from "@/api/Api";
-import { apiUrl } from "@/lib/config";
+import { reorderFeaturedLinks as saveFeaturedLinksOrder, userSpecialtiesApi } from "@/api/Api";
 
 interface Props {
   data: GlamCardFormData;
@@ -381,7 +380,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({
   const persistFeaturedLinksOrder = async (links: FeaturedLink[]) => {
     if (mode !== "edit" || !cardId) return;
     try {
-      const token = localStorage.getItem("GlamlinkaccessToken");
       // This endpoint only accepts PUT + a real JSON body — it does not
       // parse a multipart "featured_links" field as JSON the way the main
       // create/update endpoint does, and it has no way to accept new image
@@ -391,24 +389,18 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       // the new file only goes out — via featured_link_images — on the
       // next full "Save Changes" submit (see buildFormData in
       // GlamCardForm.tsx).
-      await fetch(apiUrl(`businessCard/${cardId}/featured-links/reorder`), {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "x-access-token": token || "",
-        },
-        body: JSON.stringify({
-          featured_links: links
-            .filter((link) => link?.url?.trim())
-            .map((link, index) => ({
-              title: link?.title?.trim() || "",
-              url: link.url.trim(),
-              image: link?.image ?? link?.thumbnail_url ?? link?.image_url ?? null,
-              is_featured: link?.is_featured === true,
-              sort_order: index + 1,
-            })),
-        }),
-      });
+      await saveFeaturedLinksOrder(
+        cardId,
+        links
+          .filter((link) => link?.url?.trim())
+          .map((link, index) => ({
+            title: link?.title?.trim() || "",
+            url: link.url.trim(),
+            image: link?.image ?? link?.thumbnail_url ?? link?.image_url ?? null,
+            is_featured: link?.is_featured === true,
+            sort_order: index + 1,
+          }))
+      );
     } catch (err) {
       // Non-fatal — the order still saves with the rest of the form on
       // submit, so a transient failure here just means it isn't

@@ -2,10 +2,11 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Script from "next/script";
-import { Eye, EyeOff, Sparkles } from "lucide-react";
-import { registerUser, sendOtp } from "@/api/Api";
-import { useRouter } from "next/navigation";
+import { Eye, EyeOff, MailCheck } from "lucide-react";
+import { registerUser, resendVerification } from "@/api/Api";
 import { toast } from "sonner";
+import { readApiError } from "@/lib/apiError";
+import { passwordProblem } from "@/lib/password";
 import { getFormDataFromSession } from "../glamcard/GlamCardForm/Formdatasessionstorage";
 
 // Site key comes from the Cloudflare Turnstile dashboard.
@@ -20,7 +21,9 @@ declare global {
         options: {
           sitekey: string;
           action?: string;
-          size?: "normal" | "compact" | "invisible";
+          size?: "normal" | "compact" | "flexible";
+          execution?: "render" | "execute";
+          appearance?: "always" | "execute" | "interaction-only";
           callback?: (token: string) => void;
           "error-callback"?: () => void;
           "expired-callback"?: () => void;
@@ -33,14 +36,6 @@ declare global {
   }
 }
 
-interface RegisterProps {
-  /** If provided, called after a successful registration with the
-   *  registered email, instead of navigating to /verify-otp. Used when
-   *  Register is rendered inside a modal (e.g. GlamCardForm's post-create
-   *  auth flow). */
-  onSuccess?: (email: string) => void;
-}
-
 type FieldErrors = {
   name?: string;
   email?: string;
@@ -49,11 +44,12 @@ type FieldErrors = {
   confirm_password?: string;
 };
 
-export default function Register({ onSuccess }: RegisterProps = {}) {
-  const router = useRouter();
+export default function Register() {
+  // Set once the API has emailed the verification link.
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [turnstileScriptLoaded, setTurnstileScriptLoaded] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -92,28 +88,6 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
     }));
   }, []);
 
-  // Render the invisible widget once the script has loaded. We render it
-  // up front (rather than on submit) so execute() has a widget ready to go.
-  useEffect(() => {
-    if (
-      !turnstileScriptLoaded ||
-      !TURNSTILE_SITE_KEY ||
-      !window.turnstile ||
-      !turnstileContainerRef.current ||
-      widgetIdRef.current
-    ) {
-      return;
-    }
-
-    widgetIdRef.current = window.turnstile.render(
-      turnstileContainerRef.current,
-      {
-        sitekey: TURNSTILE_SITE_KEY,
-        action: "register",
-        size: "invisible",
-      }
-    );
-  }, [turnstileScriptLoaded]);
 
   const passwordStrength = (() => {
     const p = form.password;
@@ -139,9 +113,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
   // hitting submit. Falls back to the submit-time error (from validate())
   // once that's been set, so the message doesn't flicker/disappear.
   const livePasswordError =
-    form.password.length > 0 && form.password.length < 8
-      ? "Password must be at least 8 characters"
-      : undefined;
+    form.password.length > 0 ? passwordProblem(form.password) : undefined;
   const passwordError = errors.password || livePasswordError;
 
   const liveConfirmError =
@@ -171,9 +143,8 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
     }
 
     // Password
-    if (form.password.length < 8) {
-      next.password = "Password must be at least 8 characters";
-    }
+    const problem = passwordProblem(form.password);
+    if (problem) next.password = problem;
 
     // Confirm password
     if (form.password !== form.confirm_password) {
@@ -183,50 +154,31 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
     return next;
   };
 
-  // Runs the invisible Turnstile challenge and resolves with a fresh token.
-  // Tokens are single-use, so this runs right before submit rather than
-  // being cached from page load.
-  const getTurnstileToken = async (): Promise<string | null> => {
-    if (!TURNSTILE_SITE_KEY) {
-      // No site key configured — skip silently in local/dev environments
-      // rather than blocking registration entirely.
-      console.warn(
-        "NEXT_PUBLIC_TURNSTILE_SITE_KEY is not set; skipping captcha token."
-      );
-      return null;
-    }
-
-    if (!window.turnstile || !turnstileContainerRef.current) {
-      toast.error("Captcha failed to load. Please refresh and try again.");
-      return null;
-    }
-
-    try {
-      const token = await new Promise<string>((resolve, reject) => {
-        // Re-render bound to this submit's callback so we get the token
-        // from this specific execute() call rather than a stale render.
-        const widgetId = window.turnstile!.render(
-          turnstileContainerRef.current as HTMLElement,
-          {
-            sitekey: TURNSTILE_SITE_KEY,
-            action: "register",
-            size: "invisible",
-            callback: (t) => resolve(t),
-            "error-callback": () =>
-              reject(new Error("Turnstile challenge failed")),
-            "expired-callback": () =>
-              reject(new Error("Turnstile token expired")),
-          }
-        );
-        window.turnstile!.execute(widgetId);
+  // Runs the Turnstile challenge right before submit (tokens are single-use).
+  // execution "execute" + appearance "interaction-only" keeps the widget hidden
+  // unless Cloudflare needs the visitor to click.
+  const getTurnstileToken = (): Promise<string | null> =>
+    new Promise((resolve) => {
+      if (!window.turnstile || !turnstileContainerRef.current) {
+        toast.error("Captcha failed to load. Please refresh and try again.");
+        resolve(null);
+        return;
+      }
+      if (widgetIdRef.current) window.turnstile.remove(widgetIdRef.current);
+      widgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        action: "register",
+        execution: "execute",
+        appearance: "interaction-only",
+        callback: (token) => resolve(token),
+        "error-callback": () => {
+          toast.error("Captcha verification failed. Please try again.");
+          resolve(null);
+        },
+        "expired-callback": () => resolve(null),
       });
-      return token;
-    } catch (err) {
-      console.error("Turnstile execute failed:", err);
-      toast.error("Captcha verification failed. Please try again.");
-      return null;
-    }
-  };
+      window.turnstile.execute(widgetIdRef.current);
+    });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -255,63 +207,45 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
         }
       }
 
-      const response = await registerUser({
-        name: `${form.name}`,
-        email: form.email,
-        mobile: form.mobile,
+      await registerUser({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        ...(form.mobile.trim() ? { mobile: form.mobile.trim() } : {}),
         password: form.password,
         confirm_password: form.confirm_password,
         ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
       });
-      console.log("Register Response:", response);
-
-      if (response?.success === false) {
-        toast.error(response?.message || "Something went wrong");
-        return;
-      }
-
-      toast.success(response?.message || "Account created successfully");
-
-      if (onSuccess) {
-        onSuccess(form.email);
-      } else {
-        router.push(
-          `/verify-otp?email=${encodeURIComponent(form.email)}&type=email_varification`
-        );
-      }
-      return;
+      // The API emails a verification link (also for an email that registered
+      // before but never verified). The link opens /verify-email.
+      setSentTo(form.email.trim());
     } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message || error?.message || "Something went wrong";
-
-      if (
-        errorMessage.toLowerCase().includes("verify your otp") ||
-        errorMessage.toLowerCase().includes("not verified")
-      ) {
-        // Account exists but isn't verified. Route into the same OTP step
-        // either way (modal callback or real page) since both paths lead
-        // to email verification.
-        toast.warning(errorMessage);
-        if (onSuccess) {
-          onSuccess(form.email);
-        } else {
-          router.push(
-            `/verify-otp?email=${encodeURIComponent(form.email)}&type=email_varification`
-          );
-        }
-        return;
+      const { code, message, details } = readApiError(error);
+      switch (code) {
+        case "EMAIL_TAKEN":
+          setErrors({ email: "An account with this email already exists." });
+          toast.error("An account with this email already exists. Sign in instead.");
+          break;
+        case "WEAK_PASSWORD":
+        case "PASSWORD_MISMATCH":
+          setErrors({ password: message });
+          toast.error(message);
+          break;
+        case "INVALID_INPUT":
+          if (details?.field === "email") setErrors({ email: message });
+          toast.error(message);
+          break;
+        case "CAPTCHA_REQUIRED":
+        case "CAPTCHA_FAILED":
+          toast.error("Captcha verification failed. Please try again.");
+          break;
+        case "CAPTCHA_NOT_CONFIGURED":
+          toast.error("Sign-up is temporarily unavailable. Please try again later.");
+          break;
+        default:
+          toast.error(message);
       }
-
-      // Previously this fell through silently with no user-facing error.
-      // Always surface something so the user knows the submit failed.
-      toast.error(errorMessage);
     } finally {
       setLoading(false);
-      // Reset the widget so the next submit attempt gets a fresh token
-      // instead of reusing a consumed/expired one.
-      if (window.turnstile && widgetIdRef.current) {
-        window.turnstile.reset(widgetIdRef.current);
-      }
     }
   };
 
@@ -348,10 +282,9 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js"
           strategy="afterInteractive"
-          onLoad={() => setTurnstileScriptLoaded(true)}
         />
       )}
-      {/* Container Turnstile renders into — stays empty/invisible in "invisible" size */}
+      {/* Turnstile renders here; it stays empty unless a visitor must interact */}
       <div ref={turnstileContainerRef} />
 
       {/* Background Effects */}
@@ -365,6 +298,45 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
       <div className="relative w-full max-w-md">
         {/* Card */}
         <div className="rounded-2xl border bg-card p-8 shadow-medium">
+          {sentTo ? (
+            <div className="text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent">
+                <MailCheck className="h-7 w-7 text-primary" />
+              </div>
+              <h1 className="mt-4 text-xl font-semibold tracking-tight text-foreground">
+                Check your email
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                We sent a link to <span className="font-medium text-foreground">{sentTo}</span>.
+                Open it within 24 hours to verify your email and sign in.
+              </p>
+              <button
+                type="button"
+                disabled={resending}
+                onClick={async () => {
+                  setResending(true);
+                  try {
+                    await resendVerification(sentTo);
+                    toast.success("A new link is on its way.");
+                  } catch (error) {
+                    toast.error(readApiError(error).message);
+                  } finally {
+                    setResending(false);
+                  }
+                }}
+                className="mt-6 text-sm font-medium text-primary hover:underline disabled:opacity-50"
+              >
+                {resending ? "Sending…" : "Didn't get it? Send a new link"}
+              </button>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Already verified?{" "}
+                <Link href="/login" className="font-medium text-primary hover:underline">
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          ) : (
+          <>
           <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
             Create Your Access Account
           </h1>
@@ -429,7 +401,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                 <input
                   type={showPassword ? "text" : "password"}
                   minLength={8}
-                  placeholder="Min. 8 characters"
+                  placeholder="8+ characters, 2 numbers"
                   value={form.password}
                   onChange={(e) => updateField("password", e.target.value)}
                   aria-invalid={!!passwordError}
@@ -514,7 +486,15 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
                 apply.
               </p>
             )}
+            <p className="text-center text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <Link href="/login" className="font-medium text-primary hover:underline">
+                Sign in
+              </Link>
+            </p>
           </form>
+          </>
+          )}
         </div>
       </div>
     </div>

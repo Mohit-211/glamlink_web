@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import logo from "../../../public/header_logo.png";
 import { LogoutUser } from "@/api/Api";
+import { useSession } from "@/lib/useSession";
 
 const navLinks = [
   { label: "Home", href: "/", id: "home" },
@@ -22,28 +23,13 @@ const navLinks = [
 
 export default function Header({ activeRoute }: any) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      const token = localStorage.getItem("GlamlinkaccessToken");
-      setIsLoggedIn(!!token);
-    };
-
-    checkLoginStatus();
-
-    window.addEventListener("auth-change", checkLoginStatus);
-    window.addEventListener("storage", checkLoginStatus);
-
-    return () => {
-      window.removeEventListener("auth-change", checkLoginStatus);
-      window.removeEventListener("storage", checkLoginStatus);
-    };
-  }, []);
+  // Restored from the refresh cookie on page load (see app/providers).
+  const isLoggedIn = useSession().status === "signed-in";
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -67,16 +53,11 @@ export default function Header({ activeRoute }: any) {
 
   const handleLogout = async () => {
     try {
-      await LogoutUser(); // Logout API
+      // Ends this session on the API and clears the refresh cookie.
+      await LogoutUser();
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
-      localStorage.removeItem("GlamlinkaccessToken");
-      localStorage.removeItem("GlamlinkrefreshToken");
-      localStorage.removeItem("postLoginRedirect");
-
-      window.dispatchEvent(new Event("auth-change"));
-
       setProfileDropdownOpen(false);
       setMobileMenuOpen(false);
       router.push("/login");

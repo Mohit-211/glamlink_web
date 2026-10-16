@@ -2,7 +2,7 @@
 
 import { type ReactNode } from "react";
 import { Check, Sparkles, Nfc } from "lucide-react";
-import { PRO_FEATURES, FREE_FEATURES, KEYCHAIN_FEATURE, type PlanDef } from "./plans";
+import type { PlanDef } from "./plans";
 
 interface FeatureRowProps {
   children: ReactNode;
@@ -61,7 +61,6 @@ interface PlanCardProps {
 }
 
 export function PlanCard({ plan, selected, onSelect, compact = false, disabled = false }: PlanCardProps) {
-  const isFeatured = plan.id === "nfc_with_subscription";
   const isSelected = selected && !disabled; // single source of truth
 
   return (
@@ -86,9 +85,9 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
     >
 
       <div className="relative flex items-center justify-between">
-        {isFeatured ? (
+        {plan.badge ? (
           <span className="badge-soft">
-            <Sparkles className="h-3 w-3" /> Most popular
+            <Sparkles className="h-3 w-3" /> {plan.badge}
           </span>
         ) : plan.hasKeychain ? (
           <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -96,7 +95,7 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
           </span>
         ) : (
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            {plan.isPro ? "Pro" : "Free"}
+            {plan.label}
           </span>
         )}
         <PlanRadio selected={selected} />
@@ -105,25 +104,27 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
       <h3 className="relative mt-4 text-base font-semibold text-foreground">{plan.name}</h3>
 
       <p className="relative mt-2.5 flex flex-wrap items-baseline gap-1">
+        {plan.listPriceLabel && (
+          <span className="text-sm text-muted-foreground line-through">{plan.listPriceLabel}</span>
+        )}
         <span className="text-2xl text-foreground">{plan.priceLabel}</span>
         {plan.priceSuffix && <span className="text-xs text-muted-foreground">{plan.priceSuffix}</span>}
       </p>
+      {(plan.afterNote || plan.personal) && (
+        <p className="relative mt-1 text-[11px] font-medium text-primary">
+          {plan.personal ? "Your personal price" : plan.afterNote}
+        </p>
+      )}
 
       <p className="relative mt-1.5 text-xs text-muted-foreground">{plan.tagline}</p>
 
       {!compact && (
         <ul className="relative mt-4 flex-1 border-t border-border pt-4">
-          {plan.isPro ? (
-            <>
-              <FeatureRow>Directory listing & digital card</FeatureRow>
-              {PRO_FEATURES.map((f, i) =>
-                typeof f === "string" ? <FeatureRow key={i}>{f}</FeatureRow> : <FeatureRow key={i} soon>{f.text}</FeatureRow>
-              )}
-            </>
-          ) : (
-            FREE_FEATURES.map((f) => <FeatureRow key={f}>{f}</FeatureRow>)
-          )}
-          {plan.hasKeychain && <FeatureRow keychain>{KEYCHAIN_FEATURE}</FeatureRow>}
+          {plan.features.map((f) => (
+            <FeatureRow key={f.text} soon={f.soon} keychain={f.highlight === "keychain"}>
+              {f.text}
+            </FeatureRow>
+          ))}
         </ul>
       )}
     </div>

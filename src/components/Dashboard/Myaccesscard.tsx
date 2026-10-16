@@ -9,13 +9,11 @@ import {
     ExternalLink,
     CalendarCheck,
     Edit3,
-    X,
-    Lock,
-    Nfc,
+    X,    Nfc,
     AlertCircle,
 } from 'lucide-react';
 import { AccessCardData } from './types';
-import SubscriptionPlansTab, { PlanId } from '../Pricing/SubscriptionPlansTab';
+import type { PlanId } from '../Pricing/plans';
 
 const TikTokIcon = ({ className }: { className?: string }) => (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -47,11 +45,6 @@ const cardHasNfcPlan = (card: AccessCardData): boolean => {
     return planType === 'nfc_only' || planType === 'nfc_with_subscription';
 };
 
-// Editing is unlocked only for plans that include an active subscription.
-const isCardEditable = (card: AccessCardData): boolean => {
-    const planType = getPlanType(card);
-    return planType === 'subscription_only' || planType === 'nfc_with_subscription';
-};
 
 // nfc_status assumed to live alongside subscription_status on business_user.
 // Move this lookup if your API actually returns it elsewhere on the card.
@@ -61,10 +54,6 @@ const getNfcStatus = (card: AccessCardData): string =>
 const isNfcAlreadyPaid = (card: AccessCardData): boolean =>
     cardHasNfcPlan(card) || getNfcStatus(card) === 'paid';
 
-// Plan ids that ship / include an NFC card — these should be disabled once
-// nfc_status is already "paid" so the user can't buy a second NFC card.
-// Update these to match your actual PlanId values if they differ.
-const NFC_PLAN_IDS: PlanId[] = ['nfc_only', 'nfc_with_subscription'] as PlanId[];
 
 interface Props {
     cardData: AccessCardData | AccessCardData[];
@@ -83,9 +72,6 @@ export default function MyAccessCard({
 }: Props) {
     const [copiedKey, setCopiedKey] = useState<CardKey | null>(null);
     const [qrKey, setQrKey] = useState<CardKey | null>(null);
-    const [subscriptionPromptKey, setSubscriptionPromptKey] = useState<CardKey | null>(null);
-    const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
-    const [nfcPromptKey, setNfcPromptKey] = useState<CardKey | null>(null);
 
     const cards: AccessCardData[] = Array.isArray(cardData)
         ? cardData
@@ -123,26 +109,11 @@ export default function MyAccessCard({
         }
     };
 
-    const handleEditClick = (card: AccessCardData, key: CardKey) => {
-        if (isCardEditable(card)) {
-            onEdit?.(card);
-        } else {
-            setSelectedPlan(null);
-            setSubscriptionPromptKey(key);
-        }
-    };
+    // Every owner can edit their details; photos, video and offers follow the plan
+    // (locked inside the editor, and enforced by the API).
+    const handleEditClick = (card: AccessCardData) => onEdit?.(card);
 
     const qrCard = cards.find((c, i) => getCardKey(c, i) === qrKey) ?? null;
-    const subscriptionPromptCard =
-        cards.find((c, i) => getCardKey(c, i) === subscriptionPromptKey) ?? null;
-    const nfcPromptCard = cards.find((c, i) => getCardKey(c, i) === nfcPromptKey) ?? null;
-
-    // Disable NFC-including plans in the prompt once this card's NFC has
-    // already been paid for, so the user can only pick a non-NFC plan.
-    const disabledPlanIds: PlanId[] = subscriptionPromptCard && isNfcAlreadyPaid(subscriptionPromptCard)
-        ? NFC_PLAN_IDS
-        : [];
-
     return (
         <>
             <div className="space-y-6">
@@ -179,8 +150,7 @@ export default function MyAccessCard({
                             return {};
                         }
                     })();
-                    const cardIsSubscribed = isCardEditable(card);
-                    const showIncludeNfcButton = !cardHasNfcPlan(card);
+                    const showIncludeNfcButton = !isNfcAlreadyPaid(card);
                     const isRejected = card?.status?.toLowerCase() === "rejected";
                     return (
                         <div
@@ -192,9 +162,9 @@ export default function MyAccessCard({
                                     {card?.business_name || card?.name || ''}
                                 </p>
                                 <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
-                                    {cardIsSubscribed && showIncludeNfcButton && (
+                                    {showIncludeNfcButton && (
                                         <button
-                                            onClick={() => setNfcPromptKey(key)}
+                                            onClick={() => onPayNow?.(card, 'nfc_only')}
                                             className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-secondary transition-colors"
                                         >
                                             <Nfc className="h-3 w-3" />
@@ -202,14 +172,10 @@ export default function MyAccessCard({
                                         </button>
                                     )}
                                     <button
-                                        onClick={() => handleEditClick(card, key)}
+                                        onClick={() => handleEditClick(card)}
                                         className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-secondary transition-colors"
                                     >
-                                        {cardIsSubscribed ? (
-                                            <Edit3 className="h-3 w-3" />
-                                        ) : (
-                                            <Lock className="h-3 w-3" />
-                                        )}
+                                        <Edit3 className="h-3 w-3" />
                                         Edit
                                     </button>
                                 </div>
@@ -455,92 +421,6 @@ export default function MyAccessCard({
                 </div>
             )}
 
-            {/* Subscribe Prompt Modal — capped width + safe viewport margins so it
-                doesn't stretch edge-to-edge on tablet/desktop or get clipped on
-                short mobile screens. */}
-            {subscriptionPromptCard && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4"
-                    onClick={() => setSubscriptionPromptKey(null)}
-                >
-                    <div
-                        className="card-glamlink w-full max-h-[70vh] md:max-h-[60vh] overflow-y-auto"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="mb-2 flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                                <h3 className="text-sm font-semibold text-foreground">Subscribe to edit this card</h3>
-                                <p className="text-[11px] text-muted-foreground mt-0.5">
-                                    {(subscriptionPromptCard?.business_name || subscriptionPromptCard?.name || 'This card')}&apos;s
-                                    subscription is inactive. Choose a plan to unlock editing.
-                                </p>
-                                {disabledPlanIds.length > 0 && (
-                                    <p className="text-[11px] text-muted-foreground mt-1">
-                                        You&apos;ve already paid for an NFC card on this card, so NFC plans are unavailable.
-                                    </p>
-                                )}
-                            </div>
-                            <button
-                                onClick={() => setSubscriptionPromptKey(null)}
-                                className="rounded-lg p-1.5 hover:bg-secondary transition-colors flex-shrink-0"
-                            >
-                                <X className="h-4 w-4 text-muted-foreground" />
-                            </button>
-                        </div>
-                        <SubscriptionPlansTab
-                            selectedPlan={selectedPlan}
-                            onSelectPlan={setSelectedPlan}
-                            disabledPlanIds={disabledPlanIds}
-                            businessCardId={subscriptionPromptCard?.id}
-                            canContinue={!!selectedPlan && !disabledPlanIds.includes(selectedPlan)}
-                            onContinue={() => {
-                                if (!selectedPlan || disabledPlanIds.includes(selectedPlan)) return;
-                                onPayNow?.(subscriptionPromptCard, selectedPlan);
-                                setSubscriptionPromptKey(null);
-                            }}
-                        />
-                    </div>
-                </div>
-            )}
-
-            {/* Include NFC Modal — same width cap as the subscribe modal */}
-            {nfcPromptCard && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4"
-                    onClick={() => setNfcPromptKey(null)}
-                >
-                    <div
-                        className="card-glamlink w-full max-h-[70vh] md:max-h-[60vh] overflow-y-auto"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="mb-2 flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                                <h3 className="text-sm font-semibold text-foreground">Add an NFC keychain</h3>
-                                <p className="text-[11px] text-muted-foreground mt-0.5">
-                                    Add a physical NFC keychain to {(nfcPromptCard?.business_name || nfcPromptCard?.name || 'this card')}.
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => setNfcPromptKey(null)}
-                                className="rounded-lg p-1.5 hover:bg-secondary transition-colors flex-shrink-0"
-                            >
-                                <X className="h-4 w-4 text-muted-foreground" />
-                            </button>
-                        </div>
-                        <SubscriptionPlansTab
-                            businessCardId={nfcPromptCard.id}
-                            selectedPlan={'nfc_only' as PlanId}
-                            onSelectPlan={() => { }}
-                            disabledPlanIds={['free', 'subscription_only', 'nfc_with_subscription'] as PlanId[]}
-                            canContinue={true}
-                            onContinue={() => {
-                                onPayNow?.(nfcPromptCard, 'nfc_only' as PlanId);
-                                setNfcPromptKey(null);
-                            }}
-                        />
-                    </div>
-                </div>
-            )}
         </>
     );
 }

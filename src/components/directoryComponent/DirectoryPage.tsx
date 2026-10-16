@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
-  GetBeauticianListApi,
-  GetBeauticianListDetailsApi,
+  GetProfessionalListApi,
+  GetPlaceDetailsApi,
   getBusinessProfile,
   GetAllCategoryApi,
   GetProfilesByDirectory,
@@ -71,7 +71,7 @@ export default function DirectoryPage() {
     setProvidersLoading(true);
 
     try {
-      const res = await GetBeauticianListApi();
+      const res = await GetProfessionalListApi();
       const providerList = res?.data || [];
 
       const providersWithDetails = await Promise.all(
@@ -79,7 +79,7 @@ export default function DirectoryPage() {
           try {
             if (!provider.place_id) return provider;
 
-            const details = await GetBeauticianListDetailsApi(
+            const details = await GetPlaceDetailsApi(
               provider.place_id
             );
 

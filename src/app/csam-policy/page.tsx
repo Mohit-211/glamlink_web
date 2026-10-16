@@ -105,7 +105,7 @@ const CsamPolicy: React.FC = () => {
           7. Future Commitments
         </h4>
         <ul className="list-disc ml-5 mt-2 space-y-1">
-          <li>Introducing content moderation guidelines for beauticians and users</li>
+          <li>Introducing content moderation guidelines for professionals and users</li>
           <li>Implementing age verification at signup</li>
           <li>Exploring automated content detection tools</li>
         </ul>

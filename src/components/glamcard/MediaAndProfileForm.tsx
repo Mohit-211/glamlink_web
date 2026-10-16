@@ -1,4 +1,5 @@
-﻿"use client";
+"use client";
+import Link from "next/link";
 
 import React, { useState, useCallback, useEffect } from "react";
 import Cropper from "react-easy-crop";
@@ -11,13 +12,17 @@ interface Props {
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
   errors?: FieldErrors;
   clearError?: (key: string) => void;
+  /** Photos, video and the profile image of a live card change with Access Pro only. */
+  locked?: boolean;
 }
 
 const sectionClass =
   "space-y-6 rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm";
 const labelClass = "text-sm font-medium text-foreground/80";
 
-const MAX_MEDIA_TOTAL = 5; // shared cap across photos + videos combined
+// The API's limits for a card: 4 photos and 1 video (MP4, under 21 MB).
+const MAX_PHOTOS = 4;
+const MAX_VIDEOS = 1;
 const MAX_VIDEO_SECONDS = 60;
 const MAX_VIDEO_MB = 21;
 const MAX_VIDEO_BYTES = MAX_VIDEO_MB * 1024 * 1024;
@@ -170,7 +175,7 @@ const generateVideoThumbnail = (file: File): Promise<File> => {
   });
 };
 
-const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearError }) => {
+const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearError, locked = false }) => {
   /* ================= CROP MODAL (shared) ================= */
 
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -303,7 +308,8 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
 
   const photoCount = images.filter((img) => !isVideoItem(img)).length;
   const videoCount = images.filter((img) => isVideoItem(img)).length;
-  const totalMediaCount = photoCount + videoCount;
+  const photosFull = photoCount >= MAX_PHOTOS;
+  const videosFull = videoCount >= MAX_VIDEOS;
 
   useEffect(() => {
 
@@ -370,11 +376,14 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
 
     setMediaError(null);
 
-    const remainingSlots = MAX_MEDIA_TOTAL - totalMediaCount;
+    const remainingSlots = MAX_PHOTOS - photoCount;
     if (remainingSlots <= 0) {
-      setMediaError(`You can upload up to ${MAX_MEDIA_TOTAL} media items total.`);
+      setMediaError(`You can add up to ${MAX_PHOTOS} photos.`);
       e.target.value = "";
       return;
+    }
+    if (files.length > remainingSlots) {
+      setMediaError(`Only ${remainingSlots} more photo${remainingSlots === 1 ? "" : "s"} fit; the rest were skipped.`);
     }
 
     const allowed = files.slice(0, remainingSlots);
@@ -392,8 +401,8 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
     if (!url) return;
     setMediaError(null);
 
-    if (totalMediaCount >= MAX_MEDIA_TOTAL) {
-      setMediaError(`You can upload up to ${MAX_MEDIA_TOTAL} media items total.`);
+    if (photosFull) {
+      setMediaError(`You can add up to ${MAX_PHOTOS} photos.`);
       return;
     }
 
@@ -415,9 +424,9 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
 
     setMediaError(null);
 
-    const remainingSlots = MAX_MEDIA_TOTAL - totalMediaCount;
+    const remainingSlots = MAX_VIDEOS - videoCount;
     if (remainingSlots <= 0) {
-      setMediaError(`You can upload up to ${MAX_MEDIA_TOTAL} media items total.`);
+      setMediaError(`You can add ${MAX_VIDEOS} video. Remove the current one to add another.`);
       e.target.value = "";
       return;
     }
@@ -577,6 +586,15 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
   return (
     <section className={sectionClass}>
       <h2 className="text-lg font-semibold">Media & Profile</h2>
+      {locked && (
+        <p className="rounded-xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
+          Refreshing your photos, video and profile image is part of Access Pro.{" "}
+          <Link href="/dashboard?tab=subscription-plans" className="font-medium text-primary hover:underline">
+            See plans
+          </Link>
+        </p>
+      )}
+      <fieldset disabled={locked} className={locked ? "pointer-events-none space-y-6 opacity-60" : "contents"}>
 
       {/* PROFILE */}
       <div id="field-profile_image" className="space-y-3">
@@ -645,7 +663,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
           className={`text-xs pt-2 ${errors?.images ? "text-destructive font-medium" : "text-muted-foreground"
             }`}
         >
-          Gallery media <span className="text-destructive">*</span>: {totalMediaCount}/{MAX_MEDIA_TOTAL} used (photos + videos combined)
+          Gallery <span className="text-destructive">*</span>: {photoCount}/{MAX_PHOTOS} photos · {videoCount}/{MAX_VIDEOS} video
         </p>
         {errors?.images && (
           <p className="mt-1 text-sm text-destructive">{errors.images}</p>
@@ -661,7 +679,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
           <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
             <label className={labelClass}>Photos ({photoCount})</label>
             <label
-              className={`rounded-lg px-4 py-2 text-white ${totalMediaCount >= MAX_MEDIA_TOTAL
+              className={`rounded-lg px-4 py-2 text-white ${photosFull
                   ? "bg-input cursor-not-allowed"
                   : "cursor-pointer bg-primary hover:bg-primary"
                 }`}
@@ -672,7 +690,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
                 hidden
                 multiple
                 accept="image/*"
-                disabled={totalMediaCount >= MAX_MEDIA_TOTAL}
+                disabled={photosFull}
                 onChange={handlePhotoUpload}
               />
             </label>
@@ -685,7 +703,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
               placeholder="Or paste an image URL"
               value={galleryUrlInput}
               onChange={(e) => setGalleryUrlInput(e.target.value)}
-              disabled={totalMediaCount >= MAX_MEDIA_TOTAL}
+              disabled={photosFull}
             />
             <button
               type="button"
@@ -693,7 +711,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
               disabled={
                 !galleryUrlInput.trim() ||
                 galleryUrlLoading ||
-                totalMediaCount >= MAX_MEDIA_TOTAL
+                photosFull
               }
               className="rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:bg-primary disabled:bg-input disabled:cursor-not-allowed"
             >
@@ -728,7 +746,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
             )}
           </div>
           <label
-            className={`rounded-lg px-4 py-2 text-white ${totalMediaCount >= MAX_MEDIA_TOTAL
+            className={`rounded-lg px-4 py-2 text-white ${videosFull
                 ? "bg-input cursor-not-allowed"
                 : "cursor-pointer bg-primary hover:bg-primary"
               }`}
@@ -739,7 +757,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
               hidden
               multiple
               accept="video/mp4"
-              disabled={totalMediaCount >= MAX_MEDIA_TOTAL}
+              disabled={videosFull}
               onChange={handleVideoUpload}
             />
           </label>
@@ -800,6 +818,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
           </div>
         </Modal>
       )}
+      </fieldset>
     </section>
   );
 };

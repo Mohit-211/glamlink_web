@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Mail, ArrowUpRight } from "lucide-react";
+import { MapPin, ArrowUpRight } from "lucide-react";
 import { TopicExpert } from "@/lib/topics";
 
 interface ExpertCardProps {
@@ -63,12 +63,6 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
           {(expert.professional_title || expert.business_name) && (
             <p className="text-[12px] text-muted-foreground/80 truncate">
               {expert.professional_title || expert.business_name}
-            </p>
-          )}
-          {expert.email && (
-            <p className="flex items-center gap-1 text-[11px] text-muted-foreground/80 truncate mt-0.5">
-              <Mail className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate">{expert.email}</span>
             </p>
           )}
         </div>

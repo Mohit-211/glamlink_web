@@ -1,82 +1,35 @@
 /* =============================================================
-   Shared auth-session helpers.
+   Signed-out handling.
 
-   The backend can report a missing/invalid token with an HTTP 200 and a
-   body like { success: true, status: 400, message: "Token Not Found" },
-   so this is detected from the response BODY, not from `success` or the
-   HTTP status alone. Only that specific message (or an expired/invalid
-   JWT error, see below) triggers a logout — every other 400/500 is left
-   for the caller to handle as before.
+   The API answers an ended session with 401 SESSION_EXPIRED (after a refresh
+   also fails) or SIGN_IN_REQUIRED. When that happens on a call that needs a
+   signed-in account, the person is sent to sign in and brought back to the
+   page they were on.
    ============================================================= */
-
-const TOKEN_NOT_FOUND_MESSAGE = "token not found";
-
-/* jsonwebtoken verification errors the backend passes straight through,
-   e.g. { success: false, status: 500, message: "jwt expired" }. These are
-   unambiguous auth failures, so they log out whatever the status code. */
-const JWT_ERROR_MESSAGES = ["jwt expired", "jwt malformed", "jwt must be provided"];
-
-const isTokenNotFoundBody = (body: any): boolean => {
-  if (!body || typeof body !== "object" || typeof body.message !== "string") {
-    return false;
-  }
-  const message = body.message.trim().toLowerCase();
-  if (JWT_ERROR_MESSAGES.includes(message)) return true;
-  return (
-    Number(body.status ?? body.statusCode) === 400 &&
-    message === TOKEN_NOT_FOUND_MESSAGE
-  );
-};
-
-/**
- * True when `payload` (or a response it's wrapped in — e.g. an axios
- * response's `data`, or a nested `data`/`response` object) is the
- * "Token Not Found" auth failure.
- */
-export const isTokenNotFoundResponse = (payload: any, depth = 0): boolean => {
-  if (!payload || typeof payload !== "object" || depth > 3) return false;
-  if (isTokenNotFoundBody(payload)) return true;
-  return (
-    isTokenNotFoundResponse(payload.data, depth + 1) ||
-    isTokenNotFoundResponse(payload.response, depth + 1)
-  );
-};
-
-/** Removes every auth/user/session value the app keeps in browser storage. */
-export const clearAuthStorage = () => {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.clear();
-    sessionStorage.clear();
-  } catch {
-    // Storage can be unavailable (private mode / blocked) — nothing to clear.
-  }
-};
+import { clearSession } from "@/lib/session";
 
 let redirecting = false;
 
-/**
- * Logs the user out locally and sends them to /login. Safe to call from
- * several failing requests at once — only the first one redirects.
- */
-export const handleTokenExpired = () => {
-  if (typeof window === "undefined") return;
-  clearAuthStorage();
-  // Lets the Header (and anything else listening) drop its logged-in state.
-  window.dispatchEvent(new Event("auth-change"));
+/** Where to send someone after they sign in (only paths on this site). */
+export const safeNextPath = (next: string | null | undefined): string | null =>
+  next && next.startsWith("/") && !next.startsWith("//") ? next : null;
 
-  if (redirecting || window.location.pathname.startsWith("/login")) return;
-  redirecting = true;
-  // Full navigation (not router.push) so no authenticated page state or
-  // in-flight requests keep using the invalid token.
-  window.location.replace("/login");
+/** The sign-in page, returning to `next` (default: the current page). */
+export const loginHref = (next?: string) => {
+  const target =
+    next ?? (typeof window !== "undefined" ? window.location.pathname + window.location.search : "/");
+  return `/login?next=${encodeURIComponent(target)}`;
 };
 
-/** Marker for the rejection the API layer raises after a forced logout. */
-export class TokenExpiredError extends Error {
-  isTokenExpired = true;
-  constructor() {
-    super("Session expired. Please log in again.");
-    this.name = "TokenExpiredError";
-  }
-}
+/**
+ * Forgets the session and sends the person to sign in. Safe to call from several
+ * failing requests at once: only the first one redirects.
+ */
+export const handleSignedOut = () => {
+  if (typeof window === "undefined") return;
+  clearSession();
+  if (redirecting || window.location.pathname.startsWith("/login")) return;
+  redirecting = true;
+  // Full navigation so no signed-in page state keeps running.
+  window.location.replace(loginHref());
+};
