@@ -27,7 +27,7 @@ const Modal: React.FC<ModalProps> = ({ children, onClose }) => {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-999 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-999 flex items-center justify-center scrim"
       onClick={onClose}
     >
       <div
@@ -37,7 +37,7 @@ const Modal: React.FC<ModalProps> = ({ children, onClose }) => {
         {children}
       </div>
       <button
-        className="absolute top-4 right-4 text-white"
+        className="absolute top-4 right-4 text-overlay-foreground"
         onClick={onClose}
       >
         ✕

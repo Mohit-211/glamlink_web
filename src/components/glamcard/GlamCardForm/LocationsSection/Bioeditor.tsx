@@ -239,7 +239,7 @@ function LinkButton({ editor, active }: { editor: Editor; active: boolean }) {
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://"
-            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:border-primary"
+            className="input-glamlink h-9 rounded-md px-3 py-0"
           />
           <div className="flex justify-end gap-2">
             {active && (

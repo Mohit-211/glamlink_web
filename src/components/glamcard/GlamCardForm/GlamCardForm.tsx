@@ -429,33 +429,31 @@ const GlamCardForm: React.FC<Props> = ({
                 <button
                   onClick={onCancel}
                   disabled={loading}
-                  className="flex-1 py-3 rounded-full font-medium border border-border text-muted-foreground hover:bg-secondary transition disabled:opacity-50 cursor-pointer"
+                  className="btn-outline flex-1 disabled:opacity-50"
                 >
                   Cancel
                 </button>
               )}
-              <div className="flex-1 rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-primary">
-                <button
-                  onClick={checkAuthAndSubmit}
-                  disabled={loading}
-                  className="w-full py-3 rounded-lg font-medium disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {loading
-                    ? isEdit
-                      ? "Saving..."
-                      : "Creating..."
-                    : isEdit
-                      ? "Save Changes"
-                      : "Create Business Card"}
-                </button>
-              </div>
+              <button
+                onClick={checkAuthAndSubmit}
+                disabled={loading}
+                className="btn-primary flex-1 disabled:opacity-50"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {loading
+                  ? isEdit
+                    ? "Saving..."
+                    : "Creating..."
+                  : isEdit
+                    ? "Save Changes"
+                    : "Create Business Card"}
+              </button>
             </div>
           </div>
         </div>
       </div>
       {existingCardId !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center scrim p-4">
           <div className="w-full max-w-md rounded-2xl border bg-card p-6 shadow-large">
             <h2 className="text-lg font-semibold">You already have an Access card</h2>
             <p className="mt-2 text-sm text-muted-foreground">

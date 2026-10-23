@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { Download, X, Loader2 } from "lucide-react";
-import { toPng, toJpeg } from "html-to-image";
+import { toPng, toJpeg, getFontEmbedCSS } from "html-to-image";
+import { TOKENS } from "@/lib/designTokens";
 import GlamCardLivePreview from "./GlamCardLivePreview";
 import { GlamCardFormData } from "./GlamCardForm/types";
 import BusinessCardPage from "../BusinessCardPage";
@@ -216,8 +217,8 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         const value = computed[prop];
         if (value && unsupportedColorRegex.test(value)) {
           (htmlEl.style as any)[prop] = prop.toLowerCase().includes("background")
-            ? "#ffffff"
-            : "#000000";
+            ? TOKENS.card
+            : TOKENS.foreground;
         }
         unsupportedColorRegex.lastIndex = 0;
       });
@@ -285,32 +286,32 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             mapCanvas.height = h;
             const ctx = mapCanvas.getContext("2d")!;
 
-            ctx.fillStyle = "#f2efe9";
+            ctx.fillStyle = TOKENS.muted;
             ctx.roundRect(0, 0, w, h, 0);
             ctx.fill();
 
             // Draw some fake roads for visual resemblance
-            ctx.strokeStyle = "#ffffff";
+            ctx.strokeStyle = TOKENS.card;
             ctx.lineWidth = 6;
             [[0, h * 0.45, w, h * 0.45], [0, h * 0.65, w, h * 0.65], [w * 0.3, 0, w * 0.3, h], [w * 0.7, 0, w * 0.7, h]].forEach(([x1,y1,x2,y2]) => {
               ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
             });
-            ctx.strokeStyle = "#e8e0d8";
+            ctx.strokeStyle = TOKENS.border;
             ctx.lineWidth = 2;
             [[0, h * 0.3, w, h * 0.3], [w * 0.15, 0, w * 0.15, h], [w * 0.55, 0, w * 0.55, h]].forEach(([x1,y1,x2,y2]) => {
               ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
             });
 
-            // Red pin marker at center
+            // Brand-teal pin marker at center
             const cx = w / 2, cy = h / 2;
-            ctx.fillStyle = "#e53e3e";
+            ctx.fillStyle = TOKENS.primary;
             ctx.beginPath(); ctx.arc(cx, cy - 16, 12, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.moveTo(cx, cy + 4); ctx.lineTo(cx - 10, cy - 10); ctx.lineTo(cx + 10, cy - 10); ctx.closePath(); ctx.fill();
-            ctx.fillStyle = "#fff";
+            ctx.fillStyle = TOKENS.card;
             ctx.beginPath(); ctx.arc(cx, cy - 16, 5, 0, Math.PI * 2); ctx.fill();
 
             // Border
-            ctx.strokeStyle = "#d1d5db";
+            ctx.strokeStyle = TOKENS.border;
             ctx.lineWidth = 1;
             ctx.strokeRect(0, 0, w, h);
 
@@ -323,10 +324,11 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
           const mapCanvas = document.createElement("canvas");
           mapCanvas.width = w; mapCanvas.height = h;
           const ctx = mapCanvas.getContext("2d")!;
-          ctx.fillStyle = "#e8edf2";
+          ctx.fillStyle = TOKENS.muted;
           ctx.fillRect(0, 0, w, h);
-          ctx.fillStyle = "#9ca3af";
-          ctx.font = "13px sans-serif";
+          ctx.fillStyle = TOKENS.mutedForeground;
+          // Canvas cannot use CSS variables; read the resolved site font (Manrope) instead.
+          ctx.font = `13px ${getComputedStyle(document.body).fontFamily}`;
           ctx.textAlign = "center";
           ctx.fillText("Map View", w / 2, h / 2 + 5);
           const mapImg = document.createElement("img");
@@ -366,9 +368,9 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
                 const canvas = document.createElement("canvas");
                 canvas.width = w || 160; canvas.height = h || 120;
                 const ctx = canvas.getContext("2d")!;
-                ctx.fillStyle = "#d1d5db";
+                ctx.fillStyle = TOKENS.input;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "#ffffff";
+                ctx.fillStyle = TOKENS.card;
                 const cx = canvas.width / 2, cy = canvas.height / 2;
                 ctx.beginPath();
                 ctx.moveTo(cx - 14, cy - 18);
@@ -476,10 +478,13 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
       await waitForImagesToLoad(element);
 
       const fileName = `glam-card-${Date.now()}`;
+      // Embed the site font so the image is not drawn in a fallback typeface; if that
+      // fails (e.g. a stylesheet cannot be read), still download without it.
+      const fontEmbedCSS = await getFontEmbedCSS(element).catch(() => "");
       const options = {
         cacheBust: false,
         pixelRatio: 3,
-        skipFonts: true,
+        ...(fontEmbedCSS ? { fontEmbedCSS } : { skipFonts: true }),
         fetchRequestInit: { mode: "cors" as RequestMode, cache: "no-cache" as RequestCache },
       };
 
@@ -530,7 +535,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm sm:p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center scrim sm:p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -571,11 +576,12 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         {/* Footer */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-border flex-shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="flex items-center gap-2">
-            <label className="text-sm text-muted-foreground font-medium">Format:</label>
+            <label htmlFor="download-format" className="label-glamlink mb-0">Format</label>
             <select
+              id="download-format"
               value={format}
               onChange={(e) => setFormat(e.target.value as "png" | "jpg")}
-              className="flex-1 sm:flex-initial border border-border rounded-lg px-2 py-2 sm:py-1 text-sm"
+              className="input-glamlink flex-1 sm:w-auto sm:flex-initial px-3 py-2"
             >
               <option value="png">PNG (High Quality)</option>
               <option value="jpg">JPG (Smaller Size)</option>
@@ -586,7 +592,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             <button
               onClick={onClose}
               disabled={isDownloading}
-              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl border border-border text-sm whitespace-nowrap disabled:opacity-50"
+              className="btn-outline flex-1 sm:flex-initial whitespace-nowrap disabled:opacity-50"
             >
               Cancel
             </button>
@@ -594,7 +600,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             <button
               onClick={handleDownload}
               disabled={isDownloading}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary text-white text-sm font-semibold whitespace-nowrap disabled:opacity-70"
+              className="btn-primary flex-1 sm:flex-initial whitespace-nowrap disabled:opacity-70"
             >
               {isDownloading ? (
                 <>

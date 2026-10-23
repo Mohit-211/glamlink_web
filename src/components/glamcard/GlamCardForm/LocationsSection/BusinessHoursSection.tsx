@@ -9,11 +9,7 @@ interface SectionProps {
 const sectionClass =
   "space-y-6 rounded-xl border border-border bg-card p-4 sm:p-6";
 
-const inputClass =
-  "w-full rounded-lg border border-border bg-card px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
 
-const buttonClass =
-  "flex-none sm:min-w-[120px] rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white transition";
 
 const removeButtonClass =
   "flex-none text-destructive text-sm font-medium hover:underline";
@@ -58,7 +54,7 @@ const BusinessHoursSection: React.FC<SectionProps> = ({
         <button
           type="button"
           onClick={handleAddNote}
-          className={buttonClass}
+          className="btn-primary flex-none sm:min-w-[120px]"
         >
           + Add
         </button>
@@ -79,7 +75,7 @@ const BusinessHoursSection: React.FC<SectionProps> = ({
             <input
               type="text"
               placeholder="e.g. Mon-Fri: 10am - 7pm"
-              className={inputClass}
+              className="input-glamlink"
               value={item.note || ""}
               onChange={(e) =>
                 handleNoteChange(index, e.target.value)

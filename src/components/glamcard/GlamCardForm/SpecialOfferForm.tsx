@@ -25,7 +25,7 @@ export default function SpecialOfferForm({ data, setData, locked }: Props) {
           <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
           <p className="text-muted-foreground">
             Run a special offer on your card with Access Pro.{" "}
-            <Link href="/dashboard?tab=subscription-plans" className="font-medium text-primary hover:underline">
+            <Link href="/dashboard?tab=subscription-plans" className="link-glamlink text-secondary">
               See plans
             </Link>
           </p>
@@ -37,7 +37,7 @@ export default function SpecialOfferForm({ data, setData, locked }: Props) {
               type="checkbox"
               checked={Boolean(data.offer_promotion)}
               onChange={(e) => setData((p) => ({ ...p, offer_promotion: e.target.checked }))}
-              className="h-4 w-4 accent-[hsl(var(--primary))]"
+              className="h-4 w-4 accent-secondary"
             />
             Show a special offer on my card
           </label>

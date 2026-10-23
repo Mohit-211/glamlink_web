@@ -18,7 +18,6 @@ interface Props {
 
 const sectionClass =
   "space-y-6 rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm";
-const labelClass = "text-sm font-medium text-foreground/80";
 
 // The API's limits for a card: 4 photos and 1 video (MP4, under 21 MB).
 const MAX_PHOTOS = 4;
@@ -506,21 +505,21 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
             thumbPreview ? (
               <div className="relative w-full aspect-video rounded-lg overflow-hidden">
                 <img src={thumbPreview} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                  <svg className="w-10 h-10 text-white opacity-90" fill="currentColor" viewBox="0 0 24 24">
+                <div className="absolute inset-0 flex items-center justify-center bg-overlay/20">
+                  <svg className="w-10 h-10 text-overlay-foreground opacity-90" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
-                <span className="absolute top-1 left-1 bg-primary text-white text-xs px-2 py-0.5 rounded">
+                <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
                   Video
                 </span>
               </div>
             ) : (
-              <div className="relative w-full aspect-video rounded-lg bg-foreground flex items-center justify-center">
-                <svg className="w-10 h-10 text-white opacity-70" fill="currentColor" viewBox="0 0 24 24">
+              <div className="relative w-full aspect-video rounded-lg bg-overlay flex items-center justify-center">
+                <svg className="w-10 h-10 text-overlay-foreground opacity-70" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
-                <span className="absolute top-1 left-1 bg-primary text-white text-xs px-2 py-0.5 rounded">
+                <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
                   Video
                 </span>
               </div>
@@ -541,7 +540,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
             {thumbPreview ? (
               <div className="relative">
                 <img src={thumbPreview} className="w-full aspect-video object-cover rounded-lg" />
-                <label className="absolute bottom-1 right-1 cursor-pointer bg-black/60 text-white text-xs px-2 py-0.5 rounded hover:bg-black/80">
+                <label className="absolute bottom-1 right-1 cursor-pointer bg-overlay/60 text-overlay-foreground text-xs px-2 py-0.5 rounded hover:bg-overlay/80">
                   Change
                   <input
                     type="file"
@@ -589,7 +588,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
       {locked && (
         <p className="rounded-xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
           Refreshing your photos, video and profile image is part of Access Pro.{" "}
-          <Link href="/dashboard?tab=subscription-plans" className="font-medium text-primary hover:underline">
+          <Link href="/dashboard?tab=subscription-plans" className="link-glamlink text-secondary">
             See plans
           </Link>
         </p>
@@ -598,7 +597,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
 
       {/* PROFILE */}
       <div id="field-profile_image" className="space-y-3">
-        <label className={labelClass}>
+        <label className="label-glamlink mb-0">
           Profile Image <span className="text-destructive">*</span>
         </label>
         <div className="flex flex-wrap items-center gap-5">
@@ -617,7 +616,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
                 </span>
               )}
             </div>
-            <label className="absolute bottom-1 right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary text-white shadow-md transition hover:bg-primary">
+            <label className="absolute bottom-1 right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition hover:bg-secondary">
               <span className="text-sm leading-none">✎</span>
 
               <input
@@ -639,7 +638,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
         <div className="flex items-center gap-2">
           <input
             type="url"
-            className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-2 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="input-glamlink min-w-0 flex-1 px-3 py-2 text-xs"
             placeholder="Or paste an image URL"
             value={profileUrlInput}
             onChange={(e) => setProfileUrlInput(e.target.value)}
@@ -648,7 +647,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
             type="button"
             onClick={handleProfileUrlAdd}
             disabled={!profileUrlInput.trim() || profileUrlLoading}
-            className="rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:bg-primary disabled:bg-input disabled:cursor-not-allowed"
+            className="btn-primary px-4 py-2 text-xs disabled:opacity-50"
           >
             {profileUrlLoading ? "Loading..." : "Add"}
           </button>
@@ -677,12 +676,9 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
             }`}
         >
           <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
-            <label className={labelClass}>Photos ({photoCount})</label>
+            <label className="label-glamlink mb-0">Photos ({photoCount})</label>
             <label
-              className={`rounded-lg px-4 py-2 text-white ${photosFull
-                  ? "bg-input cursor-not-allowed"
-                  : "cursor-pointer bg-primary hover:bg-primary"
-                }`}
+              className={`btn-primary px-4 py-2 ${photosFull ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
             >
               + Upload Photos
               <input
@@ -699,7 +695,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
           <div className="flex items-center gap-2">
             <input
               type="url"
-              className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-2 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="input-glamlink min-w-0 flex-1 px-3 py-2 text-xs"
               placeholder="Or paste an image URL"
               value={galleryUrlInput}
               onChange={(e) => setGalleryUrlInput(e.target.value)}
@@ -713,7 +709,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
                 galleryUrlLoading ||
                 photosFull
               }
-              className="rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:bg-primary disabled:bg-input disabled:cursor-not-allowed"
+              className="btn-primary px-4 py-2 text-xs disabled:opacity-50"
             >
               {galleryUrlLoading ? "Loading..." : "+ Add URL"}
             </button>
@@ -735,7 +731,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
       <div className="space-y-4 pt-2 border-t border-border">
         <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
           <div>
-            <label className={labelClass}>Videos ({videoCount})</label>
+            <label className="label-glamlink">Videos ({videoCount})</label>
             <p className="text-xs text-muted-foreground/80">
               Must be .mp4, under 60 seconds, and under {MAX_VIDEO_MB}MB
             </p>
@@ -746,10 +742,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
             )}
           </div>
           <label
-            className={`rounded-lg px-4 py-2 text-white ${videosFull
-                ? "bg-input cursor-not-allowed"
-                : "cursor-pointer bg-primary hover:bg-primary"
-              }`}
+            className={`btn-primary px-4 py-2 ${videosFull ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
           >
             + Upload Videos
             <input
@@ -783,7 +776,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
                 {galleryCropQueue.length > 1 ? "s" : ""} to crop after this one
               </p>
             )}
-            <div className="relative h-64 sm:h-80 bg-black rounded overflow-hidden">
+            <div className="relative h-64 sm:h-80 bg-overlay rounded overflow-hidden">
               <Cropper
                 image={imageSrc!}
                 crop={crop}
@@ -805,12 +798,12 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
               className="w-full"
             />
             <div className="flex gap-3">
-              <button onClick={cancelCrop} className="flex-1 border rounded py-2">
+              <button onClick={cancelCrop} className="btn-outline flex-1">
                 Cancel
               </button>
               <button
                 onClick={applyCrop}
-                className="flex-1 bg-primary text-white rounded py-2 hover:bg-primary"
+                className="btn-primary flex-1"
               >
                 Apply Crop
               </button>

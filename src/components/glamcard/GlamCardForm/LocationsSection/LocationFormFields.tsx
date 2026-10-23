@@ -24,13 +24,8 @@ interface FieldsProps {
   onUpdate: (updates: Partial<Location>) => void;
 }
 
-const inputClass =
-  "w-full rounded-lg border border-border bg-card px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
 
-const labelClass = "text-sm font-medium text-foreground/80 block mb-1.5";
 
-const buttonClass =
-  "min-w-[120px] rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white transition";
 
 // Helper: Convert state name/abbreviation to numeric ID
 const findStateId = (stateValue: string | undefined, statesArray: any[]): string | undefined => {
@@ -287,13 +282,14 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
     <div className="space-y-6">
       {/* Location Type */}
       <div>
-        <span className={labelClass}>Location Type</span>
+        <span className="label-glamlink">Location Type</span>
         <div className="mt-2 flex flex-wrap gap-4 sm:gap-8">
           <label className="flex cursor-pointer items-center gap-2 text-sm">
             <input
               type="radio"
               checked={location.location_type === "exact_address"}
               onChange={() => handleTypeChange("exact_address")}
+              className="accent-secondary"
             />
             Exact Address
           </label>
@@ -302,6 +298,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
               type="radio"
               checked={location.location_type === "city_only"}
               onChange={() => handleTypeChange("city_only")}
+              className="accent-secondary"
             />
             City / Area Only
           </label>
@@ -310,9 +307,9 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
 
       {/* Display Label */}
       <div>
-        <label className={labelClass}>Display Label</label>
+        <label className="label-glamlink">Display Label</label>
         <input
-          className={inputClass}
+          className="input-glamlink"
           placeholder="e.g. Downtown Studio"
           value={location.label ?? ""}
           onChange={(e) => onUpdate({ label: e.target.value })}
@@ -322,12 +319,12 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       {/* CITY / STATE */}
       {location.location_type === "city_only" && (
         <div className="space-y-5">
-          <div className="md:grid gap-5 md:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2">
             {/* STATE */}
             <div>
-              <label className={labelClass}>State</label>
+              <label className="label-glamlink">State</label>
               <select
-                className={inputClass}
+                className="input-glamlink"
                 value={String(location.state ?? "")}
                 onChange={(e) => {
                   onUpdate({
@@ -350,9 +347,9 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
 
             {/* CITY */}
             <div>
-              <label className={labelClass}>City</label>
+              <label className="label-glamlink">City</label>
               <select
-                className={inputClass}
+                className="input-glamlink"
                 value={location?.city ?? ""}
                 onChange={(e) => onUpdate({ city: e.target.value })}
                 disabled={!location.state || citiesLoading}
@@ -385,11 +382,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
             <button
               type="button"
               disabled={!canSetCity}
-              className={`w-full ${
-                canSetCity
-                  ? "bg-primary text-white hover:bg-primary"
-                  : "cursor-not-allowed bg-input text-white"
-              } ${buttonClass}`}
+              className="btn-primary w-full disabled:opacity-50"
               onClick={handleSetCity}
             >
               {citiesLoading || cityCoordsLoading ? "Loading..." : "Set Location"}
@@ -406,12 +399,12 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       {/* EXACT ADDRESS */}
       {location.location_type === "exact_address" && (
         <div>
-          <label className={labelClass}>Address</label>
+          <label className="label-glamlink">Address</label>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="min-w-0 flex-1">
               <input
                 ref={addressInputRef}
-                className={inputClass}
+                className="input-glamlink"
                 value={location.address ?? ""}
                 onChange={(e) => onUpdate({ address: e.target.value })}
                 placeholder="Start typing an address..."
@@ -421,11 +414,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
               <button
                 type="button"
                 disabled={!canConfirmExact}
-                className={`flex-1 sm:flex-none ${buttonClass} ${
-                  canConfirmExact
-                    ? "bg-primary hover:bg-primary"
-                    : "cursor-not-allowed bg-input"
-                }`}
+                className="btn-primary flex-1 sm:flex-none sm:min-w-[120px] disabled:opacity-50"
                 onClick={handleConfirmExact}
               >
                 Confirm

@@ -97,7 +97,7 @@ const LocationsSection: React.FC<SectionProps> = ({
       <button
         type="button"
         onClick={addLocation}
-        className="mt-6 w-full rounded-lg border border-dashed border-input py-3 text-sm font-medium text-muted-foreground hover:border-input hover:text-foreground transition-colors"
+        className="mt-6 w-full rounded-xl border border-dashed border-border py-3 text-sm font-semibold text-primary hover:bg-accent hover:text-secondary transition-colors"
       >
         + Add Another Location
       </button>

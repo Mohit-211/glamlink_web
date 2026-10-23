@@ -4,6 +4,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 
 import { FieldErrors, GlamCardFormData } from "../types";
+import { TOKENS } from "@/lib/designTokens";
 
 /* ================= CLIENT-ONLY BIO EDITOR ================= */
 // The rich-text editor lives in its own file and is loaded only in the
@@ -40,12 +41,8 @@ interface SectionProps {
 const sectionClass =
   "space-y-6 rounded-xl border border-border bg-card p-4 sm:p-6";
 
-const inputClass =
-  "w-full rounded-lg border border-border bg-card px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
 
-const errorInputClass = "border-destructive focus:border-destructive focus:ring-destructive/30";
 
-const labelClass = "mb-2 mt-2 block text-sm font-medium text-foreground/80";
 
 const CHARACTER_LIMIT = 80;
 
@@ -64,14 +61,14 @@ const BasicInformationSection: React.FC<SectionProps> = ({
     <section className={sectionClass}>
       <h2 className="text-lg font-semibold">Basic Information</h2>
 
-      <div className="gap-5 md:grid md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2">
         {/* NAME */}
         <div id="field-name">
-          <label className={labelClass}>
+          <label className="label-glamlink">
             Full Name <span className="text-destructive">*</span>
           </label>
           <input
-            className={`${inputClass} ${errors?.name ? errorInputClass : ""}`}
+            className="input-glamlink" aria-invalid={!!errors?.name}
             placeholder="e.g. Jane Smith"
             value={data.name || ""}
             onChange={(e) => {
@@ -89,11 +86,11 @@ const BasicInformationSection: React.FC<SectionProps> = ({
 
         {/* TITLE */}
         <div id="field-professional_title">
-          <label className={labelClass}>
+          <label className="label-glamlink">
             Professional Title <span className="text-destructive">*</span>
           </label>
           <input
-            className={`${inputClass} ${errors?.professional_title ? errorInputClass : ""}`}
+            className="input-glamlink" aria-invalid={!!errors?.professional_title}
             placeholder="e.g. Hair Stylist, Nail Technician"
             value={data.professional_title || ""}
             onChange={(e) => {
@@ -113,12 +110,12 @@ const BasicInformationSection: React.FC<SectionProps> = ({
 
         {/* EMAIL */}
         <div id="field-email">
-          <label className={labelClass}>
+          <label className="label-glamlink">
             Email <span className="text-destructive">*</span>
           </label>
           <input
             type="email"
-            className={`${inputClass} ${errors?.email ? errorInputClass : ""}`}
+            className="input-glamlink" aria-invalid={!!errors?.email}
             placeholder="you@example.com"
             value={data.email || ""}
             onChange={(e) => {
@@ -137,7 +134,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         {/* PHONE */}
     <div id="field-phone">
   <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-    <label className={labelClass}>
+    <label className="label-glamlink">
       Phone
       {(data.is_phone_visible ?? true) && <span className="text-destructive"> *</span>}
     </label>
@@ -152,7 +149,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             is_phone_visible: e.target.checked,
           }))
         }
-        className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+        className="h-4 w-4 accent-secondary"
       />
       <span className="text-xs font-medium text-muted-foreground">
         Show phone number on card
@@ -164,7 +161,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
     type="tel"
     inputMode="numeric"
     maxLength={15}
-    className={`${inputClass} ${errors?.phone ? errorInputClass : ""}`}
+    className="input-glamlink" aria-invalid={!!errors?.phone}
     placeholder="e.g. 5551234567"
     value={data.phone || ""}
     required={data.is_phone_visible}
@@ -191,7 +188,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
 
         {/* BIO */}
         <div id="field-bio" className="md:col-span-2">
-          <label className={labelClass}>
+          <label className="label-glamlink">
             Professional Bio <span className="text-destructive">*</span>
           </label>
 
@@ -231,11 +228,11 @@ const BasicInformationSection: React.FC<SectionProps> = ({
       </div>
       {/* BUSINESS NAME */}
       <div id="field-business_name">
-        <label className={labelClass}>
+        <label className="label-glamlink">
           Business Name <span className="text-destructive">*</span>
         </label>
         <input
-          className={`${inputClass} w-full ${errors?.business_name ? errorInputClass : ""}`}
+          className="input-glamlink w-full" aria-invalid={!!errors?.business_name}
           placeholder="e.g. Glow Beauty Studio"
           value={data.business_name || ""}
           onChange={(e) => {
@@ -253,7 +250,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
 
       {/* CARD COLOR */}
       <div id="field-color_code">
-        <label className={labelClass}>Card Color</label>
+        <label className="label-glamlink">Card Color</label>
         <p className="mt-1 text-xs text-muted-foreground">
           Pick an accent color for your Access Card — it themes the Featured
           Links cards, icons, and highlights across your page.
@@ -264,7 +261,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
             value={
               /^#[0-9a-fA-F]{6}$/.test(data.color_code || "")
                 ? (data.color_code as string)
-                : "#24bbcb"
+                : TOKENS.primary.toLowerCase()
             }
             onChange={(e) =>
               setData((p) => ({ ...p, color_code: e.target.value }))
@@ -274,8 +271,8 @@ const BasicInformationSection: React.FC<SectionProps> = ({
           />
           <input
             type="text"
-            className={`${inputClass} min-w-0 max-w-[140px]`}
-            placeholder="#24BBCB"
+            className="input-glamlink min-w-0 max-w-[140px]"
+            placeholder={TOKENS.primary}
             value={data.color_code || ""}
             onChange={(e) =>
               setData((p) => ({ ...p, color_code: e.target.value }))

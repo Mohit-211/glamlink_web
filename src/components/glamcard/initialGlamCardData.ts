@@ -1,6 +1,7 @@
 import { API_ORIGIN } from "@/lib/config";
 import { nanoid } from "nanoid";
 import { BOOKING_METHODS, GlamCardFormData } from "./GlamCardForm/types";
+import { TOKENS } from "@/lib/designTokens";
 
 const profileImgUrl =
   `${API_ORIGIN}/images/profile_image-1786443475610.jpg`;
@@ -70,7 +71,7 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     },
     other_links: [{ title: "My Portfolio", url: "https://example.com/portfolio" }],
     featured_links: [],
-    color_code: "#24bbcb",
+    color_code: TOKENS.primary.toLowerCase(),
     preferred_booking_methods: [BOOKING_METHODS.LINK, BOOKING_METHODS.CALL],
     booking_link: "https://example.com/book",
     important_info: [

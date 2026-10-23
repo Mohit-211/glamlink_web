@@ -121,7 +121,7 @@ const fetchData = async () => {
             onClick={() =>
               (window.location.href = "/pricing")
             }
-            className="px-6 py-3 bg-primary hover:bg-primary text-white rounded-lg"
+            className="btn-primary"
           >
             Activate Subscription
           </button>

@@ -15,12 +15,6 @@ interface Props {
 }
 
 const sectionClass = "space-y-6 rounded-xl border border-border bg-card p-4 sm:p-6";
-const labelClass = "text-sm font-medium text-foreground/80";
-const inputClass =
-  "w-full rounded-lg border border-border bg-card px-4 py-2.5 text-sm " +
-  "text-foreground placeholder-muted-foreground/80 transition " +
-  "focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
-const errorInputClass = "border-destructive focus:border-destructive focus:ring-destructive/30";
 
 const INSTAGRAM_KEYS = ["instagram", "instagram1", "instagram2"] as const;
 
@@ -433,14 +427,14 @@ const ServicesAndBookingForm: React.FC<Props> = ({
 
       {/* Additional Specialties */}
       <div id="field-specialties" className="space-y-3">
-        <label className={labelClass}>
+        <label className="label-glamlink">
           Additional Specialties <span className="text-destructive">*</span>
         </label>
 
         <div className="relative flex gap-2" ref={specialtyWrapperRef}>
           <div className="relative min-w-0 flex-1">
             <input
-              className={`${inputClass} ${errors?.specialties ? errorInputClass : ""}`}
+              className="input-glamlink" aria-invalid={!!errors?.specialties}
               placeholder="e.g. Balayage, Keratin Treatments, Bridal Makeup"
               value={specialtyInput}
               onChange={(e) => {
@@ -472,7 +466,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                         type="button"
                         onClick={() => addSpecialty(opt)}
                         disabled={data.specialties.length >= 5}
-                        className="block w-full text-left px-4 py-2 text-sm hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="block w-full text-left px-4 py-2 text-sm hover:bg-secondary/10 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {opt}
                       </button>
@@ -482,7 +476,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                       <button
                         type="button"
                         onClick={() => addSpecialty()}
-                        className="block w-full text-left px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 border-t border-border"
+                        className="block w-full text-left px-4 py-2 text-sm font-medium text-primary hover:bg-secondary/10 hover:text-secondary border-t border-border"
                       >
                         + Add &quot;{specialtyInput.trim()}&quot;
                       </button>
@@ -513,12 +507,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               !specialtyInput.trim() ||
               isSpecialtyAdded(specialtyInput)
             }
-            className={`rounded-lg px-5 text-sm font-medium transition ${data.specialties.length >= 5 ||
-                !specialtyInput.trim() ||
-                isSpecialtyAdded(specialtyInput)
-                ? "bg-border text-muted-foreground cursor-not-allowed"
-                : "bg-primary text-white hover:bg-primary"
-              }`}
+            className="btn-primary px-5 disabled:opacity-50"
           >
             + Add
           </button>
@@ -534,13 +523,13 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             {data.specialties.map((item, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-medium text-foreground"
+                className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-medium text-secondary"
               >
                 {item}
                 <button
                   type="button"
                   onClick={() => removeSpecialty(i)}
-                  className="ml-1 text-primary hover:text-destructive"
+                  className="ml-1 text-secondary/70 hover:text-destructive"
                 >
                   ×
                 </button>
@@ -562,10 +551,10 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         <div className="grid gap-4 md:grid-cols-2">
           {/* Website */}
           <div>
-            <label className={labelClass}>Website</label>
+            <label className="label-glamlink">Website</label>
             <input
               type="url"
-              className={`${inputClass} ${errors?.booking_link ? errorInputClass : ""}`}
+              className="input-glamlink" aria-invalid={!!errors?.booking_link}
               placeholder="https://yourwebsite.com"
               value={data.website || ""}
               onChange={(e) => {
@@ -578,7 +567,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           <div id="field-instagram" className="md:col-span-2">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
               <div>
-                <label className={labelClass}>
+                <label className="label-glamlink">
                   Instagram
                   {data.preferred_booking_methods?.includes(BOOKING_METHODS.INSTAGRAM) && (
                     <span className="text-destructive"> *</span>
@@ -589,7 +578,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={addInstagramHandle}
-                className="text-xs text-primary hover:underline font-medium"
+                className="link-glamlink text-xs"
               >
                 + Add Instagram
               </button>
@@ -601,7 +590,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                     {idx === 0 ? "Instagram" : `Instagram ${idx}`}
                   </span>
                   <input
-                    className={`${inputClass} min-w-0 flex-1 ${idx === 0 && errors?.instagram ? errorInputClass : ""}`}
+                    className="input-glamlink min-w-0 flex-1" aria-invalid={!!(idx === 0 && errors?.instagram)}
                     placeholder="@yourusername or full URL"
                     value={value}
                     required={
@@ -631,9 +620,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({
 
           {/* TikTok */}
           <div>
-            <label className={labelClass}>TikTok</label>
+            <label className="label-glamlink">TikTok</label>
             <input
-              className={inputClass}
+              className="input-glamlink"
               placeholder="@yourusername or full URL"
               value={data.social_media?.tiktok || ""}
               onChange={(e) =>
@@ -650,9 +639,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({
 
           {/* LinkedIn */}
           <div>
-            <label className={labelClass}>LinkedIn</label>
+            <label className="label-glamlink">LinkedIn</label>
             <input
-              className={inputClass}
+              className="input-glamlink"
               placeholder="@yourprofile or full URL"
               value={data.social_media?.linkedin || ""}
               onChange={(e) =>
@@ -669,9 +658,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({
 
           {/* YouTube */}
           <div>
-            <label className={labelClass}>YouTube</label>
+            <label className="label-glamlink">YouTube</label>
             <input
-              className={inputClass}
+              className="input-glamlink"
               placeholder="@yourchannel or full URL"
               value={data.social_media?.youtube || ""}
               onChange={(e) =>
@@ -688,9 +677,9 @@ const ServicesAndBookingForm: React.FC<Props> = ({
 
           {/* Facebook */}
           <div>
-            <label className={labelClass}>Facebook</label>
+            <label className="label-glamlink">Facebook</label>
             <input
-              className={inputClass}
+              className="input-glamlink"
               placeholder="@yourpage or full URL"
               value={data.social_media?.facebook || ""}
               onChange={(e) =>
@@ -721,7 +710,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             <button
               type="button"
               onClick={addOtherLink}
-              className="w-full flex-none rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary sm:w-auto"
+              className="btn-primary w-full flex-none sm:w-auto"
             >
               + Add Link
             </button>
@@ -736,7 +725,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      className={`${inputClass} min-w-0 flex-1`}
+                      className="input-glamlink min-w-0 flex-1"
                       placeholder="Title (e.g. Vogue Feature)"
                       value={link.title}
                       onChange={(e) => updateOtherLink(index, "title", e.target.value)}
@@ -751,7 +740,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                   </div>
                   <input
                     type="url"
-                    className={inputClass}
+                    className="input-glamlink"
                     placeholder="https://example.com/article"
                     value={link.url}
                     onChange={(e) => updateOtherLink(index, "url", e.target.value)}
@@ -781,7 +770,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           <button
             type="button"
             onClick={addFeaturedLink}
-            className="w-full flex-none rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary sm:w-auto"
+            className="btn-primary w-full flex-none sm:w-auto"
           >
             + Add Featured Link
           </button>
@@ -803,7 +792,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                   setDraggedFeaturedLinkIndex(null);
                 }}
                 onDragEnd={() => setDraggedFeaturedLinkIndex(null)}
-                className={`flex flex-col gap-2 rounded-lg border bg-card p-3 ${link.is_featured ? "border-primary ring-1 ring-primary/30" : "border-border"
+                className={`flex flex-col gap-2 rounded-lg border bg-card p-3 ${link.is_featured ? "border-secondary ring-1 ring-secondary/30" : "border-border"
                   }`}
               >
                 <div className="flex items-start gap-2">
@@ -822,8 +811,8 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                         <ImagePlus className="h-5 w-5" />
                       </div>
                     )}
-                    <label className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/0 opacity-0 transition hover:bg-black/40 hover:opacity-100">
-                      <ImagePlus className="h-4 w-4 text-white" />
+                    <label className="absolute inset-0 flex cursor-pointer items-center justify-center bg-overlay/0 opacity-0 transition hover:bg-overlay/40 hover:opacity-100">
+                      <ImagePlus className="h-4 w-4 text-overlay-foreground" />
                       <input
                         type="file"
                         accept="image/*"
@@ -854,7 +843,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
-                        className={`${inputClass} flex-1 min-w-0`}
+                        className="input-glamlink flex-1 min-w-0"
                         placeholder="Title (e.g. Shop My Skincare Favorites)"
                         value={link.title}
                         onChange={(e) => updateFeaturedLink(index, "title", e.target.value)}
@@ -869,7 +858,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                     </div>
                     <input
                       type="url"
-                      className={inputClass}
+                      className="input-glamlink"
                       placeholder="https://example.com/shop"
                       value={link.url}
                       onChange={(e) => updateFeaturedLink(index, "url", e.target.value)}
@@ -879,7 +868,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                         type="checkbox"
                         checked={!!link.is_featured}
                         onChange={() => toggleFeaturedLinkFeatured(index)}
-                        className="h-3.5 w-3.5 rounded border-border text-primary focus:ring-primary"
+                        className="h-3.5 w-3.5 accent-secondary"
                       />
                       Feature this link first
                     </label>
@@ -900,7 +889,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
 
       <div id="field-preferred_booking_methods">
         <div className="flex items-center gap-2 relative">
-          <label className={labelClass}>
+          <label className="label-glamlink">
             Ways To Connects <span className="text-destructive">*</span>
           </label>
         </div>
@@ -921,6 +910,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
               <input
                 type="checkbox"
                 checked={!!data.preferred_booking_methods?.includes(method)}
+                className="accent-secondary"
                 onChange={(e) => {
                   setData((prev) => ({
                     ...prev,
@@ -950,12 +940,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({
 
         {data.preferred_booking_methods?.includes(BOOKING_METHODS.LINK) && (
           <div id="field-booking_link" className="mt-4">
-            <label className={`${labelClass} m-0`}>
+            <label className="label-glamlink">
               Booking Link <span className="text-destructive">*</span>
             </label>
             <input
               type="url"
-              className={`${inputClass} ${errors?.booking_link ? errorInputClass : ""}`}
+              className="input-glamlink" aria-invalid={!!errors?.booking_link}
               placeholder="https://yourwebsite.com"
               value={data.booking_link || data.website || ""}
               onChange={(e) => {
@@ -975,7 +965,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
 
       {/* Important Info */}
       <div className="space-y-3">
-        <label className={`${labelClass} m-0`}>
+        <label className="label-glamlink mb-0">
           Important Information
         </label>
         {data.important_info?.length > 0 && (
@@ -983,7 +973,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             {data.important_info?.map((item, i) => (
               <div key={i} className="flex items-center gap-2">
                 <input
-                  className={inputClass}
+                  className="input-glamlink"
                   placeholder="e.g. By appointment only • Cash/Card accepted"
                   value={item}
                   onChange={(e) => updateInfo(i, e.target.value)}
@@ -1001,7 +991,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
         )}
         <div className="flex gap-2">
           <input
-            className={inputClass}
+            className="input-glamlink"
             placeholder="e.g. By appointment only • Cash/Card accepted"
             value={infoInput}
             onChange={(e) => setInfoInput(e.target.value)}
@@ -1015,7 +1005,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
           <button
             type="button"
             onClick={addInfo}
-            className="flex-none whitespace-nowrap rounded-lg bg-border px-3 py-1 text-sm font-medium hover:bg-input"
+            className="btn-outline flex-none whitespace-nowrap"
           >
             + Add
           </button>

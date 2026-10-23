@@ -90,7 +90,7 @@ export default function MyAccessCard({
                 </p>
                 <button
                     onClick={() => (window.location.href = "/access")}
-                    className="mt-6 w-full max-w-xs rounded-xl bg-primary px-6 py-3 text-white font-medium sm:w-auto"
+                    className="btn-primary mt-6 w-full max-w-xs sm:w-auto"
                 >
                     Create Business Card
                 </button>
@@ -155,7 +155,7 @@ export default function MyAccessCard({
                     return (
                         <div
                             key={key}
-                            className="space-y-3 rounded-3xl border border-border/60 bg-secondary/10 p-3 sm:p-4"
+                            className="space-y-3 rounded-3xl border border-border/60 bg-muted/10 p-3 sm:p-4"
                         >
                             <div className="flex flex-wrap items-center justify-between gap-2 px-1">
                                 <p className="min-w-0 flex-1 truncate text-xs font-semibold text-muted-foreground">
@@ -165,7 +165,7 @@ export default function MyAccessCard({
                                     {showIncludeNfcButton && (
                                         <button
                                             onClick={() => onPayNow?.(card, 'nfc_only')}
-                                            className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-secondary transition-colors"
+                                            className="btn-outline gap-1.5 px-2.5 py-1 text-[11px]"
                                         >
                                             <Nfc className="h-3 w-3" />
                                             Include NFC
@@ -173,7 +173,7 @@ export default function MyAccessCard({
                                     )}
                                     <button
                                         onClick={() => handleEditClick(card)}
-                                        className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-secondary transition-colors"
+                                        className="btn-outline gap-1.5 px-2.5 py-1 text-[11px]"
                                     >
                                         <Edit3 className="h-3 w-3" />
                                         Edit
@@ -221,7 +221,7 @@ export default function MyAccessCard({
                                                 <div className="min-w-0">
                                                     <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Website</p>
                                                     <a href={card?.website} target="_blank" rel="noopener noreferrer"
-                                                        className="flex min-w-0 items-center gap-1.5 text-[13px] font-medium text-primary hover:underline">
+                                                        className="link-glamlink flex min-w-0 items-center gap-1.5 text-[13px]">
                                                         <Globe className="h-3.5 w-3.5 flex-shrink-0" />
                                                         <span className="truncate">{card?.website.replace(/https?:\/\/(www\.)?/, '')}</span>
                                                     </a>
@@ -231,7 +231,7 @@ export default function MyAccessCard({
                                                 <div>
                                                     <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Booking</p>
                                                     <a href={card?.booking_link} target="_blank" rel="noopener noreferrer"
-                                                        className="flex items-center gap-1.5 text-[13px] font-medium text-primary hover:underline">
+                                                        className="link-glamlink flex items-center gap-1.5 text-[13px]">
                                                         <CalendarCheck className="h-3.5 w-3.5 flex-shrink-0" />
                                                         Book now
                                                     </a>
@@ -271,7 +271,7 @@ export default function MyAccessCard({
                                             )}
                                         </div>
                                     </div>
-                                    <div className="flex flex-col gap-3 border-t border-border bg-secondary/40 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                                    <div className="flex flex-col gap-3 border-t border-border bg-muted/40 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                                         {isRejected ? (
                                             <div className="flex flex-1 items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5">
                                                 <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-destructive" />
@@ -309,7 +309,7 @@ export default function MyAccessCard({
                                                 target={isRejected ? undefined : "_blank"}
                                                 rel={isRejected ? undefined : "noopener noreferrer"}
                                                 onClick={(e) => isRejected && e.preventDefault()}
-                                                className={`btn-primary w-full !px-4 !py-2 !text-xs !rounded-xl flex items-center justify-center gap-1.5 sm:w-auto ${isRejected
+                                                className={`btn-primary w-full px-4 py-2 text-xs flex items-center justify-center gap-1.5 sm:w-auto ${isRejected
                                                     ? "pointer-events-none opacity-50 cursor-not-allowed"
                                                     : ""
                                                     }`}
@@ -351,7 +351,7 @@ export default function MyAccessCard({
                                                                 href={order.tracking_link}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="text-primary hover:underline"
+                                                                className="link-glamlink"
                                                             >
                                                                 {order.tracking_number}
                                                             </a>
@@ -373,7 +373,7 @@ export default function MyAccessCard({
             {/* QR Modal */}
             {qrCard && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4"
+                    className="fixed inset-0 z-50 flex items-center justify-center scrim p-4"
                     onClick={() => setQrKey(null)}
                 >
                     <div className="card-glamlink w-full max-w-xs" onClick={(e) => e.stopPropagation()}>
@@ -382,7 +382,7 @@ export default function MyAccessCard({
                                 <h3 className="text-sm font-semibold text-foreground">Your GlamCard QR</h3>
                                 <p className="text-[11px] text-muted-foreground mt-0.5">Scan to view access card</p>
                             </div>
-                            <button onClick={() => setQrKey(null)} className="rounded-lg p-1.5 hover:bg-secondary transition-colors">
+                            <button onClick={() => setQrKey(null)} className="rounded-lg p-1.5 hover:bg-muted transition-colors">
                                 <X className="h-4 w-4 text-muted-foreground" />
                             </button>
                         </div>
@@ -390,7 +390,7 @@ export default function MyAccessCard({
                             {qrCard?.business_card_qr ? (
                                 <img src={qrCard?.business_card_qr} alt="QR Code" className="h-48 w-48 object-contain" />
                             ) : (
-                                <div className="h-48 w-48 flex items-center justify-center bg-secondary rounded-lg text-muted-foreground text-sm">
+                                <div className="h-48 w-48 flex items-center justify-center bg-muted rounded-lg text-muted-foreground text-sm">
                                     No QR available
                                 </div>
                             )}
@@ -399,7 +399,7 @@ export default function MyAccessCard({
                             <p className="text-sm font-semibold text-foreground">{qrCard?.name}</p>
                             <p className="text-[11px] text-muted-foreground">{qrCard?.professional_title}</p>
                         </div>
-                        <div className="mt-4 flex min-w-0 items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2">
+                        <div className="mt-4 flex min-w-0 items-center gap-2 rounded-xl border border-border bg-muted/60 px-3 py-2">
                             <span className="min-w-0 flex-1 truncate tabular-nums text-[11px] text-muted-foreground">{qrCard?.business_card_link}</span>
                             <button
                                 onClick={() => handleCopy(qrCard, qrKey as CardKey)}
@@ -412,7 +412,7 @@ export default function MyAccessCard({
                             href={qrCard?.business_card_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn-primary mt-4 w-full !rounded-xl !text-xs flex items-center justify-center gap-2"
+                            className="btn-primary mt-4 w-full text-xs flex items-center justify-center gap-2"
                         >
                             <ExternalLink className="h-3.5 w-3.5" />
                             View my access card

@@ -16,10 +16,6 @@ const PublicCard = () => {
     phone: "9876543210",
     email: "bhavya@email.com",
     website: SITE_URL,
-    theme: {
-      from: "#0d9488",
-      to: "#0f766e",
-    },
   };
 
   const publicUrl = `${SITE_URL}/card/${username}`;
@@ -38,23 +34,13 @@ const PublicCard = () => {
       <div className="w-full max-w-sm bg-card rounded-3xl shadow-2xl overflow-hidden animate-fadeIn">
         
         {/* BANNER */}
-        <div
-          className="h-32"
-          style={{
-            background: "#24bbcb",
-          }}
-        />
+        <div className="h-32 bg-primary" />
 
         <div className="p-6 -mt-12">
           
           {/* AVATAR + QR */}
           <div className="flex justify-between items-end">
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg"
-              style={{
-                background: "#24bbcb",
-              }}
-            >
+            <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary text-primary-foreground text-2xl font-bold shadow-lg">
               {initials}
             </div>
 
@@ -112,10 +98,7 @@ const PublicCard = () => {
               a.download = `${user.name}.vcf`;
               a.click();
             }}
-            className="mt-4 w-full py-3 rounded-xl text-white font-semibold shadow-md hover:opacity-90 transition"
-            style={{
-              background: "#24bbcb",
-            }}
+            className="mt-4 w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold shadow-md hover:bg-secondary transition"
           >
             📥 Save Contact
           </button>
@@ -124,7 +107,7 @@ const PublicCard = () => {
 
       {/* OPTIONAL FOOTER */}
       <div className="absolute bottom-4 text-xs text-muted-foreground">
-        Powered by <span className="font-semibold text-white">Glamlink</span>
+        Powered by <span className="font-semibold text-foreground">Glamlink</span>
       </div>
     </div>
   );

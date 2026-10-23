@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 import { trackEvent, AnalyticsEventType } from "@/utils/analytics";
+import { TOKENS } from "@/lib/designTokens";
 /* ================= VIDEO THUMBNAIL GENERATOR ================= */
 /**
  * Generates a JPEG data URL from a video's first safely-seekable frame.
@@ -207,7 +208,7 @@ const parseArray = (value: string | string[] | undefined): string[] => {
 };
 const isFile = (v: any): v is File => v instanceof File;
 /** Default Glamlink accent — used whenever the Access Card has no valid color_code. */
-const DEFAULT_ACCENT_COLOR = "#24bbcb";
+const DEFAULT_ACCENT_COLOR = TOKENS.primary;
 const isValidHexColor = (value: unknown): value is string =>
   typeof value === "string" &&
   /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value.trim());
@@ -451,8 +452,8 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
               alt={`${altPrefix} ${index + 1}`}
             />
           ) : null}
-          <div className="absolute inset-0 flex items-center justify-center bg-black/25">
-            <Play size={14} className="text-white fill-white" />
+          <div className="absolute inset-0 flex items-center justify-center bg-overlay/25">
+            <Play size={14} className="text-overlay-foreground fill-overlay-foreground" />
           </div>
         </div>
       );
@@ -717,7 +718,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleSaveContact}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--card-accent)] text-white text-xs font-semibold shadow transition active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--card-accent)] text-primary-foreground text-xs font-semibold shadow transition active:scale-95"
             >
               <svg
                 className="w-3.5 h-3.5"
@@ -735,7 +736,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
             </button>
              <button
                   onClick={handleShare}
-                  className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-white shadow-lg hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
+                  className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-primary-foreground shadow-lg hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
                 >
                   <Share2 size={12} strokeWidth={2.5} />
                 </button>
@@ -768,7 +769,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
               <div className="hidden lg:flex justify-end gap-2 mb-3">
                 <button
                   onClick={handleSaveContact}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap" style={socialIconStyle}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] text-primary-foreground text-sm font-medium shadow-md transition-colors whitespace-nowrap" style={socialIconStyle}
                 >
                   <svg
                     className="w-4 h-4 flex-shrink-0"
@@ -787,7 +788,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                 </button>
                 <button
                   onClick={handleShare}
-                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-white shadow-lg hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
+                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-primary-foreground shadow-lg hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
                 >
                   <Share2 size={18} strokeWidth={2.5} />
                 </button>
@@ -808,7 +809,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                 </div>
                 <div className="flex items-center gap-4 p-4">
                   {/* avatar */}
-                  <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-white shadow-lg flex-shrink-0">
+                  <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-card shadow-lg flex-shrink-0">
                     {data?.profile_image ? (
                       <img
                         src={
@@ -822,20 +823,20 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                         alt="Profile"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">
+                      <div className="w-full h-full flex items-center justify-center text-primary-foreground text-2xl font-bold">
                         {(data.name || "?")[0]}
                       </div>
                     )}
                   </div>
                   {/* info */}
-                  <div className="flex-1 min-w-0 text-white">
-                    <p className="font-bold text-white text-lg leading-tight truncate">
+                  <div className="flex-1 min-w-0 text-primary-foreground">
+                    <p className="font-bold text-primary-foreground text-lg leading-tight truncate">
                       {data.name || "Your Name"}
                     </p>
-                    <p className="text-white/90 text-sm font-medium mt-0.5 truncate">
+                    <p className="text-primary-foreground/90 text-sm font-medium mt-0.5 truncate">
                       {data.professional_title || "Professional Title"}
                     </p>
-                    <p className="text-white/70 text-xs mt-0.5 truncate">
+                    <p className="text-primary-foreground/70 text-xs mt-0.5 truncate">
                       {data.business_name || "Business Name"}
                     </p>
                   </div>
@@ -897,7 +898,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                                 normalizedImages.length,
                             )
                           }
-                          className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white active:scale-90 transition"
+                          className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-overlay/40 flex items-center justify-center text-overlay-foreground active:scale-90 transition"
                         >
                           <ChevronLeft size={16} />
                         </button>
@@ -908,7 +909,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                                 ((prev ?? 0) + 1) % normalizedImages.length,
                             )
                           }
-                          className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white active:scale-90 transition"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-overlay/40 flex items-center justify-center text-overlay-foreground active:scale-90 transition"
                         >
                           <ChevronRight size={16} />
                         </button>
@@ -1030,7 +1031,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                         }}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-primary text-white font-medium px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-xs whitespace-nowrap active:scale-95 transition"
+                        className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground font-medium px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-xs whitespace-nowrap active:scale-95 transition"
                       >
                         <svg
                           className="w-3.5 h-3.5"
@@ -1239,7 +1240,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                           }
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group relative flex items-center gap-3 sm:gap-4 rounded-2xl bg-card p-3.5 sm:p-4 border border-border/70 transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[var(--card-accent-border)] active:scale-[0.98] active:translate-y-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_1px_rgba(15,23,42,0.04),0_8px_16px_-4px_rgba(15,23,42,0.12),0_20px_40px_-14px_rgba(15,23,42,0.18)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_2px_2px_rgba(15,23,42,0.05),0_14px_24px_-4px_var(--card-accent-soft),0_28px_56px_-14px_rgba(15,23,42,0.24)]"
+                          className="group relative flex items-center gap-3 sm:gap-4 rounded-2xl bg-card p-3.5 sm:p-4 border border-border/70 transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[var(--card-accent-border)] active:scale-[0.98] active:translate-y-0 shadow-[inset_0_1px_0_hsl(var(--card)/0.6),0_1px_1px_hsl(var(--foreground)/0.04),0_8px_16px_-4px_hsl(var(--foreground)/0.12),0_20px_40px_-14px_hsl(var(--foreground)/0.18)] hover:shadow-[inset_0_1px_0_hsl(var(--card)/0.6),0_2px_2px_hsl(var(--foreground)/0.05),0_14px_24px_-4px_var(--card-accent-soft),0_28px_56px_-14px_hsl(var(--foreground)/0.24)]"
                         >
                           {/* thumbnail */}
                           <div className="relative flex-shrink-0">
@@ -1261,7 +1262,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                               )}
                             </div>
                             {link?.is_featured && (
-                              <span className="absolute -top-1.5 -left-1.5 rounded-full bg-[var(--card-accent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-sm ring-2 ring-white whitespace-nowrap">
+                              <span className="absolute -top-1.5 -left-1.5 rounded-full bg-[var(--card-accent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-primary-foreground shadow-sm ring-2 ring-card whitespace-nowrap">
                                 Featured
                               </span>
                             )}
@@ -1280,7 +1281,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                           {/* action */}
                           <div className="flex-shrink-0 w-9 h-9 rounded-full bg-muted flex items-center justify-center transition-colors duration-200 group-hover:bg-[var(--card-accent)]">
                             <ArrowUpRight
-                              className="w-4 h-4 text-muted-foreground/80 transition-colors duration-200 group-hover:text-white"
+                              className="w-4 h-4 text-muted-foreground/80 transition-colors duration-200 group-hover:text-primary-foreground"
                               strokeWidth={2.25}
                             />
                           </div>
@@ -1299,7 +1300,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                   track("CONNECT_CLICK");
                   setIsBookingModalOpen(true);
                 }}
-                className="flex items-center gap-2 bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] active:scale-95 text-white px-7 py-2.5 rounded-full text-sm font-bold tracking-widest transition-all whitespace-nowrap uppercase shadow-md" style={{
+                className="flex items-center gap-2 bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] active:scale-95 text-primary-foreground px-7 py-2.5 rounded-full text-sm font-bold tracking-widest transition-all whitespace-nowrap uppercase shadow-md" style={{
                   boxShadow: "var(--shadow-medium)",
                 }}
               >
@@ -1415,7 +1416,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
       {/* ===== BOOKING MODAL ===== */}
       {isBookingModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center scrim"
           onClick={() => setIsBookingModalOpen(false)}
         >
           <div
@@ -1549,7 +1550,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
       {/* ===== QR CODE MODAL ===== */}
       {isQrModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center scrim"
           onClick={() => setIsQrModalOpen(false)}
         >
           <div
@@ -1594,7 +1595,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     </a>
                     <button
                       onClick={handleCopyLink}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--card-accent)] text-white hover:bg-[var(--card-accent-strong)] active:scale-95 transition-all whitespace-nowrap"
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--card-accent)] text-primary-foreground hover:bg-[var(--card-accent-strong)] active:scale-95 transition-all whitespace-nowrap"
                     >
                       {copied ? "✓ Copied" : "Copy"}
                     </button>
