@@ -14,6 +14,9 @@ import {
   LogOut,
   Lock,
   Sparkles,
+  Globe,
+  ShoppingBag,
+  TrendingUp,
 } from 'lucide-react';
 import { getAccessSubscription, getMyBusinessCardForDashboard, getPaymenthistory, LogoutUser, userProfile } from '../../api/Api';
 import { useSession } from '@/lib/useSession';
@@ -26,10 +29,16 @@ import EditAccessCard from './accessCardEdit';
 import ChangePasswordTab from './Changepasswordtab';
 import SubscriptionPlansTab, { type AccessSubscription } from '../Pricing/SubscriptionPlansTab';
 import AccessCardAnalytics from './analytics/AccessCardAnalytics';
+import PageAnalytics from './analytics/PageAnalytics';
+import MyPageTab from './MyPageTab';
+import ProductsTab from './ProductsTab';
 type TabId =
   | 'my-card'
   | 'edit-card'
   | 'analytics'
+  | 'my-page'
+  | 'products'
+  | 'page-analytics'
   | 'payment-history'
   | 'qr-code'
   | 'subscription-plans'
@@ -53,6 +62,24 @@ const NAV_ITEMS = [
     label: 'Analytics',
     description: 'Views, clicks and visitors',
     icon: <BarChart3 className="h-5 w-5" />,
+  },
+  {
+    id: 'my-page',
+    label: 'My Page',
+    description: 'Your page on Glamlink',
+    icon: <Globe className="h-5 w-5" />,
+  },
+  {
+    id: 'products',
+    label: 'Products',
+    description: 'Products on your page and in the shop',
+    icon: <ShoppingBag className="h-5 w-5" />,
+  },
+  {
+    id: 'page-analytics',
+    label: 'Page Analytics',
+    description: 'Views and clicks on your page',
+    icon: <TrendingUp className="h-5 w-5" />,
   },
   {
     id: 'payment-history',
@@ -118,7 +145,7 @@ class TabErrorBoundary extends React.Component<
               this.setState({ hasError: false, message: '' });
               this.props.onReset();
             }}
-            className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+            className="btn-primary px-4 py-2 text-xs"
           >
             Try again
           </button>
@@ -240,7 +267,7 @@ export default function DashboardPage() {
             </span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Manage your access card, orders, and account settings
+            Manage your Access card, your page and products, orders and account settings
           </p>
         </div>
         <div className="flex flex-col lg:flex-row gap-6 items-start">
@@ -249,7 +276,7 @@ export default function DashboardPage() {
               next to the card, so it now stacks through tablet widths too. */}
           <aside className="w-full lg:w-64 flex-shrink-0">
             <nav className="rounded-2xl border border-border bg-card shadow-soft overflow-hidden">
-              <div className="px-4 py-4 border-b border-border bg-secondary/30 sm:px-5">
+              <div className="px-4 py-4 border-b border-border bg-muted/30 sm:px-5">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground ring-2 ring-primary/20">
                     {userdata?.name?.slice(0, 2)?.toUpperCase() || 'GL'}
@@ -281,12 +308,8 @@ export default function DashboardPage() {
                         }
                         setActiveTab(item.id);
                       }}
-                      className={`flex flex-shrink-0 items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-150 lg:w-full ${isDisabled
-                        ? 'opacity-50 cursor-not-allowed text-muted-foreground'
-                        : activeTab === item.id
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-foreground hover:bg-secondary'
-                        }`}
+                      aria-current={activeTab === item.id ? 'page' : undefined}
+                      className="nav-link flex shrink-0 items-center gap-3 rounded-xl px-3 py-3 text-left lg:w-full disabled:opacity-50 disabled:text-muted-foreground"
                     >
                       {item.icon}
                       <div className="min-w-[110px] flex-1 lg:min-w-0">
@@ -345,6 +368,9 @@ export default function DashboardPage() {
                   />
                 )}
                 {activeTab === 'analytics' && <AccessCardAnalytics cards={cardsArray} />}
+                {activeTab === 'my-page' && <MyPageTab />}
+                {activeTab === 'products' && <ProductsTab />}
+                {activeTab === 'page-analytics' && <PageAnalytics />}
                 {activeTab === 'payment-history' && <PaymentHistory payments={paymentHistory} />}
                 {activeTab === 'qr-code' && <ShowQRCode cardData={businessCard} error={error} />}
                 {activeTab === 'subscription-plans' && (

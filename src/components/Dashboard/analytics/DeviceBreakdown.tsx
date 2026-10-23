@@ -3,13 +3,23 @@ import type { DeviceBreakdown as DeviceBreakdownRow } from './types';
 import { formatNumber, getDeviceRows } from './analyticsHelpers';
 import { getDeviceIcon, getDeviceLabel } from './eventConfig';
 import { AnalyticsPanel } from './AnalyticsStates';
+import type { AnalyticsSubject } from './AnalyticsSummaryCards';
 
-export default function DeviceBreakdown({ rows }: { rows: DeviceBreakdownRow[] }) {
+export default function DeviceBreakdown({
+  rows,
+  subject = 'card',
+}: {
+  rows: DeviceBreakdownRow[];
+  subject?: AnalyticsSubject;
+}) {
   const devices = getDeviceRows(rows);
   const total = devices.reduce((sum, d) => sum + d.count, 0);
 
   return (
-    <AnalyticsPanel title="Visitors by Device" subtitle="Where your card was opened">
+    <AnalyticsPanel
+      title="Visitors by Device"
+      subtitle={subject === 'page' ? 'Where your page was opened' : 'Where your card was opened'}
+    >
       <ul className="space-y-4">
         {devices.map(({ type, count }) => {
           const Icon = getDeviceIcon(type);
@@ -29,7 +39,7 @@ export default function DeviceBreakdown({ rows }: { rows: DeviceBreakdownRow[] }
                     <span className="text-sm font-semibold text-foreground tabular-nums">{formatNumber(count)}</span>
                   </span>
                 </div>
-                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-primary"
                     style={{ width: `${count > 0 ? Math.max(4, share) : 0}%` }}

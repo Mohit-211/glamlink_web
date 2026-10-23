@@ -3,8 +3,15 @@ import type { AnalyticsEventCounts } from './types';
 import { formatNumber, getClickActivity } from './analyticsHelpers';
 import { getEventConfig } from './eventConfig';
 import { AnalyticsEmptyState, AnalyticsPanel } from './AnalyticsStates';
+import type { AnalyticsSubject } from './AnalyticsSummaryCards';
 
-export default function ClickActivity({ events }: { events: AnalyticsEventCounts }) {
+export default function ClickActivity({
+  events,
+  subject = 'card',
+}: {
+  events: AnalyticsEventCounts;
+  subject?: AnalyticsSubject;
+}) {
   const items = getClickActivity(events);
   // Bars are relative to the top item, so no percentages are implied.
   const max = items[0]?.count ?? 0;
@@ -12,7 +19,7 @@ export default function ClickActivity({ events }: { events: AnalyticsEventCounts
   return (
     <AnalyticsPanel
       title="Click Activity"
-      subtitle="What visitors tapped on your card"
+      subtitle={subject === 'page' ? 'What visitors clicked on your page' : 'What visitors tapped on your card'}
     >
       {items.length === 0 ? (
         <AnalyticsEmptyState
@@ -36,7 +43,7 @@ export default function ClickActivity({ events }: { events: AnalyticsEventCounts
                       {formatNumber(count)}
                     </span>
                   </div>
-                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                     <div
                       className="h-full rounded-full bg-primary"
                       style={{ width: `${max > 0 ? Math.max(4, (count / max) * 100) : 0}%` }}
