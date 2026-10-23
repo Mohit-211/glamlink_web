@@ -51,25 +51,24 @@ const SalesSection = () => {
       <div className="container-glamlink">
         {/* Header */}
         <div className="text-center mb-12">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+          <span className="badge-soft mb-4">
             <DollarSign className="w-4 h-4" />
             Revenue Engine
           </span>
-          <h2 className="text-3xl lg:text-4xl xl:text-5xl  text-foreground mb-4">
+          <h2 className="section-title mb-4">
             Turn Your Expertise Into{" "}
             <span className="gradient-text">Unstoppable Sales</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Glamlink isn't just a directory — it's a complete business platform
+            Glamlink isn&apos;t just a directory — it&apos;s a complete business platform
             designed to maximize your income.
           </p>
         </div>
 
         {/* Video Placeholder */}
         <div className="relative max-w-4xl mx-auto mb-16">
-          <div className="aspect-video rounded-3xl bg-gradient-to-br from-secondary via-secondary/50 to-primary/10 border border-border overflow-hidden relative group cursor-pointer">
+          <div className="aspect-video rounded-3xl bg-muted border border-border overflow-hidden relative group cursor-pointer">
             {/* Decorative elements */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
 
             {/* Play button */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -81,16 +80,16 @@ const SalesSection = () => {
             {/* Coming soon badge */}
             <div className="relative w-full max-w-5xl mx-auto rounded-3xl overflow-hidden shadow-2xl">
               {/* Gradient Background */}
-              <div className="bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 px-8 py-42 text-center text-white">
+              <div className="bg-primary px-8 py-42 text-center text-primary-foreground">
                 {/* Floating Badge */}
                 <div className="absolute top-6 left-6">
                   <span
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full 
-        bg-white/15 backdrop-blur-md 
-        text-white text-sm font-medium 
-        border border-white/30 shadow-lg"
+        bg-card/15 backdrop-blur-md 
+        text-primary-foreground text-sm font-medium 
+        border border-primary-foreground/30 shadow-lg"
                   >
-                    <Video className="w-4 h-4 text-white" />
+                    <Video className="w-4 h-4 text-primary-foreground" />
                     Pro Education Series — Coming Soon
                   </span>
                 </div>
@@ -99,19 +98,19 @@ const SalesSection = () => {
                 <div className="flex justify-center mb-6">
                   <div
                     className="w-16 h-16 flex items-center justify-center rounded-full 
-        bg-white/20 backdrop-blur-md"
+        bg-card/20 backdrop-blur-md"
                   >
-                    <Play className="w-8 h-8 text-white ml-1" />
+                    <Play className="w-8 h-8 text-primary-foreground ml-1" />
                   </div>
                 </div>
 
                 {/* Heading */}
-                <h2 className="text-3xl md:text-4xl  mb-4">
+                <h2 className="section-title mb-4">
                   Professional Video Coming Soon
                 </h2>
 
                 {/* Subtitle */}
-                <p className="text-white/90 max-w-xl mx-auto">
+                <p className="text-primary-foreground/90 max-w-xl mx-auto">
                   Stay tuned for exclusive content showing how pros maximize
                   their earnings
                 </p>
@@ -123,7 +122,7 @@ const SalesSection = () => {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="w-16 h-12 rounded-lg bg-background/20 backdrop-blur-sm border border-white/10"
+                  className="w-16 h-12 rounded-lg bg-background/20 backdrop-blur-sm border border-primary-foreground/10"
                 />
               ))}
             </div>
@@ -135,7 +134,7 @@ const SalesSection = () => {
           {benefits.map((benefit, index) => (
             <div
               key={index}
-              className="bg-card rounded-2xl p-6 border border-border hover:border-primary/30 transition-all group hover:-translate-y-1"
+              className="bg-card rounded-2xl p-6 border border-border hover:border-secondary/30 transition-all group hover:-translate-y-1"
             >
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <benefit.icon className="w-6 h-6 text-primary" />

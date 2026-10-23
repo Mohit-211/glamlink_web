@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
-/* Tell Tailwind to generate utilities from your tokens */
-@theme {
+/* ────────────────────────────────────────────────
+   DESIGN TOKENS — the only colours and font the site uses.
+   Components use the generated utilities (bg-primary, hover:bg-secondary,
+   border-border, bg-destructive/10 …), never raw hex, rgb() or Tailwind's
+   palette colours (gray-*, blue-*, white, black …).
+───────────────────────────────────────────────── */
+@theme static {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
 
@@ -11,11 +16,15 @@
   --color-popover: hsl(var(--popover));
   --color-popover-foreground: hsl(var(--popover-foreground));
 
+  /* Brand teal in two shades — see :root for which one to use where. */
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
-
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  /* Scrims (modal backdrops, dark gradients over photos) and what sits on them */
+  --color-overlay: hsl(var(--overlay));
+  --color-overlay-foreground: hsl(var(--overlay-foreground));
 
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
@@ -23,23 +32,56 @@
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
 
+  /* Status colours — for feedback only (errors, success, warnings), never decoration. */
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+
+  /* Elevation — generates shadow-soft / shadow-medium / shadow-large / shadow-primary */
+  --shadow-soft: 0 2px 8px -2px hsl(220 20% 15% / 0.08);
+  --shadow-medium: 0 4px 16px -4px hsl(220 20% 15% / 0.12);
+  --shadow-large: 0 8px 32px -8px hsl(220 20% 15% / 0.16);
+  --shadow-primary: 0 4px 20px -4px hsl(185.6 72.8% 31.8% / 0.3); /* primary #16818C */
+
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
+
+  /* Manrope (loaded in app/layout.tsx via next/font) is the single Glamlink typeface.
+     --font-serif and --font-mono point at it too, so no class can switch typeface. */
+  --font-sans: var(--font-manrope), "Manrope", system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-sans);
+  --font-mono: var(--font-sans);
 }
 
-/* ────────────────────────────────────────────────
-   THEME VARIABLES (light + dark mode)
-───────────────────────────────────────────────── */
 :root {
   --radius: 0.75rem;
 
-  /* Primary */
-  --primary: 184 68% 43%;
+  /* Brand teal: two shades and no others. Pick the shade by its job:
+       primary    #16818C  the default teal: buttons and other fills, text links, teal
+                           headings, navigation text, form labels, icons. It clears 4.5:1
+                           against both white (4.61) and black (4.55), so it works as a
+                           fill under white text and as text on a light surface.
+       secondary  #117580  the higher-contrast shade (5.41 on white, but 3.88 on black):
+                           hover states; anything selected (current page, active tab,
+                           chosen chip, checked box or radio, toggle that is on); focus
+                           rings; and teal text on a teal tint or muted surface, where
+                           primary drops to about 4:1.
+     Text on either fill is white (primary-foreground / secondary-foreground). */
+  --primary: 185.6 72.8% 31.8%; /* #16818C */
   --primary-foreground: 0 0% 100%;
+  --secondary: 185.9 76.6% 28.4%; /* #117580 */
+  --secondary-foreground: 0 0% 100%;
 
-  /* Surfaces */
-  --background: 0 0% 100%;
+  --overlay: 0 0% 0%;
+  --overlay-foreground: 0 0% 100%;
+
+  /* Surfaces — a barely warm off-white, kept light enough that primary text still
+     clears 4.5:1 on it (4.54). Cards are pure white so they lift off the page. */
+  --background: 40 60% 99%; /* #FEFDFB */
   --foreground: 220 20% 15%;
 
   --card: 0 0% 100%;
@@ -48,62 +90,24 @@
   --popover: 0 0% 100%;
   --popover-foreground: 220 20% 15%;
 
-  --secondary: 220 15% 96%;
-  --secondary-foreground: 220 20% 25%;
+  /* Neutral grey surface (table heads, skeletons, quiet buttons) and secondary text */
+  --muted: 40 14% 93%;
+  --muted-foreground: 220 9% 42%;
 
-  --muted: 220 15% 96%;
-  --muted-foreground: 220 10% 50%;
+  /* Light teal tint for highlights, selected states and soft badges */
+  --accent: 186 55% 93%;
+  --accent-foreground: var(--secondary);
 
-  --accent: 184 68% 95%;
-  --accent-foreground: 184 68% 30%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 152 60% 34%;
+  --success-foreground: 0 0% 100%;
+  --warning: 36 92% 46%;
+  --warning-foreground: 26 83% 14%;
 
-  --destructive: 0 84% 60%;
-  --border: 220 15% 90%;
-  --input: 220 15% 90%;
-  --ring: 184 68% 43%;
-
-  /* Sidebar */
-  --sidebar-background: 0 0% 98%;
-  --sidebar-foreground: 240 5.3% 26.1%;
-  --sidebar-primary: 184 68% 43%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 184 50% 95%;
-  --sidebar-border: 220 15% 90%;
-
-  /* Shadows */
-  --shadow-soft: 0 2px 8px -2px hsl(220 20% 15% / 0.08);
-  --shadow-medium: 0 4px 16px -4px hsl(220 20% 15% / 0.12);
-  --shadow-large: 0 8px 32px -8px hsl(220 20% 15% / 0.16);
-  --shadow-primary: 0 4px 20px -4px hsl(184 68% 43% / 0.35);
-}
-
-/* Dark mode overrides */
-.dark {
-  --background: 220 20% 8%;
-  --foreground: 220 15% 95%;
-
-  --card: 220 20% 12%;
-  --card-foreground: 220 15% 95%;
-
-  --popover: 220 20% 12%;
-  --popover-foreground: 220 15% 95%;
-
-  --secondary: 220 15% 15%;
-  --secondary-foreground: 220 15% 85%;
-
-  --muted: 220 15% 18%;
-  --muted-foreground: 220 10% 60%;
-
-  --accent: 184 40% 15%;
-  --accent-foreground: 184 68% 70%;
-
-  --border: 220 15% 20%;
-  --input: 220 15% 20%;
-
-  --sidebar-background: 220 20% 10%;
-  --sidebar-foreground: 220 15% 85%;
-  --sidebar-accent: 184 40% 15%;
-  --sidebar-border: 220 15% 20%;
+  --border: 40 10% 87%;
+  --input: 40 8% 82%;
+  --ring: var(--secondary);
 }
 
 /* ────────────────────────────────────────────────
@@ -116,7 +120,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-family: var(--font-sans);
   }
 
   h1,
@@ -128,8 +132,14 @@
     @apply font-semibold tracking-tight;
   }
 
-  .font-display {
-    font-family: "Playfair Display", Georgia, serif;
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
   }
 }
 
@@ -145,18 +155,14 @@
     @apply py-20 md:py-28;
   }
 
+  /* Plain page background (kept as a class for existing usages; no gradient) */
   .page-soft {
-    background: radial-gradient(
-        circle at 10% 20%,
-        rgba(30, 168, 181, 0.05),
-        transparent 40%
-      ),
-      radial-gradient(
-        circle at 90% 80%,
-        rgba(30, 168, 181, 0.04),
-        transparent 45%
-      ),
-      hsl(var(--background));
+    background: hsl(var(--background));
+  }
+
+  /* Backdrop behind every modal, drawer and lightbox */
+  .scrim {
+    @apply bg-overlay/50 backdrop-blur-sm;
   }
 
   .btn-primary {
@@ -167,7 +173,8 @@
     transform: translateY(0);
   }
 
-  .btn-primary:hover {
+  .btn-primary:hover:not(:disabled) {
+    @apply bg-secondary;
     transform: translateY(-1px);
   }
 
@@ -178,12 +185,59 @@
   .btn-outline {
     @apply inline-flex items-center justify-center gap-2 rounded-full border
     bg-background px-6 py-3 text-sm font-semibold text-foreground
-    transition-all hover:border-primary/50 hover:bg-primary/5;
+    transition-all hover:border-secondary hover:bg-accent hover:text-secondary;
+  }
+
+  /* Text links and text-only buttons ("Clear search", "Forgot password?") */
+  .link-glamlink {
+    @apply font-medium text-primary underline-offset-4 transition-colors
+    hover:text-secondary hover:underline;
+  }
+
+  /* Navigation — header menu, sidebars, tab bars. Mark the current item with
+     aria-current="page" (aria-selected / aria-pressed on buttons). */
+  .nav-link {
+    @apply font-medium text-primary transition-colors
+    not-disabled:hover:bg-accent not-disabled:hover:text-secondary;
+  }
+
+  .nav-link:is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [aria-pressed="true"]) {
+    @apply bg-accent text-secondary;
+  }
+
+  /* Choice chips — category and filter pills, date presets, page numbers.
+     Neutral until hovered; the chosen one fills with secondary.
+     Same state attributes as .nav-link, or a <label class="chip"> around a checked
+     checkbox/radio. Shape and size come from the caller. */
+  .chip {
+    @apply border border-border bg-card font-medium text-foreground transition-colors
+    not-disabled:hover:border-secondary not-disabled:hover:text-secondary;
+  }
+
+  .chip:is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [aria-pressed="true"], :has(> input:checked)) {
+    @apply border-secondary bg-secondary text-secondary-foreground;
+  }
+
+  /* Form controls — every label, text input, select and textarea on the site */
+  .label-glamlink {
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-primary;
+  }
+
+  .input-glamlink {
+    @apply w-full rounded-xl border border-input bg-card px-4 py-3 text-sm text-foreground
+    outline-none transition-[border-color,box-shadow] duration-200
+    placeholder:text-muted-foreground/70
+    focus:border-primary focus:ring-3 focus:ring-primary/15
+    disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .input-glamlink[aria-invalid="true"] {
+    @apply border-destructive focus:ring-destructive/15;
   }
 
   .card-glamlink {
-    @apply rounded-2xl border bg-card p-6
-    shadow-[var(--shadow-soft)] transition-all duration-300;
+    @apply rounded-2xl border bg-card p-4 sm:p-6
+    shadow-soft transition-all duration-300;
 
     transform: translateY(0);
   }
@@ -193,18 +247,39 @@
     box-shadow: var(--shadow-medium);
   }
 
+  /* Accent words in display headings (24px and up) — solid brand teal, no gradient */
   .gradient-text {
-    @apply bg-gradient-to-r from-primary via-[#1ea8b5] to-primary bg-clip-text text-transparent;
+    @apply text-primary;
   }
 
   .badge-soft {
     @apply inline-flex items-center gap-1.5 rounded-full
-    bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary
+    bg-primary/10 px-4 py-1.5 text-sm font-medium text-secondary
     border border-primary/20;
+  }
+
+  /* ── Hero system: shared by every top-of-page hero ── */
+  .hero-glamlink {
+    @apply pt-28 pb-16 md:pt-36 md:pb-24;
+  }
+
+  .hero-title {
+    @apply font-sans text-4xl leading-[1.1] sm:text-5xl lg:text-6xl
+    font-semibold tracking-tight text-foreground text-balance;
+  }
+
+  .hero-subtitle {
+    @apply text-lg sm:text-xl leading-relaxed text-muted-foreground;
   }
 
   .section-title {
     @apply text-3xl md:text-4xl font-semibold tracking-tight;
+  }
+
+  /* Small uppercase kicker above a heading ("Curated Picks", "Resources") —
+     the site's smaller teal heading */
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-widest text-primary;
   }
 
   .section-subtitle {
@@ -215,27 +290,18 @@
     @apply my-20 border-t border-border/60;
   }
 
-  /* Shadow utility classes — use these instead of shadow-[var(--shadow-soft|medium|primary)] */
-  .shadow-soft {
-    box-shadow: var(--shadow-soft);
-  }
-
-  .shadow-medium {
-    box-shadow: var(--shadow-medium);
-  }
-
-  .shadow-large {
-    box-shadow: var(--shadow-large);
-  }
-
-  .shadow-primary {
-    box-shadow: var(--shadow-primary);
-  }
 }
 
 /* ────────────────────────────────────────────────
    UTILITIES / ANIMATIONS
 ───────────────────────────────────────────────── */
+
+/* Larger size for hero / main CTAs — pair with .btn-primary or .btn-outline.
+   Declared as a utility so it overrides the component's default sizing. */
+@utility btn-lg {
+  @apply px-8 py-4 text-base;
+}
+
 @layer utilities {
   .animate-float {
     animation: float 6s ease-in-out infinite;
@@ -243,6 +309,10 @@
 
   .animate-fade-up {
     animation: fadeUp 0.8s ease-out forwards;
+  }
+
+  .animate-banner-in {
+    animation: bannerIn 600ms ease-out forwards;
   }
 
   .animate-pulse-slow {
@@ -267,6 +337,25 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes bannerIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-banner-in {
+      animation: none;
+      opacity: 1;
+      transform: none;
     }
   }
 
@@ -297,20 +386,74 @@
 }
 
 /* ────────────────────────────────────────────────
-   CKEDITOR OVERRIDES
+   BIO EDITOR (Tiptap)
 ───────────────────────────────────────────────── */
-.ck-editor__editable {
-  min-height: 160px !important;
-  padding: 16px !important;
+.bio-editor .tiptap {
+  min-height: 160px;
+  padding: 16px;
   font-size: 1rem;
   line-height: 1.6;
-  border: none !important;
+  outline: none;
 }
 
-.ck.ck-toolbar {
-  border: none !important;
-  border-bottom: 1px solid hsl(var(--border)) !important;
-  background: hsl(var(--background)) !important;
+.bio-editor .tiptap > * + * {
+  margin-top: 0.75em;
+}
+
+.bio-editor .tiptap h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.bio-editor .tiptap ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+.bio-editor .tiptap ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
+
+.bio-editor .tiptap a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+}
+
+.bio-editor .tiptap blockquote {
+  border-left: 3px solid hsl(var(--border));
+  padding-left: 1rem;
+  color: hsl(var(--muted-foreground));
+}
+
+/* ────────────────────────────────────────────────
+   USER-AUTHORED HTML (articles, bios, topic paragraphs)
+   Rich-text editors save inline font-family declarations (Tahoma, Georgia …);
+   the site has one typeface, so everything inside inherits it.
+───────────────────────────────────────────────── */
+.rich-text *,
+.prose-article * {
+  font-family: inherit !important;
+}
+
+.rich-text ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.rich-text ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+
+.rich-text a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.rich-text a:hover {
+  color: hsl(var(--secondary));
 }
 
 /* ────────────────────────────────────────────────
@@ -319,7 +462,7 @@
 .prose-article {
   font-size: 16px;
   line-height: 1.8;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .prose-article h1,
@@ -352,6 +495,17 @@
   display: none;
 }
 
+.prose-article > p:first-of-type::first-letter {
+  float: left;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 72px;
+  line-height: 0.85;
+  margin-right: 12px;
+  margin-top: 6px;
+  color: hsl(var(--primary));
+}
+
 .prose-article img {
   /* width: 100% !important; */
   height: auto !important;
@@ -360,24 +514,47 @@
   display: block;
 }
 
+.prose-article iframe {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+  border-radius: 12px;
+  margin: 24px 0;
+}
+
 .prose-article a {
-  color: #6366f1;
+  color: hsl(var(--primary));
   text-decoration: underline;
-  transition: 0.2s ease;
+  transition: color 0.2s ease;
+}
+
+.prose-article a.mention-link {
+  color: hsl(var(--primary));
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.prose-article a.mention-link:hover {
+  text-decoration: underline;
 }
 
 .prose-article a:hover {
-  color: #4f46e5;
+  color: hsl(var(--secondary));
 }
 
 .prose-article blockquote {
-  border-left: 3px solid #bbe8eb;
-  margin: 32px 0;
-  padding-left: 20px;
+  border-left: 3px solid hsl(var(--primary));
+  border-radius: 0 12px 12px 0;
+  background: hsl(var(--accent) / 0.6);
+  margin: 40px 0;
+  padding: 24px 24px 24px 32px;
   font-style: italic;
   font-size: 20px;
   line-height: 1.7;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .prose-article ul,
@@ -394,6 +571,31 @@
   font-weight: 600;
 }
 
+.prose-article table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 15px;
+}
+
+.prose-article th,
+.prose-article td {
+  border: 1px solid hsl(var(--border));
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose-article th {
+  background: hsl(var(--accent));
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.prose-article tr:nth-child(even) td {
+  background: hsl(var(--muted) / 0.5);
+}
+
 @media (max-width: 768px) {
   .prose-article {
     font-size: 15px;
@@ -407,6 +609,11 @@
   .prose-article h3 {
     font-size: 20px;
   }
+  .prose-article table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }
 .prose-article ul {
   list-style: disc;
@@ -418,13 +625,68 @@
   padding-left: 1.5rem;
 }
 
-/* REMOVE CKEDITOR POWERED BY */
-.ck.ck-powered-by,
-.ck-powered-by,
-.ck.ck-balloon-panel.ck-powered-by-balloon,
-.ck-license-notice,
-.ck-editor__top .ck-powered-by {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
+/* ────────────────────────────────────────────────
+   THIRD-PARTY WIDGETS
+   Libraries that inject their own CSS (system fonts, their own palettes) are
+   brought onto the site font and tokens here. `html`/`body` in the selector
+   outranks the injected rules whatever order the stylesheets load in.
+───────────────────────────────────────────────── */
+
+/* Toasts (sonner) */
+html [data-sonner-toaster] {
+  font-family: var(--font-sans);
+}
+
+html [data-sonner-toaster][data-sonner-theme] {
+  --normal-bg: hsl(var(--popover));
+  --normal-bg-hover: hsl(var(--muted));
+  --normal-border: hsl(var(--border));
+  --normal-border-hover: hsl(var(--input));
+  --normal-text: hsl(var(--popover-foreground));
+  --success-bg: color-mix(in oklab, hsl(var(--success)) 10%, hsl(var(--card)));
+  --success-border: color-mix(in oklab, hsl(var(--success)) 30%, hsl(var(--card)));
+  --success-text: hsl(var(--success));
+  --error-bg: color-mix(in oklab, hsl(var(--destructive)) 8%, hsl(var(--card)));
+  --error-border: color-mix(in oklab, hsl(var(--destructive)) 30%, hsl(var(--card)));
+  --error-text: hsl(var(--destructive));
+  --warning-bg: color-mix(in oklab, hsl(var(--warning)) 12%, hsl(var(--card)));
+  --warning-border: color-mix(in oklab, hsl(var(--warning)) 35%, hsl(var(--card)));
+  --warning-text: hsl(var(--warning-foreground));
+  --info-bg: hsl(var(--accent));
+  --info-border: color-mix(in oklab, hsl(var(--primary)) 30%, hsl(var(--card)));
+  --info-text: hsl(var(--secondary));
+}
+
+/* Google Places address suggestions (Access Card location form) */
+body .pac-container {
+  font-family: var(--font-sans);
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-medium);
+  margin-top: 4px;
+}
+
+body .pac-item {
+  border-color: hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+}
+
+body .pac-item:hover,
+body .pac-item-selected {
+  background-color: hsl(var(--accent));
+}
+
+body .pac-item-query {
+  color: hsl(var(--foreground));
+}
+
+/* Hide scrollbar for horizontally scrollable rows (mobile tab bars, carousels) */
+.no-scrollbar,
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

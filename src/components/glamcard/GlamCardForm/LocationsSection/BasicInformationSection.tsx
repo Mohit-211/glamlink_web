@@ -3,17 +3,17 @@
 import React from "react";
 import dynamic from "next/dynamic";
 
-import { GlamCardFormData } from "../types";
+import { FieldErrors, GlamCardFormData } from "../types";
+import { TOKENS } from "@/lib/designTokens";
 
-/* ================= SSR SAFE CKEDITOR ================= */
-// The editor and its build are isolated in their own client-only file.
-// dynamic() only skips SSR if the import itself is deferred like this —
-// importing CKEditor/ClassicEditor directly in this file (even if unused
-// afterwards) would still evaluate them on the server and crash.
+/* ================= CLIENT-ONLY BIO EDITOR ================= */
+// The rich-text editor lives in its own file and is loaded only in the
+// browser, which keeps it (and its editor engine) out of the server render
+// and the initial bundle.
 const BioEditor = dynamic(() => import("./Bioeditor"), {
   ssr: false,
   loading: () => (
-    <div className="h-32 w-full animate-pulse rounded-lg border border-gray-200 bg-gray-50" />
+    <div className="h-32 w-full animate-pulse rounded-lg border border-border bg-muted" />
   ),
 });
 
@@ -32,17 +32,17 @@ interface SectionProps {
       }
     >
   >;
+  errors?: FieldErrors;
+  clearError?: (key: string) => void;
 }
 
 /* ================= STYLES ================= */
 
 const sectionClass =
-  "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
+  "space-y-6 rounded-xl border border-border bg-card p-4 sm:p-6";
 
-const inputClass =
-  "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
 
-const labelClass = "text-sm font-medium text-gray-700";
+
 
 const CHARACTER_LIMIT = 80;
 
@@ -54,6 +54,8 @@ const getCharacterCount = (html: string) =>
 const BasicInformationSection: React.FC<SectionProps> = ({
   data,
   setData,
+  errors,
+  clearError,
 }) => {
   return (
     <section className={sectionClass}>
@@ -61,125 +63,223 @@ const BasicInformationSection: React.FC<SectionProps> = ({
 
       <div className="grid gap-5 md:grid-cols-2">
         {/* NAME */}
-        <div>
-          <label className={labelClass}>Full Name *</label>
+        <div id="field-name">
+          <label className="label-glamlink">
+            Full Name <span className="text-destructive">*</span>
+          </label>
           <input
-            className={inputClass}
+            className="input-glamlink" aria-invalid={!!errors?.name}
+            placeholder="e.g. Jane Smith"
             value={data.name || ""}
-            onChange={(e) =>
+            onChange={(e) => {
               setData((p) => ({
                 ...p,
                 name: e.target.value,
-              }))
-            }
+              }));
+              clearError?.("name");
+            }}
           />
+          {errors?.name && (
+            <p className="mt-1 text-sm text-destructive">{errors.name}</p>
+          )}
         </div>
 
         {/* TITLE */}
-        <div>
-          <label className={labelClass}>Professional Title *</label>
+        <div id="field-professional_title">
+          <label className="label-glamlink">
+            Professional Title <span className="text-destructive">*</span>
+          </label>
           <input
-            className={inputClass}
+            className="input-glamlink" aria-invalid={!!errors?.professional_title}
+            placeholder="e.g. Hair Stylist, Nail Technician"
             value={data.professional_title || ""}
-            onChange={(e) =>
+            onChange={(e) => {
               setData((p) => ({
                 ...p,
                 professional_title: e.target.value,
-              }))
-            }
+              }));
+              clearError?.("professional_title");
+            }}
           />
+          {errors?.professional_title && (
+            <p className="mt-1 text-sm text-destructive">{errors.professional_title}</p>
+          )}
         </div>
 
 
 
         {/* EMAIL */}
-        <div>
-          <label className={labelClass}>Email *</label>
+        <div id="field-email">
+          <label className="label-glamlink">
+            Email <span className="text-destructive">*</span>
+          </label>
           <input
             type="email"
-            className={inputClass}
+            className="input-glamlink" aria-invalid={!!errors?.email}
+            placeholder="you@example.com"
             value={data.email || ""}
-            onChange={(e) =>
+            onChange={(e) => {
               setData((p) => ({
                 ...p,
                 email: e.target.value,
-              }))
-            }
+              }));
+              clearError?.("email");
+            }}
           />
+          {errors?.email && (
+            <p className="mt-1 text-sm text-destructive">{errors.email}</p>
+          )}
         </div>
 
         {/* PHONE */}
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className={labelClass}>Phone *</label>
+    <div id="field-phone">
+  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+    <label className="label-glamlink">
+      Phone
+      {(data.is_phone_visible ?? true) && <span className="text-destructive"> *</span>}
+    </label>
 
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={data.is_phone_visible ?? true}
-                onChange={(e) =>
-                  setData((p) => ({
-                    ...p,
-                    is_phone_visible: e.target.checked,
-                  }))
-                }
-                className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-              />
-              <span className="text-xs font-medium text-gray-600">
-                Show phone number on card
-              </span>
-            </label>
-          </div>
+    <label className="flex cursor-pointer items-center gap-2">
+      <input
+        type="checkbox"
+        checked={data.is_phone_visible ?? true}
+        onChange={(e) =>
+          setData((p) => ({
+            ...p,
+            is_phone_visible: e.target.checked,
+          }))
+        }
+        className="h-4 w-4 accent-secondary"
+      />
+      <span className="text-xs font-medium text-muted-foreground">
+        Show phone number on card
+      </span>
+    </label>
+  </div>
 
-          <input
-            className={inputClass}
-            value={data.phone || ""}
-            onChange={(e) =>
-              setData((p) => ({
-                ...p,
-                phone: e.target.value,
-              }))
-            }
-          />
-        </div>
+  <input
+    type="tel"
+    inputMode="numeric"
+    maxLength={15}
+    className="input-glamlink" aria-invalid={!!errors?.phone}
+    placeholder="e.g. 5551234567"
+    value={data.phone || ""}
+    required={data.is_phone_visible}
+    onChange={(e) => {
+      const digitsOnly = e.target.value.replace(/\D/g, "");
+      setData((p) => ({
+        ...p,
+        phone: digitsOnly,
+      }));
+      clearError?.("phone");
+    }}
+  />
+
+  {errors?.phone ? (
+    <p className="mt-1 text-sm text-destructive">{errors.phone}</p>
+  ) : (
+    data.is_phone_visible && !data.phone?.trim() && (
+      <p className="mt-1 text-sm text-destructive">
+        Phone number is required.
+      </p>
+    )
+  )}
+</div>
 
         {/* BIO */}
-        <div className="md:col-span-2">
-          <label className={labelClass}>Professional Bio</label>
+        <div id="field-bio" className="md:col-span-2">
+          <label className="label-glamlink">
+            Professional Bio <span className="text-destructive">*</span>
+          </label>
 
-          <BioEditor
-            value={data.bio || ""}
-            placeholder="Write your bio..."
-            onChange={(html) => {
-              const text = html.replace(/<[^>]*>/g, "").trim();
+          <div
+            className={
+              errors?.bio ? "rounded-lg ring-1 ring-destructive" : undefined
+            }
+          >
+            <BioEditor
+              value={data.bio || ""}
+              placeholder="Write your bio..."
+              onChange={(html) => {
+                const text = html.replace(/<[^>]*>/g, "").trim();
 
-              if (text.length <= CHARACTER_LIMIT) {
-                setData((p) => ({
-                  ...p,
-                  bio: html,
-                }));
-              }
-            }}
-          />
+                if (text.length <= CHARACTER_LIMIT) {
+                  setData((p) => ({
+                    ...p,
+                    bio: html,
+                  }));
+                  clearError?.("bio");
+                }
+              }}
+            />
+          </div>
 
-          <p className="mt-2 text-right text-xs text-gray-500">
-            {getCharacterCount(data.bio || "")} / {CHARACTER_LIMIT}
-          </p>
+          <div className="mt-1 flex items-start justify-between gap-3">
+            {errors?.bio ? (
+              <p className="text-sm text-destructive">{errors.bio}</p>
+            ) : (
+              <span />
+            )}
+            <p className="text-right text-xs text-muted-foreground">
+              {getCharacterCount(data.bio || "")} / {CHARACTER_LIMIT}
+            </p>
+          </div>
         </div>
       </div>
       {/* BUSINESS NAME */}
-      <div>
-        <label className={labelClass}>Business Name</label>
+      <div id="field-business_name">
+        <label className="label-glamlink">
+          Business Name <span className="text-destructive">*</span>
+        </label>
         <input
-          className={`${inputClass} w-full`}
+          className="input-glamlink w-full" aria-invalid={!!errors?.business_name}
+          placeholder="e.g. Glow Beauty Studio"
           value={data.business_name || ""}
-          onChange={(e) =>
+          onChange={(e) => {
             setData((p) => ({
               ...p,
               business_name: e.target.value,
-            }))
-          }
+            }));
+            clearError?.("business_name");
+          }}
         />
+        {errors?.business_name && (
+          <p className="mt-1 text-sm text-destructive">{errors.business_name}</p>
+        )}
+      </div>
+
+      {/* CARD COLOR */}
+      <div id="field-color_code">
+        <label className="label-glamlink">Card Color</label>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Pick an accent color for your Access Card — it themes the Featured
+          Links cards, icons, and highlights across your page.
+        </p>
+        <div className="mt-2 flex items-center gap-3">
+          <input
+            type="color"
+            value={
+              /^#[0-9a-fA-F]{6}$/.test(data.color_code || "")
+                ? (data.color_code as string)
+                : TOKENS.primary.toLowerCase()
+            }
+            onChange={(e) =>
+              setData((p) => ({ ...p, color_code: e.target.value }))
+            }
+            className="h-10 w-14 flex-none cursor-pointer rounded-lg border border-border bg-card p-1"
+            title="Pick a color"
+          />
+          <input
+            type="text"
+            className="input-glamlink min-w-0 max-w-[140px]"
+            placeholder={TOKENS.primary}
+            value={data.color_code || ""}
+            onChange={(e) =>
+              setData((p) => ({ ...p, color_code: e.target.value }))
+            }
+            maxLength={7}
+          />
+        </div>
       </div>
     </section>
   );

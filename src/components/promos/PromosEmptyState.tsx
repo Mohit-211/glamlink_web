@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 
 const PromosEmptyState = () => {
   return (
-    <section className="flex-1 flex items-center justify-center py-16 lg:py-24 bg-secondary/20">
+    <section className="flex-1 flex items-center justify-center py-16 lg:py-24 bg-muted/20">
       <div className="container-glamlink">
         <div className="max-w-lg mx-auto text-center">
           {/* Icon illustration */}
@@ -12,7 +12,7 @@ const PromosEmptyState = () => {
             <div className="absolute w-32 h-32 rounded-full border-2 border-dashed border-border animate-[spin_20s_linear_infinite]" />
             
             {/* Inner circle */}
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+            <div className="w-24 h-24 rounded-full bg-accent flex items-center justify-center">
               <Gift className="w-10 h-10 text-primary/60" />
             </div>
 
@@ -32,7 +32,7 @@ const PromosEmptyState = () => {
           </p>
 
           {/* Notify CTA */}
-          <Button variant="outline" className="rounded-full px-6 py-5 gap-2 border-2 hover:border-primary hover:text-primary">
+          <Button variant="outline" className="rounded-full px-6 py-5 gap-2 border-2 hover:border-secondary hover:text-secondary">
             <Bell className="w-4 h-4" />
             Notify Me When Promos Drop
           </Button>

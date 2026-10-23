@@ -1,18 +1,40 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, Sparkles } from "lucide-react";
-import { registerUser, sendOtp } from "@/api/Api";
-import { useRouter } from "next/navigation";
-import { message } from "antd";
+import Script from "next/script";
+import { Eye, EyeOff, MailCheck } from "lucide-react";
+import { registerUser, resendVerification } from "@/api/Api";
+import { toast } from "sonner";
+import { readApiError } from "@/lib/apiError";
+import { passwordProblem } from "@/lib/password";
 import { getFormDataFromSession } from "../glamcard/GlamCardForm/Formdatasessionstorage";
+import AuthShell from "./AuthShell";
 
-interface RegisterProps {
-  /** If provided, called after a successful registration with the
-   *  registered email, instead of navigating to /verify-otp. Used when
-   *  Register is rendered inside a modal (e.g. GlamCardForm's post-create
-   *  auth flow). */
-  onSuccess?: (email: string) => void;
+// Site key comes from the Cloudflare Turnstile dashboard.
+// Set NEXT_PUBLIC_TURNSTILE_SITE_KEY in your .env.local / deployment env.
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        container: string | HTMLElement,
+        options: {
+          sitekey: string;
+          action?: string;
+          size?: "normal" | "compact" | "flexible";
+          execution?: "render" | "execute";
+          appearance?: "always" | "execute" | "interaction-only";
+          callback?: (token: string) => void;
+          "error-callback"?: () => void;
+          "expired-callback"?: () => void;
+        }
+      ) => string;
+      execute: (widgetIdOrContainer: string | HTMLElement) => void;
+      reset: (widgetId?: string) => void;
+      remove: (widgetId: string) => void;
+    };
+  }
 }
 
 type FieldErrors = {
@@ -23,8 +45,10 @@ type FieldErrors = {
   confirm_password?: string;
 };
 
-export default function Register({ onSuccess }: RegisterProps = {}) {
-  const router = useRouter();
+export default function Register() {
+  // Set once the API has emailed the verification link.
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -35,6 +59,12 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
     confirm_password: "",
   });
   const [errors, setErrors] = useState<FieldErrors>({});
+
+  // Invisible Turnstile still needs a container element to render into
+  // (even though nothing visible appears there), and we track the
+  // widget id so we can execute/reset the same widget on submit.
+  const turnstileContainerRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
 
   // Prefill name/email/mobile from sessionStorage (if saved earlier in this
   // session — e.g. when GlamCardForm stored its submit payload).
@@ -59,6 +89,7 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
     }));
   }, []);
 
+
   const passwordStrength = (() => {
     const p = form.password;
     if (p.length === 0) return 0;
@@ -72,11 +103,25 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
   const strengthLabel = ["", "Weak", "Fair", "Good", "Strong"][passwordStrength];
   const strengthColor = [
     "",
-    "bg-red-400",
-    "bg-yellow-400",
-    "bg-emerald-400",
-    "bg-emerald-500",
+    "bg-destructive",
+    "bg-warning",
+    "bg-success",
+    "bg-success",
   ][passwordStrength];
+
+  // Live (pre-submit) checks — recomputed on every keystroke so the user
+  // sees "too short" / "doesn't match" instantly instead of only after
+  // hitting submit. Falls back to the submit-time error (from validate())
+  // once that's been set, so the message doesn't flicker/disappear.
+  const livePasswordError =
+    form.password.length > 0 ? passwordProblem(form.password) : undefined;
+  const passwordError = errors.password || livePasswordError;
+
+  const liveConfirmError =
+    form.confirm_password.length > 0 && form.password !== form.confirm_password
+      ? "Passwords do not match"
+      : undefined;
+  const confirmPasswordError = errors.confirm_password || liveConfirmError;
 
   const validate = (): FieldErrors => {
     const next: FieldErrors = {};
@@ -99,9 +144,8 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
     }
 
     // Password
-    if (form.password.length < 8) {
-      next.password = "Password must be at least 8 characters";
-    }
+    const problem = passwordProblem(form.password);
+    if (problem) next.password = problem;
 
     // Confirm password
     if (form.password !== form.confirm_password) {
@@ -110,6 +154,32 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
 
     return next;
   };
+
+  // Runs the Turnstile challenge right before submit (tokens are single-use).
+  // execution "execute" + appearance "interaction-only" keeps the widget hidden
+  // unless Cloudflare needs the visitor to click.
+  const getTurnstileToken = (): Promise<string | null> =>
+    new Promise((resolve) => {
+      if (!window.turnstile || !turnstileContainerRef.current) {
+        toast.error("Captcha failed to load. Please refresh and try again.");
+        resolve(null);
+        return;
+      }
+      if (widgetIdRef.current) window.turnstile.remove(widgetIdRef.current);
+      widgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        action: "register",
+        execution: "execute",
+        appearance: "interaction-only",
+        callback: (token) => resolve(token),
+        "error-callback": () => {
+          toast.error("Captcha verification failed. Please try again.");
+          resolve(null);
+        },
+        "expired-callback": () => resolve(null),
+      });
+      window.turnstile.execute(widgetIdRef.current);
+    });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,61 +191,60 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
       // Surface the first error as a toast too, so it's noticeable even if
       // the field is off-screen.
       const firstError = Object.values(fieldErrors)[0];
-      if (firstError) message.error(firstError);
+      if (firstError) toast.error(firstError);
       return;
     }
 
     try {
       setLoading(true);
-      const response = await registerUser({
-        name: `${form.name}`,
-        email: form.email,
-        mobile: form.mobile,
+
+      // Fetch a fresh, single-use token right before hitting the API.
+      let turnstileToken: string | null = null;
+      if (TURNSTILE_SITE_KEY) {
+        turnstileToken = await getTurnstileToken();
+        if (!turnstileToken) {
+          // getTurnstileToken already surfaced an error toast.
+          return;
+        }
+      }
+
+      await registerUser({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        ...(form.mobile.trim() ? { mobile: form.mobile.trim() } : {}),
         password: form.password,
         confirm_password: form.confirm_password,
+        ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
       });
-      console.log("Register Response:", response);
-
-      if (response?.success === false) {
-        message.error(response?.message || "Something went wrong");
-        return;
-      }
-
-      message.success(response?.message || "Account created successfully");
-
-      if (onSuccess) {
-        onSuccess(form.email);
-      } else {
-        router.push(
-          `/verify-otp?email=${encodeURIComponent(form.email)}&type=email_varification`
-        );
-      }
-      return;
+      // The API emails a verification link (also for an email that registered
+      // before but never verified). The link opens /verify-email.
+      setSentTo(form.email.trim());
     } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message || error?.message || "Something went wrong";
-
-      if (
-        errorMessage.toLowerCase().includes("verify your otp") ||
-        errorMessage.toLowerCase().includes("not verified")
-      ) {
-        // Account exists but isn't verified. Route into the same OTP step
-        // either way (modal callback or real page) since both paths lead
-        // to email verification.
-        message.warning(errorMessage);
-        if (onSuccess) {
-          onSuccess(form.email);
-        } else {
-          router.push(
-            `/verify-otp?email=${encodeURIComponent(form.email)}&type=email_varification`
-          );
-        }
-        return;
+      const { code, message, details } = readApiError(error);
+      switch (code) {
+        case "EMAIL_TAKEN":
+          setErrors({ email: "An account with this email already exists." });
+          toast.error("An account with this email already exists. Sign in instead.");
+          break;
+        case "WEAK_PASSWORD":
+        case "PASSWORD_MISMATCH":
+          setErrors({ password: message });
+          toast.error(message);
+          break;
+        case "INVALID_INPUT":
+          if (details?.field === "email") setErrors({ email: message });
+          toast.error(message);
+          break;
+        case "CAPTCHA_REQUIRED":
+        case "CAPTCHA_FAILED":
+          toast.error("Captcha verification failed. Please try again.");
+          break;
+        case "CAPTCHA_NOT_CONFIGURED":
+          toast.error("Sign-up is temporarily unavailable. Please try again later.");
+          break;
+        default:
+          toast.error(message);
       }
-
-      // Previously this fell through silently with no user-facing error.
-      // Always surface something so the user knows the submit failed.
-      message.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -183,6 +252,24 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
 
   const updateField = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+
+    // Password and confirm-password are cross-validated, so a stale
+    // submit-time error on one can outlive an edit to the other (e.g. submit
+    // fails on mismatch, user then fixes it by editing "password" instead of
+    // "confirm_password" — only editing "confirm_password" would normally
+    // clear that error). Clear both together so the live check above always
+    // wins once either field changes.
+    if (field === "password" || field === "confirm_password") {
+      if (errors.password || errors.confirm_password) {
+        setErrors((prev) => ({
+          ...prev,
+          password: undefined,
+          confirm_password: undefined,
+        }));
+      }
+      return;
+    }
+
     // Clear that field's error as soon as the user edits it.
     if (errors[field as keyof FieldErrors]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -190,153 +277,215 @@ export default function Register({ onSuccess }: RegisterProps = {}) {
   };
 
   return (
-    <div className="page-soft min-h-screen flex items-center justify-center mt-10">
-      {/* Background Effects */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 overflow-hidden"
-      >
-        <div className="animate-pulse-slow absolute -top-32 -right-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-        <div className="animate-pulse-slow animation-delay-500 absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-primary/8 blur-3xl" />
-      </div>
-      <div className="relative w-full max-w-md">
-        {/* Card */}
-        <div className="rounded-2xl border bg-card p-8 shadow-[var(--shadow-medium)]">
-          <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
-            Create Your Access Account
+    <AuthShell>
+      {/* Cloudflare Turnstile script — invisible mode, no checkbox UI */}
+      {TURNSTILE_SITE_KEY && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          strategy="afterInteractive"
+        />
+      )}
+      {/* Turnstile renders here; it stays empty unless a visitor must interact */}
+      <div ref={turnstileContainerRef} />
+
+      {sentTo ? (
+        <div className="text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent">
+            <MailCheck className="h-7 w-7 text-primary" />
+          </div>
+          <h1 className="mt-4 text-xl font-semibold tracking-tight text-foreground">
+            Check your email
           </h1>
-          <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            {/* Name */}
-            <div className="grid grid-cols-1 gap-3">
-              <div className="space-y-1.5">
-                <label className="block text-sm font-medium">Name</label>
-                <input
-                  type="text"
-                  placeholder="John"
-                  value={form.name}
-                  onChange={(e) => updateField("name", e.target.value)}
-                  aria-invalid={!!errors.name}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${
-                    errors.name ? "border-red-500" : "border-input"
-                  }`}
-                />
-                {errors.name && (
-                  <p className="text-xs text-red-500">{errors.name}</p>
-                )}
-              </div>
-            </div>
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Email Address</label>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={(e) => updateField("email", e.target.value)}
-                aria-invalid={!!errors.email}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${
-                  errors.email ? "border-red-500" : "border-input"
-                }`}
-              />
-              {errors.email && (
-                <p className="text-xs text-red-500">{errors.email}</p>
-              )}
-            </div>
-            {/* Mobile */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Mobile Number</label>
-              <input
-                type="tel"
-                maxLength={10}
-                placeholder="9876543210"
-                value={form.mobile}
-                onChange={(e) =>
-                  updateField("mobile", e.target.value.replace(/\D/g, ""))
-                }
-                aria-invalid={!!errors.mobile}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${
-                  errors.mobile ? "border-red-500" : "border-input"
-                }`}
-              />
-              {errors.mobile && (
-                <p className="text-xs text-red-500">{errors.mobile}</p>
-              )}
-            </div>
-            {/* Password */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  minLength={8}
-                  placeholder="Min. 8 characters"
-                  value={form.password}
-                  onChange={(e) => updateField("password", e.target.value)}
-                  aria-invalid={!!errors.password}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm ${
-                    errors.password ? "border-red-500" : "border-input"
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-xs text-red-500">{errors.password}</p>
-              )}
-              {form.password.length > 0 && (
-                <>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        className={`h-1 flex-1 rounded-full ${
-                          i <= passwordStrength ? strengthColor : "bg-border"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Password strength:
-                    <span className="ml-1 font-medium text-foreground">
-                      {strengthLabel}
-                    </span>
-                  </p>
-                </>
-              )}
-            </div>
-            {/* Confirm Password */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Confirm Password</label>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Confirm Password"
-                value={form.confirm_password}
-                onChange={(e) => updateField("confirm_password", e.target.value)}
-                aria-invalid={!!errors.confirm_password}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${
-                  errors.confirm_password ? "border-red-500" : "border-input"
-                }`}
-              />
-              {errors.confirm_password && (
-                <p className="text-xs text-red-500">{errors.confirm_password}</p>
-              )}
-            </div>
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full justify-center disabled:opacity-50"
-            >
-              {loading ? "Creating Access Account..." : "Create Access Account"}
-            </button>
-          </form>
+          <p className="mt-2 text-sm text-muted-foreground">
+            We sent a link to <span className="font-medium text-foreground">{sentTo}</span>.
+            Open it within 24 hours to verify your email and sign in.
+          </p>
+          <button
+            type="button"
+            disabled={resending}
+            onClick={async () => {
+              setResending(true);
+              try {
+                await resendVerification(sentTo);
+                toast.success("A new link is on its way.");
+              } catch (error) {
+                toast.error(readApiError(error).message);
+              } finally {
+                setResending(false);
+              }
+            }}
+            className="link-glamlink mt-6 text-sm disabled:opacity-50"
+          >
+            {resending ? "Sending…" : "Didn't get it? Send a new link"}
+          </button>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Already verified?{" "}
+            <Link href="/login" className="link-glamlink">
+              Sign in
+            </Link>
+          </p>
         </div>
-      </div>
-    </div>
+      ) : (
+      <>
+      <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
+        Create Your Access Account
+      </h1>
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+        {/* Name */}
+        <div className="grid grid-cols-1 gap-3">
+          <div className="space-y-1.5">
+            <label htmlFor="name" className="label-glamlink mb-0">Name</label>
+            <input
+              id="name"
+              type="text"
+              placeholder="John"
+              value={form.name}
+              onChange={(e) => updateField("name", e.target.value)}
+              aria-invalid={!!errors.name}
+              className="input-glamlink"
+            />
+            {errors.name && (
+              <p className="text-xs text-destructive">{errors.name}</p>
+            )}
+          </div>
+        </div>
+        {/* Email */}
+        <div className="space-y-1.5">
+          <label htmlFor="email" className="label-glamlink mb-0">Email Address</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={(e) => updateField("email", e.target.value)}
+            aria-invalid={!!errors.email}
+            className="input-glamlink"
+          />
+          {errors.email && (
+            <p className="text-xs text-destructive">{errors.email}</p>
+          )}
+        </div>
+        {/* Mobile */}
+        <div className="space-y-1.5">
+          <label htmlFor="mobile" className="label-glamlink mb-0">Mobile Number</label>
+          <input
+            id="mobile"
+            type="tel"
+            maxLength={10}
+            placeholder="9876543210"
+            value={form.mobile}
+            onChange={(e) =>
+              updateField("mobile", e.target.value.replace(/\D/g, ""))
+            }
+            aria-invalid={!!errors.mobile}
+            className="input-glamlink"
+          />
+          {errors.mobile && (
+            <p className="text-xs text-destructive">{errors.mobile}</p>
+          )}
+        </div>
+        {/* Password */}
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="label-glamlink mb-0">Password</label>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              minLength={8}
+              placeholder="8+ characters, 2 numbers"
+              value={form.password}
+              onChange={(e) => updateField("password", e.target.value)}
+              aria-invalid={!!passwordError}
+              className="input-glamlink pr-11"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {passwordError && (
+            <p className="text-xs text-destructive">{passwordError}</p>
+          )}
+          {form.password.length > 0 && (
+            <>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-1 flex-1 rounded-full ${i <= passwordStrength ? strengthColor : "bg-border"
+                      }`}
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Password strength:
+                <span className="ml-1 font-medium text-foreground">
+                  {strengthLabel}
+                </span>
+              </p>
+            </>
+          )}
+        </div>
+        {/* Confirm Password */}
+        <div className="space-y-1.5">
+          <label htmlFor="confirm_password" className="label-glamlink mb-0">Confirm Password</label>
+          <input
+            id="confirm_password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Confirm Password"
+            value={form.confirm_password}
+            onChange={(e) => updateField("confirm_password", e.target.value)}
+            aria-invalid={!!confirmPasswordError}
+            className="input-glamlink"
+          />
+          {confirmPasswordError && (
+            <p className="text-xs text-destructive">{confirmPasswordError}</p>
+          )}
+        </div>
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary w-full justify-center disabled:opacity-50"
+        >
+          {loading ? "Creating Access Account..." : "Create Access Account"}
+        </button>
+        {TURNSTILE_SITE_KEY && (
+          <p className="text-[11px] text-muted-foreground text-center">
+            This site is protected by Cloudflare Turnstile and its{" "}
+            <a
+              href="https://www.cloudflare.com/privacypolicy/"
+              target="_blank"
+              rel="noreferrer"
+              className="link-glamlink font-normal underline"
+            >
+              Privacy Policy
+            </a>{" "}
+            and{" "}
+            <a
+              href="https://www.cloudflare.com/website-terms/"
+              target="_blank"
+              rel="noreferrer"
+              className="link-glamlink font-normal underline"
+            >
+              Terms of Service
+            </a>{" "}
+            apply.
+          </p>
+        )}
+        <p className="text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link href="/login" className="link-glamlink">
+            Sign in
+          </Link>
+        </p>
+      </form>
+      </>
+      )}
+    </AuthShell>
   );
 }

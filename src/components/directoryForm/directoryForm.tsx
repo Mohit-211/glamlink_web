@@ -4,7 +4,10 @@ import { FormField, Input, TextArea, Select } from './Formfield'
 import { AccessCardToggle } from './Accesscardtoggle'
 import { SuccessModal } from './Successmodal'
 import { SectionCard } from './Sectioncard'
-import { getAllCategories } from '@/api/Api'
+import { toast } from 'sonner'
+import { getAllCategories, getGooglePlaceForm, submitDirectoryApplication } from '@/api/Api'
+import { readApiError } from '@/lib/apiError'
+import { GoogleBusinessFinder } from './GoogleBusinessFinder'
 
 // ── Types ─────────────────────────────────────────────────
 
@@ -74,8 +77,6 @@ export interface FormData {
   profilePhoto: File | null
   profilePhotoPreview: string
   gallery: GalleryItem[]
-  offer_promotion: boolean
-  promotion_details: string
   elite_setup: boolean
   important_info: string[]
   excites_about_glamlink: string[]
@@ -144,8 +145,6 @@ const INITIAL_FORM: FormData = {
   profilePhoto: null,
   profilePhotoPreview: '',
   gallery: [],
-  offer_promotion: false,
-  promotion_details: '',
   elite_setup: false,
   important_info: [],
   excites_about_glamlink: [],
@@ -155,21 +154,10 @@ const INITIAL_FORM: FormData = {
 
 // ── Reusable UI ───────────────────────────────────────────
 
-function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <div
-      onClick={() => onChange(!enabled)}
-      className={`w-10 h-[22px] rounded-full relative transition-colors duration-200 shrink-0 cursor-pointer ${enabled ? 'bg-[#3BBDD4]' : 'bg-[#B4DCE9]'}`}
-    >
-      <div className={`absolute w-4 h-4 bg-white rounded-full top-[3px] shadow-sm transition-transform duration-200 ${enabled ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
-    </div>
-  )
-}
-
 function CheckIcon() {
   return (
-    <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-      <path d="M1 3.5L3.5 6L8 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="9" height="7" viewBox="0 0 9 7" fill="none" className="text-primary-foreground">
+      <path d="M1 3.5L3.5 6L8 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -195,17 +183,17 @@ function MultiSelect({
             type="button"
             onClick={() => toggle(opt)}
             className={`text-left text-[13px] px-4 py-3 rounded-xl border-[1.5px] transition-all duration-150 leading-snug flex items-center gap-3
-              ${active ? 'bg-[#EEF9FC] border-[#3BBDD4] text-[#1A3A42] font-semibold' : 'bg-[#F7FAFB] border-[#DCF0F6] text-[#4A7A88] hover:border-[#A8E0EE] hover:bg-[#EEF9FC]'}`}
+              ${active ? 'bg-accent border-secondary text-secondary font-semibold' : 'bg-card border-border text-muted-foreground hover:border-border hover:bg-accent'}`}
           >
-            <span className={`w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 ${active ? 'bg-[#3BBDD4] border-[#3BBDD4]' : 'border-[#B4DCE9]'}`}>
-              {active && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+            <span className={`w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 ${active ? 'bg-secondary border-secondary' : 'border-border'}`}>
+              {active && <span className="w-1.5 h-1.5 rounded-full bg-card" />}
             </span>
             {opt}
           </button>
         )
       })}
       {minLabel && selected.length === 0 && (
-        <p className="text-[11px] text-[#F4928A] mt-1">{minLabel}</p>
+        <p className="text-[11px] text-destructive mt-1">{minLabel}</p>
       )}
     </div>
   )
@@ -228,12 +216,12 @@ function BusinessHoursSection({ hours, onChange }: { hours: BusinessHourNote[]; 
             type="button"
             onClick={() => toggle(preset.note)}
             className={`text-left text-[13px] px-4 py-3 rounded-xl border-[1.5px] transition-all duration-150 flex items-center gap-3
-              ${active ? 'bg-[#EEF9FC] border-[#3BBDD4] text-[#1A3A42] font-semibold' : 'bg-[#F7FAFB] border-[#DCF0F6] text-[#4A7A88] hover:border-[#A8E0EE]'}`}
+              ${active ? 'bg-accent border-secondary text-secondary font-semibold' : 'bg-card border-border text-muted-foreground hover:border-border'}`}
           >
-            <div className={`w-4 h-4 rounded-[4px] border-[1.5px] flex items-center justify-center shrink-0 ${active ? 'bg-[#3BBDD4] border-[#3BBDD4]' : 'border-[#B4DCE9] bg-white'}`}>
+            <div className={`w-4 h-4 rounded-[4px] border-[1.5px] flex items-center justify-center shrink-0 ${active ? 'bg-secondary border-secondary' : 'border-border bg-card'}`}>
               {active && (
-                <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
-                  <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                <svg width="8" height="6" viewBox="0 0 8 6" fill="none" className="text-primary-foreground">
+                  <path d="M1 3L3 5L7 1" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </div>
@@ -266,10 +254,10 @@ function MediaSection({
     <div>
       {/* Profile Image */}
       <div className="mb-8">
-        <p className="text-[13px] font-bold text-[#3BBDD4] mb-3">Profile Image</p>
+        <p className="label-glamlink mb-3">Profile Image</p>
         <div className="flex items-center gap-6">
           <div className="relative shrink-0">
-            <div className="w-[90px] h-[90px] rounded-full border-2 border-[#DCF0F6] overflow-hidden bg-[#EEF9FC] flex items-center justify-center">
+            <div className="w-[90px] h-[90px] rounded-full border-2 border-border overflow-hidden bg-accent flex items-center justify-center">
               {profilePhotoPreview
                 ? <img src={profilePhotoPreview} alt="Profile" className="w-full h-full object-cover" />
                 : <span className="text-4xl">👤</span>
@@ -278,10 +266,10 @@ function MediaSection({
             <button
               type="button"
               onClick={() => profileRef.current?.click()}
-              className="absolute bottom-0 right-0 w-7 h-7 bg-[#3BBDD4] rounded-full flex items-center justify-center shadow-md hover:bg-[#2A9BB5] transition-colors"
+              className="absolute bottom-0 right-0 w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-md hover:bg-secondary transition-colors"
             >
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                <path d="M9.5 1.5L11.5 3.5L4.5 10.5H2.5V8.5L9.5 1.5Z" stroke="white" strokeWidth="1.4" strokeLinejoin="round" />
+                <path d="M9.5 1.5L11.5 3.5L4.5 10.5H2.5V8.5L9.5 1.5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
               </svg>
             </button>
             <input ref={profileRef} type="file" accept="image/*" className="hidden"
@@ -291,7 +279,7 @@ function MediaSection({
               }}
             />
           </div>
-          <p className="text-[13px] text-[#7AAAB8] leading-relaxed">
+          <p className="text-[13px] text-muted-foreground leading-relaxed">
             Square image works best. Face centered. Clean background.
           </p>
         </div>
@@ -300,14 +288,14 @@ function MediaSection({
       {/* Gallery */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[13px] font-bold text-[#3BBDD4]">
-            Gallery <span className="text-[#7AAAB8] font-normal">(Max 5)</span>
+          <p className="label-glamlink mb-0">
+            Gallery <span className="normal-case tracking-normal font-normal text-muted-foreground">(Max 5)</span>
           </p>
           {gallery.length < 5 && (
             <button
               type="button"
               onClick={() => galleryRef.current?.click()}
-              className="bg-[#3BBDD4] hover:bg-[#2A9BB5] text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors flex items-center gap-1.5"
+              className="btn-primary px-4 py-2"
             >
               + Upload
             </button>
@@ -319,42 +307,42 @@ function MediaSection({
 
         {gallery.length === 0 ? (
           <div
-            className="border-2 border-dashed border-[#B4DCE9] rounded-xl p-10 text-center cursor-pointer hover:border-[#3BBDD4] hover:bg-[#EEF9FC] transition-all"
+            className="border-2 border-dashed border-border rounded-xl p-10 text-center cursor-pointer hover:border-secondary hover:bg-accent transition-all"
             onClick={() => galleryRef.current?.click()}
           >
-            <p className="text-[13px] text-[#7AAAB8]">
-              <span className="text-[#3BBDD4] font-bold">Click to upload</span> gallery photos
+            <p className="text-[13px] text-muted-foreground">
+              <span className="text-primary font-semibold">Click to upload</span> gallery photos
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-3">
             {gallery.map((item, i) => (
-              <div key={i} className="border border-[#DCF0F6] rounded-xl overflow-hidden bg-white">
+              <div key={i} className="border border-border rounded-xl overflow-hidden bg-card">
                 <div className="relative h-[140px]">
                   <img src={item.preview_url} alt={item.caption || `Photo ${i + 1}`} className="w-full h-full object-cover" />
                   {item.is_thumbnail && (
-                    <span className="absolute top-2 left-2 bg-[#3BBDD4] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                    <span className="absolute top-2 left-2 bg-primary text-primary-foreground text-[10px] font-semibold px-2.5 py-0.5 rounded-full">
                       Thumbnail
                     </span>
                   )}
                 </div>
                 {/* Caption */}
-                <div className="px-3 py-2 border-t border-[#DCF0F6]">
+                <div className="px-3 py-2 border-t border-border">
                   <input
                     type="text"
                     value={item.caption}
                     onChange={(e) => onGalleryCaption(i, e.target.value)}
                     placeholder="Add caption…"
-                    className="w-full text-[12px] text-[#1A3A42] bg-transparent outline-none placeholder:text-[#AAC8D0]"
+                    className="w-full text-[12px] text-foreground bg-transparent outline-none placeholder:text-muted-foreground"
                   />
                 </div>
                 {/* Actions */}
-                <div className="px-3 py-2 flex items-center gap-3 border-t border-[#DCF0F6]">
+                <div className="px-3 py-2 flex items-center gap-3 border-t border-border">
                   {!item.is_thumbnail && (
                     <button
                       type="button"
                       onClick={() => onGalleryThumbnail(i)}
-                      className="text-[11px] text-[#3BBDD4] font-semibold hover:underline"
+                      className="link-glamlink text-[11px] font-semibold"
                     >
                       Make Thumbnail
                     </button>
@@ -362,7 +350,7 @@ function MediaSection({
                   <button
                     type="button"
                     onClick={() => onGalleryRemove(i)}
-                    className="text-[11px] text-[#F4928A] font-semibold hover:underline ml-auto"
+                    className="text-[11px] text-destructive font-semibold hover:underline ml-auto"
                   >
                     Remove
                   </button>
@@ -376,11 +364,94 @@ function MediaSection({
   )
 }
 
+// ── Starting from a Google listing ───────────────────────
+
+/** What the API knows about a Google listing (GET /directory/google/places/:placeId). */
+interface GooglePlace {
+  place_id: string
+  claimed?: boolean
+  name?: string
+  form?: {
+    phone?: string | null
+    website?: string | null
+    bio?: string | null
+    locations?: Partial<Location>[]
+    business_hours?: BusinessHourNote[]
+  }
+}
+
+/** The form with what Google knows filled in; the person adds name, title and email. */
+function withGooglePlace(prev: FormData, place: GooglePlace): FormData {
+  const known = place.form ?? {}
+  return {
+    ...prev,
+    phone: known.phone || prev.phone,
+    website: known.website || prev.website,
+    bio: known.bio || prev.bio,
+    locations:
+      known.locations && known.locations.length > 0
+        ? known.locations.map((loc, i) => ({
+            ...prev.locations[0],
+            ...loc,
+            business_name: loc.business_name || place.name || '',
+            is_primary: i === 0,
+            sort_order: i + 1,
+          }))
+        : prev.locations,
+    business_hours: known.business_hours && known.business_hours.length > 0 ? known.business_hours : prev.business_hours,
+  }
+}
+
 // ── Main ──────────────────────────────────────────────────
 
 export default function DirectoryFormApply() {
   const [form, setForm] = useState<FormData>(INITIAL_FORM)
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  // The Google listing being claimed (?claim=<place_id>, or picked in the finder)
+  const [claim, setClaim] = useState<string | null>(null)
+  const [claimNote, setClaimNote] = useState('')
+
+  /** Fills in what Google knows about a listing (from the finder or a ?claim= link). */
+  const applyGooglePlace = (place: GooglePlace | null | undefined) => {
+    if (!place) return
+    if (place.claimed) {
+      setClaimNote(`${place.name ?? 'This business'} is already on Glamlink. Fill in the form to apply on your own.`)
+      return
+    }
+    setForm((prev) => withGooglePlace(prev, place))
+    setClaim(place.place_id)
+    window.history.replaceState(null, '', `?claim=${encodeURIComponent(place.place_id)}`)
+    setClaimNote(`We filled in what Google knows about ${place.name ?? 'your business'}. Add your name, title and email, then check the rest.`)
+  }
+
+  const googleFailed = (err: unknown) =>
+    setClaimNote(readApiError(err, "We couldn't load your Google listing. Fill in the form instead.").message)
+
+  // "Claim this profile" on /directory opens the form with ?claim=<place_id>
+  useEffect(() => {
+    const placeId = new URLSearchParams(window.location.search).get('claim')
+    if (!placeId) return
+    let active = true
+    getGooglePlaceForm(placeId)
+      .then((res) => {
+        if (!active) return
+        const place: GooglePlace | undefined = res?.data
+        if (place?.claimed) {
+          setClaimNote(`${place.name ?? 'This business'} is already on Glamlink. Fill in the form to apply on your own.`)
+        } else if (place) {
+          setForm((prev) => withGooglePlace(prev, place))
+          setClaim(place.place_id || placeId)
+          setClaimNote(`We filled in what Google knows about ${place.name ?? 'your business'}. Add your name, title and email, then check the rest.`)
+        }
+      })
+      .catch((err) => {
+        if (active) setClaimNote(readApiError(err, "We couldn't load your Google listing. Fill in the form instead.").message)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
   const [categories, setCategories] = useState<Category[]>([])
   const [categoriesLoading, setCategoriesLoading] = useState(true)
 
@@ -388,8 +459,6 @@ useEffect(() => {
   const fetchCategories = async () => {
     try {
       const response = await getAllCategories();
-
-      console.log(response, "===>>");
 
       const categoryArray = Array.isArray(response?.data?.rows)
         ? response.data.rows
@@ -406,7 +475,6 @@ useEffect(() => {
 
   fetchCategories();
 }, []);
-console.log(categories,"==")
   const set = <K extends keyof FormData>(key: K, value: FormData[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }))
 
@@ -442,9 +510,14 @@ console.log(categories,"==")
   }
 
   const handleGalleryRemove = (idx: number) => {
-    let next = form.gallery.filter((_, i) => i !== idx)
-    if (!next.some((g) => g.is_thumbnail) && next.length > 0) next[0].is_thumbnail = true
-    set('gallery', next.map((g, i) => ({ ...g, sort_order: i + 1 })))
+    const next = form.gallery.filter((_, i) => i !== idx)
+    // If the thumbnail was removed, promote the first remaining image (without mutating state).
+    const hasThumbnail = next.some((g) => g.is_thumbnail)
+    set('gallery', next.map((g, i) => ({
+      ...g,
+      is_thumbnail: hasThumbnail ? g.is_thumbnail : i === 0,
+      sort_order: i + 1,
+    })))
   }
 
   const handleGalleryCaption = (idx: number, caption: string) => {
@@ -459,6 +532,8 @@ console.log(categories,"==")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (submitting) return
+    setSubmitting(true)
 
     try {
       const formData = new FormData()
@@ -493,12 +568,12 @@ console.log(categories,"==")
 
       // ── Profile Image ──
       if (form.profilePhoto) {
-        formData.append("profilePhoto", form.profilePhoto)
+        formData.append("profile_image", form.profilePhoto)
       }
 
       // ── Gallery Images ──
-      form.gallery.forEach((item, index) => {
-        formData.append(`gallery_images`, item.file)
+      form.gallery.forEach((item) => {
+        formData.append("images", item.file)
       })
 
       // ── Gallery Meta (captions, thumbnail, order) ──
@@ -512,10 +587,6 @@ console.log(categories,"==")
           }))
         )
       )
-
-      // ── Promotion ──
-      formData.append("offer_promotion", String(form.offer_promotion))
-      formData.append("promotion_details", form.promotion_details)
 
       // ── Elite Setup ──
       formData.append("elite_setup", String(form.elite_setup))
@@ -533,29 +604,19 @@ console.log(categories,"==")
       // ── Access Card ──
       formData.append("createAccessCard", String(form.createAccessCard))
 
-      // ── API CALL ──
-      const res = await fetch(
-        "https://node.glamlink.net:5000/api/v1/businessCard",
-        {
-          method: "POST",
-          body: formData, // ✅ DO NOT set Content-Type
-        }
-      )
+      // ── The Google listing being claimed ──
+      if (claim) formData.append("place_id", claim)
 
-      const data = await res.json()
+      // Stored as sent for admins to review (POST /directory/applications)
+      await submitDirectoryApplication(formData)
 
-      if (!res.ok) {
-        throw new Error(data?.message || "Something went wrong")
-      }
-
-      console.log("SUCCESS:", data)
-
-      // success modal
       setSubmitted(true)
-
-    } catch (err: any) {
-      console.error(err)
-      alert(err.message || "Submission failed")
+    } catch (err) {
+      const error = readApiError(err, "We couldn't send your application. Please try again.")
+      const field = typeof error.details?.field === "string" ? ` (${error.details.field.replace(/_/g, " ")})` : ""
+      toast.error(`${error.message}${field}`)
+    } finally {
+      setSubmitting(false)
     }
   }
 // ✅ UPDATE LOCATION
@@ -625,52 +686,57 @@ const removeLocation = (index: number) => {
   })
 }
   return (
-    <div className="bg-[#F7FAFB] min-h-screen font-nunito text-[#1A3A42]">
-
-      {/* HEADER */}
-      <header className="bg-white border-b-2 border-[#D6F2F8] h-[62px] flex items-center justify-between px-12 sticky top-0 z-40 shadow-[0_2px_12px_rgba(59,189,212,0.08)]">
-        <span className="font-poppins text-2xl font-semibold text-[#3BBDD4] tracking-tight">glamlink</span>
-        <nav className="text-xs text-[#7AAAB8]">
-          <a href="#" className="text-[#3BBDD4] font-bold hover:text-[#2A9BB5] transition-colors">Directory</a>{' › '}Apply
-        </nav>
-      </header>
+    <div className="bg-background min-h-screen pt-16 md:pt-20 text-foreground">
 
       {/* HERO */}
-      <section className="bg-gradient-to-br from-[#3BBDD4] via-[#2A9BB5] to-[#1E7A90] py-[68px] px-10 text-center relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_600px_at_20%_50%,rgba(255,255,255,0.07)_0%,transparent_60%)]" />
-        <div className="absolute bottom-[-2px] left-0 right-0 h-12 bg-[#F7FAFB] [clip-path:ellipse(56%_100%_at_50%_100%)]" />
-        <div className="inline-flex items-center gap-2 bg-white/20 border border-white/35 backdrop-blur-sm rounded-full px-5 py-1.5 text-[11px] font-bold tracking-[0.18em] uppercase text-white mb-5 relative">
+      <section className="bg-primary py-[68px] px-5 sm:px-10 text-center relative overflow-hidden">
+        <div className="absolute bottom-[-2px] left-0 right-0 h-12 bg-background [clip-path:ellipse(56%_100%_at_50%_100%)]" />
+        <div className="inline-flex items-center gap-2 bg-card/20 border border-primary-foreground/35 backdrop-blur-sm rounded-full px-5 py-1.5 text-[11px] font-semibold tracking-[0.18em] uppercase text-primary-foreground mb-5 relative">
           ✦ &nbsp;Professional Directory Application
         </div>
-        <h1 className="font-poppins text-[clamp(28px,5vw,50px)] font-semibold text-white leading-[1.2] mb-3.5 relative">
-          Get Listed on GlamLink<br /><span className="text-white/75 font-light">Beauty & Wellness Directory</span>
+        <h1 className="hero-title text-primary-foreground mb-4 relative">
+          Get Listed on GlamLink<br /><span className="text-primary-foreground/80 font-medium">Beauty & Wellness Directory</span>
         </h1>
-        <p className="text-[15px] text-white/80 max-w-[520px] mx-auto mb-8 leading-[1.75] font-light relative">
+        <p className="text-[15px] text-primary-foreground/80 max-w-[520px] mx-auto mb-8 leading-[1.75] font-normal relative">
           Join thousands of beauty professionals. Get discovered by clients, appear on the treatment map, and receive your free Access digital business card — all in one application.
         </p>
         <div className="flex justify-center flex-wrap gap-2.5 relative">
           {HERO_BADGES.map((b) => (
-            <div key={b.label} className="bg-white/16 border border-white/32 rounded-full px-4 py-1.5 text-xs font-bold text-white flex items-center gap-1.5">
+            <div key={b.label} className="bg-card/16 border border-primary-foreground/30 rounded-full px-4 py-1.5 text-xs font-semibold text-primary-foreground flex items-center gap-1.5">
               {b.icon} {b.label}
             </div>
           ))}
         </div>
       </section>
 
-      <main className="max-w-[840px] mx-auto px-5 pt-9 pb-20">
+      <div className="max-w-[840px] mx-auto px-5 pt-9 pb-20">
 
         {/* Process Bar */}
-        <div className="bg-white border border-[#DCF0F6] rounded-2xl px-7 py-5 flex items-center justify-center flex-wrap gap-0 mb-8">
+        <div className="bg-card border border-border rounded-2xl px-7 py-5 flex items-center justify-center flex-wrap gap-0 mb-8">
           {PROCESS_STEPS.map((step, i) => (
             <React.Fragment key={step}>
               <div className="flex flex-col items-center gap-1.5 px-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#EEF9FC] border-2 border-[#D6F2F8] text-[#3BBDD4] font-bold text-[13px] flex items-center justify-center">{i + 1}</div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.07em] text-[#7AAAB8] text-center max-w-[70px] leading-tight">{step}</span>
+                <div className="w-8 h-8 rounded-full bg-accent border-2 border-border text-secondary font-semibold text-[13px] flex items-center justify-center">{i + 1}</div>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.07em] text-muted-foreground text-center max-w-[70px] leading-tight">{step}</span>
               </div>
-              {i < PROCESS_STEPS.length - 1 && <span className="text-[#D6F2F8] text-xl mb-5 px-1 hidden sm:block">›</span>}
+              {i < PROCESS_STEPS.length - 1 && <span className="text-accent-foreground text-xl mb-5 px-1 hidden sm:block">›</span>}
             </React.Fragment>
           ))}
         </div>
+
+        {claimNote ? (
+          <p role="status" className="mb-8 rounded-2xl border border-secondary/30 bg-accent px-5 py-4 text-sm text-secondary">
+            {claimNote}
+          </p>
+        ) : (
+          <GoogleBusinessFinder
+            onPick={(match) =>
+              getGooglePlaceForm(match.place_id)
+                .then((res) => applyGooglePlace(res?.data))
+                .catch(googleFailed)
+            }
+          />
+        )}
 
         <form onSubmit={handleSubmit} noValidate>
 
@@ -763,7 +829,7 @@ const removeLocation = (index: number) => {
             <FormField label="Additional Specialties">
               <div className="relative">
                 <select
-                  className="w-full border border-[#DCF0F6] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#3BBDD4]"
+                  className="input-glamlink cursor-pointer"
                   onChange={(e) => {
                     const value = e.target.value
                     if (!value) return
@@ -790,7 +856,7 @@ const removeLocation = (index: number) => {
               {form.specialties.map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-2 bg-[#EEF9FC] border border-[#3BBDD4] text-[#1A3A42] text-xs font-semibold px-3 py-1.5 rounded-full"
+                  className="flex items-center gap-2 bg-accent border border-secondary/30 text-secondary text-xs font-semibold px-3 py-1.5 rounded-full"
                 >
                   {item}
                   <button
@@ -801,7 +867,7 @@ const removeLocation = (index: number) => {
                         form.specialties.filter((s) => s !== item)
                       )
                     }
-                    className="text-[#F4928A] font-bold"
+                    className="text-destructive font-semibold"
                   >
                     ✕
                   </button>
@@ -811,11 +877,11 @@ const removeLocation = (index: number) => {
 
             {/* Counter */}
             <div className="flex justify-between mt-2">
-              <span className="text-[11px] text-[#7AAAB8]">
+              <span className="text-[11px] text-muted-foreground">
                 {form.specialties.length}/5 selected
               </span>
               {form.specialties.length >= 5 && (
-                <span className="text-[11px] text-[#3BBDD4] font-semibold">
+                <span className="text-[11px] text-primary font-semibold">
                   Maximum reached
                 </span>
               )}
@@ -830,17 +896,17 @@ const removeLocation = (index: number) => {
   <div className="space-y-5">
 
     {form.locations.map((loc, index) => (
-      <div key={index} className="border border-[#E5E7EB] rounded-xl bg-[#F9FAFB] p-4">
+      <div key={index} className="border border-border rounded-xl bg-muted p-4">
 
         {/* HEADER */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
-            <p className="font-semibold text-sm text-[#1A3A42]">
+            <p className="font-semibold text-sm text-foreground">
               {loc.label || `Location ${index + 1}`}
             </p>
 
             {loc.is_primary && (
-              <span className="bg-[#FDE68A] text-[10px] px-2 py-0.5 rounded-full font-semibold">
+              <span className="bg-accent text-accent-foreground text-[10px] px-2 py-0.5 rounded-full font-semibold">
                 Primary
               </span>
             )}
@@ -851,7 +917,7 @@ const removeLocation = (index: number) => {
               <button
                 type="button"
                 onClick={() => updateLocation(index, { is_primary: true })}
-                className="text-[#F59E0B] font-medium"
+                className="link-glamlink"
               >
                 Make primary
               </button>
@@ -861,7 +927,7 @@ const removeLocation = (index: number) => {
               <button
                 type="button"
                 onClick={() => removeLocation(index)}
-                className="text-[#EF4444]"
+                className="text-destructive"
               >
                 Remove
               </button>
@@ -871,13 +937,14 @@ const removeLocation = (index: number) => {
 
         {/* LOCATION TYPE */}
         <div className="mb-4">
-          <p className="text-xs font-medium mb-2">Location Type</p>
+          <p className="label-glamlink mb-2">Location Type</p>
 
           <div className="flex gap-6 text-sm">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
                 checked={loc.location_type === "exact_address"}
+                className="accent-secondary"
                 onChange={() =>
                   updateLocation(index, { location_type: "exact_address" })
                 }
@@ -889,6 +956,7 @@ const removeLocation = (index: number) => {
               <input
                 type="radio"
                 checked={loc.location_type === "service_area"}
+                className="accent-secondary"
                 onChange={() =>
                   updateLocation(index, { location_type: "service_area" })
                 }
@@ -921,7 +989,7 @@ const removeLocation = (index: number) => {
               />
               <button
                 type="button"
-                className="bg-[#374151] text-white px-4 rounded-md text-sm"
+                className="btn-primary px-4"
               >
                 Confirm
               </button>
@@ -990,7 +1058,7 @@ const removeLocation = (index: number) => {
     <button
       type="button"
       onClick={addLocation}
-      className="w-full border-dashed border border-[#B4DCE9] py-3 rounded-xl text-sm text-[#3BBDD4] font-semibold hover:bg-[#EEF9FC]"
+      className="w-full border-dashed border border-border py-3 rounded-xl text-sm text-primary font-semibold hover:bg-accent hover:text-secondary"
     >
       + Add Another Location
     </button>
@@ -999,7 +1067,7 @@ const removeLocation = (index: number) => {
 </SectionCard>
           {/* 5. BUSINESS HOURS */}
        <SectionCard step={5} title="Business Hours">
-  <p className="text-[13px] text-[#4A7A88] mb-4 leading-relaxed">
+  <p className="text-[13px] text-muted-foreground mb-4 leading-relaxed">
     Select all notes that apply to your availability.
   </p>
 
@@ -1009,7 +1077,7 @@ const removeLocation = (index: number) => {
       id="business-note-input"
       type="text"
       placeholder="Enter business note..."
-      className="flex-1 border border-[#DCF0F6] rounded-xl px-4 py-2 text-sm outline-none focus:border-[#3BBDD4]"
+      className="input-glamlink flex-1"
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault()
@@ -1038,7 +1106,7 @@ const removeLocation = (index: number) => {
         set("business_hours", [...form.business_hours, { note: value }])
         input.value = ""
       }}
-      className="bg-[#3BBDD4] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#2A9BB5]"
+      className="btn-primary"
     >
       Add
     </button>
@@ -1050,7 +1118,7 @@ const removeLocation = (index: number) => {
       {form.business_hours.map((item, i) => (
         <div
           key={i}
-          className="flex items-center gap-2 bg-[#EEF9FC] border border-[#3BBDD4] text-[#1A3A42] text-xs font-semibold px-3 py-1.5 rounded-full"
+          className="flex items-center gap-2 bg-accent border border-secondary/30 text-secondary text-xs font-semibold px-3 py-1.5 rounded-full"
         >
           {item.note}
           <button
@@ -1061,7 +1129,7 @@ const removeLocation = (index: number) => {
                 form.business_hours.filter((h) => h.note !== item.note)
               )
             }
-            className="text-[#F4928A] font-bold"
+            className="text-destructive font-semibold"
           >
             ✕
           </button>
@@ -1091,15 +1159,15 @@ const removeLocation = (index: number) => {
 
           {/* 7. GLAMLINK INTEGRATION */}
           <SectionCard step={7} title="Glamlink Integration">
-            <p className="text-[13px] text-[#4A7A88] mb-6 leading-relaxed">
+            <p className="text-[13px] text-muted-foreground mb-6 leading-relaxed">
               Help us understand your needs and how we can best support your business.
             </p>
 
             {/* Excites */}
             <div className="mb-6">
-              <p className="text-sm font-bold text-[#1A3A42] mb-1">
-                What excites you about Glamlink? <span className="text-[#F4928A]">*</span>
-                <span className="text-[#7AAAB8] font-normal text-xs ml-1">(Select at least 1)</span>
+              <p className="label-glamlink">
+                What excites you about Glamlink? <span className="text-destructive">*</span>
+                <span className="normal-case tracking-normal font-normal text-muted-foreground ml-1">(Select at least 1)</span>
               </p>
               <MultiSelect
                 options={EXCITES_OPTIONS}
@@ -1111,9 +1179,9 @@ const removeLocation = (index: number) => {
 
             {/* Pain points */}
             <div className="mb-6">
-              <p className="text-sm font-bold text-[#1A3A42] mb-1">
-                Biggest pain points <span className="text-[#F4928A]">*</span>
-                <span className="text-[#7AAAB8] font-normal text-xs ml-1">(Select at least 1)</span>
+              <p className="label-glamlink">
+                Biggest pain points <span className="text-destructive">*</span>
+                <span className="normal-case tracking-normal font-normal text-muted-foreground ml-1">(Select at least 1)</span>
               </p>
               <MultiSelect
                 options={PAIN_POINTS_OPTIONS}
@@ -1123,40 +1191,23 @@ const removeLocation = (index: number) => {
               />
             </div>
 
-            <div className="flex flex-col gap-4 pt-4 border-t border-[#DCF0F6]">
-
-              {/* Promotion toggle */}
-              <div className="flex items-center gap-3 cursor-pointer" onClick={() => set('offer_promotion', !form.offer_promotion)}>
-                <Toggle enabled={form.offer_promotion} onChange={(v) => set('offer_promotion', v)} />
-                <span className="text-sm font-semibold text-[#1A3A42]">
-                  I would like to offer a promotion with my digital card
-                </span>
-              </div>
-              {form.offer_promotion && (
-                <FormField label="Promotion Details" hint="e.g. 20% off Balayage for first-time clients">
-                  <Input
-                    placeholder="20% off on Balayage for first-time clients"
-                    value={form.promotion_details}
-                    onChange={(e) => set('promotion_details', e.target.value)}
-                  />
-                </FormField>
-              )}
+            <div className="flex flex-col gap-4 pt-4 border-t border-border">
 
               {/* Elite setup */}
               <div
-                className="flex items-start gap-3 cursor-pointer p-4 rounded-xl border-[1.5px] border-[#DCF0F6] hover:border-[#A8E0EE] transition-colors bg-[#F7FAFB]"
+                className="flex items-start gap-3 cursor-pointer p-4 rounded-xl border-[1.5px] border-border hover:border-border transition-colors bg-accent"
                 onClick={() => set('elite_setup', !form.elite_setup)}
               >
-                <div className={`mt-0.5 w-5 h-5 rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 transition-all ${form.elite_setup ? 'bg-[#3BBDD4] border-[#3BBDD4]' : 'bg-white border-[#B4DCE9]'}`}>
+                <div className={`mt-0.5 w-5 h-5 rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 transition-all ${form.elite_setup ? 'bg-secondary border-secondary' : 'bg-card border-border'}`}>
                   {form.elite_setup && <CheckIcon />}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-[#1A3A42]">
+                  <p className="text-sm font-semibold text-foreground">
                     The Elite Setup{' '}
-                    <span className="text-[11px] text-[#3BBDD4] font-semibold">(Recommended)</span>
+                    <span className="text-[11px] text-secondary font-semibold">(Recommended)</span>
                   </p>
-                  <p className="text-xs text-[#7AAAB8] mt-1 leading-relaxed">
-                    I agree to let the Glamlink Concierge Team build my professional profile and digital business card using my existing public social media content. We'll curate your first clips, photo albums, and service menu so you can launch instantly.
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                    I agree to let the Glamlink Concierge Team build my professional profile and digital business card using my existing public social media content. We&apos;ll curate your first clips, photo albums, and service menu so you can launch instantly.
                   </p>
                 </div>
               </div>
@@ -1168,20 +1219,21 @@ const removeLocation = (index: number) => {
           <div className="text-center pt-2">
             <button
               type="submit"
-              className="bg-gradient-to-br from-[#3BBDD4] to-[#2A9BB5] hover:from-[#2A9BB5] hover:to-[#1E7A90] text-white border-none rounded-full px-16 py-[17px] font-poppins text-[15px] font-semibold tracking-wide transition-all duration-200 cursor-pointer shadow-[0_6px_22px_rgba(59,189,212,0.38)] hover:-translate-y-0.5 hover:shadow-[0_10px_34px_rgba(59,189,212,0.46)]"
+              disabled={submitting}
+              className="btn-primary btn-lg px-16"
             >
-              Submit My Application →
+              {submitting ? "Sending…" : "Submit My Application →"}
             </button>
-            <p className="text-xs text-[#7AAAB8] mt-3.5 leading-[1.7]">
-              By submitting you agree to GlamLink's{' '}
-              <a href="#" className="text-[#3BBDD4] font-bold hover:underline">Terms of Service</a>{' '}and{' '}
-              <a href="#" className="text-[#3BBDD4] font-bold hover:underline">Directory Guidelines</a>.
+            <p className="text-xs text-muted-foreground mt-3.5 leading-[1.7]">
+              By submitting you agree to GlamLink&apos;s{' '}
+              <a href="#" className="link-glamlink font-semibold">Terms of Service</a>{' '}and{' '}
+              <a href="#" className="link-glamlink font-semibold">Directory Guidelines</a>.
               <br />Applications are reviewed within 2–3 business days. Confirmation email sent immediately.
             </p>
           </div>
 
         </form>
-      </main>
+      </div>
 
       <SuccessModal open={submitted} onClose={() => setSubmitted(false)} accessCard={form.createAccessCard} />
     </div>

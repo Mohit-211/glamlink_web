@@ -1,18 +1,20 @@
+import { API_ORIGIN } from "@/lib/config";
+import { nanoid } from "nanoid";
 import { BOOKING_METHODS, GlamCardFormData } from "./GlamCardForm/types";
-import profileImg from "../../../public/fashion/pexels-decembrenell-3317434.jpg";
-import galleryImg1 from "../../../public/fashion/pexels-element5-973403.jpg";
-import galleryImg2 from "../../../public/fashion/pexels-pixabay-38554.jpg";
-import galleryImg3 from "../../../public/fashion/pexels-pixabay-159780.jpg";
+import { TOKENS } from "@/lib/designTokens";
+
+const profileImgUrl =
+  `${API_ORIGIN}/images/profile_image-1786443475610.jpg`;
+const galleryImg1Url =
+  `${API_ORIGIN}/images/images-1786443475619.jpg`;
+const galleryImg2Url =
+  `${API_ORIGIN}/images/images-1786443475614.jpg`;
 /* ================= HELPER ================= */
 async function urlToFile(
   url: string,
   filename: string
 ): Promise<File> {
-  const fullUrl =
-    typeof window !== "undefined"
-      ? window.location.origin + url
-      : url;
-  const res = await fetch(fullUrl);
+  const res = await fetch(url);
   const blob = await res.blob();
   return new File([blob], filename, {
     type: blob.type,
@@ -24,23 +26,19 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
   if (typeof window === "undefined") {
     return {} as GlamCardFormData;
   }
-  const [profile_image, img1, img2, img3] =
+  const [profile_image, img1, img2] =
     await Promise.all([
       urlToFile(
-        profileImg.src,
-        "pexels-decembrenell-3317434.jpg"
+        profileImgUrl,
+        "profile_image-1786443475610.jpg"
       ),
       urlToFile(
-        galleryImg1.src,
-        "pexels-element5-973403.jpg"
+        galleryImg1Url,
+        "images-1786443475619.jpg"
       ),
       urlToFile(
-        galleryImg2.src,
-        "pexels-pixabay-38554.jpg"
-      ),
-      urlToFile(
-        galleryImg3.src,
-        "pexels-pixabay-159780.jpg"
+        galleryImg2Url,
+        "images-1786443475614.jpg"
       ),
     ]);
   return {
@@ -48,60 +46,62 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     name: "John Doe",
     professional_title: "Your Profession",
     email: "example@email.com",
-    phone: "000-000-0000",
-    booking_phone: "000-000-0000",
+    phone: "1234567890",
+    booking_phone: "1234567890",
     bio: `
     <p>Enter your bio here.</p>
    
   `,
+  is_phone_visible: true,
     business_name: "Your Business Name",
     /* ================= SPECIALTIES ================= */
-    primary_specialty: "Your Specialty",
-    specialties: [
-      "Specialty 1",
-      "Specialty 2",
-      "Specialty 3",
-      "Specialty 4",
-    ],
+    primary_specialty: "Hair Stylist",
+    specialties: ["Hair Styling", "Makeup", "Skincare", "Nails"],
     /* ================= HANDLES ================= */
     custom_handle: "yourhandle",
     instagram_handle: "yourhandle",
     website: "https://example.com",
     /* ================= SOCIAL ================= */
     social_media: {
-      instagram: "",
-      facebook: "",
-      linkedin: "",
-      youtube: "",
-      tiktok: "",
+      instagram: "https://instagram.com/yourhandle",
+      facebook: "https://facebook.com/yourhandle",
+      linkedin: "https://linkedin.com/in/yourhandle",
+      youtube: "https://youtube.com/@yourhandle",
+      tiktok: "https://tiktok.com/@yourhandle",
     },
-    other_links: [],
-    preferred_booking_methods: [],
-    booking_link: "",
+    other_links: [{ title: "My Portfolio", url: "https://example.com/portfolio" }],
+    featured_links: [],
+    color_code: TOKENS.primary.toLowerCase(),
+    preferred_booking_methods: [BOOKING_METHODS.LINK, BOOKING_METHODS.CALL],
+    booking_link: "https://example.com/book",
     important_info: [
       "Add your important information here.",
     ],
     /* ================= BUSINESS HOURS ================= */
-    business_hour: [],
+    business_hour: [
+      { note: "Mon–Fri: 9:00 AM – 6:00 PM" },
+      { note: "Sat: 10:00 AM – 4:00 PM" },
+      { note: "Sun: Closed" },
+    ],
     /* ================= LOCATION ================= */
     locations: [
       {
-        id: "location-1",
-        label: "Main Office",
+        id: nanoid(),
+        label: "Location 1",
         location_type: "exact_address",
-        address: "123 Sample Street",
-        city: "Sample City",
-        state: "Sample State",
-        area: "Sample Area",
-        phone: "000-000-0000",
-        description: "Replace with your business address.",
+        address: "123 Main Street",
+        area: "Downtown",
+        city: "Los Angeles",
+        state: "CA",
+        phone: "1234567890",
+        description: "Our main studio location.",
         isPrimary: true,
         isOpen: true,
       },
     ],
     /* ================= IMAGES ================= */
     profile_image,
-    images: [img1, img2, img3],
+    images: [img1, img2],
     gallery_meta: [
       {
         id: "1",
@@ -115,18 +115,10 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
         is_thumbnail: false,
         sort_order: 1,
       },
-      {
-        id: "3",
-        caption: "Sample Image 3",
-        is_thumbnail: false,
-        sort_order: 2,
-      },
     ],
     /* ================= MARKETING ================= */
     elite_setup: false,
-    offer_promotion: undefined,
-    promotion_details: "",
-    excites_about_glamlink: [],
-    biggest_pain_points: [],
+    excites_about_glamlink: ["Reaching new clients", "Easy online booking"],
+    biggest_pain_points: ["Finding new clients", "Managing appointments"],
   };
 }

@@ -1,15 +1,19 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getBusinessCardBySlug } from "@/api/Api";
+import { trackEvent } from "@/utils/analytics";
 import { GlamCardFormData } from "./glamcard/GlamCardForm/types";
 import GlamCardLivePreview from "./glamcard/GlamCardLivePreview";
 interface BusinessCardPageProps {
   slug?: string;
   mode?: "live" | "view" | "download";
+  /** Only the public /access/[slug] page opts in to analytics. */
+  trackAnalytics?: boolean;
 }
 const BusinessCardPage: React.FC<BusinessCardPageProps> = ({
   slug,
   mode,
+  trackAnalytics = false,
 }) => {
   const [data, setData] = useState<GlamCardFormData | null>(
     null
@@ -76,10 +80,19 @@ const fetchData = async () => {
 };
     fetchData();
   }, [slug]);
+  // ACCESS_CARD_VIEW fires once per card (ref guards Strict Mode double effects / re-renders).
+  const trackedViewIdRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!trackAnalytics) return;
+    const businessCardId = Number(data?.id);
+    if (!businessCardId || trackedViewIdRef.current === businessCardId) return;
+    trackedViewIdRef.current = businessCardId;
+    trackEvent({ businessCardId, eventType: "ACCESS_CARD_VIEW" });
+  }, [data, trackAnalytics]);
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-muted-foreground">
           Loading...
         </p>
       </div>
@@ -88,18 +101,18 @@ const fetchData = async () => {
  if (error) {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg border p-8 text-center">
+      <div className="max-w-md w-full bg-card rounded-2xl shadow-lg border p-8 text-center">
         <div className="text-6xl mb-4">
           {isSubscriptionError ? "💳" : "⚠️"}
         </div>
 
-        <h2 className="text-2xl font-bold mb-3 text-red-600">
+        <h2 className="text-2xl font-bold mb-3 text-destructive">
           {isSubscriptionError
             ? "Subscription Required"
             : "Error"}
         </h2>
 
-        <p className="text-gray-600 mb-6">
+        <p className="text-muted-foreground mb-6">
           {error}
         </p>
 
@@ -108,7 +121,7 @@ const fetchData = async () => {
             onClick={() =>
               (window.location.href = "/pricing")
             }
-            className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg"
+            className="btn-primary"
           >
             Activate Subscription
           </button>
@@ -122,6 +135,7 @@ const fetchData = async () => {
     <GlamCardLivePreview
       data={data}
       mode={mode}
+      trackAnalytics={trackAnalytics}
       onClose={() =>
         console.log("Close clicked")
       }

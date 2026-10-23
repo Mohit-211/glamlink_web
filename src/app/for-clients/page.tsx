@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import Script from "next/script";
 
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
     title: "Discover & Book Beauty Professionals | Glamlink",
     description:
       "Browse verified beauty experts, discover services, and book professionals easily with Glamlink.",
-    url: "https://glamlink.net/for-clients",
+    url: `${SITE_URL}/for-clients`,
   },
 };
 
@@ -48,13 +49,13 @@ const webpageSchema = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "Glamlink For Clients",
-  url: "https://glamlink.net/for-clients",
+  url: `${SITE_URL}/for-clients`,
   description:
     "A platform for clients to discover, explore, and book trusted beauty and wellness professionals.",
   isPartOf: {
     "@type": "WebSite",
     name: "Glamlink",
-    url: "https://glamlink.net",
+    url: SITE_URL,
   },
 };
 

@@ -15,29 +15,17 @@ const MagazineHero = () => {
     <>
       <NewsletterPopup openDelay={3000} />
 
-      <section className="relative pt-18 pb-18 md:pt-20 md:pb-20 overflow-hidden bg-white">
-        {/* Very subtle luxury texture */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.006]">
-          <div
-            className="w-full h-full"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 2px 2px, #e0e0e0 1px, transparent 0)",
-              backgroundSize: "50px 50px",
-            }}
-          />
-        </div>
-
-        <div className="container-glamlink px-5 md:px-8 relative z-10">
+      <section className="hero-glamlink relative overflow-hidden bg-background">
+        <div className="container-glamlink relative z-10">
           <div className="max-w-5xl mx-auto text-center">
 
             {/* Single-line friendly headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-light text-gray-950 tracking-tight leading-none mb-8 md:mb-10">
-              <span className="italic text-[#24bbcb]"> The Glamlink Edit</span>
+            <h1 className="hero-title">
+              <span className="text-primary">The Glamlink Edit</span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-12 md:mb-16">
+            <p className="hero-subtitle mt-6 max-w-3xl mx-auto mb-10 md:mb-12">
               The Glamlink Edit is your inside look at beauty and wellness. Where top professionals, top treatments and evolving innovation are spotlighted. Stories go deeper and insight actually mean something. Watch, shop beauty products and connect with professionals behind the stories.
             </p>
 
@@ -49,15 +37,15 @@ const MagazineHero = () => {
               >
                 {/* Input wrapper */}
                 <div className="relative flex-1 min-w-0">
-                  <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/80 pointer-events-none" />
                   <input
                     type="email"
                     placeholder="Your email address"
                     className="
                     w-full h-14 pl-14 pr-6 rounded-full 
-                    border border-gray-200 bg-white text-gray-900 
-                    placeholder:text-gray-400 
-                    outline-none focus:border-[#24bbcb] focus:ring-4 focus:ring-[#24bbcb]/15 
+                    border border-border bg-card text-foreground 
+                    placeholder:text-muted-foreground/80 
+                    outline-none focus:border-primary focus:ring-4 focus:ring-primary/15 
                     transition-all duration-300 shadow-sm hover:shadow
                   "
                   />
@@ -68,9 +56,9 @@ const MagazineHero = () => {
                   type="submit"
                   className="
                   h-14 px-8 min-w-[160px] 
-                  bg-[#24bbcb] hover:bg-[#1ea8b5] 
-                  text-white font-medium rounded-full 
-                  shadow-md hover:shadow-lg shadow-[#24bbcb]/20 hover:shadow-[#24bbcb]/30 
+                  bg-primary hover:bg-secondary 
+                  text-primary-foreground font-medium rounded-full 
+                  shadow-md hover:shadow-lg shadow-primary/20 hover:shadow-primary/30 
                   transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
                   flex items-center gap-2
                 "
@@ -80,7 +68,7 @@ const MagazineHero = () => {
                 </Button>
               </form>
 
-              <p className="mt-5 text-sm text-gray-500">
+              <p className="mt-5 text-sm text-muted-foreground">
                 Join beauty enthusiasts • Unsubscribe anytime
               </p>
             </div>

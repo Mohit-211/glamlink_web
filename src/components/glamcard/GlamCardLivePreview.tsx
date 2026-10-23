@@ -1,32 +1,116 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import { GlamCardFormData } from "./GlamCardForm/types";
 import Logo from "../../../public/assets/ACCESS-3.png";
 import Image from "next/image";
+import { Instagram, Linkedin, Youtube, Facebook } from "@/components/icons/BrandIcons";
 import {
-  Instagram,
   Globe,
-  Linkedin,
-  Youtube,
-  Facebook,
   Music2,
   ExternalLink,
   Download,
   QrCode,
+  Share2,
   ChevronLeft,
   ChevronRight,
   Phone,
   MapPin,
   Clock,
+  Play,
+  Send,
+  Link2,
+  ArrowUpRight,
 } from "lucide-react";
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
+import { trackEvent, AnalyticsEventType } from "@/utils/analytics";
+import { TOKENS } from "@/lib/designTokens";
+/* ================= VIDEO THUMBNAIL GENERATOR ================= */
+/**
+ * Generates a JPEG data URL from a video's first safely-seekable frame.
+ * Needed because Safari (macOS/iOS) does not reliably render a preview
+ * frame for <video> without an explicit poster.
+ */
+function generateVideoThumbnail(
+  videoUrl: string,
+  seekTime: number = 0.1,
+): Promise<string | null> {
+  return new Promise((resolve) => {
+    if (!videoUrl || typeof document === "undefined") {
+      resolve(null);
+      return;
+    }
+    try {
+      const video = document.createElement("video");
+      if (!videoUrl.startsWith("blob:") && !videoUrl.startsWith("data:")) {
+        video.crossOrigin = "anonymous";
+      }
+      video.preload = "metadata";
+      video.muted = true;
+      video.playsInline = true;
+      (video as any).webkitPlaysInline = true;
+      video.src = videoUrl;
 
+      let settled = false;
+      const finish = (result: string | null) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeoutId);
+        video.removeAttribute("src");
+        video.load();
+        resolve(result);
+      };
+
+      const captureFrame = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = video.videoWidth || 320;
+          canvas.height = video.videoHeight || 240;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            finish(null);
+            return;
+          }
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+          finish(dataUrl);
+        } catch {
+          // Tainted canvas (CORS) or other draw failure — fall back gracefully.
+          finish(null);
+        }
+      };
+
+      video.addEventListener("loadedmetadata", () => {
+        const duration = video.duration;
+        const target =
+          isFinite(duration) && duration > 0 && duration < seekTime
+            ? Math.max(duration / 2, 0.01)
+            : seekTime;
+        try {
+          video.currentTime = target;
+        } catch {
+          captureFrame();
+        }
+      });
+      video.addEventListener("seeked", captureFrame);
+      video.addEventListener("error", () => finish(null));
+
+      const timeoutId = window.setTimeout(() => finish(null), 5000);
+
+      video.load();
+    } catch {
+      resolve(null);
+    }
+  });
+}
 /* ================= VCF GENERATOR ================= */
 export function generateVCF(data: GlamCardFormData) {
+  const fullName = (data.name || "").trim();
+  const [firstName, ...rest] = fullName.split(/\s+/).filter(Boolean);
+  const lastName = rest.join(" ");
   return [
     "BEGIN:VCARD",
     "VERSION:3.0",
-    `N:${data.name || ""};;;;`,
-    `FN:${data.name || ""}`,
+    `N:${lastName};${firstName || ""};;;`,
+    `FN:${fullName}`,
     `ORG:${data.business_name || ""}`,
     `TITLE:${data.professional_title || ""}`,
     `TEL;TYPE=CELL:${data.phone || ""}`,
@@ -48,17 +132,17 @@ function downloadVCF(data: GlamCardFormData) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-
 /* ================= TYPES ================= */
 interface Props {
   data: GlamCardFormData;
   sticky?: boolean;
   mode?: "live" | "view" | "download";
+  /** Only the public /access/[slug] page opts in to analytics. */
+  trackAnalytics?: boolean;
   onClose?: () => void;
   onDownload?: () => void;
   onCopyLink?: () => void;
 }
-
 /* ================= REUSABLE SECTION BOX ================= */
 const SectionBox: React.FC<{
   title: string;
@@ -68,43 +152,40 @@ const SectionBox: React.FC<{
 }> = ({ title, titleAlign = "left", icon, children }) => (
   <div
     className="rounded-2xl p-[2px]"
-    style={{ background: "linear-gradient(135deg, #23B9CD33, #a8edea55)" }}
+    style={{ background: "linear-gradient(135deg, var(--card-accent-faint), var(--card-accent-light))" }}
   >
     <div
       className="rounded-2xl p-3 sm:p-4 h-full"
       style={{
-        background: "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
-        boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+        background: "linear-gradient(135deg, var(--card-panel-start) 0%, var(--card-panel-end) 100%)",
+        boxShadow: "var(--shadow-medium)",
       }}
-
     >
       {titleAlign === "center" ? (
         <div className="flex items-center gap-2 mb-3">
-          <span className="flex-1 h-px bg-gray-400/60" />
+          <span className="flex-1 h-px bg-input/60" />
           <div className="flex items-center gap-1.5">
-            {icon && <span className="text-[#23B9CD]">{icon}</span>}
-            <p className="text-xs font-bold tracking-wider text-gray-700 uppercase whitespace-nowrap">
+            {icon && <span className="text-[var(--card-accent)]">{icon}</span>}
+            <p className="text-xs font-bold tracking-wider text-foreground/80 uppercase whitespace-nowrap">
               {title}
             </p>
           </div>
-          <span className="flex-1 h-px bg-gray-400/60" />
+          <span className="flex-1 h-px bg-input/60" />
         </div>
       ) : (
         <div className="flex items-center gap-1.5 mb-3">
-          {icon && <span className="text-[#23B9CD]">{icon}</span>}
-          <p className="text-xs font-bold tracking-wider text-gray-700 uppercase">
+          {icon && <span className="text-[var(--card-accent)]">{icon}</span>}
+          <p className="text-xs font-bold tracking-wider text-foreground/80 uppercase">
             {title}
           </p>
         </div>
       )}
-      <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm" style={{
-        boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
+      <div className="rounded-xl bg-card p-3 sm:p-4 shadow-sm" style={{
+        boxShadow: "var(--shadow-medium)",
       }}>{children}</div>
     </div>
   </div>
 );
-
 /* ================= HELPERS ================= */
 const formatTime = (time: string) => {
   if (!time) return "";
@@ -114,7 +195,6 @@ const formatTime = (time: string) => {
   const formattedHour = hour % 12 || 12;
   return `${formattedHour}:${m} ${ampm}`;
 };
-
 const parseArray = (value: string | string[] | undefined): string[] => {
   if (!value) return [];
   if (Array.isArray(value)) return value;
@@ -126,9 +206,36 @@ const parseArray = (value: string | string[] | undefined): string[] => {
   }
   return [];
 };
-
 const isFile = (v: any): v is File => v instanceof File;
-
+/** Default Glamlink accent — used whenever the Access Card has no valid color_code. */
+const DEFAULT_ACCENT_COLOR = TOKENS.primary;
+const isValidHexColor = (value: unknown): value is string =>
+  typeof value === "string" &&
+  /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value.trim());
+/** Expands `rgb(a)` from a hex color, e.g. for `rgba(...)` glows/tints derived from color_code. */
+const hexToRgb = (hex: string): { r: number; g: number; b: number } => {
+  let h = hex.trim().replace("#", "");
+  if (h.length === 3) {
+    h = h
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  const num = parseInt(h, 16);
+  return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+};
+const hexToRgba = (hex: string, alpha: number): string => {
+  const { r, g, b } = hexToRgb(hex);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+/** Darkens (negative percent) or lightens (positive percent) a hex color — used for hover/gradient shades derived from color_code. */
+const shadeColor = (hex: string, percent: number): string => {
+  const { r, g, b } = hexToRgb(hex);
+  const t = percent < 0 ? 0 : 255;
+  const p = Math.abs(percent) / 100;
+  const mix = (c: number) => Math.round((t - c) * p) + c;
+  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+};
 /* ================= TEAL DOT BULLET LIST ================= */
 const DotList: React.FC<{ items: any[]; placeholder: string }> = ({
   items,
@@ -138,29 +245,50 @@ const DotList: React.FC<{ items: any[]; placeholder: string }> = ({
     {items.length ? (
       items.map((item, i) => (
         <li key={i} className="flex items-start gap-2.5">
-          {/* <span className="mt-1.5 w-2 h-2 rounded-full bg-[#23B9CD] flex-shrink-0" /> */}
-          <span className="text-gray-700 leading-snug">
+          {/* <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--card-accent)] flex-shrink-0" /> */}
+          <span className="text-foreground/80 leading-snug">
             {typeof item === "string" ? item : item?.note || item?.text || ""}
           </span>
         </li>
       ))
     ) : (
-      <li className="text-gray-400 text-xs italic">{placeholder}</li>
+      <li className="text-muted-foreground/80 text-xs italic">{placeholder}</li>
     )}
   </ul>
 );
-
+/* ================= BLACK PILL TAG LIST ================= */
+const TagList: React.FC<{ items: any[] }> = ({ items }) => {
+  const display = items.length ? items : [""];
+  return (
+    <div className="flex flex-wrap gap-2">
+      {display.map((item, i) => (
+        <span
+          key={i}
+          className="rounded-full px-3 py-1.5 text-xs font-medium text-foreground min-w-[2.5rem] min-h-[1.5rem]"
+        >
+          {typeof item === "string" ? item : item?.note || item?.text || ""}
+        </span>
+      ))}
+    </div>
+  );
+};
 /* ================= COMPONENT ================= */
-const GlamCardLivePreview: React.FC<Props> = ({
+// Callers can pass no data while a card is still loading. The guard lives in
+// its own component so the hooks below always run in the same order.
+const GlamCardLivePreview: React.FC<Props> = (props) => {
+  if (!props.data) return null;
+  return <GlamCardLivePreviewContent {...props} />;
+};
+
+const GlamCardLivePreviewContent: React.FC<Props> = ({
   data,
   sticky = false,
   mode,
+  trackAnalytics = false,
   onClose,
   onDownload,
   onCopyLink,
 }) => {
-  if (!data) return null;
-
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(0);
@@ -169,30 +297,27 @@ const GlamCardLivePreview: React.FC<Props> = ({
   );
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-
   const specialtiesArray = parseArray(data.specialties);
-  console.log(specialtiesArray, "specialtiesArray");
   const importantInfoArray = parseArray(data.important_info);
-
   /* ================= PROFILE IMAGE ================= */
+  const profileImage = data.profile_image;
   const profileImageUrl = useMemo(() => {
-    if (!data?.profile_image) return "";
-    if (mode === "live" && isFile(data.profile_image))
-      return URL.createObjectURL(data.profile_image);
-    if (typeof data.profile_image === "string") return data.profile_image;
+    if (!profileImage) return "";
+    if (mode === "live" && isFile(profileImage))
+      return URL.createObjectURL(profileImage);
+    if (typeof profileImage === "string") return profileImage;
     return "";
-  }, [data?.profile_image, mode]);
-
+  }, [profileImage, mode]);
   useEffect(() => {
     return () => {
       if (profileImageUrl?.startsWith("blob:"))
         URL.revokeObjectURL(profileImageUrl);
     };
   }, [profileImageUrl]);
-
   /* ================= IMAGE NORMALIZATION ================= */
+  const images = data.images;
   const normalizedImages = useMemo(() => {
-    const rawImages = data?.images || [];
+    const rawImages = images || [];
     return rawImages?.map((item: any, index: number) => {
       if (typeof item === "string")
         return {
@@ -219,8 +344,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
         sort_order: item.sort_order ?? index,
       };
     });
-  }, [data?.images]);
-
+  }, [images]);
   /* ================= DEDUPLICATE ================= */
   const deduplicatedImages = useMemo(() => {
     const properVideoUrls = new Set(
@@ -237,21 +361,18 @@ const GlamCardLivePreview: React.FC<Props> = ({
         ),
     );
   }, [normalizedImages]);
-
   const galleryMeta = data?.gallery_meta || [];
-
   /* ================= GALLERY PREVIEWS ================= */
   const galleryPreviews = useMemo(
     () =>
       mode === "live"
         ? normalizedImages?.map((item, idx) => {
-          const raw = data?.images?.[idx];
+          const raw = images?.[idx];
           return isFile(raw) ? URL.createObjectURL(raw) : item.url;
         })
         : normalizedImages?.map((item) => item.url),
-    [mode, normalizedImages, data?.images],
+    [mode, normalizedImages, images],
   );
-
   /* ================= THUMBNAIL PREVIEWS ================= */
   const thumbnailPreviews = useMemo(
     () =>
@@ -266,7 +387,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
       }),
     [normalizedImages, galleryMeta, galleryPreviews],
   );
-
   useEffect(() => {
     if (mode !== "live") return;
     return () => {
@@ -278,7 +398,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
       });
     };
   }, [galleryPreviews, thumbnailPreviews, mode]);
-
   /* ================= THUMBNAIL INDEX ================= */
   useEffect(() => {
     if (!normalizedImages.length) {
@@ -290,23 +409,72 @@ const GlamCardLivePreview: React.FC<Props> = ({
       setThumbnailIndex(metaIndex !== -1 ? metaIndex : 0);
     }
   }, [normalizedImages, galleryMeta, thumbnailIndex]);
-
-  const otherIndexes = useMemo(
-    () => normalizedImages?.map((_, i) => i),
-    [normalizedImages],
+  /* ================= VIDEO THUMBNAIL CACHE ================= */
+  const [videoThumbCache, setVideoThumbCache] = useState<Record<string, string>>(
+    {},
   );
-
+  const attemptedVideoUrlsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    let cancelled = false;
+    normalizedImages.forEach((item, idx) => {
+      if (item.file_type !== "video" || item.thumbnail_uri) return;
+      const videoUrl = galleryPreviews[idx];
+      if (!videoUrl || attemptedVideoUrlsRef.current.has(videoUrl)) return;
+      attemptedVideoUrlsRef.current.add(videoUrl);
+      generateVideoThumbnail(videoUrl).then((thumb) => {
+        if (cancelled || !thumb) return;
+        setVideoThumbCache((prev) => ({ ...prev, [videoUrl]: thumb }));
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [normalizedImages, galleryPreviews]);
+  /** First preference: backend thumbnail_uri, second: cached/generated thumbnail. */
+  const getVideoThumbSrc = (index: number): string | null => {
+    const item = normalizedImages[index];
+    if (!item) return null;
+    if (item.thumbnail_uri) return item.thumbnail_uri;
+    const videoUrl = galleryPreviews[index];
+    if (videoUrl && videoThumbCache[videoUrl]) return videoThumbCache[videoUrl];
+    return null;
+  };
+  const renderThumbImage = (index: number, altPrefix: string) => {
+    const item = normalizedImages[index];
+    if (item?.file_type === "video") {
+      const thumbSrc = getVideoThumbSrc(index);
+      return (
+        <div className="relative h-full w-full bg-foreground">
+          {thumbSrc ? (
+            <img
+              src={thumbSrc}
+              className="h-full w-full object-cover"
+              alt={`${altPrefix} ${index + 1}`}
+            />
+          ) : null}
+          <div className="absolute inset-0 flex items-center justify-center bg-overlay/25">
+            <Play size={14} className="text-overlay-foreground fill-overlay-foreground" />
+          </div>
+        </div>
+      );
+    }
+    return (
+      <img
+        src={thumbnailPreviews[index]}
+        className="h-full w-full object-cover"
+        alt={`${altPrefix} ${index + 1}`}
+      />
+    );
+  };
   /* ================= LOCATION ================= */
   const primaryLocation = useMemo(
     () => data.locations?.find((l: any) => l.is_primary) || data.locations?.[0],
     [data.locations],
   );
-
   useEffect(() => {
     if (!selectedLocationId && primaryLocation?.id)
       setSelectedLocationId(String(primaryLocation.id));
   }, [primaryLocation?.id, selectedLocationId]);
-
   const selectedLocation = useMemo(() => {
     if (!data.locations?.length) return null;
     return (
@@ -314,7 +482,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
       primaryLocation
     );
   }, [data.locations, selectedLocationId, primaryLocation]);
-
   /* ================= MAP SRC ================= */
   const mapQuery = useMemo(() => {
     if (!selectedLocation) return "";
@@ -330,12 +497,11 @@ const GlamCardLivePreview: React.FC<Props> = ({
         .join(", ") || ""
     );
   }, [selectedLocation]);
-
   const mapZoom = selectedLocation?.location_type === "exact_address" ? 15 : 12;
   const mapSrc = mapQuery
     ? `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=${mapZoom}&output=embed`
     : "";
-
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`;
   /* ================= SOCIAL MEDIA ================= */
   const socialMedia = useMemo(() => {
     if (!data?.social_media) return {};
@@ -348,7 +514,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
     }
     return data.social_media;
   }, [data.social_media]);
-
   /* ================= ALL INSTAGRAM HANDLES ================= */
   const allInstagramHandles = useMemo(() => {
     const handles: { key: string; url: string }[] = [];
@@ -361,7 +526,6 @@ const GlamCardLivePreview: React.FC<Props> = ({
     }
     return handles;
   }, [socialMedia]);
-
   /* ================= OTHER LINKS ================= */
   const otherLinks = useMemo(() => {
     if (!data?.other_links) return [];
@@ -374,10 +538,72 @@ const GlamCardLivePreview: React.FC<Props> = ({
     }
     return Array.isArray(data.other_links) ? data.other_links : [];
   }, [data.other_links]);
-
+  /* ================= FEATURED LINKS ================= */
+  const featuredLinks = useMemo(() => {
+    let value = data?.featured_links;
+    if (typeof value === "string") {
+      try {
+        value = JSON.parse(value);
+      } catch {
+        value = [];
+      }
+    }
+    if (!Array.isArray(value)) return [];
+    const filtered = value.filter((link: any) => link?.url);
+    // Position always follows the server's sort_order (falling back to
+    // array position for a link that doesn't have one yet, e.g. brand-new
+    // and not yet saved/reordered through the API) — is_featured no longer
+    // forces it to the top, it's shown as a "Featured" tag on the card
+    // instead, wherever it falls in that order.
+    return [...filtered].sort((a: any, b: any) => {
+      const aOrder = a?.sort_order ?? filtered.indexOf(a);
+      const bOrder = b?.sort_order ?? filtered.indexOf(b);
+      return aOrder - bOrder;
+    });
+  }, [data.featured_links]);
+  /* Theme accent for the whole card — sourced from the Access Card's
+     color_code, falling back to the default Glamlink accent when
+     missing/invalid so the card never breaks on a bad value. Exposed to
+     every section below (including the standalone SectionBox component)
+     as CSS custom properties on the outermost wrapper, so nothing in this
+     file hardcodes a color — see `cardColorVars` near the JSX return. */
+  const colorCode = data.color_code;
+  const cardColor = useMemo(
+    () =>
+      isValidHexColor(colorCode)
+        ? colorCode.trim()
+        : DEFAULT_ACCENT_COLOR,
+    [colorCode],
+  );
+  /* Resolves a thumbnail for both a persisted URL and a pending File (this
+     component doubles as the live preview during editing, where a newly
+     selected thumbnail is still a raw File). Object URLs are created once
+     per featuredLinks change and revoked together, same pattern as the
+     gallery preview cache above. */
+  const featuredLinkThumbSrcs = useMemo(() => {
+    const map = new Map<any, string>();
+    featuredLinks.forEach((link: any) => {
+      if (link?.thumbnail_file instanceof File) {
+        map.set(link, URL.createObjectURL(link.thumbnail_file));
+      }
+    });
+    return map;
+  }, [featuredLinks]);
+  useEffect(() => {
+    return () => {
+      featuredLinkThumbSrcs.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [featuredLinkThumbSrcs]);
+  const getFeaturedLinkThumbnailSrc = (link: any): string | undefined =>
+    featuredLinkThumbSrcs.get(link) ||
+    link?.image ||
+    link?.thumbnail_url ||
+    link?.image_url ||
+    undefined;
   /* ================= PREFERRED BOOKING METHODS ================= */
+  const rawPreferredBookingMethod = (data as any)?.preferred_booking_method;
   const preferredBookingMethods = useMemo(() => {
-    const val = (data as any)?.preferred_booking_method;
+    const val = rawPreferredBookingMethod;
     if (Array.isArray(val)) return val;
     if (typeof val === "string" && val) {
       try {
@@ -390,8 +616,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
       }
     }
     return [];
-  }, [(data as any)?.preferred_booking_method]);
-
+  }, [rawPreferredBookingMethod]);
   const handleCopyLink = async () => {
     const link = data?.business_card_qr;
     try {
@@ -402,7 +627,39 @@ const GlamCardLivePreview: React.FC<Props> = ({
       console.error("Failed to copy link:", error);
     }
   };
-
+  /* ================= ANALYTICS ================= */
+  // Fire-and-forget; runs alongside each existing action, never instead of it.
+  const track = (
+    eventType: AnalyticsEventType,
+    eventTarget: string | null = null,
+    metadata?: Record<string, unknown>,
+  ) => {
+    if (!trackAnalytics) return;
+    trackEvent({ businessCardId: Number(data?.id), eventType, eventTarget, metadata });
+  };
+  const handleSaveContact = () => {
+    track("SAVE_CONTACT_CLICK");
+    downloadVCF(data);
+  };
+  const handleShare = async () => {
+    track("SHARE_CLICK", null, {
+      method: typeof navigator !== "undefined" && "share" in navigator ? "native_share" : "copy_link",
+    });
+    const link = data?.business_card_link;
+    if (!link) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: data?.name || "Business Card",
+          url: link,
+        });
+      } catch (error) {
+        // user cancelled share or share failed silently
+      }
+    } else {
+      handleCopyLink();
+    }
+  };
   /* ================= SOCIAL ICONS LIST ================= */
   const hasSocials =
     data?.website ||
@@ -411,25 +668,57 @@ const GlamCardLivePreview: React.FC<Props> = ({
     socialMedia?.linkedin ||
     socialMedia?.youtube ||
     socialMedia?.tiktok;
-
   /* ================= RENDER ================= */
   const socialIconStyle = {
-    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+    boxShadow: "var(--shadow-medium)",
   };
+  /* Raised, premium button look for the Connect section icons only. */
+  const connectIconStyle = {
+    boxShadow:
+      "var(--shadow-medium)",
+  };
+  /* Every dynamic color used below (including inside the standalone
+     SectionBox component, which has no props/access to `cardColor`)
+     resolves through these CSS custom properties instead of a hardcoded
+     hex, so picking a new color_code re-themes the entire card with no
+     per-element wiring. Pre-mixing the alpha variants here (rather than
+     relying on Tailwind's opacity modifier on a `var(...)` value, which it
+     can't compute) keeps every consumer a plain, JIT-safe literal class
+     like `bg-[var(--card-accent)]`. */
+  const cardColorLight = shadeColor(cardColor, 55);
+  const cardColorVars = {
+    "--card-accent": cardColor,
+    "--card-accent-strong": shadeColor(cardColor, -14),
+    "--card-accent-deep": shadeColor(cardColor, -25),
+    "--card-accent-soft": hexToRgba(cardColor, 0.35),
+    "--card-accent-faint": hexToRgba(cardColor, 0.12),
+    "--card-accent-border": hexToRgba(cardColor, 0.4),
+    // Pastel partner for the two-tone gradient borders — a lighter tint of
+    // the same accent instead of a fixed mint, so the gradient stays
+    // monochromatic no matter which color_code is picked.
+    "--card-accent-light": hexToRgba(cardColorLight, 0.45),
+    // Panel background (SectionBox, Important Info, Press & Features,
+    // Featured Links) — was a fixed blue-gray gradient that clashed with
+    // any non-teal color_code; now a near-white tint of the accent itself,
+    // so the panel background always matches the chosen theme.
+    "--card-panel-start": shadeColor(cardColor, 90),
+    "--card-panel-end": shadeColor(cardColor, 78),
+  } as React.CSSProperties;
   return (
     <div
       className={`${mode !== "download" ? "min-h-screen" : ""} flex flex-col`}
+      style={cardColorVars}
     >
       {/* ===== MOBILE STICKY TOP BAR (view mode) ===== */}
       {mode === "view" && (
-        <div className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm lg:hidden">
+        <div className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-card/90 backdrop-blur-md border-b border-border shadow-sm lg:hidden">
           <div className="flex items-center gap-2">
             <Image src={Logo} alt="access" width={90} height={28} />
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => downloadVCF(data)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#23B9CD] text-white text-xs font-semibold shadow transition active:scale-95"
+              onClick={handleSaveContact}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--card-accent)] text-primary-foreground text-xs font-semibold shadow transition active:scale-95"
             >
               <svg
                 className="w-3.5 h-3.5"
@@ -445,38 +734,42 @@ const GlamCardLivePreview: React.FC<Props> = ({
               </svg>
               Save
             </button>
-            <button
+             <button
+                  onClick={handleShare}
+                  className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-primary-foreground shadow-lg hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
+                >
+                  <Share2 size={12} strokeWidth={2.5} />
+                </button>
+            {/* <button
               onClick={() => setIsQrModalOpen(true)}
-              className="h-8 w-8 flex items-center justify-center rounded-full bg-[#23B9CD]/10 text-[#23B9CD] transition active:scale-95"
+              className="h-8 w-8 flex items-center justify-center rounded-full bg-[var(--card-accent-faint)] text-[var(--card-accent)] transition active:scale-95"
             >
               <QrCode size={15} strokeWidth={2.5} />
-            </button>
+            </button> */}
           </div>
         </div>
       )}
-
       <div className="px-3 py-4 sm:px-5 sm:py-6 lg:p-6 flex flex-col items-center">
         <div
-          className="w-full max-w-lg lg:max-w-3xl p-[2px] rounded-2xl"
+          className="w-full max-w-lg lg:max-w-2xl p-[2px] rounded-2xl"
           style={{
-            background: "linear-gradient(135deg, #23B9CD, #a8edea 50%, #23B9CD)",
-            boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+            background: `linear-gradient(135deg, ${cardColor}, ${cardColorLight} 50%, ${cardColor})`,
+            boxShadow: "var(--shadow-medium)",
           }}
         >
-          <div className="rounded-2xl bg-[#F4F9FF] p-4 sm:p-6 shadow-sm">
+          <div className="rounded-2xl bg-card p-4 sm:p-6 shadow-sm">
             {/* ===== LOGO (desktop / non-view) ===== */}
             <div
               className={`mb-5 text-center ${mode === "view" ? "hidden lg:flex justify-center" : "flex justify-center"}`}
             >
               <Image src={Logo} alt="access image" width={160} height={160} />
             </div>
-
             {/* ===== DESKTOP TOP ACTIONS ===== */}
             {mode === "view" && (
               <div className="hidden lg:flex justify-end gap-2 mb-3">
                 <button
-                  onClick={() => downloadVCF(data)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#23B9CD] hover:bg-[#1ea8b5] text-white text-sm font-medium shadow-md transition-colors whitespace-nowrap" style={socialIconStyle}
+                  onClick={handleSaveContact}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] text-primary-foreground text-sm font-medium shadow-md transition-colors whitespace-nowrap" style={socialIconStyle}
                 >
                   <svg
                     className="w-4 h-4 flex-shrink-0"
@@ -494,32 +787,29 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   Save Contact
                 </button>
                 <button
-                  onClick={() => setIsQrModalOpen(true)}
-                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[#23B9CD] text-white shadow-lg hover:bg-[#1ea8b5] transition-all duration-200" style={socialIconStyle}
+                  onClick={handleShare}
+                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-primary-foreground shadow-lg hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
                 >
-                  <QrCode size={18} strokeWidth={2.5} />
+                  <Share2 size={18} strokeWidth={2.5} />
                 </button>
               </div>
             )}
-
-            {/* ===== MOBILE HERO: PROFILE CARD ===== */}
-            <div className="lg:hidden mb-4">
+            {/* ===== HERO: PROFILE CARD ===== */}
+            <div className="mb-4">
               <div
-                className="rounded-2xl overflow-hidden shadow-md"
+                className="relative rounded-2xl overflow-hidden shadow-md"
                 style={{
-                  background:
-                    "linear-gradient(135deg, #23B9CD 0%, #0e8fa0 100%)",
+                  background: `${cardColor}`,
                 }}
               >
                 {/* bg pattern */}
                 <div className="absolute inset-0 opacity-10">
-                  <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white translate-x-8 -translate-y-8" />
-                  <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white -translate-x-6 translate-y-6" />
+                  {/* <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-card translate-x-8 -translate-y-8" /> */}
+                  {/* <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-card -translate-x-6 translate-y-6" /> */}
                 </div>
-
                 <div className="flex items-center gap-4 p-4">
                   {/* avatar */}
-                  <div className="w-28 h-28 rounded-full overflow-hidden bg-white/20 border-2 border-white shadow-lg flex-shrink-0">
+                  <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-card shadow-lg flex-shrink-0">
                     {data?.profile_image ? (
                       <img
                         src={
@@ -533,352 +823,28 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         alt="Profile"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">
+                      <div className="w-full h-full flex items-center justify-center text-primary-foreground text-2xl font-bold">
                         {(data.name || "?")[0]}
                       </div>
                     )}
                   </div>
                   {/* info */}
-                  <div className="flex-1 min-w-0 text-white">
-                    <p className="font-bold text-white text-lg leading-tight truncate">
+                  <div className="flex-1 min-w-0 text-primary-foreground">
+                    <p className="font-bold text-primary-foreground text-lg leading-tight truncate">
                       {data.name || "Your Name"}
                     </p>
-                    <p className="text-white/90 text-sm font-medium mt-0.5 truncate">
+                    <p className="text-primary-foreground/90 text-sm font-medium mt-0.5 truncate">
                       {data.professional_title || "Professional Title"}
                     </p>
-                    <p className="text-white/70 text-xs mt-0.5 truncate">
+                    <p className="text-primary-foreground/70 text-xs mt-0.5 truncate">
                       {data.business_name || "Business Name"}
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* ===== DESKTOP / TABLET TWO-COL ===== */}
-            <div className="hidden lg:grid lg:grid-cols-2 gap-5">
-              {/* ---- LEFT COLUMN ---- */}
-              <div className="flex flex-col gap-5">
-                {/* ABOUT */}
-                <SectionBox title={`About ${data.name || "Your Name"}`}>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="h-28 w-28 overflow-hidden rounded-full bg-gray-200 ring-2 ring-white shadow flex items-center justify-center">
-                      {data?.profile_image && (
-                        <img
-                          src={
-                            mode === "live" && isFile(data.profile_image)
-                              ? URL.createObjectURL(data.profile_image)
-                              : typeof data.profile_image === "string"
-                                ? data.profile_image
-                                : ""
-                          }
-                          className="h-full w-full object-cover"
-                          alt="Profile"
-                        />
-                      )}
-                    </div>
-                    <div className="mt-3">
-                      <p className="font-bold text-gray-800">
-                        {data.name || "Your Name"}
-                      </p>
-                      <p className="text-sm text-[#24bbcb] font-medium">
-                        {data.professional_title || "Professional Title"}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {data.business_name || "Business Name"}
-                      </p>
-                    </div>
-                  </div>
-                  {data.bio && (
-                    <div
-                      className="prose prose-sm mt-4 text-gray-700"
-                      dangerouslySetInnerHTML={{ __html: data.bio }}
-                    />
-                  )}
-                </SectionBox>
-
-                {/* SIGNATURE WORK — DESKTOP */}
-       <SectionBox title="Gallery" titleAlign="center">
-                  {normalizedImages.length > 0 && thumbnailIndex !== null ? (
-                    <>
-                  <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-gray-100 shadow-sm group">
-                        {normalizedImages[thumbnailIndex]?.file_type ===
-                          "video" ? (
-                          /* ✅ iOS FIX: playsInline + preload + key */
-                          <video
-                            key={galleryPreviews[thumbnailIndex]}
-                            controls
-                            playsInline
-                            preload="metadata"
-                            webkit-playsinline="true"
-                            controlsList="nodownload"
-                            className="h-full w-full object-cover"
-                          >
-                            <source
-                              src={galleryPreviews[thumbnailIndex]}
-                              type="video/mp4"
-                            />
-                            {/* Your browser does not support video. */}
-                          </video>
-                        ) : (
-                          <img
-                            src={
-                              normalizedImages[thumbnailIndex]?.thumbnail_uri ||
-                              galleryPreviews[thumbnailIndex]
-                            }
-                            className="h-full w-full object-cover transition hover:scale-105 duration-300" style={{
-                              boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
-                            }}
-                            alt="Featured work"
-                          />
-                        )}
-
-                        {/* prev / next arrows — desktop gallery carousel */}
-                        {normalizedImages.length > 1 && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setThumbnailIndex(
-                                  (prev) =>
-                                    ((prev ?? 0) - 1 + normalizedImages.length) %
-                                    normalizedImages.length,
-                                )
-                              }
-                              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity active:scale-90"
-                              aria-label="Previous image"
-                            >
-                              <ChevronLeft size={18} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setThumbnailIndex(
-                                  (prev) =>
-                                    ((prev ?? 0) + 1) % normalizedImages.length,
-                                )
-                              }
-                              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity active:scale-90"
-                              aria-label="Next image"
-                            >
-                              <ChevronRight size={18} />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                      {otherIndexes.length > 0 && (
-                        <div className="mt-3 flex gap-2 overflow-x-auto p-1">
-                          {otherIndexes?.map((index) => (
-                            <button
-                              key={index}
-                              onClick={() => setThumbnailIndex(index)}
-                              className={`h-12 w-16 aspect-[4/3] cursor-pointer overflow-hidden rounded-lg border shadow-sm flex-shrink-0 ${thumbnailIndex === index ? "ring-2 ring-teal-500" : "hover:ring-2 hover:ring-teal-400"}`} style={{
-                                boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
-                              }}
-                            >
-                              <img
-                                src={thumbnailPreviews[index]}
-                                className="h-full w-full object-cover"
-                                alt={`Thumbnail ${index + 1}`}
-                              />
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="flex aspect-[4/3] items-center justify-center text-xs text-gray-400">
-                      Featured work will appear here
-                    </div>
-                  )}
-                </SectionBox>
-              </div>
-
-              {/* ---- RIGHT COLUMN ---- */}
-             <div className="flex flex-col gap-5">
-                {/* LOCATION + HOURS desktop */}
-                <div
-                  className="rounded-2xl p-[2px]"
-                  style={{
-                    background: "linear-gradient(135deg, #23B9CD33, #a8edea55)",
-                  }}
-                >
-                  <div
-                    className="rounded-2xl p-4 h-full"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
-                      boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
-                    }}
-                  >
-                    {data.locations?.length ? (
-                      <>
-                        {data.locations.length > 1 && (
-                          <select
-                            className="mb-3 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-200"
-                            value={selectedLocationId || ""}
-                            onChange={(e) =>
-                              setSelectedLocationId(e.target.value)
-                            }
-                          >
-                            {data.locations.map((loc: any) => (
-                              <option key={loc.id} value={loc.id}>
-                                {loc.label || `Location ${loc.id}`}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                        {selectedLocation && (
-                          <div className="text-sm mb-3 space-y-1">
-                            {data.locations.length === 1 &&
-                              selectedLocation.label && (
-                                     <p className="font-semibold text-gray-800">
-                                  {selectedLocation.label}
-                                </p>
-                              )}
-                            {/* {selectedLocation.business_name && (
-                              <p className="font-semibold text-gray-800">
-                                {selectedLocation.business_name}
-                              </p>
-                            )} */}
-                            <p className="text-gray-600 leading-relaxed">
-                              {selectedLocation.location_type ===
-                                "exact_address"
-                                ? selectedLocation.address?.trim() ||
-                                "Address not provided"
-                                : [
-                                  selectedLocation.city?.trim(),
-                                  selectedLocation.state?.trim(),
-                                  selectedLocation.area?.trim(),
-                                ]
-                                  .filter(Boolean)
-                                  .join(", ") || "Location not fully set"}
-                            </p>
-                            {(selectedLocation?.phone || data.phone) &&
-                              data.is_phone_visible && (
-                                <p className="text-gray-600">
-                                  📞 {selectedLocation.phone || data.phone}
-                                </p>
-                              )}
-                            {selectedLocation.description && (
-                              <p className="text-xs text-gray-500 italic">
-                                {selectedLocation.description}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                        {mapSrc ? (
-                          <div className="relative rounded-xl overflow-hidden shadow-sm" style={{
-                            boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
-                          }}>
-                            <iframe
-                              title="Business Location Map"
-                              className="w-full h-48 sm:h-52"
-                              style={{ border: 0, display: "block" }}
-                              loading="lazy"
-                              allowFullScreen
-                              referrerPolicy="no-referrer-when-downgrade"
-                              src={mapSrc}
-                            />
-                            <a
-                              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-200 text-sm whitespace-nowrap" style={{boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)"}}
-                            >
-                              <svg
-                                className="w-4 h-4"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                              >
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                              </svg>
-                              Get Directions
-                            </a>
-                          </div>
-                        ) : (
-                          <p className="text-xs text-gray-400 italic">
-                            Map will appear here once location is set
-                          </p>
-                        )}
-                      </>
-                    ) : (
-                      <p className="text-xs text-gray-400 italic">
-                        Location details will appear here once set
-                      </p>
-                    )}
-
-                    {/* BUSINESS HOURS desktop */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-3 mt-3">
-                        <span className="flex-1 h-px bg-gray-400/60" />
-                        <p className="text-sm font-bold tracking-wide text-gray-800 whitespace-nowrap">
-                          Business Hours
-                        </p>
-                        <span className="flex-1 h-px bg-gray-400/60" />
-                      </div>
-                      <div className="rounded-xl bg-white p-4 shadow-sm" style={{
-                        boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
-                      }}>
-                        {data.business_hour.length !== 0 ? (
-                          <ul className="space-y-1.5 text-sm">
-                            {data.business_hour.map(
-                              (hour: any, index: number) => {
-                                const open = hour.open_time
-                                  ? formatTime(hour.open_time)
-                                  : "Closed";
-                                const close = hour.close_time
-                                  ? formatTime(hour.close_time)
-                                  : "";
-                                const timeText =
-                                  open && close && open !== "Closed"
-                                    ? `${open} - ${close}`
-                                    : open;
-                                return (
-                                  <li
-                                    key={hour.id ?? index}
-                                    className="flex items-start gap-2"
-                                  >
-                                    <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0" />
-                                    <span className="text-gray-700">
-                                      {hour.note ? hour.note : timeText}
-                                    </span>
-                                  </li>
-                                );
-                              },
-                            )}
-                          </ul>
-                        ) : (
-                          <ul className="space-y-1.5 text-sm">
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1.5 w-2.5 h-2.5 rounded-full bg-teal-400 flex-shrink-0" />
-                              <span className="text-gray-700">
-                                Appointment on request
-                              </span>
-                            </li>
-                          </ul>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SPECIALTIES desktop */}
-                <SectionBox title="Specialties" titleAlign="center">
-                  <DotList
-                    items={specialtiesArray}
-                    placeholder="Your specialties will appear here"
-                  />
-                </SectionBox>
-              </div>
-            </div>
-
-            {/* ===== MOBILE: STACKED SECTIONS ===== */}
-            <div className="lg:hidden flex flex-col gap-3">
+            {/* ===== STACKED SECTIONS ===== */}
+            <div className="flex flex-col gap-3">
               {/* BIO */}
               {data.bio && (
                 <SectionBox
@@ -886,18 +852,15 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   icon={<span className="text-[10px]">✦</span>}
                 >
                   <div
-                    className="prose prose-sm text-gray-700 text-sm leading-relaxed"
+                    className="rich-text text-foreground/80 text-sm leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: data.bio }}
                   />
                 </SectionBox>
               )}
-
-              {/* GALLERY — MOBILE */}
               {normalizedImages.length > 0 && thumbnailIndex !== null && (
                 <SectionBox title="Gallery" titleAlign="center">
-                  <div className=" aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 shadow-sm">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted shadow-sm">
                     {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
-                      /* ✅ iOS FIX: playsInline + preload + key */
                       <video
                         key={galleryPreviews[thumbnailIndex]}
                         controls
@@ -905,6 +868,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         preload="metadata"
                         webkit-playsinline="true"
                         controlsList="nodownload"
+                        poster={getVideoThumbSrc(thumbnailIndex) || undefined}
                         className="h-full w-full object-cover"
                       >
                         <source
@@ -919,11 +883,10 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           normalizedImages[thumbnailIndex]?.thumbnail_uri ||
                           galleryPreviews[thumbnailIndex]
                         }
-                        className="h-full w-full object-cove r"
+                        className="h-full w-full object-cover"
                         alt="Featured work"
                       />
                     )}
-
                     {/* prev / next arrows */}
                     {normalizedImages.length > 1 && (
                       <>
@@ -935,7 +898,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                                 normalizedImages.length,
                             )
                           }
-                          className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white active:scale-90 transition"
+                          className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-overlay/40 flex items-center justify-center text-overlay-foreground active:scale-90 transition"
                         >
                           <ChevronLeft size={16} />
                         </button>
@@ -946,7 +909,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                                 ((prev ?? 0) + 1) % normalizedImages.length,
                             )
                           }
-                          className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white active:scale-90 transition"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-overlay/40 flex items-center justify-center text-overlay-foreground active:scale-90 transition"
                         >
                           <ChevronRight size={16} />
                         </button>
@@ -956,35 +919,38 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             <button
                               key={i}
                               onClick={() => setThumbnailIndex(i)}
-                              className={`rounded-full transition-all ${i === thumbnailIndex ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/60"}`}
+                              className={`rounded-full transition-all ${i === thumbnailIndex ? "w-4 h-1.5 bg-card" : "w-1.5 h-1.5 bg-card/60"}`}
                             />
                           ))}
                         </div>
                       </>
                     )}
                   </div>
-
                   {/* thumbnail strip */}
                   {normalizedImages.length > 1 && (
                     <div className="mt-2 flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory scrollbar-none">
                       {normalizedImages.slice(0, 8).map((_, index) => (
                         <button
                           key={index}
-                          onClick={() => setThumbnailIndex(index)}
-                          className={` h-12 w-12 overflow-hidden rounded-lg border flex-shrink-0 snap-start transition-all ${thumbnailIndex === index ? "ring-2 ring-[#23B9CD] border-[#23B9CD]" : "border-gray-200"}`}
+                          onClick={() => {
+                            const item = normalizedImages[index];
+                            track("IMAGE_CLICK", galleryPreviews[index] || null, {
+                              image_id: item?.id ?? null,
+                              index,
+                              file_type: item?.file_type,
+                              caption: item?.caption || null,
+                            });
+                            setThumbnailIndex(index);
+                          }}
+                          className={` h-12 w-12 overflow-hidden rounded-lg border flex-shrink-0 snap-start transition-all ${thumbnailIndex === index ? "ring-2 ring-[var(--card-accent)] border-[var(--card-accent)]" : "border-border"}`}
                         >
-                          <img
-                            src={thumbnailPreviews[index]}
-                            className="h-full w-full object-cover"
-                            alt={`Thumb ${index + 1}`}
-                          />
+                          {renderThumbImage(index, "Thumb")}
                         </button>
                       ))}
                     </div>
                   )}
                 </SectionBox>
               )}
-
               {/* LOCATION */}
               {data.locations?.length > 0 && (
                 <SectionBox
@@ -994,7 +960,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 >
                   {data.locations.length > 1 && (
                     <select
-                      className="mb-3 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 bg-white"
+                      className="mb-3 w-full rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--card-accent-border)] bg-card"
                       value={selectedLocationId || ""}
                       onChange={(e) => setSelectedLocationId(e.target.value)}
                     >
@@ -1007,12 +973,13 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   )}
                   {selectedLocation && (
                     <div className="mb-3 space-y-1">
-                      {/* {selectedLocation.business_name && (
-                        <p className="font-semibold text-gray-800 text-sm">
-                          {selectedLocation.business_name}
-                        </p>
-                      )} */}
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                     {data.locations.length === 1 &&
+                              selectedLocation.label && (
+                                <p className="font-semibold text-foreground">
+                                  {selectedLocation.label}
+                                </p>
+                              )}
+                      <p className="text-muted-foreground text-sm leading-relaxed">
                         {selectedLocation.location_type === "exact_address"
                           ? selectedLocation.address?.trim() ||
                           "Address not provided"
@@ -1024,9 +991,9 @@ const GlamCardLivePreview: React.FC<Props> = ({
                             .filter(Boolean)
                             .join(", ")}
                       </p>
-                      {(selectedLocation?.phone || data.phone) &&
+                      {(data.phone || selectedLocation?.phone) &&
                         data.is_phone_visible && (
-                          <p className="text-gray-600">
+                          <p className="text-muted-foreground">
                             📞 {selectedLocation.phone || data.phone}
                           </p>
                         )}
@@ -1044,10 +1011,27 @@ const GlamCardLivePreview: React.FC<Props> = ({
                         src={mapSrc}
                       />
                       <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`}
+                        href={directionsUrl}
+                        onClick={() => {
+                          const lat = Number(selectedLocation?.latitude);
+                          const lng = Number(selectedLocation?.longitude);
+                          const hasCoords =
+                            selectedLocation?.latitude != null &&
+                            selectedLocation?.longitude != null &&
+                            Number.isFinite(lat) &&
+                            Number.isFinite(lng);
+                          track(
+                            "LOCATION_CLICK",
+                            hasCoords ? `${lat.toFixed(6)},${lng.toFixed(6)}` : null,
+                            {
+                              location_id: selectedLocation?.id ?? null,
+                              label: selectedLocation?.label || null,
+                            },
+                          );
+                        }}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white font-medium px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-xs whitespace-nowrap active:scale-95 transition"
+                        className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground font-medium px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-xs whitespace-nowrap active:scale-95 transition"
                       >
                         <svg
                           className="w-3.5 h-3.5"
@@ -1060,13 +1044,12 @@ const GlamCardLivePreview: React.FC<Props> = ({
                       </a>
                     </div>
                   ) : (
-                    <p className="text-xs text-gray-400 italic">
+                    <p className="text-xs text-muted-foreground/80 italic">
                       Map will appear once location is set
                     </p>
                   )}
                 </SectionBox>
               )}
-
               {/* BUSINESS HOURS mobile */}
               <SectionBox
                 title="Business Hours"
@@ -1091,8 +1074,8 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           key={hour.id ?? index}
                           className="flex items-start gap-2.5"
                         >
-                          <span className="mt-1.5 w-2 h-2 rounded-full bg-[#23B9CD] flex-shrink-0" />
-                          <span className="text-gray-700">
+                          <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--card-accent)] flex-shrink-0" />
+                          <span className="text-foreground/80">
                             {hour.note ? hour.note : timeText}
                           </span>
                         </li>
@@ -1102,15 +1085,14 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 ) : (
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2.5">
-                      <span className="mt-1.5 w-2 h-2 rounded-full bg-[#23B9CD] flex-shrink-0" />
-                      <span className="text-gray-700">
+                      <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--card-accent)] flex-shrink-0" />
+                      <span className="text-foreground/80">
                         Appointment on request
                       </span>
                     </li>
                   </ul>
                 )}
               </SectionBox>
-
               {/* SPECIALTIES mobile */}
               {specialtiesArray.length > 0 && (
                 <SectionBox title="Specialties" titleAlign="center">
@@ -1121,69 +1103,64 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </SectionBox>
               )}
             </div>
-
             {/* ===== IMPORTANT INFO (shared) ===== */}
-            {importantInfoArray.length > 0 && (
+            {importantInfoArray.length !==0 &&
+            <div
+              className="rounded-2xl p-[2px] mt-3"
+              style={{
+                background: "linear-gradient(135deg, var(--card-accent-faint), var(--card-accent-light))",
+              }}
+            >
               <div
-                className="rounded-2xl p-[2px] mt-3"
+                className="rounded-2xl p-3 sm:p-4"
                 style={{
-                  background: "linear-gradient(135deg, #23B9CD33, #a8edea55)",
-
+                  background:
+                    "linear-gradient(135deg, var(--card-panel-start) 0%, var(--card-panel-end) 100%)",
+                  boxShadow: "var(--shadow-medium)",
                 }}
               >
-                <div
-                  className="rounded-2xl p-3 sm:p-4"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
-                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-                  }}
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="flex-1 h-px bg-gray-400/60" />
-                    <p className="text-xs font-bold tracking-wider text-gray-700 uppercase whitespace-nowrap">
-                      Important Info
-                    </p>
-                    <span className="flex-1 h-px bg-gray-400/60" />
-                  </div>
-                  <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm" style={{
-                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-                  }}>
-                    <DotList
-                      items={importantInfoArray}
-                      placeholder="Important information will appear here"
-                    />
-                  </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="flex-1 h-px bg-input/60" />
+                  <p className="text-xs font-bold tracking-wider text-foreground/80 uppercase whitespace-nowrap">
+                    Important Info
+                  </p>
+                  <span className="flex-1 h-px bg-input/60" />
+                </div>
+                <div className="rounded-xl bg-card p-3 sm:p-4 shadow-sm" style={{
+                  boxShadow: "var(--shadow-medium)",
+                }}>
+                  <DotList items={importantInfoArray}
+                    placeholder=""
+                  />
                 </div>
               </div>
-            )}
-
+            </div>
+            }
             {/* ===== PRESS & FEATURES ===== */}
             {otherLinks.filter((l: any) => l?.url).length > 0 && (
               <div
                 className="rounded-2xl p-[2px] mt-3"
                 style={{
-                  background: "linear-gradient(135deg, #23B9CD33, #a8edea55)",
+                  background: "linear-gradient(135deg, var(--card-accent-faint), var(--card-accent-light))",
                 }}
               >
                 <div
                   className="rounded-2xl p-3 sm:p-4"
                   style={{
                     background:
-                      "linear-gradient(135deg, #e6edf5 0%, #d6e0eb 100%)",
-                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+                      "linear-gradient(135deg, var(--card-panel-start) 0%, var(--card-panel-end) 100%)",
+                    boxShadow: "var(--shadow-medium)",
                   }}
                 >
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="flex-1 h-px bg-gray-400/60" />
-                    <p className="text-xs font-bold tracking-wider text-gray-700 uppercase whitespace-nowrap">
+                    <span className="flex-1 h-px bg-input/60" />
+                    <p className="text-xs font-bold tracking-wider text-foreground/80 uppercase whitespace-nowrap">
                       Press & Features
                     </p>
-                    <span className="flex-1 h-px bg-gray-400/60" />
+                    <span className="flex-1 h-px bg-input/60" />
                   </div>
-                  <div className="rounded-xl bg-white p-3 sm:p-4 shadow-sm space-y-2" style={{
-                    boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
-
+                  <div className="rounded-xl bg-card p-3 sm:p-4 shadow-sm space-y-2" style={{
+                    boxShadow: "var(--shadow-medium)",
                   }}>
                     {otherLinks
                       .filter((link: any) => link?.url)
@@ -1195,11 +1172,14 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           <a
                             key={index}
                             href={link.url}
+                            onClick={() =>
+                              track("OTHER_LINK_CLICK", link.url, { title: link.title, index })
+                            }
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-700 transition hover:border-teal-300 hover:bg-teal-50 active:scale-[0.98]" style={socialIconStyle}
+                            className="flex items-center gap-2 rounded-lg border border-border px-3 py-2.5 text-sm text-foreground/80 transition hover:border-[var(--card-accent)] hover:bg-[var(--card-accent-faint)] active:scale-[0.98]" style={socialIconStyle}
                           >
-                            <ExternalLink className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                            <ExternalLink className="h-4 w-4 text-[var(--card-accent)] flex-shrink-0" />
                             <span className="truncate font-medium">
                               {link.title}
                             </span>
@@ -1210,148 +1190,252 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </div>
               </div>
             )}
-
-            {/* ===== CONNECT BUTTON ===== */}
-            <div className="flex items-center gap-3 mt-5">
-              <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent to-teal-400" />
-              <button
-                onClick={() => setIsBookingModalOpen(true)}
-                className="flex items-center gap-2 bg-[#23B9CD] hover:bg-[#1ea8b5] active:scale-95 text-white px-7 py-2.5 rounded-full text-sm font-bold tracking-widest transition-all whitespace-nowrap uppercase shadow-md shadow-[#23B9CD]/30" style={{
-                  boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.7)",
+            {/* ===== FEATURED LINKS =====
+                Every accent color here resolves through the CSS custom
+                properties set on the outer wrapper (cardColorVars, derived
+                from the Access Card's color_code) — no hardcoded hex, so a
+                new color re-themes the whole section automatically. */}
+            {featuredLinks.length > 0 && (
+              <div
+                className="rounded-2xl p-[2px] mt-3"
+                style={{
+                  background: "linear-gradient(135deg, var(--card-accent-faint), var(--card-accent-light))",
                 }}
               >
-                <svg
-                  className="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <div
+                  className="rounded-2xl p-3 sm:p-4"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, var(--card-panel-start) 0%, var(--card-panel-end) 100%)",
+                    boxShadow: "var(--shadow-medium)",
+                  }}
                 >
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="flex-1 h-px bg-input/60" />
+                    <p className="text-xs font-bold tracking-wider text-foreground/80 uppercase whitespace-nowrap">
+                      Featured Links
+                    </p>
+                    <span className="flex-1 h-px bg-input/60" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-1 gap-3 sm:gap-4">
+                    {featuredLinks.map((link: any, index: number) => {
+                      const thumbSrc = getFeaturedLinkThumbnailSrc(link);
+                      const description: string = link?.description || "";
+                      let hostname = "";
+                      try {
+                        hostname = new URL(link.url).hostname.replace(
+                          /^www\./,
+                          "",
+                        );
+                      } catch {
+                        hostname = "";
+                      }
+                      const subtext = description || hostname;
+                      return (
+                        <a
+                          key={link?.id ?? index}
+                          href={link.url}
+                          onClick={() =>
+                            track("FEATURED_LINK_CLICK", link.url, { title: link.title, index })
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group relative flex items-center gap-3 sm:gap-4 rounded-2xl bg-card p-3.5 sm:p-4 border border-border/70 transition-all duration-200 ease-out hover:-translate-y-1 hover:border-[var(--card-accent-border)] active:scale-[0.98] active:translate-y-0 shadow-[inset_0_1px_0_hsl(var(--card)/0.6),0_1px_1px_hsl(var(--foreground)/0.04),0_8px_16px_-4px_hsl(var(--foreground)/0.12),0_20px_40px_-14px_hsl(var(--foreground)/0.18)] hover:shadow-[inset_0_1px_0_hsl(var(--card)/0.6),0_2px_2px_hsl(var(--foreground)/0.05),0_14px_24px_-4px_var(--card-accent-soft),0_28px_56px_-14px_hsl(var(--foreground)/0.24)]"
+                        >
+                          {/* thumbnail */}
+                          <div className="relative flex-shrink-0">
+                            <div
+                              className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex items-center justify-center"
+                              style={{
+                                background: "var(--card-accent-faint)",
+                                boxShadow: "inset 0 0 0 1px var(--card-accent-border)",
+                              }}
+                            >
+                              {thumbSrc ? (
+                                <img
+                                  src={thumbSrc}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <Link2 className="w-5 h-5 text-[var(--card-accent)]" />
+                              )}
+                            </div>
+                            {link?.is_featured && (
+                              <span className="absolute -top-1.5 -left-1.5 rounded-full bg-[var(--card-accent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-primary-foreground shadow-sm ring-2 ring-card whitespace-nowrap">
+                                Featured
+                              </span>
+                            )}
+                          </div>
+                          {/* title + description */}
+                          <div className="flex-1 min-w-0">
+                            <p className="truncate text-sm sm:text-base font-semibold text-foreground leading-snug">
+                              {link.title}
+                            </p>
+                            {subtext && (
+                              <p className="text-xs sm:text-[13px] text-muted-foreground leading-snug mt-1 line-clamp-2">
+                                {subtext}
+                              </p>
+                            )}
+                          </div>
+                          {/* action */}
+                          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-muted flex items-center justify-center transition-colors duration-200 group-hover:bg-[var(--card-accent)]">
+                            <ArrowUpRight
+                              className="w-4 h-4 text-muted-foreground/80 transition-colors duration-200 group-hover:text-primary-foreground"
+                              strokeWidth={2.25}
+                            />
+                          </div>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* ===== CONNECT BUTTON ===== */}
+            <div className="flex items-center gap-3 mt-5">
+              <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent to-[var(--card-accent)]" />
+              <button
+                onClick={() => {
+                  track("CONNECT_CLICK");
+                  setIsBookingModalOpen(true);
+                }}
+                className="flex items-center gap-2 bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] active:scale-95 text-primary-foreground px-7 py-2.5 rounded-full text-sm font-bold tracking-widest transition-all whitespace-nowrap uppercase shadow-md" style={{
+                  boxShadow: "var(--shadow-medium)",
+                }}
+              >
+                <Send className="w-4 h-4" strokeWidth={2.5} />
                 CONNECT
               </button>
-              <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent to-teal-400" />
+              <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent to-[var(--card-accent)]" />
             </div>
-
             {/* ===== SOCIAL ICONS ===== */}
-            <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
-
-
-              <div className="flex justify-center lg:justify-end flex-wrap gap-4 mt-3">
-                {data?.website && (
+            <div className="flex justify-center flex-wrap gap-4 sm:gap-5 mt-4">
+              {data?.website && (
+                <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={data.website}
+                    onClick={() => track("WEBSITE_CLICK", data.website ?? null)}
                     target="_blank"
                     rel="noopener noreferrer"
                     title={data.website}
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Globe className="w-5 h-5 text-gray-500 hover:text-teal-600 transition-colors duration-300" />
+                    <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                )}
-
-                {allInstagramHandles.map(({ key, url }) => (
+                  <span className="text-[11px] font-medium text-muted-foreground">Website</span>
+                </div>
+              )}
+              {allInstagramHandles.map(({ key, url }, idx) => (
+                <div key={key} className="flex flex-col items-center gap-1.5">
                   <a
-                    key={key}
                     href={url}
+                    onClick={() => track("INSTAGRAM_CLICK", url, { index: idx })}
                     target="_blank"
                     rel="noopener noreferrer"
                     title={url}
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Instagram className="w-5 h-5 text-gray-500 hover:text-pink-600 transition-colors duration-300" />
+                    <Instagram className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                ))}
-
-                {socialMedia?.facebook && (
+                  <span className="text-[11px] font-medium text-muted-foreground">
+                    {idx > 0 ? `Instagram ${idx + 1}` : "Instagram"}
+                  </span>
+                </div>
+              ))}
+              {socialMedia?.facebook && (
+                <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.facebook}
+                    onClick={() => track("FACEBOOK_CLICK", socialMedia.facebook)}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Facebook"
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Facebook className="w-5 h-5 text-gray-500 hover:text-blue-600 transition-colors duration-300" />
+                    <Facebook className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                )}
-
-                {socialMedia?.linkedin && (
+                  <span className="text-[11px] font-medium text-muted-foreground">Facebook</span>
+                </div>
+              )}
+              {socialMedia?.linkedin && (
+                <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.linkedin}
+                    onClick={() => track("LINKEDIN_CLICK", socialMedia.linkedin)}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="LinkedIn"
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Linkedin className="w-5 h-5 text-gray-500 hover:text-blue-700 transition-colors duration-300" />
+                    <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                )}
-
-                {socialMedia?.youtube && (
+                  <span className="text-[11px] font-medium text-muted-foreground">LinkedIn</span>
+                </div>
+              )}
+              {socialMedia?.youtube && (
+                <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.youtube}
+                    onClick={() => track("YOUTUBE_CLICK", socialMedia.youtube)}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="YouTube"
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Youtube className="w-5 h-5 text-gray-500 hover:text-red-600 transition-colors duration-300" />
+                    <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                )}
-
-                {socialMedia?.tiktok && (
+                  <span className="text-[11px] font-medium text-muted-foreground">YouTube</span>
+                </div>
+              )}
+              {socialMedia?.tiktok && (
+                <div className="flex flex-col items-center gap-1.5">
                   <a
                     href={socialMedia.tiktok}
+                    onClick={() => track("TIKTOK_CLICK", socialMedia.tiktok)}
                     target="_blank"
                     rel="noopener noreferrer"
                     title="TikTok"
-                    className="p-2 rounded-full bg-white hover:bg-gray-100 transition duration-300"
-                    style={socialIconStyle}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-card hover:bg-muted transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+                    style={connectIconStyle}
                   >
-                    <Music2 className="w-5 h-5 text-gray-500 hover:text-black transition-colors duration-300" />
+                    <Music2 className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                )}
-
-              </div>
+                  <span className="text-[11px] font-medium text-muted-foreground">TikTok</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-
       {/* ===== BOOKING MODAL ===== */}
       {isBookingModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center scrim"
           onClick={() => setIsBookingModalOpen(false)}
         >
           <div
-            className="bg-white rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-sm sm:mx-4 max-h-[90vh] overflow-y-auto"
+            className="bg-card rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-sm sm:mx-4 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sm:hidden w-10 h-1 rounded-full bg-gray-300 mx-auto mb-4" />
+            <div className="sm:hidden w-10 h-1 rounded-full bg-input mx-auto mb-4" />
             <div className="flex justify-between items-center mb-1">
-              <p className="text-base font-bold text-gray-800">
+              <p className="text-base font-bold text-foreground">
                 How would you like to connect?
               </p>
               <button
                 onClick={() => setIsBookingModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 text-lg leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+                className="text-muted-foreground/80 hover:text-muted-foreground text-lg leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition"
               >
                 ✕
               </button>
             </div>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-muted-foreground mb-4">
               Choose your preferred booking method
             </p>
             <div className="flex flex-col gap-2.5">
@@ -1362,17 +1446,18 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   rel="noopener noreferrer"
                   onClick={(e) => {
                     if (!data.booking_link) e.preventDefault();
+                    else track("BOOKING_CLICK", data.booking_link);
                   }}
-                  className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.booking_link ? "border-gray-200 hover:bg-gray-50" : "border-gray-200 opacity-50 cursor-not-allowed"}`}
+                  className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.booking_link ? "border-border hover:bg-muted" : "border-border opacity-50 cursor-not-allowed"}`}
                 >
-                  <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center flex-shrink-0 text-lg">
+                  <div className="w-10 h-10 rounded-full bg-[var(--card-accent)] flex items-center justify-center flex-shrink-0 text-lg">
                     🔗
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">
+                    <p className="text-sm font-semibold text-foreground">
                       Book via Link
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {data.booking_link
                         ? "Visit booking page"
                         : "Not configured"}
@@ -1385,17 +1470,18 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   href={data.phone ? `tel:${data.phone}` : "#"}
                   onClick={(e) => {
                     if (!data.phone) e.preventDefault();
+                    else track("PHONE_CLICK", `tel:${data.phone}`);
                   }}
-                  className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.phone ? "border-gray-200 hover:bg-gray-50" : "border-gray-200 opacity-50 cursor-not-allowed"}`}
+                  className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors active:scale-[0.98] ${data.phone ? "border-border hover:bg-muted" : "border-border opacity-50 cursor-not-allowed"}`}
                 >
-                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0 text-lg">
+                  <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center flex-shrink-0 text-lg">
                     📞
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">
+                    <p className="text-sm font-semibold text-foreground">
                       Call / Text
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {data.phone || "Not configured"}
                     </p>
                   </div>
@@ -1411,34 +1497,43 @@ const GlamCardLivePreview: React.FC<Props> = ({
                           ? url
                           : `https://ig.me/m/${url.replace(/^@/, "")}`
                       }
+                      onClick={() =>
+                        track(
+                          "INSTAGRAM_CLICK",
+                          url.startsWith("http")
+                            ? url
+                            : `https://ig.me/m/${url.replace(/^@/, "")}`,
+                          { source: "connect_modal", index: idx },
+                        )
+                      }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors active:scale-[0.98]"
+                      className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:bg-muted transition-colors active:scale-[0.98]"
                     >
-                      <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0 text-lg">
+                      <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center flex-shrink-0 text-lg">
                         📸
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">
+                        <p className="text-sm font-semibold text-foreground">
                           DM on Instagram
                           {allInstagramHandles.length > 1 ? ` ${idx + 1}` : ""}
                         </p>
-                        <p className="text-xs text-gray-500 truncate max-w-[180px]">
+                        <p className="text-xs text-muted-foreground truncate max-w-[180px]">
                           {url}
                         </p>
                       </div>
                     </a>
                   ))
                 ) : (
-                  <div className="flex items-center gap-3 p-3.5 rounded-xl border border-gray-200 opacity-50 cursor-not-allowed">
-                    <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0 text-lg">
+                  <div className="flex items-center gap-3 p-3.5 rounded-xl border border-border opacity-50 cursor-not-allowed">
+                    <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center flex-shrink-0 text-lg">
                       📸
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-800">
+                      <p className="text-sm font-semibold text-foreground">
                         DM on Instagram
                       </p>
-                      <p className="text-xs text-gray-500">Not configured</p>
+                      <p className="text-xs text-muted-foreground">Not configured</p>
                     </div>
                   </div>
                 ))}
@@ -1446,32 +1541,30 @@ const GlamCardLivePreview: React.FC<Props> = ({
           </div>
         </div>
       )}
-
       {/* ===== DOWNLOAD MODAL ===== */}
       <GlamCardDownloadModal
         isOpen={isDownloadModalOpen}
         onClose={() => setIsDownloadModalOpen(false)}
         datadownload={data}
       />
-
       {/* ===== QR CODE MODAL ===== */}
       {isQrModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center scrim"
           onClick={() => setIsQrModalOpen(false)}
         >
           <div
-            className="bg-white rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-md sm:mx-4"
+            className="bg-card rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-md sm:mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sm:hidden w-10 h-1 rounded-full bg-gray-300 mx-auto mb-4" />
+            <div className="sm:hidden w-10 h-1 rounded-full bg-input mx-auto mb-4" />
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-gray-800">
+              <h3 className="text-base font-bold text-foreground">
                 Business Card QR Code
               </h3>
               <button
                 onClick={() => setIsQrModalOpen(false)}
-                className="text-gray-500 hover:text-gray-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+                className="text-muted-foreground hover:text-foreground/80 w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition"
               >
                 ✕
               </button>
@@ -1479,7 +1572,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
             {data?.business_card_qr ? (
               <>
                 <div className="flex justify-center mb-4">
-                  <div className="p-3 rounded-2xl border-2 border-[#23B9CD]/20 bg-[#F4F9FF]">
+                  <div className="p-3 rounded-2xl border-2 border-[var(--card-accent-border)] bg-[var(--card-accent-faint)]">
                     <img
                       src={data.business_card_qr}
                       alt="Business Card QR"
@@ -1488,21 +1581,21 @@ const GlamCardLivePreview: React.FC<Props> = ({
                   </div>
                 </div>
                 <div className="mb-2">
-                  <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
                     Business Card Link
                   </label>
-                  <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 p-2.5">
+                  <div className="flex items-center gap-2 rounded-xl border border-border bg-muted p-2.5">
                     <a
                       href={data.business_card_qr}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 truncate text-sm text-teal-700 hover:underline"
+                      className="flex-1 truncate text-sm text-[var(--card-accent-deep)] hover:underline"
                     >
                       {data.business_card_qr}
                     </a>
                     <button
                       onClick={handleCopyLink}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#23B9CD] text-white hover:bg-[#1ea8b5] active:scale-95 transition-all whitespace-nowrap"
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--card-accent)] text-primary-foreground hover:bg-[var(--card-accent-strong)] active:scale-95 transition-all whitespace-nowrap"
                     >
                       {copied ? "✓ Copied" : "Copy"}
                     </button>
@@ -1510,7 +1603,7 @@ const GlamCardLivePreview: React.FC<Props> = ({
                 </div>
               </>
             ) : (
-              <div className="text-center py-10 text-gray-500">
+              <div className="text-center py-10 text-muted-foreground">
                 QR Code not available
               </div>
             )}
@@ -1520,5 +1613,4 @@ const GlamCardLivePreview: React.FC<Props> = ({
     </div>
   );
 };
-
 export default GlamCardLivePreview;

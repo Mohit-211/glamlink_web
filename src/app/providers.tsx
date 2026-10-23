@@ -1,20 +1,20 @@
 "use client";
 
-import { ReactNode, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactNode, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
+import { initSession } from "@/lib/session";
 
 export default function Providers({ children }: { children: ReactNode }) {
-  // One QueryClient per browser session
-  const [queryClient] = useState(() => new QueryClient());
+  // Silent sign-in: restore the session from the refresh cookie on page load.
+  useEffect(() => {
+    initSession();
+  }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster position="top-right" richColors />
-        {children}
-      </TooltipProvider>
-    </QueryClientProvider>
+    <TooltipProvider>
+      <Toaster position="top-right" richColors />
+      {children}
+    </TooltipProvider>
   );
 }

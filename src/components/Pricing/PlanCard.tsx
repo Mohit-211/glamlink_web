@@ -2,7 +2,7 @@
 
 import { type ReactNode } from "react";
 import { Check, Sparkles, Nfc } from "lucide-react";
-import { PRO_FEATURES, FREE_FEATURES, KEYCHAIN_FEATURE, type PlanDef } from "./plans";
+import type { PlanDef } from "./plans";
 
 interface FeatureRowProps {
   children: ReactNode;
@@ -26,7 +26,7 @@ export function FeatureRow({ children, soon = false, keychain = false }: Feature
       </span>
       <span
         className={`text-[13.5px] leading-5 ${
-          soon ? "text-muted-foreground" : keychain ? "font-medium text-primary" : "text-foreground"
+          soon ? "text-muted-foreground" : keychain ? "font-medium text-secondary" : "text-foreground"
         }`}
       >
         {children}
@@ -44,7 +44,7 @@ export function PlanRadio({ selected }: { selected: boolean }) {
   return (
     <span
       className={`flex h-5 w-5 flex-none items-center justify-center rounded-full border-2 transition-colors duration-200 ${
-        selected ? "border-primary bg-primary" : "border-border bg-transparent"
+        selected ? "border-secondary bg-secondary" : "border-border bg-transparent"
       }`}
     >
       {selected && <Check className="h-3 w-3 text-primary-foreground" strokeWidth={3} />}
@@ -61,7 +61,6 @@ interface PlanCardProps {
 }
 
 export function PlanCard({ plan, selected, onSelect, compact = false, disabled = false }: PlanCardProps) {
-  const isFeatured = plan.id === "proKeychain";
   const isSelected = selected && !disabled; // single source of truth
 
   return (
@@ -79,16 +78,16 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
       } ${compact ? "p-4" : ""} ${
         isSelected
           ? plan.isPro
-            ? "shadow-primary border-primary bg-accent/40"
-            : "shadow-medium border-primary"
+            ? "shadow-primary border-secondary bg-accent/40"
+            : "shadow-medium border-secondary"
           : "border-border"
       }`}
     >
 
       <div className="relative flex items-center justify-between">
-        {isFeatured ? (
+        {plan.badge ? (
           <span className="badge-soft">
-            <Sparkles className="h-3 w-3" /> Most popular
+            <Sparkles className="h-3 w-3" /> {plan.badge}
           </span>
         ) : plan.hasKeychain ? (
           <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -96,7 +95,7 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
           </span>
         ) : (
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            {plan.isPro ? "Pro" : "Free"}
+            {plan.label}
           </span>
         )}
         <PlanRadio selected={selected} />
@@ -105,25 +104,27 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
       <h3 className="relative mt-4 text-base font-semibold text-foreground">{plan.name}</h3>
 
       <p className="relative mt-2.5 flex flex-wrap items-baseline gap-1">
-        <span className="font-display text-2xl text-foreground">{plan.priceLabel}</span>
+        {plan.listPriceLabel && (
+          <span className="text-sm text-muted-foreground line-through">{plan.listPriceLabel}</span>
+        )}
+        <span className="text-2xl text-foreground">{plan.priceLabel}</span>
         {plan.priceSuffix && <span className="text-xs text-muted-foreground">{plan.priceSuffix}</span>}
       </p>
+      {(plan.afterNote || plan.personal) && (
+        <p className="relative mt-1 text-[11px] font-medium text-secondary">
+          {plan.personal ? "Your personal price" : plan.afterNote}
+        </p>
+      )}
 
       <p className="relative mt-1.5 text-xs text-muted-foreground">{plan.tagline}</p>
 
       {!compact && (
         <ul className="relative mt-4 flex-1 border-t border-border pt-4">
-          {plan.isPro ? (
-            <>
-              <FeatureRow>Directory listing & digital card</FeatureRow>
-              {PRO_FEATURES.map((f, i) =>
-                typeof f === "string" ? <FeatureRow key={i}>{f}</FeatureRow> : <FeatureRow key={i} soon>{f.text}</FeatureRow>
-              )}
-            </>
-          ) : (
-            FREE_FEATURES.map((f) => <FeatureRow key={f}>{f}</FeatureRow>)
-          )}
-          {plan.hasKeychain && <FeatureRow keychain>{KEYCHAIN_FEATURE}</FeatureRow>}
+          {plan.features.map((f) => (
+            <FeatureRow key={f.text} soon={f.soon} keychain={f.highlight === "keychain"}>
+              {f.text}
+            </FeatureRow>
+          ))}
         </ul>
       )}
     </div>

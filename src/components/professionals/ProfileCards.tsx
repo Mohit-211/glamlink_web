@@ -14,16 +14,16 @@ import { Button } from "@/components/ui/button";
 
 const ProfileCards = () => {
   return (
-    <section className="py-16 lg:py-24 bg-secondary/30">
+    <section className="py-16 lg:py-24 bg-muted/30">
       <div className="container-glamlink">
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Profile Lock-in Card */}
-          <div className="bg-card rounded-3xl p-8 lg:p-10 border border-border hover:border-primary/30 transition-colors group">
+          <div className="bg-card rounded-3xl p-8 lg:p-10 border border-border hover:border-secondary/30 transition-colors group">
             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <Store className="w-7 h-7 text-primary" />
             </div>
 
-            <span className="inline-block px-3 py-1 rounded-full bg-warning/10 text-warning text-sm font-medium mb-4">
+            <span className="badge-soft mb-4">
               Pre-Launch Access
             </span>
 
@@ -61,7 +61,7 @@ const ProfileCards = () => {
           </div>
 
           {/* Founding Member Card */}
-          <div className="bg-gradient-to-br from-primary/5 via-card to-primary/10 rounded-3xl p-8 lg:p-10 border border-primary/20 relative overflow-hidden group">
+          <div className="bg-accent/50 rounded-3xl p-8 lg:p-10 border border-primary/20 relative overflow-hidden group">
             {/* Decorative badge */}
             <div className="absolute top-6 right-6">
               <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
@@ -105,13 +105,13 @@ const ProfileCards = () => {
               ))}
             </ul>
 
-            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg gap-2">
+            <Button className="w-full bg-primary hover:bg-secondary text-primary-foreground py-6 text-lg gap-2">
               <Crown className="w-5 h-5" />
               Claim Founder Status
             </Button>
 
             <p className="text-center text-sm text-muted-foreground mt-4">
-              Only <span className="text-primary font-semibold">23 spots</span>{" "}
+              Only <span className="text-secondary font-semibold">23 spots</span>{" "}
               remaining
             </p>
           </div>

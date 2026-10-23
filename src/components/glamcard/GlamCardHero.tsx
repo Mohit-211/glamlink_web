@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import PlanPrice from "@/components/Pricing/PlanPrice";
 
 interface GlamCardHeroProps {
   onApplyClick: () => void;
@@ -36,46 +37,43 @@ const features = [
 
 const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
   return (
-    <section className="section-glamlink page-soft">
+    <section className="hero-glamlink bg-background">
       <div className="container-glamlink">
         {/* Hero */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left */}
           <div className="max-w-2xl animate-fade-up">
-            <h1 className="font-display text-5xl md:text-6xl xl:text-7xl leading-tight text-foreground">
-              Everything your clients
-              <br />
-              need to know—
-              <br />
-              <span className="text-primary">in one tap.</span>
+            <h1 className="hero-title">
+              Everything your clients need to know—{" "}
+              <span className="text-primary sm:block">in one tap.</span>
             </h1>
 
-            <p className="mt-8 text-lg leading-8 text-muted-foreground">
+            <p className="hero-subtitle mt-6">
               One profile. One QR code. One link for your services, booking,
               photos, videos, social media, business hours, location, and more.
             </p>
 
-            <div className="mt-8 flex items-center gap-4 text-xl font-semibold text-foreground">
-              <span>$39.99 SETUP</span>
+            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-xl font-semibold text-foreground">
+              <span>FREE TO START</span>
               <span className="text-primary">•</span>
-              <span>$4.99/MONTH</span>
+              <span>PRO <PlanPrice product="pro" />/MONTH</span>
             </div>
 
             <button
               onClick={onApplyClick}
-              className="mt-10 inline-flex items-center justify-center rounded-md bg-[#23AEB8] px-10 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-[#1d98a2]"
+              className="btn-primary btn-lg mt-10"
             >
               CREATE YOUR ACCESS CARD
             </button>
 
             <p className="mt-4 text-sm italic text-muted-foreground">
-              NFC keychain included.
+              Add the NFC keychain to any plan for <PlanPrice product="keychain" />, one-time, shipping included.
             </p>
           </div>
 
           {/* Right */}
           <div className="flex justify-center lg:justify-end">
-            <div className="w-full max-w-md overflow-hidden rounded-3xl border border-border bg-card shadow-[var(--shadow-large)]">
+            <div className="w-full max-w-md overflow-hidden rounded-3xl border border-border bg-card shadow-large">
               <video
                 className="aspect-[9/16] w-full object-cover"
                 autoPlay
@@ -114,7 +112,7 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
               ONE TAP CAN OPEN THE DOOR TO NEW CONNECTIONS.
             </p>
 
-            <p className="mt-8 font-display text-3xl uppercase tracking-[0.2em] text-foreground">
+            <p className="mt-8 text-3xl uppercase tracking-[0.2em] text-foreground">
               ACCESS BY <span className="text-primary">GLAMLINK</span>
             </p>
           </div>

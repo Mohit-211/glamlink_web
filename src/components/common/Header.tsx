@@ -3,45 +3,34 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import logo from "../../../public/header_logo.png";
 import { LogoutUser } from "@/api/Api";
+import { useSession } from "@/lib/useSession";
 
+// The menu of the Oct 2026 home page mockup. The magazine and the podcast are
+// reached from the Journal, Watch and the footer.
 const navLinks = [
   { label: "Home", href: "/", id: "home" },
-  { label: "Magazine", href: "/magazine", id: "magazine" },
-  { label: "Podcast", href: "/podcast", id: "podcast" },
   { label: "Journal", href: "/journal", id: "journal" },
-  { label: "Access", href: "/apply/digital-card", id: "access" },
-
+  { label: "Watch", href: "/watch", id: "watch" },
+  { label: "Shop", href: "/shop", id: "shop" },
+  { label: "Directory", href: "/directory", id: "directory" },
+  { label: "Industry", href: "/industry", id: "industry" },
+  { label: "Access", href: "/access", id: "access" },
 ];
 
 export default function Header({ activeRoute }: any) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      const token = localStorage.getItem("GlamlinkaccessToken");
-      setIsLoggedIn(!!token);
-    };
-
-    checkLoginStatus();
-
-    window.addEventListener("auth-change", checkLoginStatus);
-    window.addEventListener("storage", checkLoginStatus);
-
-    return () => {
-      window.removeEventListener("auth-change", checkLoginStatus);
-      window.removeEventListener("storage", checkLoginStatus);
-    };
-  }, []);
+  // Restored from the refresh cookie on page load (see app/providers).
+  const isLoggedIn = useSession().status === "signed-in";
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -59,34 +48,33 @@ export default function Header({ activeRoute }: any) {
     };
   }, []);
 
-  const isActive = (href: string) => pathname === href;
+  // A section stays highlighted on its inner pages too (an article under /journal).
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 
   const hideAuthButton = pathname.startsWith("/dashboard");
 
   const handleLogout = async () => {
     try {
-      await LogoutUser(); // Logout API
+      // Ends this session on the API and clears the refresh cookie.
+      await LogoutUser();
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
-      localStorage.removeItem("GlamlinkaccessToken");
-      localStorage.removeItem("GlamlinkrefreshToken");
-      localStorage.removeItem("postLoginRedirect");
-
-      window.dispatchEvent(new Event("auth-change"));
-
       setProfileDropdownOpen(false);
+      setMobileMenuOpen(false);
       router.push("/login");
     }
   };
 
   const handleDashboard = () => {
     setProfileDropdownOpen(false);
+    setMobileMenuOpen(false);
     router.push("/dashboard");
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
       <div className="container-glamlink">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* LOGO */}
@@ -94,9 +82,7 @@ export default function Header({ activeRoute }: any) {
             <Image
               src={logo}
               alt="Glamlink"
-              width={140}
-              height={40}
-              className="object-contain"
+              className="h-9 w-auto md:h-10"
               priority
             />
           </Link>
@@ -107,98 +93,111 @@ export default function Header({ activeRoute }: any) {
               <Link
                 key={link.id}
                 href={link.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive(link.href)
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  }`}
+                aria-current={isActive(link.href) ? "page" : undefined}
+                className="nav-link rounded-lg px-4 py-2 text-sm"
               >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          {/* DESKTOP BUTTON / PROFILE ICON */}
-          {!hideAuthButton && (
-            <div className="hidden lg:block">
-              {isLoggedIn ? (
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() =>
-                      setProfileDropdownOpen(!profileDropdownOpen)
-                    }
-                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-teal-500 to-cyan-500 hover:shadow-lg transition-all"
-                  >
-                    <User className="w-6 h-6 text-white" />
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {profileDropdownOpen && (
-                    <div
-                      className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50"
-                      style={{
-                        boxShadow:
-                          "0 10px 25px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(35, 174, 184, 0.1)",
-                      }}
+          {/* DESKTOP SEARCH + BUTTON / PROFILE ICON */}
+          <div className="hidden items-center gap-2 lg:flex">
+            <Link
+              href="/search"
+              aria-label="Search"
+              aria-current={pathname === "/search" ? "page" : undefined}
+              className="nav-link flex h-11 w-11 items-center justify-center rounded-full"
+            >
+              <Search className="h-5 w-5" />
+            </Link>
+            {!hideAuthButton && (
+              <div>
+                {isLoggedIn ? (
+                  <div className="relative" ref={dropdownRef}>
+                    <button
+                      onClick={() =>
+                        setProfileDropdownOpen(!profileDropdownOpen)
+                      }
+                      className="flex items-center justify-center w-12 h-12 rounded-full bg-primary hover:bg-secondary hover:shadow-lg transition-all"
                     >
-                      {/* Dashboard Option */}
-                      <button
-                        onClick={handleDashboard}
-                        className="w-full px-4 py-3 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
-                      >
-                        <LayoutDashboard className="w-5 h-5 text-teal-600" />
-                        <span className="font-medium">Dashboard</span>
-                      </button>
+                      <User className="w-6 h-6 text-primary-foreground" />
+                    </button>
 
-                      {/* Logout Option */}
-                      <button
-                        onClick={handleLogout}
-                        className="w-full px-4 py-3 flex items-center gap-3 text-red-600 hover:bg-red-50 transition-colors"
+                    {/* Dropdown Menu */}
+                    {profileDropdownOpen && (
+                      <div
+                        className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-card shadow-medium"
                       >
-                        <LogOut className="w-5 h-5" />
-                        <span className="font-medium">Logout</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Button
-                  asChild
-                  className="btn-primary rounded-full px-6 text-sm"
-                >
-                  <Link href="/login">Login</Link>
-                </Button>
-              )}
-            </div>
-          )}
+                        {/* Dashboard Option */}
+                        <button
+                          onClick={handleDashboard}
+                          className="nav-link w-full px-4 py-3 flex items-center gap-3 border-b border-border"
+                        >
+                          <LayoutDashboard className="w-5 h-5" />
+                          <span className="font-medium">Dashboard</span>
+                        </button>
 
-          {/* MOBILE MENU BUTTON */}
-          <button
-            className="lg:hidden p-2 rounded-lg hover:bg-muted"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
+                        {/* Logout Option */}
+                        <button
+                          onClick={handleLogout}
+                          className="w-full px-4 py-3 flex items-center gap-3 text-destructive hover:bg-destructive/5 transition-colors"
+                        >
+                          <LogOut className="w-5 h-5" />
+                          <span className="font-medium">Logout</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Button
+                    asChild
+                    className="btn-primary rounded-full px-6 text-sm"
+                  >
+                    <Link href="/login">Login</Link>
+                  </Button>
+                )}
+              </div>
             )}
-          </button>
+          </div>
+
+          {/* MOBILE SEARCH + MENU BUTTON */}
+          <div className="flex items-center gap-1 lg:hidden">
+            <Link
+              href="/search"
+              aria-label="Search"
+              onClick={() => setMobileMenuOpen(false)}
+              className="rounded-lg p-2 hover:bg-muted"
+            >
+              <Search className="h-6 w-6" />
+            </Link>
+            <button
+              className="p-2 rounded-lg hover:bg-muted"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* MOBILE MENU */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-background">
+        <div className="lg:hidden border-t border-border bg-card shadow-lg max-h-[calc(100dvh-4rem)] overflow-y-auto">
           <div className="container-glamlink py-6 flex flex-col gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.id}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`px-4 py-3 rounded-lg text-base font-medium ${isActive(link.href)
-                    ? "bg-primary/10 text-primary"
-                    : "text-foreground hover:bg-muted"
-                  }`}
+                aria-current={isActive(link.href) ? "page" : undefined}
+                className="nav-link rounded-lg px-4 py-3 text-base"
               >
                 {link.label}
               </Link>
@@ -218,14 +217,18 @@ export default function Header({ activeRoute }: any) {
                     <Button
                       onClick={handleLogout}
                       variant="outline"
-                      className="w-full rounded-full py-6 flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50"
+                      className="w-full rounded-full py-6 flex items-center gap-2 border-destructive/30 text-destructive hover:bg-destructive/5"
                     >
                       <LogOut className="w-5 h-5" />
                       Logout
                     </Button>
                   </div>
                 ) : (
-                  <Link href="/login" className="w-full">
+                  <Link
+                    href="/login"
+                    className="w-full"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
                     <Button className="btn-primary w-full rounded-full py-6">
                       Login
                     </Button>

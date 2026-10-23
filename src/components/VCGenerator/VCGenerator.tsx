@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import React, { useState } from "react";
 
 const VCGenerator = () => {
@@ -40,8 +40,8 @@ END:VCARD
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#eef4ff] p-6">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-6">
+      <div className="w-full max-w-md bg-card rounded-2xl shadow-lg p-6 space-y-4">
 
         <h2 className="text-xl font-bold text-center">VCF Generator</h2>
 
@@ -51,7 +51,7 @@ END:VCARD
           placeholder="First Name"
           value={form.firstName}
           onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
+          className="input-glamlink"
         />
 
         <input
@@ -60,7 +60,7 @@ END:VCARD
           placeholder="Last Name"
           value={form.lastName}
           onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
+          className="input-glamlink"
         />
 
         <input
@@ -69,7 +69,7 @@ END:VCARD
           placeholder="Phone Number"
           value={form.phone}
           onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
+          className="input-glamlink"
         />
 
         <input
@@ -78,7 +78,7 @@ END:VCARD
           placeholder="Email"
           value={form.email}
           onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
+          className="input-glamlink"
         />
 
         <input
@@ -87,7 +87,7 @@ END:VCARD
           placeholder="Company"
           value={form.company}
           onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
+          className="input-glamlink"
         />
 
         <input
@@ -96,12 +96,12 @@ END:VCARD
           placeholder="Website"
           value={form.website}
           onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
+          className="input-glamlink"
         />
 
         <button
           onClick={generateVCF}
-          className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg font-semibold"
+          className="w-full bg-primary hover:bg-secondary text-primary-foreground py-2 rounded-lg font-semibold"
         >
           Download VCF
         </button>

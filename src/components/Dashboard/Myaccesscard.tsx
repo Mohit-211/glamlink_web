@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FaInstagram } from "react-icons/fa";
+import { Instagram } from "@/components/icons/BrandIcons";
 import {
     Globe,
     Copy,
@@ -9,13 +9,11 @@ import {
     ExternalLink,
     CalendarCheck,
     Edit3,
-    X,
-    Lock,
-    Nfc,
+    X,    Nfc,
     AlertCircle,
 } from 'lucide-react';
 import { AccessCardData } from './types';
-import SubscriptionPlansTab, { PlanId } from '../Pricing/SubscriptionPlansTab';
+import type { PlanId } from '../Pricing/plans';
 
 const TikTokIcon = ({ className }: { className?: string }) => (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -25,23 +23,37 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 
 type CardKey = string | number;
 
+const formatUtcDateTime = (dateStr?: string): string | null => {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return null;
+    const date = d.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+    const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    return `${date}`;
+};
+
 const getCardKey = (card: AccessCardData, index: number): CardKey =>
     (card as any)?.id ?? index;
 
-const isSubscriptionActive = (card: AccessCardData): boolean =>
-    ((card as any)?.business_user?.subscription_status || '').toLowerCase() === 'active';
+const getPlanType = (card: AccessCardData): string =>
+    ((card as any)?.plan_type || '').toLowerCase();
+
+// plan_type already bundles NFC (nfc_only / nfc_with_subscription) — hide the
+// "Include NFC" upsell button once the card is on one of those plans.
+const cardHasNfcPlan = (card: AccessCardData): boolean => {
+    const planType = getPlanType(card);
+    return planType === 'nfc_only' || planType === 'nfc_with_subscription';
+};
+
 
 // nfc_status assumed to live alongside subscription_status on business_user.
 // Move this lookup if your API actually returns it elsewhere on the card.
 const getNfcStatus = (card: AccessCardData): string =>
     ((card as any)?.business_user?.nfc_status || (card as any)?.nfc_status || '').toLowerCase();
 
-const isNfcAlreadyPaid = (card: AccessCardData): boolean => getNfcStatus(card) === 'paid';
+const isNfcAlreadyPaid = (card: AccessCardData): boolean =>
+    cardHasNfcPlan(card) || getNfcStatus(card) === 'paid';
 
-// Plan ids that ship / include an NFC card — these should be disabled once
-// nfc_status is already "paid" so the user can't buy a second NFC card.
-// Update these to match your actual PlanId values if they differ.
-const NFC_PLAN_IDS: PlanId[] = ['freeKeychain', 'proKeychain'] as PlanId[];
 
 interface Props {
     cardData: AccessCardData | AccessCardData[];
@@ -60,9 +72,6 @@ export default function MyAccessCard({
 }: Props) {
     const [copiedKey, setCopiedKey] = useState<CardKey | null>(null);
     const [qrKey, setQrKey] = useState<CardKey | null>(null);
-    const [subscriptionPromptKey, setSubscriptionPromptKey] = useState<CardKey | null>(null);
-    const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
-    const [nfcPromptKey, setNfcPromptKey] = useState<CardKey | null>(null);
 
     const cards: AccessCardData[] = Array.isArray(cardData)
         ? cardData
@@ -72,16 +81,16 @@ export default function MyAccessCard({
 
     if (error === "Business card not found." || cards.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-16">
-                <h2 className="text-2xl font-semibold text-gray-900">
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center sm:py-16">
+                <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
                     Create Your Business Card
                 </h2>
-                <p className="mt-2 text-sm text-gray-500 text-center max-w-md">
-                    You haven't created a business card yet.
+                <p className="mt-2 text-sm text-muted-foreground max-w-md">
+                    You haven&apos;t created a business card yet.
                 </p>
                 <button
-                    onClick={() => (window.location.href = "/apply/digital-card")}
-                    className="mt-6 rounded-xl bg-primary px-6 py-3 text-white font-medium"
+                    onClick={() => (window.location.href = "/access")}
+                    className="btn-primary mt-6 w-full max-w-xs sm:w-auto"
                 >
                     Create Business Card
                 </button>
@@ -100,26 +109,11 @@ export default function MyAccessCard({
         }
     };
 
-    const handleEditClick = (card: AccessCardData, key: CardKey) => {
-        if (isSubscriptionActive(card)) {
-            onEdit?.(card);
-        } else {
-            setSelectedPlan(null);
-            setSubscriptionPromptKey(key);
-        }
-    };
+    // Every owner can edit their details; photos, video and offers follow the plan
+    // (locked inside the editor, and enforced by the API).
+    const handleEditClick = (card: AccessCardData) => onEdit?.(card);
 
     const qrCard = cards.find((c, i) => getCardKey(c, i) === qrKey) ?? null;
-    const subscriptionPromptCard =
-        cards.find((c, i) => getCardKey(c, i) === subscriptionPromptKey) ?? null;
-    const nfcPromptCard = cards.find((c, i) => getCardKey(c, i) === nfcPromptKey) ?? null;
-
-    // Disable NFC-including plans in the prompt once this card's NFC has
-    // already been paid for, so the user can only pick a non-NFC plan.
-    const disabledPlanIds: PlanId[] = subscriptionPromptCard && isNfcAlreadyPaid(subscriptionPromptCard)
-        ? NFC_PLAN_IDS
-        : [];
-
     return (
         <>
             <div className="space-y-6">
@@ -156,48 +150,44 @@ export default function MyAccessCard({
                             return {};
                         }
                     })();
-
-                    const cardIsSubscribed = isSubscriptionActive(card);
-                    const isNfcNotPurchased = (card: any) =>
-                        card?.nfc_status === "not_purchased";
+                    const showIncludeNfcButton = !isNfcAlreadyPaid(card);
                     const isRejected = card?.status?.toLowerCase() === "rejected";
                     return (
                         <div
                             key={key}
-                            className="space-y-3 rounded-3xl border border-border/60 bg-secondary/10 p-3 sm:p-4"
+                            className="space-y-3 rounded-3xl border border-border/60 bg-muted/10 p-3 sm:p-4"
                         >
-                            <div className="flex items-center justify-between gap-2 px-1">
-                                <p className="text-xs font-semibold text-muted-foreground">
+                            <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+                                <p className="min-w-0 flex-1 truncate text-xs font-semibold text-muted-foreground">
                                     {card?.business_name || card?.name || ''}
                                 </p>
-                                <div className="flex items-center gap-2">
-                                    {cardIsSubscribed && isNfcNotPurchased(card) && (
+                                <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
+                                    {showIncludeNfcButton && (
                                         <button
-                                            onClick={() => setNfcPromptKey(key)}
-                                            className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-secondary transition-colors"
+                                            onClick={() => onPayNow?.(card, 'nfc_only')}
+                                            className="btn-outline gap-1.5 px-2.5 py-1 text-[11px]"
                                         >
                                             <Nfc className="h-3 w-3" />
                                             Include NFC
                                         </button>
                                     )}
                                     <button
-                                        onClick={() => handleEditClick(card, key)}
-                                        className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-secondary transition-colors"
+                                        onClick={() => handleEditClick(card)}
+                                        className="btn-outline gap-1.5 px-2.5 py-1 text-[11px]"
                                     >
-                                        {cardIsSubscribed ? (
-                                            <Edit3 className="h-3 w-3" />
-                                        ) : (
-                                            <Lock className="h-3 w-3" />
-                                        )}
+                                        <Edit3 className="h-3 w-3" />
                                         Edit
                                     </button>
                                 </div>
                             </div>
                             <div className="space-y-4">
-                                <div className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition-all duration-300 hover:shadow-[var(--shadow-medium)]">
-                                    <div className="flex flex-col sm:flex-row min-h-[200px]">
-                                        <div className="h-1.5 w-full sm:h-auto sm:w-1.5 flex-shrink-0 bg-primary" />
-                                        <div className="flex flex-col items-center justify-center gap-3 border-b border-border sm:border-b-0 sm:border-r px-6 py-6 sm:min-w-[160px] sm:px-8">
+                                {/* Card switches to a 3-up row at lg (1024px) instead of sm (640px) —
+                                    at sm/tablet widths, three fixed-min-width columns side by side
+                                    overflowed and forced horizontal scroll. */}
+                                <div className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-all duration-300 hover:shadow-medium">
+                                    <div className="flex flex-col lg:flex-row min-h-[200px]">
+                                        <div className="h-1.5 w-full lg:h-auto lg:w-1.5 flex-shrink-0 bg-primary" />
+                                        <div className="flex flex-col items-center justify-center gap-3 border-b border-border px-6 py-6 lg:w-[180px] lg:flex-shrink-0 lg:border-b-0 lg:border-r lg:px-8">
                                             {card?.profile_image ? (
                                                 <img
                                                     src={card?.profile_image}
@@ -217,23 +207,23 @@ export default function MyAccessCard({
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="flex flex-1 flex-col justify-center gap-4 border-b border-border sm:border-b-0 sm:border-r px-6 py-6 sm:px-7">
+                                        <div className="flex flex-1 flex-col justify-center gap-4 border-b border-border px-6 py-6 lg:min-w-0 lg:border-b-0 lg:border-r lg:px-7">
                                             <div>
                                                 <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">About</p>
                                                 <div
-                                                    className="text-[13px] leading-relaxed text-foreground/80"
+                                                    className="rich-text text-[13px] leading-relaxed text-foreground/80 break-words"
                                                     dangerouslySetInnerHTML={{ __html: bioSummary || "" }}
                                                 />
                                             </div>
                                         </div>
-                                        <div className="flex flex-col justify-center gap-4 px-6 py-6 sm:min-w-[200px] sm:px-7">
+                                        <div className="flex flex-col justify-center gap-4 px-6 py-6 lg:w-[220px] lg:flex-shrink-0 lg:px-7">
                                             {card?.website && (
-                                                <div>
+                                                <div className="min-w-0">
                                                     <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Website</p>
                                                     <a href={card?.website} target="_blank" rel="noopener noreferrer"
-                                                        className="flex items-center gap-1.5 text-[13px] font-medium text-primary hover:underline">
+                                                        className="link-glamlink flex min-w-0 items-center gap-1.5 text-[13px]">
                                                         <Globe className="h-3.5 w-3.5 flex-shrink-0" />
-                                                        {card?.website.replace(/https?:\/\/(www\.)?/, '')}
+                                                        <span className="truncate">{card?.website.replace(/https?:\/\/(www\.)?/, '')}</span>
                                                     </a>
                                                 </div>
                                             )}
@@ -241,13 +231,15 @@ export default function MyAccessCard({
                                                 <div>
                                                     <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Booking</p>
                                                     <a href={card?.booking_link} target="_blank" rel="noopener noreferrer"
-                                                        className="flex items-center gap-1.5 text-[13px] font-medium text-primary hover:underline">
+                                                        className="link-glamlink flex items-center gap-1.5 text-[13px]">
                                                         <CalendarCheck className="h-3.5 w-3.5 flex-shrink-0" />
                                                         Book now
                                                     </a>
                                                 </div>
                                             )}
-                                            <div className="h-px w-full bg-border" />
+                                            {(card?.website || card?.booking_link) && Object.keys(socialMedia).length > 0 && (
+                                                <div className="h-px w-full bg-border" />
+                                            )}
                                             {Object.keys(socialMedia).length > 0 && (
                                                 <div>
                                                     <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
@@ -261,7 +253,7 @@ export default function MyAccessCard({
                                                                 rel="noopener noreferrer"
                                                                 className="flex items-center gap-2"
                                                             >
-                                                                <FaInstagram className="h-5 w-5 text-pink-500" />
+                                                                <Instagram className="h-5 w-5 text-primary" />
                                                             </a>
                                                         )}
                                                         {socialMedia.tiktok && (
@@ -279,46 +271,45 @@ export default function MyAccessCard({
                                             )}
                                         </div>
                                     </div>
-                                    <div className="flex flex-col gap-3 border-t border-border bg-secondary/40 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                                        <div className="flex flex-1 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
-                                            <span className="flex-1 truncate font-mono text-[12px] text-muted-foreground">
-                                                {isRejected ? "••••••••••••••••••••••" : card?.business_card_link}
-                                            </span>
-                                            {isRejected && (
-                                                <>
-                                                    <AlertCircle className="mt-0.5 h-5 w-5 text-red-600" />
-                                                    <div>
-                                                        <p className="text-sm font-semibold text-red-700">
-                                                            Your access card has been rejected.
-                                                        </p>
-                                                        <p className="mt-1 text-xs text-red-600">
-                                                            Please update your details and submit your access card again. It will remain unavailable until it is approved.
-                                                        </p>
-                                                    </div>
-                                                </>
-                                            )}
-                                            {!isRejected && (
+                                    <div className="flex flex-col gap-3 border-t border-border bg-muted/40 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                                        {isRejected ? (
+                                            <div className="flex flex-1 items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5">
+                                                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-destructive" />
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-semibold text-destructive">
+                                                        Your access card has been rejected.
+                                                    </p>
+                                                    <p className="mt-1 text-xs text-destructive">
+                                                        Please update your details and submit your access card again. It will remain unavailable until it is approved.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
+                                                <span className="min-w-0 flex-1 truncate tabular-nums text-[12px] text-muted-foreground">
+                                                    {card?.business_card_link}
+                                                </span>
                                                 <button
                                                     onClick={() => handleCopy(card, key)}
                                                     className="flex-shrink-0 rounded-lg p-1 hover:bg-accent transition-colors"
                                                     aria-label="Copy link"
                                                 >
                                                     {copiedKey === key ? (
-                                                        <Check className="h-3.5 w-3.5 text-green-600" />
+                                                        <Check className="h-3.5 w-3.5 text-success" />
                                                     ) : (
                                                         <Copy className="h-3.5 w-3.5 text-muted-foreground" />
                                                     )}
                                                 </button>
-                                            )}
-                                        </div>
+                                            </div>
+                                        )}
 
-                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                        <div className="flex flex-shrink-0 items-center gap-2">
                                             <a
                                                 href={isRejected ? undefined : card?.business_card_link}
                                                 target={isRejected ? undefined : "_blank"}
                                                 rel={isRejected ? undefined : "noopener noreferrer"}
                                                 onClick={(e) => isRejected && e.preventDefault()}
-                                                className={`btn-primary !px-4 !py-2 !text-xs !rounded-xl flex items-center gap-1.5 ${isRejected
+                                                className={`btn-primary w-full px-4 py-2 text-xs flex items-center justify-center gap-1.5 sm:w-auto ${isRejected
                                                     ? "pointer-events-none opacity-50 cursor-not-allowed"
                                                     : ""
                                                     }`}
@@ -330,6 +321,49 @@ export default function MyAccessCard({
                                         </div>
                                     </div>
                                 </div>
+                                {(card?.access_orders?.length ?? 0) > 0 && (
+                                    <div className="space-y-2">
+                                        {card.access_orders!.map((order) => (
+                                            <div
+                                                key={order.id}
+                                                className="flex flex-col gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-[12px] sm:flex-row sm:items-center sm:justify-between sm:px-6"
+                                            >
+                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                                                    <span className="text-muted-foreground">
+                                                        <span className="font-semibold text-foreground">Ordered:</span>{' '}
+                                                        {formatUtcDateTime(order.created_at)}
+                                                    </span>
+                                                    <span className="text-muted-foreground">
+                                                        <span className="font-semibold text-foreground">Order #:</span>{' '}
+                                                        {order.order_number}
+                                                    </span>
+                                                    {order.fulfillment_status && (
+                                                        <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[10px] font-semibold capitalize text-muted-foreground">
+                                                            {order.fulfillment_status}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {order.tracking_number && (
+                                                    <div className="min-w-0 truncate text-muted-foreground">
+                                                        <span className="font-semibold text-foreground">Tracking:</span>{' '}
+                                                        {order.tracking_link ? (
+                                                            <a
+                                                                href={order.tracking_link}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="link-glamlink"
+                                                            >
+                                                                {order.tracking_number}
+                                                            </a>
+                                                        ) : (
+                                                            order.tracking_number
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     );
@@ -339,7 +373,7 @@ export default function MyAccessCard({
             {/* QR Modal */}
             {qrCard && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4"
+                    className="fixed inset-0 z-50 flex items-center justify-center scrim p-4"
                     onClick={() => setQrKey(null)}
                 >
                     <div className="card-glamlink w-full max-w-xs" onClick={(e) => e.stopPropagation()}>
@@ -348,15 +382,15 @@ export default function MyAccessCard({
                                 <h3 className="text-sm font-semibold text-foreground">Your GlamCard QR</h3>
                                 <p className="text-[11px] text-muted-foreground mt-0.5">Scan to view access card</p>
                             </div>
-                            <button onClick={() => setQrKey(null)} className="rounded-lg p-1.5 hover:bg-secondary transition-colors">
+                            <button onClick={() => setQrKey(null)} className="rounded-lg p-1.5 hover:bg-muted transition-colors">
                                 <X className="h-4 w-4 text-muted-foreground" />
                             </button>
                         </div>
-                        <div className="flex justify-center rounded-xl bg-white p-5">
+                        <div className="flex justify-center rounded-xl bg-card p-5">
                             {qrCard?.business_card_qr ? (
                                 <img src={qrCard?.business_card_qr} alt="QR Code" className="h-48 w-48 object-contain" />
                             ) : (
-                                <div className="h-48 w-48 flex items-center justify-center bg-secondary rounded-lg text-muted-foreground text-sm">
+                                <div className="h-48 w-48 flex items-center justify-center bg-muted rounded-lg text-muted-foreground text-sm">
                                     No QR available
                                 </div>
                             )}
@@ -365,20 +399,20 @@ export default function MyAccessCard({
                             <p className="text-sm font-semibold text-foreground">{qrCard?.name}</p>
                             <p className="text-[11px] text-muted-foreground">{qrCard?.professional_title}</p>
                         </div>
-                        <div className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2">
-                            <span className="flex-1 truncate font-mono text-[11px] text-muted-foreground">{qrCard?.business_card_link}</span>
+                        <div className="mt-4 flex min-w-0 items-center gap-2 rounded-xl border border-border bg-muted/60 px-3 py-2">
+                            <span className="min-w-0 flex-1 truncate tabular-nums text-[11px] text-muted-foreground">{qrCard?.business_card_link}</span>
                             <button
                                 onClick={() => handleCopy(qrCard, qrKey as CardKey)}
                                 className="flex-shrink-0 rounded-md p-1 hover:bg-accent transition-colors"
                             >
-                                {copiedKey === qrKey ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
+                                {copiedKey === qrKey ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
                             </button>
                         </div>
                         <a
                             href={qrCard?.business_card_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn-primary mt-4 w-full !rounded-xl !text-xs flex items-center justify-center gap-2"
+                            className="btn-primary mt-4 w-full text-xs flex items-center justify-center gap-2"
                         >
                             <ExternalLink className="h-3.5 w-3.5" />
                             View my access card
@@ -387,90 +421,6 @@ export default function MyAccessCard({
                 </div>
             )}
 
-            {/* Subscribe Prompt Modal */}
-            {subscriptionPromptCard && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4"
-                    onClick={() => setSubscriptionPromptKey(null)}
-                >
-                    <div
-                        className="card-glamlink w-full max-h-[90vh] overflow-y-auto"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="mb-2 flex items-start justify-between">
-                            <div>
-                                <h3 className="text-sm font-semibold text-foreground">Subscribe to edit this card</h3>
-                                <p className="text-[11px] text-muted-foreground mt-0.5">
-                                    {(subscriptionPromptCard?.business_name || subscriptionPromptCard?.name || 'This card')}'s
-                                    subscription is inactive. Choose a plan to unlock editing.
-                                </p>
-                                {disabledPlanIds.length > 0 && (
-                                    <p className="text-[11px] text-muted-foreground mt-1">
-                                        You've already paid for an NFC card on this card, so NFC plans are unavailable.
-                                    </p>
-                                )}
-                            </div>
-                            <button
-                                onClick={() => setSubscriptionPromptKey(null)}
-                                className="rounded-lg p-1.5 hover:bg-secondary transition-colors flex-shrink-0"
-                            >
-                                <X className="h-4 w-4 text-muted-foreground" />
-                            </button>
-                        </div>
-                        <SubscriptionPlansTab
-                            selectedPlan={selectedPlan}
-                            onSelectPlan={setSelectedPlan}
-                            disabledPlanIds={disabledPlanIds}
-                            businessCardId={subscriptionPromptCard?.id}
-                            canContinue={!!selectedPlan && !disabledPlanIds.includes(selectedPlan)}
-                            onContinue={() => {
-                                if (!selectedPlan || disabledPlanIds.includes(selectedPlan)) return;
-                                onPayNow?.(subscriptionPromptCard, selectedPlan);
-                                setSubscriptionPromptKey(null);
-                            }}
-                        />
-                    </div>
-                </div>
-            )}
-
-            {/* Include NFC Modal — independent of the subscribe-prompt modal */}
-            {nfcPromptCard && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4"
-                    onClick={() => setNfcPromptKey(null)}
-                >
-                    <div
-                        className="card-glamlink w-full max-h-[90vh] overflow-y-auto"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="mb-2 flex items-start justify-between">
-                            <div>
-                                <h3 className="text-sm font-semibold text-foreground">Add an NFC keychain</h3>
-                                <p className="text-[11px] text-muted-foreground mt-0.5">
-                                    Add a physical NFC keychain to {(nfcPromptCard?.business_name || nfcPromptCard?.name || 'this card')}.
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => setNfcPromptKey(null)}
-                                className="rounded-lg p-1.5 hover:bg-secondary transition-colors flex-shrink-0"
-                            >
-                                <X className="h-4 w-4 text-muted-foreground" />
-                            </button>
-                        </div>
-                        <SubscriptionPlansTab
-                            businessCardId={nfcPromptCard.id}
-                            selectedPlan={'freeKeychain' as PlanId}
-                            onSelectPlan={() => { }}
-                            disabledPlanIds={['free', 'pro', 'proKeychain'] as PlanId[]}
-                            canContinue={true}
-                            onContinue={() => {
-                                onPayNow?.(nfcPromptCard, 'freeKeychain' as PlanId);
-                                setNfcPromptKey(null);
-                            }}
-                        />
-                    </div>
-                </div>
-            )}
         </>
     );
 }

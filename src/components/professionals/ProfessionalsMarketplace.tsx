@@ -5,7 +5,6 @@ import {
   Search,
   Filter,
   MapPin,
-  Instagram,
   CalendarDays,
   BadgeCheck,
   X,
@@ -14,6 +13,7 @@ import {
   ChevronsUpDown,
   ChevronDown,
 } from "lucide-react";
+import { Instagram } from "@/components/icons/BrandIcons";
 import { Button } from "@/components/ui/button";
 import { getBusinessProfile } from "@/api/Api";
 import GlamCardLivePreview from "../glamcard/GlamCardLivePreview";
@@ -68,7 +68,7 @@ const ProfessionalCard = ({
   return (
     <div
       onClick={() => pro.is_details && onCardClick(pro)}
-      className={`group rounded-[22px] overflow-hidden bg-white border-2 border-[#24bbcb]/30 shadow-md hover:shadow-xl hover:border-[#24bbcb] transition-all duration-300 flex flex-col select-none ${
+      className={`group rounded-[22px] overflow-hidden bg-card border-2 border-primary/30 shadow-md hover:shadow-xl hover:border-secondary transition-all duration-300 flex flex-col select-none ${
         pro.is_details ? "cursor-pointer" : "cursor-default"
       }`}
     >
@@ -80,7 +80,7 @@ const ProfessionalCard = ({
           className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
         />
         {founderBadge && (
-          <span className="absolute top-3 left-3 bg-[#24bbcb] text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md tracking-wide">
+          <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md tracking-wide">
             {founderBadge}
           </span>
         )}
@@ -88,19 +88,19 @@ const ProfessionalCard = ({
 
       {/* Info */}
       <div className="p-5 flex flex-col gap-2 flex-1">
-        <h3 className="text-[17px] font-bold text-gray-900 leading-tight">{pro.name}</h3>
+        <h3 className="text-[17px] font-semibold text-foreground leading-tight">{pro.name}</h3>
 
-        <p className="text-gray-500 text-sm -mt-1">
+        <p className="text-muted-foreground text-sm -mt-1">
           {pro.professional_title || "Beauty Expert"}
         </p>
 
-        <div className="flex items-center text-sm text-gray-500">
-          <MapPin className="w-4 h-4 mr-1.5 text-[#24bbcb] shrink-0" />
+        <div className="flex items-center text-sm text-muted-foreground">
+          <MapPin className="w-4 h-4 mr-1.5 text-primary shrink-0" />
           {pro?.locations?.[0]?.city},&nbsp;{pro?.locations?.[0]?.state}
         </div>
 
         {pro.instagram && (
-          <div className="flex items-center text-sm text-[#24bbcb]">
+          <div className="flex items-center text-sm text-primary">
             <Instagram className="w-4 h-4 mr-1.5 shrink-0" />
             <span>{pro.instagram}</span>
           </div>
@@ -108,7 +108,7 @@ const ProfessionalCard = ({
 
         {(pro.specialty || pro.professional_title) && (
           <div className="mt-1">
-            <span className="inline-flex items-center gap-1.5 bg-[#24bbcb]/10 text-[#24bbcb] text-xs font-medium px-3 py-1.5 rounded-full border border-[#24bbcb]/20">
+            <span className="inline-flex items-center gap-1.5 bg-primary/10 text-secondary text-xs font-medium px-3 py-1.5 rounded-full border border-primary/20">
               <BadgeCheck className="w-3.5 h-3.5" />
               {pro.specialty || pro.professional_title}
             </span>
@@ -117,7 +117,7 @@ const ProfessionalCard = ({
 
         <Button
           onClick={(e) => e.stopPropagation()}
-          className="mt-auto w-full bg-[#23B9CD] hover:bg-[#1ea8b5] text-white rounded-full py-5 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 gap-2"
+          className="mt-auto w-full bg-primary hover:bg-secondary text-primary-foreground rounded-full py-5 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 gap-2"
         >
           <CalendarDays className="w-4 h-4" />
          CONNECT
@@ -138,20 +138,6 @@ const ProfessionalsMarketplace = () => {
   const sortRef = useRef<HTMLDivElement>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
-  /* Close dropdowns on outside click using refs */
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
-        setSortOpen(false);
-      }
-      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
-        setFilterOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, []);
-
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -166,6 +152,20 @@ const ProfessionalsMarketplace = () => {
 
   /* GlamCardLivePreview state */
   const [selectedPro, setSelectedPro] = useState<Professional | null>(null);
+
+  /* Close dropdowns on outside click using refs */
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+        setSortOpen(false);
+      }
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setFilterOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
 /* ================= MAPPER ================= */
 
 const mapProToGlamCardData = (pro: Professional): any => ({
@@ -289,15 +289,15 @@ console.log(allSpecialties,"")
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
   return (
-    <section className="py-20 md:py-28 bg-gradient-to-b from-white via-gray-50/70 to-white">
-      <div className="container-glamlink px-5 md:px-8">
+    <section className="pt-28 pb-20 md:pt-36 md:pb-28 bg-background">
+      <div className="container-glamlink">
 
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
-          <h1 className="text-4xl md:text-6xl tracking-tight text-gray-900 mb-5">
-            <span className="text-[#24bbcb]">Meet the Professionals</span>
+          <h1 className="hero-title">
+            <span className="text-primary">Meet the Professionals</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="hero-subtitle mt-6 max-w-3xl mx-auto">
             Browse our verified beauty experts ready to transform your look.
           </p>
         </div>
@@ -308,13 +308,13 @@ console.log(allSpecialties,"")
 
             {/* Search Input */}
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/80" />
               <input
                 type="text"
                 placeholder="Search professionals..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-5 py-3 bg-white border border-gray-200 rounded-full text-sm focus:outline-none focus:border-[#24bbcb] transition shadow-sm"
+                className="w-full pl-11 pr-5 py-3 bg-card border border-border rounded-full text-sm focus:outline-none focus:border-primary transition shadow-sm"
               />
             </div>
 
@@ -322,9 +322,9 @@ console.log(allSpecialties,"")
             <div className="relative" ref={sortRef}>
               <button
                 onClick={() => setSortOpen((o) => !o)}
-                className="inline-flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm hover:border-[#24bbcb] transition whitespace-nowrap"
+                className="inline-flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-full text-sm font-medium text-foreground/80 shadow-sm hover:border-secondary transition whitespace-nowrap"
               >
-                <ChevronsUpDown className="w-4 h-4 text-gray-400" />
+                <ChevronsUpDown className="w-4 h-4 text-muted-foreground/80" />
                 {/* FIX 1: Clean label — no "undefined" when nothing selected */}
                 {activeSort
                   ? `Sort by ${sortOptions.find((o) => o.value === activeSort)?.label}`
@@ -332,15 +332,15 @@ console.log(allSpecialties,"")
                 {/* FIX 2: Only show arrow when a sort is active */}
                 {activeSort && (
                   sortDir === "asc"
-                    ? <ArrowUp className="w-4 h-4 text-[#24bbcb]" />
-                    : <ArrowDown className="w-4 h-4 text-[#24bbcb]" />
+                    ? <ArrowUp className="w-4 h-4 text-primary" />
+                    : <ArrowDown className="w-4 h-4 text-primary" />
                 )}
-                <ChevronDown className="w-4 h-4 text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-muted-foreground/80" />
               </button>
 
               {/* Dropdown Menu */}
               {sortOpen && (
-                <div className="absolute top-full mt-2 left-0 bg-white border border-gray-100 rounded-2xl shadow-lg z-20 min-w-[160px] overflow-hidden">
+                <div className="absolute top-full mt-2 left-0 bg-card border border-border rounded-2xl shadow-lg z-20 min-w-[160px] overflow-hidden">
                   {sortOptions.map((option) => (
                     <button
                       key={option.value}
@@ -353,13 +353,13 @@ console.log(allSpecialties,"")
                         }
                         setSortOpen(false);
                       }}
-                      className="w-full flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition"
+                      className="w-full flex items-center justify-between px-4 py-3 text-sm text-foreground/80 hover:bg-muted transition"
                     >
                       <span>{option.label}</span>
                       {activeSort === option.value && (
                         sortDir === "asc"
-                          ? <ArrowUp className="w-4 h-4 text-[#24bbcb]" />
-                          : <ArrowDown className="w-4 h-4 text-[#24bbcb]" />
+                          ? <ArrowUp className="w-4 h-4 text-primary" />
+                          : <ArrowDown className="w-4 h-4 text-primary" />
                       )}
                     </button>
                   ))}
@@ -374,14 +374,14 @@ console.log(allSpecialties,"")
                 onClick={() => setFilterOpen((o) => !o)}
                 className={`rounded-full px-4 py-3 h-auto text-sm font-medium transition ${
                   filterOpen || selectedSpecialties.length > 0 || selectedLocations.length > 0
-                    ? "border-[#24bbcb] text-[#24bbcb]"
+                    ? "border-secondary text-secondary"
                     : ""
                 }`}
               >
                 <Filter className="w-4 h-4 mr-2" />
                 Filters
                 {(selectedSpecialties.length + selectedLocations.length) > 0 && (
-                  <span className="ml-1.5 bg-[#24bbcb] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="ml-1.5 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
                     {selectedSpecialties.length + selectedLocations.length}
                   </span>
                 )}
@@ -390,18 +390,18 @@ console.log(allSpecialties,"")
               {/* Filter Panel */}
               {filterOpen && (
                 <div
-                  className="absolute top-full mt-2 right-0 bg-white border border-gray-100 rounded-2xl shadow-xl z-30 w-72"
+                  className="absolute top-full mt-2 right-0 bg-card border border-border rounded-2xl shadow-xl z-30 w-72"
                 >
                   {/* Tabs */}
-                  <div className="flex border-b border-gray-100">
+                  <div className="flex border-b border-border">
                     {(["specialty", "location"] as const).map((tab) => (
                       <button
                         key={tab}
                         onClick={() => setActiveFilterTab(tab)}
                         className={`flex-1 py-3 text-sm font-semibold capitalize transition border-b-2 -mb-px ${
                           activeFilterTab === tab
-                            ? "border-[#24bbcb] text-[#24bbcb]"
-                            : "border-transparent text-gray-500 hover:text-gray-700"
+                            ? "border-secondary text-secondary"
+                            : "border-transparent text-muted-foreground hover:text-secondary"
                         }`}
                       >
                         {tab === "specialty" ? "Specialty" : "Location"}
@@ -437,18 +437,18 @@ console.log(allSpecialties,"")
                         <div
                           key={item}
                           onClick={toggle}
-                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer select-none"
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted cursor-pointer select-none"
                         >
                           <div
                             className={`w-4 h-4 rounded border-2 shrink-0 flex items-center justify-center transition ${
                               selected
-                                ? "bg-[#24bbcb] border-[#24bbcb]"
-                                : "border-gray-300"
+                                ? "bg-secondary border-secondary"
+                                : "border-border"
                             }`}
                           >
                             {selected && (
                               <svg
-                                className="w-2.5 h-2.5 text-white"
+                                className="w-2.5 h-2.5 text-primary-foreground"
                                 fill="none"
                                 viewBox="0 0 10 10"
                               >
@@ -462,7 +462,7 @@ console.log(allSpecialties,"")
                               </svg>
                             )}
                           </div>
-                          <span className="text-sm text-gray-700">{item}</span>
+                          <span className="text-sm text-foreground/80">{item}</span>
                         </div>
                       );
                     })}
@@ -470,13 +470,13 @@ console.log(allSpecialties,"")
 
                   {/* Footer */}
                   {(selectedSpecialties.length + selectedLocations.length) > 0 && (
-                    <div className="border-t border-gray-100 p-3 flex justify-end">
+                    <div className="border-t border-border p-3 flex justify-end">
                       <button
                         onClick={() => {
                           setSelectedSpecialties([]);
                           setSelectedLocations([]);
                         }}
-                        className="text-xs text-gray-500 hover:text-red-500 transition"
+                        className="text-xs text-muted-foreground hover:text-destructive transition"
                       >
                         Clear all
                       </button>
@@ -491,17 +491,17 @@ console.log(allSpecialties,"")
 
         {/* States */}
         {loading && (
-          <div className="text-center py-10 text-gray-500">Loading professionals...</div>
+          <div className="text-center py-10 text-muted-foreground">Loading professionals...</div>
         )}
         {error && (
-          <div className="text-center py-10 text-red-500">{error}</div>
+          <div className="text-center py-10 text-destructive">{error}</div>
         )}
 
         {!loading && !error && (
           <>
             {/* Empty state */}
             {currentProfessionals.length === 0 && (
-              <div className="text-center py-16 text-gray-400">
+              <div className="text-center py-16 text-muted-foreground/80">
                 <p className="text-lg font-medium">No professionals found.</p>
                 <p className="text-sm mt-1">Try adjusting your search or filters.</p>
               </div>
@@ -538,11 +538,8 @@ console.log(allSpecialties,"")
                     <button
                       key={page}
                       onClick={() => goToPage(page)}
-                      className={`w-10 h-10 rounded-full text-sm font-medium transition ${
-                        currentPage === page
-                          ? "bg-[#24bbcb] text-white shadow"
-                          : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                      }`}
+                      aria-current={currentPage === page ? "page" : undefined}
+                      className="chip w-10 h-10 rounded-full text-sm"
                     >
                       {page}
                     </button>
@@ -565,16 +562,16 @@ console.log(allSpecialties,"")
         {/* Modal */}
         {selectedPro && (
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 scrim flex items-center justify-center z-50 p-4"
             onClick={() => setSelectedPro(null)}
           >
             <div
-              className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="relative bg-card rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setSelectedPro(null)}
-                className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition"
+                className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-muted hover:bg-border text-muted-foreground hover:text-foreground transition"
               >
                 <X className="w-4 h-4" />
               </button>

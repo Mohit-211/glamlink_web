@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { Modal, message } from "antd";
+import React, { useState } from "react";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import SuccessModal from "@/components/SuccessModal";
-import { GlamCardFormData } from "./types";
+import { BOOKING_METHODS, FieldErrors, GlamCardFormData } from "./types";
 import BasicInfoForm from "./BasicInfoForm";
 import MediaAndProfileForm from "../MediaAndProfileForm";
-import GlamlinkIntegrationForm from "./GlamlinkIntegrationForm";
 import ServicesAndBookingForm from "./ServicesAndBookingForm";
 import { useRouter } from "next/navigation";
 import { saveFormDataToSession } from "./Formdatasessionstorage";
-import VerifyOtp from "@/components/AuthPage/VerifyOtp";
-import Register from "@/components/AuthPage/Register";
-import Login from "@/components/AuthPage/Login";
-import { SubscriptionPaymentModal } from "../../Dashboard/SubscriptionPay";
+import { createCard, createGuestCard, updateCard } from "@/api/Api";
+import { readApiError } from "@/lib/apiError";
+import { saveCardToken } from "@/lib/cardToken";
+import { loginHref } from "@/lib/auth";
+import { useSession } from "@/lib/useSession";
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
@@ -24,12 +23,21 @@ interface Props {
   onSuccess?: (result: any) => void;
   /** shown as a Cancel action when mode === "edit" */
   onCancel?: () => void;
+  /** Edit mode: whether the owner may change photos, video and offers (Access Pro,
+   *  or a card that is not live yet). Details can always be edited. */
+  proAccess?: boolean;
 }
-const FORM_STORAGE_KEY = "glamcard_form_draft";
-// "payment" is intentionally NOT rendered inside the register/otp/login
-// Modal below — it's shown via its own SubscriptionPaymentModal instance so
-// the two modals never stack on top of one another.
-type AuthStep = "register" | "otp" | "login" | "payment" | null;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Digits only — no letters, spaces, or symbols (+, -, parens, etc).
+const PHONE_DIGITS_REGEX = /^\d+$/;
+const isValidPhone = (value: string) =>
+  PHONE_DIGITS_REGEX.test(value) && value.length >= 7 && value.length <= 15;
+// API field names (INVALID_CARD details.field) that the form tracks under another key.
+const FIELD_ALIASES: Record<string, string> = {
+  preferred_booking_method: "preferred_booking_methods",
+  videos: "images",
+  video_thumbnails: "images",
+};
 const GlamCardForm: React.FC<Props> = ({
   data,
   setData,
@@ -37,121 +45,98 @@ const GlamCardForm: React.FC<Props> = ({
   cardId,
   onSuccess,
   onCancel,
+  proAccess = true,
 }) => {
   const isEdit = mode === "edit";
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-    const token = localStorage.getItem("GlamlinkaccessToken");
-
-  // Auth flow state — shown when a card is created for a user who doesn't
-  // have a Glamlink login yet (result.data.user_login === false).
-  // Flow: register -> otp -> login -> (payment, if pending)
-  const [authStep, setAuthStep] = useState<AuthStep>(null);
-  const [createdCardEmail, setCreatedCardEmail] = useState<string>("");
-  // What should happen once the success popup is dismissed. We always show
-  // the "your card was created" popup first now — this just decides what
-  // comes after it: straight to the dashboard, or into the register flow
-  // for users who don't have a Glamlink login yet.
-  const [postSuccessAction, setPostSuccessAction] = useState<
-    "dashboard" | "register" | null
-  >(null);
-  // Owned here (not by Login) so the payment modal survives the
-  // register/otp/login Modal closing and doesn't stack two modals at once.
-  const [pendingCardId, setPendingCardId] = useState<string | number | null>(
-    null
-  );
-  // Restore form data from localStorage on mount (create flow only — edit loads from server data via props).
-  //
-  // The draft in FORM_STORAGE_KEY is ONLY meant to survive the intentional
-  // "logged out -> save draft -> redirect to /login -> come back" flow
-  // (see handleLogin below, which sets postLoginRedirect right before
-  // saving the draft). We use that flag to distinguish "we just came back
-  // from login" from "the user simply refreshed the page" — on a plain
-  // reload there's no reason to silently repopulate the form with
-  // whatever was last saved, possibly from a much earlier session, so we
-  // clear it instead of restoring it.
-  useEffect(() => {
-    if (isEdit) return;
-    const cameFromLoginRedirect =
-      localStorage.getItem("postLoginRedirect") === "/apply/digital-card";
-    const storedData = localStorage.getItem(FORM_STORAGE_KEY);
-    if (cameFromLoginRedirect && storedData) {
-      try {
-        const parsed = JSON.parse(storedData);
-        setData(parsed);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    // Either way, clear both keys now: if we just consumed the draft, it's
-    // no longer needed; if this was a plain reload, we don't want a stale
-    // draft or redirect flag lingering around for next time.
-    localStorage.removeItem(FORM_STORAGE_KEY);
-    localStorage.removeItem("postLoginRedirect");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setData, isEdit]);
+  const session = useSession();
+  // Set when a signed-in professional already has a card (409 CARD_EXISTS).
+  const [existingCardId, setExistingCardId] = useState<number | null>(null);
+  // Tracks which required fields currently fail validation, so the relevant
+  // inputs can be outlined in red instead of the user only seeing a toast.
+  // Populated by validateData() below (and by the API's INVALID_CARD answer);
+  // cleared per-field as the section components call clearError().
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const clearError = (key: string) => {
+    setErrors((prev) => {
+      if (!prev[key]) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  };
   /* ================= REQUIRED VALIDATION =================
      Pulled out so it can run before we even check for login,
      without needing to touch handleSubmit's flow. */
   const validateData = (): boolean => {
-    if (!data.name?.trim()) {
-      alert("Please enter your Name");
-      return false;
-    }
-    if (!data.professional_title?.trim()) {
-      alert("Please enter your Professional Title");
-      return false;
-    }
-    if (!data.email?.trim()) {
-      alert("Please enter your Email");
-      return false;
-    }
-    if (!data.phone?.trim()) {
-      alert("Please enter your Phone Number");
-      return false;
-    }
-    if (!data.business_name?.trim()) {
-      alert("Please enter your Business Name");
-      return false;
-    }
-    if (!data.bio?.trim()) {
-      alert("Please enter your Bio");
-      return false;
-    }
-    if (!data.primary_specialty?.trim()) {
-      alert("Please select your Primary Specialty");
-      return false;
-    }
-    if (!data.custom_handle?.trim()) {
-      alert("Please enter your Custom Handle");
-      return false;
-    }
-    if (!data.website?.trim()) {
-      alert("Please enter your Website");
-      return false;
-    }
+    const newErrors: FieldErrors = {};
+    let firstMessage = "";
+    let firstKey = "";
+    const fail = (key: string, msg: string) => {
+      newErrors[key] = msg;
+      if (!firstMessage) {
+        firstMessage = msg;
+        firstKey = key;
+      }
+    };
+
+    if (!data.name?.trim()) fail("name", "Please enter your Name");
+    if (!data.professional_title?.trim())
+      fail("professional_title", "Please enter your Professional Title");
+    if (!data.email?.trim()) fail("email", "Please enter your Email");
+    else if (!EMAIL_REGEX.test(data.email.trim()))
+      fail("email", "Please enter a valid Email address");
+    // Phone is only required when it's set to show on the card — matches
+    // the conditional "Phone number is required." hint under the field in
+    // BasicInformationSection (and the "Show phone number on card" toggle).
+   if ((data.is_phone_visible ?? true) && !data.phone?.trim()) {
+  fail("phone", "Please enter your Phone Number");
+} else if (
+  (data.is_phone_visible ?? true) &&
+  data.phone?.trim() &&
+  !/^\d{10}$/.test(data.phone.trim())
+) {
+  fail("phone", "Phone Number must contain exactly 10 digits");
+}
+    if (!data.business_name?.trim())
+      fail("business_name", "Please enter your Business Name");
+    if (!data.bio?.trim()) fail("bio", "Please enter your Bio");
     if (
       !Array.isArray(data.preferred_booking_methods) ||
       data.preferred_booking_methods.length === 0
     ) {
-      alert("Please select Preferred Booking Method");
-      return false;
+      fail("preferred_booking_methods", "Please select Preferred Booking Method");
     }
-    if (!data.profile_image) {
-      alert("Please upload Profile Image");
-      return false;
+    // "Go to Website" needs somewhere to send clients — either a dedicated
+    // booking link, or the website URL it falls back to (see the Booking
+    // Link field in ServicesAndBookingForm).
+    if (
+      data.preferred_booking_methods?.includes(BOOKING_METHODS.LINK) &&
+      !data.booking_link?.trim() &&
+      !data.website?.trim()
+    ) {
+      fail("booking_link", "Please enter a Booking Link or Website");
     }
-    if (!data.images?.length) {
-      alert("Please upload Gallery Images");
-      return false;
+    // "DM on Instagram" needs a handle to actually DM.
+    if (
+      data.preferred_booking_methods?.includes(BOOKING_METHODS.INSTAGRAM) &&
+      !data.social_media?.instagram?.trim()
+    ) {
+      fail("instagram", "Please enter your Instagram handle");
     }
-    if (!data.specialties?.length) {
-      alert("Please add at least one Specialty");
-      return false;
-    }
-    if (!data.locations?.length) {
-      alert("Please add a Location");
+    if (!data.profile_image) fail("profile_image", "Please upload Profile Image");
+    if (!data.images?.length) fail("images", "Please upload Gallery Images");
+    if (!data.specialties?.length)
+      fail("specialties", "Please add at least one Specialty");
+    if (!data.locations?.length) fail("locations", "Please add a Location");
+
+    setErrors(newErrors);
+    if (firstMessage) {
+      toast.info(firstMessage);
+      document
+        .getElementById(`field-${firstKey}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
     return true;
@@ -232,12 +217,45 @@ const GlamCardForm: React.FC<Props> = ({
     if (data.social_media) {
       formData.append("social_media", JSON.stringify(data.social_media));
     }
+    // Featured Links — new thumbnail Files go in "featured_link_images" (in
+    // order), and "featured_links" carries a matching JSON array where
+    // image_index points a link at its file's position in that array (null
+    // when the link has no new image attached). For a link that already had
+    // an image and isn't getting a new one (the common "edit" case — just
+    // touching the title/url/order of an existing link), its persisted
+    // image URL is carried forward via "image" so it doesn't get lost —
+    // without this, an edit-and-save with no new upload would strip the
+    // image from every existing link.
+    const featuredLinksRaw: any[] = Array.isArray(data.featured_links)
+      ? data.featured_links
+      : [];
+    const featuredLinksFiltered = featuredLinksRaw.filter((link) => link?.url?.trim());
+    const featuredLinksPayload = featuredLinksFiltered.map((link, index) => ({
+      title: link?.title?.trim() || "",
+      url: link.url.trim(),
+      image_index: null as number | null,
+      image:
+        link?.thumbnail_file instanceof File
+          ? null
+          : link?.image ?? link?.thumbnail_url ?? link?.image_url ?? null,
+      sort_order: index + 1,
+      is_featured: link?.is_featured === true,
+    }));
+    let featuredImageIndex = 0;
+    featuredLinksFiltered.forEach((link, index) => {
+      if (link?.thumbnail_file instanceof File) {
+        formData.append("featured_link_images", link.thumbnail_file);
+        featuredLinksPayload[index].image_index = featuredImageIndex;
+        featuredImageIndex++;
+      }
+    });
+    if (data.featured_links !== undefined) {
+      formData.append("featured_links", JSON.stringify(featuredLinksPayload));
+    }
     const jsonFields = [
       "business_hour",
       "other_links",
       "important_info",
-      "excites_about_glamlink",
-      "biggest_pain_points",
       "specialties",
       "locations",
     ] as const;
@@ -261,12 +279,8 @@ const GlamCardForm: React.FC<Props> = ({
       "professional_title",
       "bio",
       "booking_link",
-      "offer_promotion",
-      "elite_setup",
-      "primary_specialty",
-      "custom_handle",
       "website",
-      "promotion_details",
+      "color_code",
     ] as const;
     primitiveFields.forEach((field) => {
       const value = data[field];
@@ -280,57 +294,21 @@ const GlamCardForm: React.FC<Props> = ({
   const checkAuthAndSubmit = () => {
     if (!validateData()) return;
     const formData = buildFormData();
-    // Session storage is only a hand-off mechanism for the logged-out ->
-    // login -> resume-submit flow (see the useEffect above that reads
-    // FORM_STORAGE_KEY on mount, and handleLogin below). A logged-in user
-    // never needs that hand-off, so don't write their data to session
-    // storage at all in that case.
-    const token = localStorage.getItem("GlamlinkaccessToken");
-    if (!token) {
-      saveFormDataToSession(formData);
-    }
-    // if (!token) {
-    //   if (isEdit) {
-    //     alert("Your session has expired. Please log in again.");
-    //     return;
-    //   }
-    //   Modal.confirm({
-    //     title: "Login Required",
-    //     content:
-    //       "Please login first to create your GlamCard and save your business profile.",
-    //     okText: "Login Now",
-    //     cancelText: "Cancel",
-    //     centered: true,
-    //     onOk: () => {
-    //       handleLogin();
-    //     },
-    //   });
-    //   return;
-    // }
+    // A guest's details are kept for this tab so sign-in can prefill the email
+    // if the API says the email already has an account.
+    if (session.status !== "signed-in") saveFormDataToSession(formData);
     handleSubmit(formData);
   };
-  // Fires once the success popup is dismissed, whether that's via its own
-  // auto-close timer or a user clicking a close/"see your card" button
-  // inside it. Guarded by postSuccessAction so it's safe to fire twice
-  // (e.g. once from the timeout below and once from onClose).
-  const advanceAfterSuccess = () => {
-    setShowSuccess(false);
-    setPostSuccessAction((current) => {
-      if (current === "register") {
-        setAuthStep("register");
-      } else if (current === "dashboard") {
-        router.push("/dashboard");
-      }
-      return null;
-    });
+
+  /** Shows the API's refusal of a card field under that field. */
+  const showFieldError = (field: string, message: string) => {
+    const key = FIELD_ALIASES[field] ?? field;
+    setErrors((prev) => ({ ...prev, [key]: message }));
+    toast.error(message);
+    document.getElementById(`field-${key}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
-  const handleLogin = () => {
-    localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(data));
-    localStorage.setItem("postLoginRedirect", "/apply/digital-card");
-    window.location.href = "/login";
-  };
-  const handleSubmit = async (formData: FormData) => {
-    console.log("FINAL DATA 👉", data);
+
+  const handleSubmit = async (formData: FormData, replace = false) => {
     const newVideoItems = (data.images ?? [])
       .map((file, index) => ({ file, meta: data.gallery_meta?.[index], index }))
       .filter(
@@ -338,65 +316,67 @@ const GlamCardForm: React.FC<Props> = ({
       );
     for (const { meta, index } of newVideoItems) {
       if (!meta?.thumbnail_file) {
-        alert(`Please upload a thumbnail for video #${index + 1}.`);
+        toast.error(`Please upload a thumbnail for video #${index + 1}.`);
         return;
       }
     }
+    if (replace) formData.set("replace", "true");
     try {
       setLoading(true);
-      const token = localStorage.getItem("GlamlinkaccessToken");
-      const endpoint = isEdit
-        ? `https://node.glamlink.net:5000/api/v1/businessCard/updateBusinessCard/${cardId}`
-        : token
-          ? "https://node.glamlink.net:5000/api/v1/businessCard/createBusinessCard"
-          : "https://node.glamlink.net:5000/api/v1/businessCard";
-      const res = await fetch(endpoint, {
-        method: isEdit ? "PUT" : "POST",
-        headers: {
-          "x-access-token": token || "",
-          role_id: String(7),
-        },
-        body: formData,
-      });
-      console.log(res, "res====");
-      if (!res.ok) {
-        throw new Error(
-          isEdit ? "Failed to update GlamCard" : "Failed to create GlamCard"
-        );
-      }
-      const result = await res.json();
-      if (isEdit) {
-        message.success(result?.message || "GlamCard updated successfully!");
+
+      if (isEdit && cardId) {
+        const result = await updateCard(cardId, formData);
+        toast.success(result?.message || "Your card is updated.");
         onSuccess?.(result?.data ?? result);
-      } else {
-        // New user -> straight to plan selection with the new card's id.
-        if (result?.data?.user_exists === false) {
-          const businessCardId = result?.data?.business_card_id;
-          router.push(`/pricing?businessCardId=${businessCardId}`);
-          return;
-        }
-        // Existing user -> normal success popup -> dashboard.
-        setPostSuccessAction("dashboard");
-        setShowSuccess(true);
-        setTimeout(advanceAfterSuccess, 6000);
+        return;
       }
+
+      if (session.status === "signed-in") {
+        // The card belongs to the signed-in professional; choose a plan next.
+        const result = await createCard(formData);
+        router.push(`/pricing?businessCardId=${result?.data?.business_card_id}`);
+        return;
+      }
+
+      // A guest's card is a hidden draft until a plan is chosen or paid. The
+      // card token proves this browser made it, for the purchase calls.
+      const result = await createGuestCard(formData);
+      const created = result?.data ?? {};
+      const businessCardId = created.business_card_id;
+      if (created.card_token) saveCardToken(businessCardId, created.card_token);
+      const pricing = `/pricing?businessCardId=${businessCardId}`;
+      if (created.next_step === "sign_in") {
+        // The email already has a Glamlink account: sign in, then the draft is
+        // claimed for that account on the pricing page.
+        toast.info("This email already has a Glamlink account. Sign in to continue.");
+        router.push(loginHref(`${pricing}&claim=1`));
+        return;
+      }
+      router.push(pricing);
     } catch (error) {
-      console.error("ERROR 👉", error);
-      message.error(
-        isEdit ? "Failed to update Business Card" : "Failed to create Business Card"
-      );
+      const { code, message, details } = readApiError(error);
+      if (code === "INVALID_CARD" && details?.field) {
+        showFieldError(String(details.field), message);
+      } else if (code === "CARD_EXISTS") {
+        setExistingCardId(Number(details?.card_id) || null);
+      } else if (code === "UPGRADE_REQUIRED") {
+        toast.error(
+          details?.feature === "edit_details"
+            ? "Editing your card is part of Access Pro. Upgrade to make changes."
+            : "Changing photos and video is part of Access Pro. Upgrade to refresh them."
+        );
+      } else if (code === "TOO_MANY_REQUESTS") {
+        toast.error("Too many cards were created from this connection. Please try again in an hour.");
+      } else {
+        toast.error(message);
+      }
     } finally {
       setLoading(false);
     }
   };
-  // register/otp/login share one Modal; "payment" is deliberately excluded
-  // so it renders via its own SubscriptionPaymentModal instance below,
-  // instead of stacking on top of this one.
-  const isAuthModalOpen =
-    authStep === "register" || authStep === "otp" || authStep === "login";
   return (
     <>
-      <div className="h-[90dvh] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+      <div className="lg:h-[90dvh] lg:overflow-y-auto lg:pr-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         {/* Wrapping container gives the fields a clearly-intentional
             "disabled while saving" look (dimmed + no pointer events + a
             centered spinner) instead of just going quiet with no
@@ -417,117 +397,88 @@ const GlamCardForm: React.FC<Props> = ({
             className={`space-y-10 pb-6 transition-opacity duration-150 ${loading ? "pointer-events-none opacity-50" : ""
               }`}
           >
-            <BasicInfoForm data={data} setData={setData} />
-            <MediaAndProfileForm data={data} setData={setData} />
-            <ServicesAndBookingForm data={data} setData={setData} />
-            {/* <GlamlinkIntegrationForm data={data} setData={setData} /> */}
-            <div className="mt-10 flex gap-3">
+            <BasicInfoForm
+              data={data}
+              setData={setData}
+              errors={errors}
+              clearError={clearError}
+            />
+            <MediaAndProfileForm
+              data={data}
+              setData={setData}
+              errors={errors}
+              clearError={clearError}
+              locked={isEdit && !proAccess}
+            />
+            <ServicesAndBookingForm
+              data={data}
+              setData={setData}
+              errors={errors}
+              clearError={clearError}
+              mode={mode}
+              cardId={cardId}
+            />
+            <div className="mt-10 flex flex-col-reverse gap-3 sm:flex-row">
               {isEdit && onCancel && (
                 <button
                   onClick={onCancel}
                   disabled={loading}
-                  className="flex-1 py-3 rounded-full font-medium border border-border text-muted-foreground hover:bg-secondary transition disabled:opacity-50 cursor-pointer"
+                  className="btn-outline flex-1 disabled:opacity-50"
                 >
                   Cancel
                 </button>
               )}
-              <div
-                className="flex-1 rounded-full text-sm font-semibold text-white shadow-lg"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #23aeb8 0%, #53bec6 50%, #5cc2d6 100%)",
-                }}
+              <button
+                onClick={checkAuthAndSubmit}
+                disabled={loading}
+                className="btn-primary flex-1 disabled:opacity-50"
               >
-                <button
-                  onClick={checkAuthAndSubmit}
-                  disabled={loading}
-                  className="w-full py-3 rounded-lg font-medium disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {loading
-                    ? isEdit
-                      ? "Saving..."
-                      : "Creating..."
-                    : isEdit
-                      ? "Save Changes"
-                      : "Create Business Card"}
-                </button>
-              </div>
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {loading
+                  ? isEdit
+                    ? "Saving..."
+                    : "Creating..."
+                  : isEdit
+                    ? "Save Changes"
+                    : "Create Business Card"}
+              </button>
             </div>
           </div>
         </div>
       </div>
-      {!isEdit && (
-        <SuccessModal
-          open={showSuccess}
-          onClose={advanceAfterSuccess}
-          title="Your Access Card has been created successfully!"
-//           message="
-// Your Access Card is currently under review. Once approved, we'll email you with instructions to access your account and view your Access Card.
-// "
-        />
+      {existingCardId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center scrim p-4">
+          <div className="w-full max-w-md rounded-2xl border bg-card p-6 shadow-large">
+            <h2 className="text-lg font-semibold">You already have an Access card</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Each person has one card. Edit the one you have, or replace it with this one: the new card keeps
+              your public link, QR code, keychain and plan.
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <button type="button" onClick={() => router.push("/dashboard")} className="btn-outline flex-1">
+                Edit my card
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setExistingCardId(null);
+                  handleSubmit(buildFormData(), true);
+                }}
+                className="btn-primary flex-1"
+              >
+                Replace it
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setExistingCardId(null)}
+              className="mt-4 w-full text-sm text-muted-foreground hover:text-foreground"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
-      
-      {/* {!isEdit && (
-        <Modal
-          open={isAuthModalOpen}
-          onCancel={() => setAuthStep(null)}
-          footer={null}
-          centered
-          width={480}
-          destroyOnHidden
-        >
-          {authStep === "register" && (
-            <Register
-              onSuccess={(email) => {
-                setCreatedCardEmail(email);
-                setAuthStep("otp");
-              }}
-            />
-          )}
-          {authStep === "otp" && (
-            <VerifyOtp
-              email={createdCardEmail}
-              onSuccess={() => setAuthStep("login")}
-            />
-          )}
-          {authStep === "login" && (
-            <Login
-              onSuccess={() => {
-                setAuthStep(null);
-                router.push("/dashboard");
-              }}
-              onNeedsVerification={(email) => {
-                setCreatedCardEmail(email);
-                setAuthStep("otp");
-              }}
-              onPaymentRequired={(businessCardId) => {
-                // Close this Modal and hand off to our own
-                // SubscriptionPaymentModal instance below, instead of
-                // letting Login render its internal fallback modal.
-                setPendingCardId(businessCardId);
-                setAuthStep("payment");
-              }}
-            />
-          )}
-        </Modal>
-      )}
-    
-      {!isEdit && (
-        <SubscriptionPaymentModal
-          open={authStep === "payment"}
-          onClose={() => setAuthStep(null)}
-          onSuccess={() => {
-            setAuthStep(null);
-            router.push("/dashboard");
-          }}
-          businessCardId={pendingCardId}
-          onGoToAddresses={() => {
-            setAuthStep(null);
-            router.push("/dashboard?tab=addresses");
-          }}
-        />
-      )} */}
     </>
   );
 };

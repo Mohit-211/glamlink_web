@@ -1,20 +1,22 @@
-import React, { useState } from "react";
-import { BOOKING_METHODS, BookingMethod, GlamCardFormData } from "./types";
+﻿import React, { useState, useEffect, useRef, useCallback } from "react";
+import { nanoid } from "nanoid";
+import { GripVertical, ImagePlus, X } from "lucide-react";
+import { BOOKING_METHODS, BookingMethod, FeaturedLink, FieldErrors, GlamCardFormData } from "./types";
+import { reorderFeaturedLinks as saveFeaturedLinksOrder, userSpecialtiesApi } from "@/api/Api";
 
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
+  errors?: FieldErrors;
+  clearError?: (key: string) => void;
+  /** Needed to persist a Featured Links reorder immediately via its own endpoint (edit mode only). */
+  mode?: "create" | "edit";
+  cardId?: string | number;
 }
 
-const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
-const labelClass = "text-sm font-medium text-gray-700";
-const inputClass =
-  "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm " +
-  "text-gray-900 placeholder-gray-400 transition " +
-  "focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200";
+const sectionClass = "space-y-6 rounded-xl border border-border bg-card p-4 sm:p-6";
 
 const INSTAGRAM_KEYS = ["instagram", "instagram1", "instagram2"] as const;
-type InstagramKey = (typeof INSTAGRAM_KEYS)[number];
 
 /* ================= HELPERS ================= */
 const parseOtherLinks = (value: any): { title: string; url: string }[] => {
@@ -31,22 +33,113 @@ const parseOtherLinks = (value: any): { title: string; url: string }[] => {
   return [];
 };
 
-const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
+const parseFeaturedLinks = (value: any): FeaturedLink[] => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
+const ServicesAndBookingForm: React.FC<Props> = ({
+  data,
+  setData,
+  errors,
+  clearError,
+  mode,
+  cardId,
+}) => {
   const [specialtyInput, setSpecialtyInput] = useState("");
   const [infoInput, setInfoInput] = useState("");
   const [showInfo, setShowInfo] = useState(false);
 
+
+  const [specialtyOptions, setSpecialtyOptions] = useState<string[]>([]);
+  const [loadingSpecialties, setLoadingSpecialties] = useState(true);
+  const [specialtyDropdownOpen, setSpecialtyDropdownOpen] = useState(false);
+  const specialtyWrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await userSpecialtiesApi();
+        const names: string[] = (res?.data?.rows ?? [])
+          .map((item: any) => item?.name ?? item?.title ?? item)
+          .filter(Boolean);
+        if (mounted) setSpecialtyOptions(names);
+      } catch (err) {
+        console.error("Failed to load specialties:", err);
+      } finally {
+        if (mounted) setLoadingSpecialties(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        specialtyWrapperRef.current &&
+        !specialtyWrapperRef.current.contains(e.target as Node)
+      ) {
+        setSpecialtyDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  /* ================= FEATURED LINK PREVIEWS ================= */
+  // Object-URL previews for pending (not-yet-uploaded) thumbnail files, keyed
+  // by link id. Regenerated/revoked whenever the featured_links array changes
+  // so blob URLs don't leak as thumbnails are added, replaced, or removed.
+  const [featuredLinkPreviews, setFeaturedLinkPreviews] = useState<Record<string, string>>({});
+  const featuredLinks = data?.featured_links;
+  useEffect(() => {
+    const links = parseFeaturedLinks(featuredLinks);
+    const next: Record<string, string> = {};
+    links.forEach((link) => {
+      if (link.thumbnail_file instanceof File) {
+        next[link.id] = URL.createObjectURL(link.thumbnail_file);
+      }
+    });
+    setFeaturedLinkPreviews(next);
+    return () => {
+      Object.values(next).forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [featuredLinks]);
+
+  const [draggedFeaturedLinkIndex, setDraggedFeaturedLinkIndex] = useState<number | null>(null);
+
   if (!data) return null;
 
   /* ================= SPECIALTIES ================= */
-  const addSpecialty = () => {
-    if (!specialtyInput.trim()) return;
+  const isSpecialtyAdded = (val: string) =>
+    data.specialties.some(
+      (s) => s.toLowerCase() === val.trim().toLowerCase()
+    );
+
+  const addSpecialty = (value?: string) => {
+    const val = (value ?? specialtyInput).trim();
+    if (!val) return;
     if (data.specialties.length >= 5) return;
+    if (isSpecialtyAdded(val)) return;
     setData((prev) => ({
       ...prev,
-      specialties: [...prev.specialties, specialtyInput.trim()],
+      specialties: [...prev.specialties, val],
     }));
     setSpecialtyInput("");
+    setSpecialtyDropdownOpen(false);
+    clearError?.("specialties");
   };
 
   const removeSpecialty = (index: number) => {
@@ -55,6 +148,22 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
       specialties: prev.specialties.filter((_, i) => i !== index),
     }));
   };
+
+  const filteredSpecialtyOptions = specialtyOptions.filter(
+    (opt) =>
+      opt.toLowerCase().includes(specialtyInput.trim().toLowerCase()) &&
+      !isSpecialtyAdded(opt)
+  );
+
+  const specialtyExactMatch = specialtyOptions.some(
+    (opt) => opt.toLowerCase() === specialtyInput.trim().toLowerCase()
+  );
+
+  const canAddCustomSpecialty =
+    specialtyInput.trim().length > 0 &&
+    !specialtyExactMatch &&
+    !isSpecialtyAdded(specialtyInput) &&
+    data.specialties.length < 5;
 
   /* ================= IMPORTANT INFO ================= */
   const addInfo = () => {
@@ -73,6 +182,15 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
     }));
   };
 
+  const updateInfo = (index: number, value: string) => {
+    setData((prev) => ({
+      ...prev,
+      important_info: prev.important_info?.map((item, i) =>
+        i === index ? value : item
+      ),
+    }));
+  };
+
   /* ================= FORMATTERS ================= */
   const formatInstagram = (value: string) => {
     if (!value.trim()) return "";
@@ -81,12 +199,17 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
     return `https://www.instagram.com/${clean}`;
   };
 
-  const formatTikTok = (value: string) => {
+  const formatSocialLink = (value: string, domain: string) => {
     if (!value.trim()) return "";
     if (value.startsWith("http")) return value.trim();
     const clean = value.replace(/^@/, "").trim();
-    return `https://www.tiktok.com/@${clean}`;
+    return `https://${domain}/${clean}`;
   };
+
+  const formatTikTok = (value: string) => formatSocialLink(value, "www.tiktok.com");
+  const formatLinkedIn = (value: string) => formatSocialLink(value, "linkedin.com/in");
+  const formatYouTube = (value: string) => formatSocialLink(value, "youtube.com");
+  const formatFacebook = (value: string) => formatSocialLink(value, "facebook.com");
 
   /* ================= INSTAGRAM HANDLES ================= */
   const getHandles = (): string[] => {
@@ -114,7 +237,6 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
       i++;
     }
 
-    // Next key: instagram → instagram1 → instagram2 → instagram3...
     const nextKey = count === 0 ? "instagram" : `instagram${count}`;
 
     setData((prev) => ({
@@ -129,6 +251,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
       ...prev,
       social_media: { ...prev.social_media, [key]: formatInstagram(value) },
     }));
+    if (idx === 0) clearError?.("instagram");
   };
 
   const removeInstagramHandle = (idx: number) => {
@@ -175,65 +298,238 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
     });
   };
 
+  /* ================= FEATURED LINKS ================= */
+  const addFeaturedLink = () => {
+    setData((prev) => {
+      const links = parseFeaturedLinks(prev.featured_links);
+      return {
+        ...prev,
+        featured_links: [
+          ...links,
+          { id: nanoid(), title: "", url: "", sort_order: links.length },
+        ],
+      };
+    });
+  };
+
+  const removeFeaturedLink = (index: number) => {
+    setData((prev) => ({
+      ...prev,
+      featured_links: parseFeaturedLinks(prev.featured_links)
+        .filter((_, i) => i !== index)
+        .map((link, i) => ({ ...link, sort_order: i })),
+    }));
+  };
+
+  const updateFeaturedLink = (index: number, field: "title" | "url", value: string) => {
+    setData((prev) => {
+      const updated = [...parseFeaturedLinks(prev.featured_links)];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, featured_links: updated };
+    });
+  };
+
+  const setFeaturedLinkThumbnail = (index: number, file: File) => {
+    setData((prev) => {
+      const updated = [...parseFeaturedLinks(prev.featured_links)];
+      updated[index] = { ...updated[index], thumbnail_file: file };
+      return { ...prev, featured_links: updated };
+    });
+  };
+
+  const removeFeaturedLinkThumbnail = (index: number) => {
+    setData((prev) => {
+      const updated = [...parseFeaturedLinks(prev.featured_links)];
+      updated[index] = {
+        ...updated[index],
+        thumbnail_file: undefined,
+        image: undefined,
+        thumbnail_url: undefined,
+        image_url: undefined,
+      };
+      return { ...prev, featured_links: updated };
+    });
+  };
+
+  // Only one link can be featured-first at a time — setting it clears the flag
+  // on every other link; clicking the active one again un-sets it.
+  const toggleFeaturedLinkFeatured = (index: number) => {
+    setData((prev) => {
+      const links = parseFeaturedLinks(prev.featured_links);
+      const nextValue = !links[index]?.is_featured;
+      return {
+        ...prev,
+        featured_links: links.map((link, i) => ({
+          ...link,
+          is_featured: i === index ? nextValue : false,
+        })),
+      };
+    });
+  };
+
+  // Persists a new order immediately via the dedicated reorder endpoint —
+  // only meaningful in edit mode, once the card already exists server-side.
+  // In create mode there's nothing to reorder yet; the final order still
+  // goes out with the rest of the data on submit via buildFormData.
+  const persistFeaturedLinksOrder = async (links: FeaturedLink[]) => {
+    if (mode !== "edit" || !cardId) return;
+    try {
+      // This endpoint only accepts PUT + a real JSON body — it does not
+      // parse a multipart "featured_links" field as JSON the way the main
+      // create/update endpoint does, and it has no way to accept new image
+      // files at all (confirmed directly against the API). So a pending,
+      // not-yet-uploaded thumbnail_file is irrelevant here — always send
+      // whatever image URL is already live on the server for that link;
+      // the new file only goes out — via featured_link_images — on the
+      // next full "Save Changes" submit (see buildFormData in
+      // GlamCardForm.tsx).
+      await saveFeaturedLinksOrder(
+        cardId,
+        links
+          .filter((link) => link?.url?.trim())
+          .map((link, index) => ({
+            title: link?.title?.trim() || "",
+            url: link.url.trim(),
+            image: link?.image ?? link?.thumbnail_url ?? link?.image_url ?? null,
+            is_featured: link?.is_featured === true,
+            sort_order: index + 1,
+          }))
+      );
+    } catch (err) {
+      // Non-fatal — the order still saves with the rest of the form on
+      // submit, so a transient failure here just means it isn't
+      // reflected on the live card until then.
+      console.error("Failed to persist featured links order:", err);
+    }
+  };
+
+  const reorderFeaturedLinks = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    setData((prev) => {
+      const links = [...parseFeaturedLinks(prev.featured_links)];
+      const [moved] = links.splice(fromIndex, 1);
+      links.splice(toIndex, 0, moved);
+      const reordered = links.map((link, i) => ({ ...link, sort_order: i }));
+      persistFeaturedLinksOrder(reordered);
+      return { ...prev, featured_links: reordered };
+    });
+  };
+
   /* ================= RENDER ================= */
   return (
     <section className={sectionClass}>
       <header className="space-y-1">
         <h2 className="text-lg font-semibold">Services & Booking</h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Your specialties and how clients can reach you
         </p>
       </header>
 
-      {/* Primary Specialty */}
-      {/* <div>
-        <label className={labelClass}>Primary Specialty *</label>
-        <input
-          className={inputClass}
-          placeholder="e.g. Hair Styling, Nails, Makeup..."
-          value={data.primary_specialty || ""}
-          onChange={(e) =>
-            setData((prev) => ({ ...prev, primary_specialty: e.target.value }))
-          }
-          required
-        />
-      </div> */}
-
       {/* Additional Specialties */}
-      <div className="space-y-3">
-        <label className={labelClass}>Additional Specialties</label>
-        <div className="flex gap-2">
-          <input
-            className={inputClass}
-            placeholder="e.g. Balayage, Keratin Treatments, Bridal Makeup"
-            value={specialtyInput}
-            onChange={(e) => setSpecialtyInput(e.target.value)}
-          />
+      <div id="field-specialties" className="space-y-3">
+        <label className="label-glamlink">
+          Additional Specialties <span className="text-destructive">*</span>
+        </label>
+
+        <div className="relative flex gap-2" ref={specialtyWrapperRef}>
+          <div className="relative min-w-0 flex-1">
+            <input
+              className="input-glamlink" aria-invalid={!!errors?.specialties}
+              placeholder="e.g. Balayage, Keratin Treatments, Bridal Makeup"
+              value={specialtyInput}
+              onChange={(e) => {
+                setSpecialtyInput(e.target.value);
+                setSpecialtyDropdownOpen(true);
+              }}
+              onFocus={() => setSpecialtyDropdownOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (specialtyExactMatch) {
+                    addSpecialty(specialtyInput.trim());
+                  } else if (canAddCustomSpecialty) {
+                    addSpecialty();
+                  }
+                }
+              }}
+            />
+
+            {specialtyDropdownOpen && (
+              <div className="absolute z-10 mt-1 w-full max-h-56 overflow-auto rounded-lg border border-border bg-card shadow-lg">
+                {loadingSpecialties ? (
+                  <div className="px-4 py-2 text-sm text-muted-foreground/80">Loading…</div>
+                ) : (
+                  <>
+                    {filteredSpecialtyOptions.map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => addSpecialty(opt)}
+                        disabled={data.specialties.length >= 5}
+                        className="block w-full text-left px-4 py-2 text-sm hover:bg-secondary/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {opt}
+                      </button>
+                    ))}
+
+                    {canAddCustomSpecialty && (
+                      <button
+                        type="button"
+                        onClick={() => addSpecialty()}
+                        className="block w-full text-left px-4 py-2 text-sm font-medium text-primary hover:bg-secondary/10 hover:text-secondary border-t border-border"
+                      >
+                        + Add &quot;{specialtyInput.trim()}&quot;
+                      </button>
+                    )}
+
+                    {!filteredSpecialtyOptions.length && !canAddCustomSpecialty && (
+                      <div className="px-4 py-2 text-sm text-muted-foreground/80">
+                        {specialtyOptions.length === 0 ? "No specialties available" : "No matches"}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
           <button
             type="button"
-            onClick={addSpecialty}
-            disabled={data.specialties.length >= 5 || !specialtyInput.trim()}
-            className={`rounded-lg px-5 text-sm font-medium transition ${data.specialties.length >= 5 || !specialtyInput.trim()
-              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-teal-600 text-white hover:bg-teal-700"
-              }`}
+            onClick={() => {
+              if (specialtyExactMatch) {
+                addSpecialty(specialtyInput.trim());
+              } else {
+                addSpecialty();
+              }
+            }}
+            disabled={
+              data.specialties.length >= 5 ||
+              !specialtyInput.trim() ||
+              isSpecialtyAdded(specialtyInput)
+            }
+            className="btn-primary px-5 disabled:opacity-50"
           >
             + Add
           </button>
         </div>
-        <p className="text-xs text-gray-500">Max 5 specialties</p>
+
+        {errors?.specialties ? (
+          <p className="text-sm text-destructive">{errors.specialties}</p>
+        ) : (
+          <p className="text-xs text-muted-foreground">Max 5 specialties</p>
+        )}
         {data.specialties.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {data.specialties.map((item, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700"
+                className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-medium text-secondary"
               >
                 {item}
                 <button
                   type="button"
                   onClick={() => removeSpecialty(i)}
-                  className="ml-1 text-teal-800 hover:text-red-600"
+                  className="ml-1 text-secondary/70 hover:text-destructive"
                 >
                   ×
                 </button>
@@ -243,24 +539,11 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
         )}
       </div>
 
-      {/* Custom Handle */}
-      {/* <div>
-        <label className={labelClass}>Claim Your Custom Handle</label>
-        <input
-          className={inputClass}
-          placeholder="Used for your Glamlink profile URL"
-          value={data.custom_handle || ""}
-          onChange={(e) =>
-            setData((prev) => ({ ...prev, custom_handle: e.target.value }))
-          }
-        />
-      </div> */}
-
       {/* Socials & Website */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-sm font-semibold text-gray-800">Socials & Website</h3>
-          <p className="text-xs text-gray-500 mt-1">
+          <h3 className="text-sm font-semibold text-foreground">Socials & Website</h3>
+          <p className="text-xs text-muted-foreground mt-1">
             Add your social profiles, website, press features, or articles
           </p>
         </div>
@@ -268,43 +551,46 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
         <div className="grid gap-4 md:grid-cols-2">
           {/* Website */}
           <div>
-            <label className={labelClass}>Website</label>
+            <label className="label-glamlink">Website</label>
             <input
               type="url"
-              className={inputClass}
+              className="input-glamlink" aria-invalid={!!errors?.booking_link}
               placeholder="https://yourwebsite.com"
               value={data.website || ""}
-              onChange={(e) =>
-                setData((prev) => ({ ...prev, website: e.target.value }))
-              }
+              onChange={(e) => {
+                setData((prev) => ({ ...prev, website: e.target.value }));
+                clearError?.("booking_link");
+              }}
             />
           </div>
 
-          {/* Instagram — 3 fixed slots */}
-
-          {/* Instagram — dynamic */}
-          <div className="md:col-span-2">
-            <div className="flex items-center justify-between mb-2">
+          <div id="field-instagram" className="md:col-span-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
               <div>
-                <label className={labelClass}>Instagram</label>
-                <p className="text-xs text-gray-500">Add multiple Instagram handles</p>
+                <label className="label-glamlink">
+                  Instagram
+                  {data.preferred_booking_methods?.includes(BOOKING_METHODS.INSTAGRAM) && (
+                    <span className="text-destructive"> *</span>
+                  )}
+                </label>
+                <p className="text-xs text-muted-foreground">Add multiple Instagram handles</p>
               </div>
               <button
                 type="button"
                 onClick={addInstagramHandle}
-                className="text-xs text-[#23AEB8] hover:underline font-medium"
+                className="link-glamlink text-xs"
               >
                 + Add Instagram
               </button>
             </div>
             <div className="space-y-2">
               {getHandles().map((value, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400 w-24 shrink-0">
+                <div key={idx} className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+                  <span className="text-xs text-muted-foreground/80 w-full sm:w-24 sm:shrink-0">
                     {idx === 0 ? "Instagram" : `Instagram ${idx}`}
                   </span>
                   <input
-                    className={`${inputClass} flex-1`}
+                    className="input-glamlink min-w-0 flex-1" aria-invalid={!!(idx === 0 && errors?.instagram)}
                     placeholder="@yourusername or full URL"
                     value={value}
                     required={
@@ -319,7 +605,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                     <button
                       type="button"
                       onClick={() => removeInstagramHandle(idx)}
-                      className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 hover:bg-red-100"
+                      className="rounded-lg bg-destructive/5 px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
                     >
                       ×
                     </button>
@@ -327,14 +613,16 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                 </div>
               ))}
             </div>
+            {errors?.instagram && (
+              <p className="mt-1 text-sm text-destructive">{errors.instagram}</p>
+            )}
           </div>
-
 
           {/* TikTok */}
           <div>
-            <label className={labelClass}>TikTok</label>
+            <label className="label-glamlink">TikTok</label>
             <input
-              className={inputClass}
+              className="input-glamlink"
               placeholder="@yourusername or full URL"
               value={data.social_media?.tiktok || ""}
               onChange={(e) =>
@@ -351,16 +639,18 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
 
           {/* LinkedIn */}
           <div>
-            <label className={labelClass}>LinkedIn</label>
+            <label className="label-glamlink">LinkedIn</label>
             <input
-              type="url"
-              className={inputClass}
-              placeholder="https://linkedin.com/in/yourprofile"
+              className="input-glamlink"
+              placeholder="@yourprofile or full URL"
               value={data.social_media?.linkedin || ""}
               onChange={(e) =>
                 setData((prev) => ({
                   ...prev,
-                  social_media: { ...prev.social_media, linkedin: e.target.value },
+                  social_media: {
+                    ...prev.social_media,
+                    linkedin: formatLinkedIn(e.target.value),
+                  },
                 }))
               }
             />
@@ -368,16 +658,18 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
 
           {/* YouTube */}
           <div>
-            <label className={labelClass}>YouTube</label>
+            <label className="label-glamlink">YouTube</label>
             <input
-              type="url"
-              className={inputClass}
-              placeholder="https://youtube.com/@yourchannel"
+              className="input-glamlink"
+              placeholder="@yourchannel or full URL"
               value={data.social_media?.youtube || ""}
               onChange={(e) =>
                 setData((prev) => ({
                   ...prev,
-                  social_media: { ...prev.social_media, youtube: e.target.value },
+                  social_media: {
+                    ...prev.social_media,
+                    youtube: formatYouTube(e.target.value),
+                  },
                 }))
               }
             />
@@ -385,16 +677,18 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
 
           {/* Facebook */}
           <div>
-            <label className={labelClass}>Facebook</label>
+            <label className="label-glamlink">Facebook</label>
             <input
-              type="url"
-              className={inputClass}
-              placeholder="https://facebook.com/yourpage"
+              className="input-glamlink"
+              placeholder="@yourpage or full URL"
               value={data.social_media?.facebook || ""}
               onChange={(e) =>
                 setData((prev) => ({
                   ...prev,
-                  social_media: { ...prev.social_media, facebook: e.target.value },
+                  social_media: {
+                    ...prev.social_media,
+                    facebook: formatFacebook(e.target.value),
+                  },
                 }))
               }
             />
@@ -402,13 +696,13 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
         </div>
 
         {/* Press / Articles / Other Links */}
-        <div className="space-y-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-5">
-          <div className="flex items-center justify-between">
+        <div className="space-y-4 rounded-xl border border-dashed border-border bg-muted p-3 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <label className="text-sm font-semibold text-gray-800">
+              <label className="text-sm font-semibold text-foreground">
                 Press / Articles / Other Links
               </label>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Add magazine features, interviews, blog articles, portfolios,
                 press coverage, Behance projects, or any important external links.
               </p>
@@ -416,7 +710,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             <button
               type="button"
               onClick={addOtherLink}
-              className="flex-none rounded-lg bg-[#23AEB8] px-4 py-2 text-sm font-medium text-white hover:bg-[#1f9aa3]"
+              className="btn-primary w-full flex-none sm:w-auto"
             >
               + Add Link
             </button>
@@ -426,12 +720,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
               (link: { title: string; url: string }, index: number) => (
                 <div
                   key={index}
-                  className="flex flex-col gap-2 rounded-lg border border-gray-200 bg-white p-3"
+                  className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3"
                 >
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      className={`${inputClass} flex-1`}
+                      className="input-glamlink min-w-0 flex-1"
                       placeholder="Title (e.g. Vogue Feature)"
                       value={link.title}
                       onChange={(e) => updateOtherLink(index, "title", e.target.value)}
@@ -439,14 +733,14 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                     <button
                       type="button"
                       onClick={() => removeOtherLink(index)}
-                      className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+                      className="rounded-lg bg-destructive/5 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10"
                     >
                       Delete
                     </button>
                   </div>
                   <input
                     type="url"
-                    className={inputClass}
+                    className="input-glamlink"
                     placeholder="https://example.com/article"
                     value={link.url}
                     onChange={(e) => updateOtherLink(index, "url", e.target.value)}
@@ -455,22 +749,154 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
               )
             )}
             {parseOtherLinks(data?.other_links).length === 0 && (
-              <div className="rounded-lg border border-gray-200 bg-white p-4 text-center text-sm text-gray-500">
-                No links added yet. Click "Add Link" to get started.
+              <div className="rounded-lg border border-border bg-card p-4 text-center text-sm text-muted-foreground">
+                No links added yet. Click &quot;Add Link&quot; to get started.
               </div>
             )}
           </div>
         </div>
       </div>
 
-      <div>
+      {/* Featured Links */}
+      <div className="space-y-4 rounded-xl border border-dashed border-border bg-muted p-3 sm:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <label className="text-sm font-semibold text-foreground">Featured Links</label>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Shop your favorites, promote a package, or share anything else you want
+              clients to find fast — shown as clickable cards on your Access page.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={addFeaturedLink}
+            className="btn-primary w-full flex-none sm:w-auto"
+          >
+            + Add Featured Link
+          </button>
+        </div>
+        <div className="space-y-3">
+          {parseFeaturedLinks(data?.featured_links).map((link, index) => {
+            const previewSrc =
+              featuredLinkPreviews[link.id] || link.image || link.thumbnail_url || link.image_url;
+            return (
+              <div
+                key={link.id}
+                draggable
+                onDragStart={() => setDraggedFeaturedLinkIndex(index)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => {
+                  if (draggedFeaturedLinkIndex !== null) {
+                    reorderFeaturedLinks(draggedFeaturedLinkIndex, index);
+                  }
+                  setDraggedFeaturedLinkIndex(null);
+                }}
+                onDragEnd={() => setDraggedFeaturedLinkIndex(null)}
+                className={`flex flex-col gap-2 rounded-lg border bg-card p-3 ${link.is_featured ? "border-secondary ring-1 ring-secondary/30" : "border-border"
+                  }`}
+              >
+                <div className="flex items-start gap-2">
+                  <span
+                    className="mt-3 cursor-grab text-muted-foreground/80 hover:text-muted-foreground active:cursor-grabbing"
+                    title="Drag to reorder"
+                  >
+                    <GripVertical className="h-4 w-4" />
+                  </span>
+
+                  <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
+                    {previewSrc ? (
+                      <img src={previewSrc} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-muted-foreground/60">
+                        <ImagePlus className="h-5 w-5" />
+                      </div>
+                    )}
+                    <label className="absolute inset-0 flex cursor-pointer items-center justify-center bg-overlay/0 opacity-0 transition hover:bg-overlay/40 hover:opacity-100">
+                      <ImagePlus className="h-4 w-4 text-overlay-foreground" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setFeaturedLinkThumbnail(index, file);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {previewSrc && (
+                      <button
+                        type="button"
+                        onClick={() => removeFeaturedLinkThumbnail(index)}
+                        title="Remove thumbnail"
+                        className="absolute -right-1 -top-1 rounded-full bg-card p-0.5 text-muted-foreground shadow hover:text-destructive"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Everything to the right of the drag handle/thumbnail lives in
+                      one column, so the URL field and checkbox line up with the
+                      title input above them instead of needing a guessed margin. */}
+                  <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        className="input-glamlink flex-1 min-w-0"
+                        placeholder="Title (e.g. Shop My Skincare Favorites)"
+                        value={link.title}
+                        onChange={(e) => updateFeaturedLink(index, "title", e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeFeaturedLink(index)}
+                        className="flex-none rounded-lg bg-destructive/5 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                    <input
+                      type="url"
+                      className="input-glamlink"
+                      placeholder="https://example.com/shop"
+                      value={link.url}
+                      onChange={(e) => updateFeaturedLink(index, "url", e.target.value)}
+                    />
+                    <label className="flex w-fit cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground select-none">
+                      <input
+                        type="checkbox"
+                        checked={!!link.is_featured}
+                        onChange={() => toggleFeaturedLinkFeatured(index)}
+                        className="h-3.5 w-3.5 accent-secondary"
+                      />
+                      Feature this link first
+                    </label>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          {parseFeaturedLinks(data?.featured_links).length === 0 && (
+            <div className="rounded-lg border border-border bg-card p-4 text-center text-sm text-muted-foreground">
+              No featured links yet. Click &quot;Add Featured Link&quot; to get started.
+            </div>
+          )}
+        </div>
+      </div>
+
+    
+
+      <div id="field-preferred_booking_methods">
         <div className="flex items-center gap-2 relative">
-          <label className={labelClass}>Ways To Connects</label>
+          <label className="label-glamlink">
+            Ways To Connects <span className="text-destructive">*</span>
+          </label>
         </div>
 
         <div
-          className="mt-3"
-          style={{ display: "flex", gap: "8px" }}
+          className={`mt-3 rounded-lg p-1 ${errors?.preferred_booking_methods ? "ring-1 ring-destructive" : ""}`}
+          style={{ display: "flex", flexWrap: "wrap", gap: "8px 20px" }}
         >
           {[
             BOOKING_METHODS.LINK,
@@ -484,6 +910,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
               <input
                 type="checkbox"
                 checked={!!data.preferred_booking_methods?.includes(method)}
+                className="accent-secondary"
                 onChange={(e) => {
                   setData((prev) => ({
                     ...prev,
@@ -493,6 +920,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
                         (m) => m !== method
                       ),
                   }));
+                  clearError?.("preferred_booking_methods");
                 }}
               />
 
@@ -504,31 +932,40 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             </label>
           ))}
         </div>
+        {errors?.preferred_booking_methods && (
+          <p className="mt-1 text-sm text-destructive">
+            {errors.preferred_booking_methods}
+          </p>
+        )}
 
         {data.preferred_booking_methods?.includes(BOOKING_METHODS.LINK) && (
-          <div className="mt-4">
-            <label className={`${labelClass} m-0`}>
-              Booking Link
+          <div id="field-booking_link" className="mt-4">
+            <label className="label-glamlink">
+              Booking Link <span className="text-destructive">*</span>
             </label>
-           <input
-  type="url"
-  className={inputClass}
-  placeholder="https://yourwebsite.com"
-  value={data.booking_link || data.website || ""}
-  onChange={(e) =>
-    setData((prev) => ({
-      ...prev,
-      booking_link: e.target.value,
-    }))
-  }
-/>
+            <input
+              type="url"
+              className="input-glamlink" aria-invalid={!!errors?.booking_link}
+              placeholder="https://yourwebsite.com"
+              value={data.booking_link || data.website || ""}
+              onChange={(e) => {
+                setData((prev) => ({
+                  ...prev,
+                  booking_link: e.target.value,
+                }));
+                clearError?.("booking_link");
+              }}
+            />
+            {errors?.booking_link && (
+              <p className="mt-1 text-sm text-destructive">{errors.booking_link}</p>
+            )}
           </div>
         )}
       </div>
 
       {/* Important Info */}
       <div className="space-y-3">
-        <label className={`${labelClass} m-0`}>
+        <label className="label-glamlink mb-0">
           Important Information
         </label>
         {data.important_info?.length > 0 && (
@@ -536,14 +973,15 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
             {data.important_info?.map((item, i) => (
               <div key={i} className="flex items-center gap-2">
                 <input
-                  className={`${inputClass} bg-gray-50`}
+                  className="input-glamlink"
+                  placeholder="e.g. By appointment only • Cash/Card accepted"
                   value={item}
-                  disabled
+                  onChange={(e) => updateInfo(i, e.target.value)}
                 />
                 <button
                   type="button"
                   onClick={() => removeInfo(i)}
-                  className="text-red-600 hover:text-red-800 text-xl"
+                  className="flex-none px-1 text-destructive hover:text-destructive text-xl"
                 >
                   ×
                 </button>
@@ -553,15 +991,21 @@ const ServicesAndBookingForm: React.FC<Props> = ({ data, setData }) => {
         )}
         <div className="flex gap-2">
           <input
-            className={inputClass}
+            className="input-glamlink"
             placeholder="e.g. By appointment only • Cash/Card accepted"
             value={infoInput}
             onChange={(e) => setInfoInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addInfo();
+              }
+            }}
           />
           <button
             type="button"
             onClick={addInfo}
-            className="rounded-lg bg-gray-200 p-1 text-sm font-medium hover:bg-gray-300"
+            className="btn-outline flex-none whitespace-nowrap"
           >
             + Add
           </button>

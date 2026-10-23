@@ -1,42 +1,38 @@
 "use client";
-import { useState, useMemo } from "react";
-import { Download, X, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import CategoryNav from "./CategoryNav";
-import BlogGrid from "./BlogGrid";
-import HeroSection from "./HeroSection";
-import { issues2025, issues2026, Issue } from "@/data/issues";
+
+import { Fragment, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { BookOpen, ChevronLeft, ChevronRight, Download, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import ApiImage from "@/components/common/ApiImage";
+import ArticleTile from "@/components/content/ArticleTile";
+import PageLinks from "@/components/content/PageLinks";
+import EmptyState from "@/components/content/EmptyState";
 import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
-import JournalEducation from "./JournalEducation";
-import JournalEvent from "./JournalEvent";
-import JournalShop from "./JournalShop";
-/* ─────────────────────────────────────────────────────────────
-   Constants
-───────────────────────────────────────────────────────────── */
+import JournalSearchBar from "./JournalSearchBar";
+import { useDeviceType } from "@/ads/Usedevicetype";
+import { useAds } from "@/ads/Useads";
+import AdSlot from "@/ads/Adslot";
+import { formatDate } from "@/lib/format";
+import { flipbookEmbedUrl, issueNumber } from "@/lib/magazineFormat";
+import { articleHref, issueHref } from "@/lib/routes";
+import { listHref } from "@/lib/searchParams";
+import type { ArticleCard, JournalCategory, MagazineIssue, Paged } from "@/lib/api/types";
+
+/*
+ * The Journal (/journal). The page reads one page of articles on the server
+ * (category, search and page come from the URL); this view lays them out with
+ * the category nav, the magazine sidebar, the flipbook drawer and the ad slots.
+ * Choosing a category or a page is a link; typing a search updates the URL.
+ */
+
 const MOBILE_ISSUES_PER_PAGE = 4;
 const SIDEBAR_ISSUES_PER_PAGE = 3;
+const SEARCH_DEBOUNCE_MS = 400;
 
-const TOP_TABS = [
-  { label: "Journal", path: "journal", href: "/journal" },
-  { label: "Education", path: "education", href: "/journal/education" },
-  { label: "Events", path: "event", href: "/journal/events" },
-  { label: "Shop", path: "shop", href: "/journal/shop" },
-];
+/* ── Pagination for the small magazine lists ─────────────────── */
 
-// Only the "journal" tab shows Category nav + Magazine sidebar
-const isFullLayout = (path: string) => path === "journal";
-/* ─────────────────────────────────────────────────────────────
-   Helpers
-───────────────────────────────────────────────────────────── */
-const getIssueNumber = (issue: Issue) =>
-  Number(issue.title.match(/\d+/)?.[0] || 0);
-const allSortedIssues = [...issues2026, ...issues2025].sort(
-  (a, b) => getIssueNumber(b) - getIssueNumber(a)
-);
-/* ─────────────────────────────────────────────────────────────
-   Pagination controls (reusable)
-───────────────────────────────────────────────────────────── */
 const PaginationControls = ({
   page,
   totalPages,
@@ -56,9 +52,8 @@ const PaginationControls = ({
       <button
         onClick={onPrev}
         disabled={page === 1}
-        className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground
-          hover:text-[#24bbcb] disabled:opacity-30 disabled:cursor-not-allowed
-          transition-colors duration-150"
+        aria-label="Previous issues"
+        className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground transition-colors duration-150 hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
       >
         <ChevronLeft className="h-3.5 w-3.5" />
         {!compact && "Prev"}
@@ -69,9 +64,8 @@ const PaginationControls = ({
       <button
         onClick={onNext}
         disabled={page === totalPages}
-        className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground
-          hover:text-[#24bbcb] disabled:opacity-30 disabled:cursor-not-allowed
-          transition-colors duration-150"
+        aria-label="Next issues"
+        className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground transition-colors duration-150 hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
       >
         {!compact && "Next"}
         <ChevronRight className="h-3.5 w-3.5" />
@@ -79,400 +73,472 @@ const PaginationControls = ({
     </div>
   );
 };
-/* ─────────────────────────────────────────────────────────────
-   Top Tabs (Journal / Education / Events / Shop)
-───────────────────────────────────────────────────────────── */
-const TopTabs = ({ path }: { path: string }) => {
-  const router = useRouter();
-  return (
-    <div className="w-full flex justify-center mb-4 lg:mb-6">
-      <div
-        role="tablist"
-        className="inline-flex items-center gap-1 p-1 rounded-full
-          bg-muted/40 border border-border/40"
-      >
-        {TOP_TABS.map((tab) => {
-          const isActive = path === tab.path;
-          return (
-            <button
-              key={tab.path}
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => router.push(tab.href)}
-              className={`cursor-pointer px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold uppercase tracking-wide
-                rounded-full whitespace-nowrap transition-all duration-200
-                ${isActive
-                  ? "bg-background text-[#24bbcb] shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-                }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-/* ─────────────────────────────────────────────────────────────
-   Mobile Magazine Carousel (with pagination)
-───────────────────────────────────────────────────────────── */
+
+function usePagedIssues(issues: MagazineIssue[], perPage: number) {
+  const [page, setPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(issues.length / perPage));
+  const visible = useMemo(() => issues.slice((page - 1) * perPage, page * perPage), [issues, page, perPage]);
+  return {
+    page,
+    totalPages,
+    visible,
+    prev: () => setPage((p) => Math.max(1, p - 1)),
+    next: () => setPage((p) => Math.min(totalPages, p + 1)),
+  };
+}
+
+/* ── Magazine: mobile carousel, desktop sidebar, flipbook drawer ── */
+
 const MobileMagazineCarousel = ({
+  issues,
   onIssueClick,
 }: {
-  onIssueClick: (issue: Issue) => void;
+  issues: MagazineIssue[];
+  onIssueClick: (issue: MagazineIssue) => void;
 }) => {
-  const [page, setPage] = useState(1);
-  const totalPages = Math.ceil(allSortedIssues.length / MOBILE_ISSUES_PER_PAGE);
-  const visibleIssues = useMemo(() => {
-    const start = (page - 1) * MOBILE_ISSUES_PER_PAGE;
-    return allSortedIssues.slice(start, start + MOBILE_ISSUES_PER_PAGE);
-  }, [page]);
+  const { page, totalPages, visible, prev, next } = usePagedIssues(issues, MOBILE_ISSUES_PER_PAGE);
+  if (issues.length === 0) return null;
   return (
-    <div className="lg:hidden mt-2 px-0.5">
-      {/* Header row */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-bold uppercase text-foreground tracking-wide">
-          Latest Issues
-        </h3>
-        <span className="text-[10px] text-muted-foreground">
-          {allSortedIssues.length} issues
-        </span>
+    <div className="mt-2 px-0.5 lg:hidden">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="eyebrow">Latest Issues</h2>
+        <span className="text-[10px] text-muted-foreground">{issues.length} issues</span>
       </div>
-      {/* Scrollable row */}
-      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-        {visibleIssues.map((issue) => {
-          const issueNum = getIssueNumber(issue);
-          return (
-            <div
-              key={issue.slug}
-              onClick={() => onIssueClick(issue)}
-              className="min-w-[100px] flex-shrink-0 cursor-pointer group"
-            >
-              <div className="w-full h-[134px] rounded-lg overflow-hidden bg-muted/30 border border-border/30 group-hover:border-[#24bbcb]/50 transition-colors">
-                {issue.cover ? (
-                  <img
-                    src={issue.cover}
-                    alt={issue.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-xs text-[#24bbcb] font-bold">
-                    #{issueNum}
-                  </div>
-                )}
-              </div>
-              <p className="text-[11px] mt-1.5 text-center font-medium line-clamp-1 text-foreground group-hover:text-[#24bbcb] transition-colors">
-                Issue {issueNum}
-              </p>
-            </div>
-          );
-        })}
+      <div className="no-scrollbar flex gap-3 overflow-x-auto pb-2">
+        {visible.map((issue) => (
+          <button
+            key={issue.slug}
+            type="button"
+            onClick={() => onIssueClick(issue)}
+            className="group min-w-25 shrink-0 text-left"
+          >
+            <span className="relative block h-33.5 w-full overflow-hidden rounded-lg border border-border/30 bg-muted/30 transition-colors group-hover:border-secondary/50">
+              <ApiImage
+                src={issue.cover_image}
+                alt=""
+                fill
+                sizes="100px"
+                className="object-cover transition-transform duration-200 group-hover:scale-105"
+              />
+            </span>
+            <span className="mt-1.5 line-clamp-1 block text-center text-[11px] font-medium text-foreground transition-colors group-hover:text-secondary">
+              Issue {issueNumber(issue)}
+            </span>
+          </button>
+        ))}
       </div>
-      {/* Pagination */}
-      <PaginationControls
-        page={page}
-        totalPages={totalPages}
-        onPrev={() => setPage((p) => Math.max(1, p - 1))}
-        onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-        compact
-      />
+      <PaginationControls page={page} totalPages={totalPages} onPrev={prev} onNext={next} compact />
     </div>
   );
 };
-/* ─────────────────────────────────────────────────────────────
-   Flipbook Panel
-───────────────────────────────────────────────────────────── */
-const FlipbookPanel = ({
-  issue,
-  onClose,
-}: {
-  issue: Issue | null;
-  onClose: () => void;
-}) => {
-  const router = useRouter();
+
+const FlipbookPanel = ({ issue, onClose }: { issue: MagazineIssue | null; onClose: () => void }) => {
   const isOpen = !!issue;
-  const issueNum =
-    issue?.title.match(/Issue\s*(\d+)/i)?.[1] ?? issue?.id?.toString() ?? "";
-  const flipbookUrl =
-    issue?.publuu?.accountId && issue?.publuu?.flipbookId
-      ? `https://publuu.com/flip-book/${issue.publuu.accountId}/${issue.publuu.flipbookId}/page/1?embed`
-      : issue?.flipbookUrl ?? null;
+  const embed = issue ? flipbookEmbedUrl(issue) : null;
   return (
     <>
-      {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-30 transition-opacity duration-300
-          ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        className={`scrim fixed inset-0 z-30 transition-opacity duration-300 ${
+          isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
         onClick={onClose}
       />
-      {/* Drawer */}
       <div
-        className={`fixed inset-y-0 right-0 z-40 flex flex-col
-          w-full sm:w-[480px] lg:w-[460px]
-          bg-background border-l border-border/40 shadow-2xl
-          transition-transform duration-300 ease-out
-          ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={issue ? issue.title : "Magazine issue"}
+        aria-hidden={!isOpen}
+        className={`fixed inset-y-0 right-0 z-40 flex w-full flex-col border-l border-border/40 bg-background shadow-2xl transition-transform duration-300 ease-out sm:w-120 lg:w-115 ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border/30 bg-muted/20">
-          <div className="flex items-center gap-2 min-w-0">
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg hover:bg-muted/60 flex-shrink-0"
-            >
+        <div className="flex items-center justify-between border-b border-border/30 bg-muted/20 px-4 py-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <button onClick={onClose} aria-label="Back" className="shrink-0 rounded-lg p-1.5 hover:bg-muted/60">
               <ChevronLeft className="h-4 w-4 text-muted-foreground" />
             </button>
             {issue && (
               <div className="min-w-0">
-                <span className="block text-[11px] font-semibold text-[#24bbcb]">
-                  Issue {issueNum}
-                </span>
-                <p className="text-sm font-semibold text-foreground truncate">
-                  {issue.title}
-                </p>
+                <span className="block text-[11px] font-semibold text-secondary">Issue {issueNumber(issue)}</span>
+                <p className="truncate text-sm font-semibold text-foreground">{issue.title}</p>
               </div>
             )}
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-muted/60 flex-shrink-0"
-          >
+          <button onClick={onClose} aria-label="Close" className="shrink-0 rounded-lg p-1.5 hover:bg-muted/60">
             <X className="h-4 w-4 text-muted-foreground" />
           </button>
         </div>
-        {/* Flipbook */}
-        <div className="flex-1 overflow-hidden bg-black/5 relative mt-6">
-          {flipbookUrl ? (
-            <iframe src={flipbookUrl} className="w-full h-full" allowFullScreen />
+        <div className="relative mt-6 flex-1 overflow-hidden bg-overlay/5">
+          {embed && isOpen ? (
+            <iframe src={embed} title={issue?.title} className="h-full w-full" allowFullScreen />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
               <BookOpen className="h-12 w-12 opacity-20" />
             </div>
           )}
         </div>
-        {/* Footer */}
-        <div className="px-4 py-3 border-t border-border/30">
-          <Button
-            size="sm"
-            className="w-full rounded-full bg-[#24bbcb] text-white text-xs"
-            onClick={() => router.push(`/magazine/${issue?.slug}/digital`)}
-          >
-            <Download className="mr-2 h-3.5 w-3.5" />
-            Open Full Digital Edition
-          </Button>
-        </div>
-      </div>
-    </>
-  );
-};
-/* ─────────────────────────────────────────────────────────────
-   Magazine Sidebar (desktop, with pagination)
-───────────────────────────────────────────────────────────── */
-const MagazineSidebar = ({
-  activeIssue,
-  onIssueClick,
-}: {
-  activeIssue: Issue | null;
-  onIssueClick: (issue: Issue) => void;
-}) => {
-  const router = useRouter();
-  const [page, setPage] = useState(1);
-  const totalPages = Math.ceil(allSortedIssues.length / SIDEBAR_ISSUES_PER_PAGE);
-  const visibleIssues = useMemo(() => {
-    const start = (page - 1) * SIDEBAR_ISSUES_PER_PAGE;
-    return allSortedIssues.slice(start, start + SIDEBAR_ISSUES_PER_PAGE);
-  }, [page]);
-  return (
-    <div className="border border-border/40 rounded-xl bg-background shadow-sm overflow-hidden">
-      {/* Header */}
-      <div className="px-4 pt-5 pb-4 border-b border-border/30">
-        <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">
-          The Glamlink Edit
-        </h2>
-        <p className="text-xs text-[#24bbcb] font-semibold mt-1">
-          Interactive Edition
-        </p>
-        <p className="text-[11px] text-muted-foreground mt-2">
-          Explore | Discover | Watch | Shop
-        </p>
-      </div>
-      {/* Issue list */}
-      <div className="p-3 space-y-2">
-        {visibleIssues.map((issue) => {
-          const isActive = activeIssue?.slug === issue.slug;
-          const issueNum = getIssueNumber(issue);
-          return (
-            <div
-              key={issue.slug}
-              onClick={() => onIssueClick(issue)}
-              className={`group flex items-center gap-3 p-2.5 rounded-lg cursor-pointer
-                border transition-all duration-200
-                ${isActive
-                  ? "bg-[#24bbcb]/10 border-[#24bbcb]/40"
-                  : "border-transparent hover:bg-[#24bbcb]/5"
-                }`}
-            >
-              <div className="w-12 h-16 rounded-md overflow-hidden bg-muted/30 flex-shrink-0">
-                {issue.cover ? (
-                  <img
-                    src={issue.cover}
-                    alt={issue.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-[#24bbcb]">
-                    #{issueNum}
-                  </div>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <span className="block text-[11px] font-semibold text-[#24bbcb]">
-                  Issue {issueNum}
-                </span>
-                <p className="text-xs font-medium line-clamp-2 text-foreground group-hover:text-[#24bbcb] transition-colors">
-                  {issue.title}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      {/* Pagination */}
-      <div className="px-4 pb-3">
-        <PaginationControls
-          page={page}
-          totalPages={totalPages}
-          onPrev={() => setPage((p) => Math.max(1, p - 1))}
-          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-        />
-      </div>
-      {/* Footer CTA */}
-      <div className="px-4 py-3 border-t border-border/30 bg-muted/5">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => router.push("/magazine")}
-          className="w-full rounded-full text-xs border-[#24bbcb]/40 hover:border-[#24bbcb] hover:text-[#24bbcb]"
-        >
-          View All Issues
-        </Button>
-      </div>
-    </div>
-  );
-};
-/* ─────────────────────────────────────────────────────────────
-   MAIN LAYOUT
-   Only the "journal" tab shows the 3-column shell (Category nav +
-   main content + Magazine sidebar). Education/Events/Shop render
-   only their centered main content.
-───────────────────────────────────────────────────────────── */
-const JournalClient = ({ path }: { path: string }) => {
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
-  const handleIssueClick = (issue: Issue) => {
-    setSelectedIssue((prev) => (prev?.slug === issue.slug ? null : issue));
-  };
-
-  const fullLayout = isFullLayout(path);
-
-  const renderMainContent = () => {
-    switch (path) {
-      case "journal":
-        return (
-          <main className="space-y-6 min-w-0">
-            <HeroSection />
-            <BlogGrid activeCategory={activeCategory} />
-          </main>
-        );
-      case "education":
-        return (
-          <main className="space-y-6 min-w-0">
-            <JournalEducation />
-          </main>
-        );
-      case "event":
-        return (
-          <main className="space-y-6 min-w-0">
-            <JournalEvent />
-          </main>
-        );
-      case "shop":
-        return (
-          <main className="space-y-6 min-w-0">
-            <JournalShop />
-          </main>
-        );
-      default:
-        return (
-          <main className="space-y-6 min-w-0">
-            <HeroSection />
-            <BlogGrid activeCategory={activeCategory} />
-          </main>
-        );
-    }
-  };
-
-  return (
-    <>
-      <NewsletterPopup openDelay={3000} />
-      <div className="min-h-screen bg-background">
-        <div className="max-w-[1700px] mx-auto px-4 sm:px-6 xl:px-14 mt-[120px] pb-8 lg:pb-14">
-          {/* ── Top tab navigation (Journal / Education / Events / Shop) ── */}
-          <TopTabs path={path} />
-
-          {fullLayout ? (
-            <>
-              {/* ── Mobile layout (Journal only) ── */}
-              <div className="lg:hidden space-y-4">
-                <CategoryNav
-                  activeCategory={activeCategory}
-                  setActiveCategory={setActiveCategory}
-                />
-                <MobileMagazineCarousel onIssueClick={handleIssueClick} />
-                {renderMainContent()}
-              </div>
-
-              {/* ── Desktop 3-column layout (Journal only) ── */}
-              <div className="hidden lg:grid grid-cols-[200px_1fr_300px] xl:grid-cols-[220px_1fr_300px] 2xl:grid-cols-[240px_1fr_320px] gap-10 xl:gap-14">
-                <aside>
-                  <div className="sticky top-28 pr-4">
-                    <CategoryNav
-                      activeCategory={activeCategory}
-                      setActiveCategory={setActiveCategory}
-                      vertical
-                      path={path}
-                    />
-                  </div>
-                </aside>
-
-                {renderMainContent()}
-
-                <aside>
-                  <div className="sticky top-28 space-y-10 pl-4">
-                    <MagazineSidebar
-                      activeIssue={selectedIssue}
-                      onIssueClick={handleIssueClick}
-                    />
-                    <div className="border border-border/40 rounded-xl p-6 text-center text-sm text-muted-foreground">
-                      Ad Space
-                    </div>
-                  </div>
-                </aside>
-              </div>
-
-              <FlipbookPanel
-                issue={selectedIssue}
-                onClose={() => setSelectedIssue(null)}
-              />
-            </>
-          ) : (
-            /* ── Centered single-column layout (Education / Events / Shop) ── */
-            <div className="max-w-4xl mx-auto">{renderMainContent()}</div>
+        <div className="border-t border-border/30 px-4 py-3">
+          {issue && (
+            <Button asChild size="sm" className="w-full rounded-full text-xs">
+              <Link href={`${issueHref(issue.slug)}/digital`}>
+                <Download className="mr-2 h-3.5 w-3.5" />
+                Open Full Digital Edition
+              </Link>
+            </Button>
           )}
         </div>
       </div>
     </>
   );
 };
+
+const MagazineSidebar = ({
+  issues,
+  activeIssue,
+  onIssueClick,
+}: {
+  issues: MagazineIssue[];
+  activeIssue: MagazineIssue | null;
+  onIssueClick: (issue: MagazineIssue) => void;
+}) => {
+  const { page, totalPages, visible, prev, next } = usePagedIssues(issues, SIDEBAR_ISSUES_PER_PAGE);
+  if (issues.length === 0) return null;
+  return (
+    <div className="overflow-hidden rounded-xl border border-border/40 bg-background shadow-sm">
+      <div className="border-b border-border/30 px-4 pb-4 pt-5">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-foreground">The Glamlink Edit</h2>
+        <p className="mt-1 text-xs font-semibold text-primary">Interactive Edition</p>
+        <p className="mt-2 text-[11px] text-muted-foreground">Explore | Discover | Watch | Shop</p>
+      </div>
+      <div className="space-y-2 p-3">
+        {visible.map((issue) => {
+          const isActive = activeIssue?.slug === issue.slug;
+          return (
+            <button
+              key={issue.slug}
+              type="button"
+              onClick={() => onIssueClick(issue)}
+              aria-pressed={isActive}
+              className={`group flex w-full items-center gap-3 rounded-lg border p-2.5 text-left transition-all duration-200 ${
+                isActive ? "border-secondary/40 bg-accent" : "border-transparent hover:bg-secondary/5"
+              }`}
+            >
+              <span className="relative h-16 w-12 shrink-0 overflow-hidden rounded-md bg-muted/30">
+                <ApiImage src={issue.cover_image} alt="" fill sizes="48px" className="object-cover transition group-hover:scale-105" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[11px] font-semibold text-secondary">Issue {issueNumber(issue)}</span>
+                <span className="line-clamp-2 block text-xs font-medium text-foreground transition-colors group-hover:text-secondary">
+                  {issue.title}
+                </span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="px-4 pb-3">
+        <PaginationControls page={page} totalPages={totalPages} onPrev={prev} onNext={next} />
+      </div>
+      <div className="border-t border-border/30 bg-muted/5 px-4 py-3">
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="w-full rounded-full border-primary/40 text-xs hover:border-secondary hover:text-secondary"
+        >
+          <Link href="/magazine">View All Issues</Link>
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+/* ── Categories ──────────────────────────────────────────────── */
+
+function CategoryLinks({
+  categories,
+  current,
+  search,
+  vertical = false,
+}: {
+  categories: JournalCategory[];
+  current: string;
+  search: string;
+  vertical?: boolean;
+}) {
+  const items = [{ slug: "", title: "All" }, ...categories];
+
+  if (vertical) {
+    return (
+      <nav aria-label="Categories" className="rounded-xl border border-border/40 bg-background p-4 shadow-sm">
+        <h2 className="eyebrow mb-4">Categories</h2>
+        <ul className="flex flex-col gap-1">
+          {items.map((category) => (
+            <li key={category.slug || "all"}>
+              <Link
+                href={listHref("/journal", { category: category.slug, search })}
+                aria-current={current === category.slug ? "page" : undefined}
+                scroll={false}
+                className="nav-link block w-full rounded-md px-3 py-2 text-left text-sm"
+              >
+                {category.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    );
+  }
+
+  return (
+    <nav aria-label="Categories" className="sticky top-15 z-40 border-b border-border bg-card lg:hidden">
+      <ul className="scrollbar-hide mt-5 flex items-center gap-3 overflow-x-auto whitespace-nowrap px-4 py-3">
+        {items.map((category) => (
+          <li key={category.slug || "all"} className="shrink-0">
+            <Link
+              href={listHref("/journal", { category: category.slug, search })}
+              aria-current={current === category.slug ? "page" : undefined}
+              scroll={false}
+              className="chip inline-flex rounded-full px-4 py-2 text-sm"
+            >
+              {category.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+/* ── Featured article ────────────────────────────────────────── */
+
+function JournalHero({ article }: { article: ArticleCard }) {
+  const date = formatDate(article.publish_date ?? article.created_at);
+  return (
+    <section aria-label="Featured article" className="relative rounded-2xl bg-muted px-6 py-10 md:px-10 md:py-12">
+      <Link href={articleHref(article)} className="group block space-y-6">
+        <div className="grid items-center gap-8 md:grid-cols-[1.1fr_1fr]">
+          <div className="relative aspect-16/10 overflow-hidden rounded-xl">
+            <ApiImage
+              src={article.cover_image}
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            />
+          </div>
+          <div className="space-y-4">
+            {article.journal_category?.title && <p className="eyebrow mb-1">{article.journal_category.title}</p>}
+            <h2 className="text-xl leading-snug tracking-tight transition-colors group-hover:text-secondary md:text-2xl">
+              {article.title}
+            </h2>
+            {article.short_description && (
+              <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">{article.short_description}</p>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-3 border-t border-border/40 pt-4 text-xs">
+          {article.journal_author?.name && <span className="font-medium">{article.journal_author.name}</span>}
+          {article.journal_author?.name && date && <span className="h-1 w-1 rounded-full bg-border" />}
+          {date && <span className="text-muted-foreground">{date}</span>}
+        </div>
+      </Link>
+    </section>
+  );
+}
+
+/* ── Main view ───────────────────────────────────────────────── */
+
+export interface JournalClientProps {
+  hero: ArticleCard | null;
+  articles: Paged<ArticleCard>;
+  categories: JournalCategory[];
+  issues: MagazineIssue[];
+  category: string;
+  search: string;
+  page: number;
+  perPage: number;
+}
+
+const JournalClient = ({ hero, articles, categories, issues, category, search, page, perPage }: JournalClientProps) => {
+  const router = useRouter();
+  const [selectedIssue, setSelectedIssue] = useState<MagazineIssue | null>(null);
+  const device = useDeviceType();
+  const ads = useAds({ page: "journal-listing", device });
+
+  // Search as you type: the URL follows the box after a pause; the server answers.
+  const [searchInput, setSearchInput] = useState(search);
+  const [pending, startTransition] = useTransition();
+  const lastPushed = useRef(search);
+
+  useEffect(() => {
+    // Back/forward or a link changed the search: show it in the box
+    if (search !== lastPushed.current) {
+      lastPushed.current = search;
+      setSearchInput(search);
+    }
+  }, [search]);
+
+  useEffect(() => {
+    const value = searchInput.trim();
+    if (value === lastPushed.current) return;
+    const timer = setTimeout(() => {
+      lastPushed.current = value;
+      startTransition(() => {
+        router.replace(listHref("/journal", { category, search: value }), { scroll: false });
+      });
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchInput, category, router]);
+
+  const handleIssueClick = (issue: MagazineIssue) => {
+    setSelectedIssue((prev) => (prev?.slug === issue.slug ? null : issue));
+  };
+
+  const pageCount = Math.max(1, Math.ceil(articles.count / perPage));
+  const categoryTitle = categories.find((c) => c.slug === category)?.title;
+
+  const main = (
+    <main className="min-w-0 space-y-6">
+      {hero && <JournalHero article={hero} />}
+
+      {search && (
+        <p role="status" aria-live="polite" className="text-[11px] text-muted-foreground">
+          {articles.count} {articles.count === 1 ? "result" : "results"} for &ldquo;{search}&rdquo;
+          {categoryTitle && ` in ${categoryTitle}`}
+        </p>
+      )}
+
+      {articles.rows.length === 0 ? (
+        <EmptyState
+          title={search ? `No articles match “${search}”` : "No articles here yet"}
+          action={
+            <div className="flex items-center gap-4">
+              {search && (
+                <button type="button" onClick={() => setSearchInput("")} className="link-glamlink text-sm">
+                  Clear search
+                </button>
+              )}
+              {category && (
+                <Link href={listHref("/journal", { search })} className="link-glamlink text-sm">
+                  View all categories
+                </Link>
+              )}
+            </div>
+          }
+        >
+          {search
+            ? "Try a different keyword. You can search by title, category or author."
+            : "There are no articles in this category yet."}
+        </EmptyState>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 lg:gap-x-12 lg:gap-y-16">
+          {articles.rows.map((article, index) => (
+            <Fragment key={article.id}>
+              <ArticleTile article={article} priority={!hero && index < 2} />
+
+              {/* In-feed ad(s) after the 1st and the 2nd row */}
+              {index === 1 && !!ads["journal-listing-in-feed"]?.length && (
+                <div className="flex flex-wrap justify-center gap-4 md:col-span-2">
+                  {ads["journal-listing-in-feed"].map((ad) => (
+                    <AdSlot key={ad.id} slotId="journal-listing-in-feed" ad={ad} />
+                  ))}
+                </div>
+              )}
+              {index === 3 && !!ads["journal-listing-in-feed-2"]?.length && (
+                <div className="flex flex-wrap justify-center gap-4 md:col-span-2">
+                  {ads["journal-listing-in-feed-2"].map((ad) => (
+                    <AdSlot key={ad.id} slotId="journal-listing-in-feed-2" ad={ad} />
+                  ))}
+                </div>
+              )}
+            </Fragment>
+          ))}
+        </div>
+      )}
+
+      <PageLinks
+        className="pt-6"
+        page={page}
+        pageCount={pageCount}
+        hrefFor={(p) => listHref("/journal", { category, search, page: p })}
+      />
+    </main>
+  );
+
+  return (
+    <>
+      <NewsletterPopup openDelay={3000} />
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto mt-30 max-w-[1700px] px-4 pb-8 sm:px-6 lg:pb-14 xl:px-14">
+          <header className="mb-6 text-center lg:mb-8">
+            <h1 className="text-3xl tracking-tight md:text-4xl">The Glamlink Journal</h1>
+            <p className="mt-2 text-sm text-muted-foreground md:text-base">
+              Beauty industry insights, trends, tips and expert articles.
+            </p>
+          </header>
+
+          <div className="flex flex-wrap justify-center gap-4 py-4">
+            {(ads["journal-top-banner"] ?? []).map((ad) => (
+              <AdSlot key={ad.id} slotId="journal-top-banner" ad={ad} />
+            ))}
+          </div>
+
+          <div className="mx-auto mb-6 w-full max-w-2xl lg:mb-8">
+            <JournalSearchBar
+              value={searchInput}
+              onChange={setSearchInput}
+              isSearching={pending || searchInput.trim() !== search}
+            />
+          </div>
+
+          {/* Mobile */}
+          <div className="space-y-4 lg:hidden">
+            <CategoryLinks categories={categories} current={category} search={search} />
+            <MobileMagazineCarousel issues={issues} onIssueClick={handleIssueClick} />
+            {main}
+          </div>
+
+          {/* Desktop: categories, articles, magazine */}
+          <div className="hidden grid-cols-[200px_1fr_300px] gap-10 lg:grid xl:grid-cols-[220px_1fr_300px] xl:gap-14 2xl:grid-cols-[240px_1fr_320px]">
+            <aside>
+              <div className="sticky top-28 space-y-6 pr-4">
+                <CategoryLinks categories={categories} current={category} search={search} vertical />
+                {(ads["journal-sidebar-left"] ?? []).map((ad) => (
+                  <AdSlot key={ad.id} slotId="journal-sidebar-left" ad={ad} />
+                ))}
+              </div>
+            </aside>
+
+            {main}
+
+            <aside>
+              <div className="sticky top-28 space-y-10 pl-4">
+                <MagazineSidebar issues={issues} activeIssue={selectedIssue} onIssueClick={handleIssueClick} />
+                {(ads["journal-sidebar-right"] ?? []).map((ad) => (
+                  <AdSlot key={ad.id} slotId="journal-sidebar-right" ad={ad} />
+                ))}
+              </div>
+            </aside>
+          </div>
+
+          <div className="lg:hidden">
+            {(ads["journal-mobile-bottom"] ?? []).map((ad) => (
+              <AdSlot key={ad.id} slotId="journal-mobile-bottom" ad={ad} />
+            ))}
+          </div>
+
+          <FlipbookPanel issue={selectedIssue} onClose={() => setSelectedIssue(null)} />
+        </div>
+        <div className="flex flex-wrap justify-center gap-4">
+          {(ads["journal-bottom"] ?? []).map((ad) => (
+            <AdSlot key={ad.id} slotId="journal-bottom" ad={ad} />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+};
+
 export default JournalClient;

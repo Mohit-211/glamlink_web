@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { ChangePassword } from '../../api/Api';
-import { useRouter } from 'next/navigation';
+import { readApiError } from '@/lib/apiError';
+import { passwordProblem } from '@/lib/password';
 type FieldName = 'old_password' | 'new_password' | 'confirm_password';
 interface FormState {
     old_password: string;
@@ -16,11 +17,10 @@ const INITIAL_STATE: FormState = {
 };
 /**
  * Standalone "Change Password" tab for the dashboard.
- * Calls the ChangePassword API (user/auth/reset-password) with the
- * old/new/confirm password payload it expects.
+ * Calls user/auth/change-password. This device stays signed in; every other
+ * device is signed out.
  */
 export default function ChangePasswordTab() {
-    const router = useRouter();
     const [form, setForm] = useState<FormState>(INITIAL_STATE);
     const [showPassword, setShowPassword] = useState<Record<FieldName, boolean>>({
         old_password: false,
@@ -42,7 +42,8 @@ export default function ChangePasswordTab() {
     const validate = (): string | null => {
         if (!form.old_password) return 'Please enter your current password.';
         if (!form.new_password) return 'Please enter a new password.';
-        if (form.new_password.length < 8) return 'New password must be at least 8 characters.';
+        const problem = passwordProblem(form.new_password);
+        if (problem) return `${problem}.`;
         if (form.new_password === form.old_password) {
             return 'New password must be different from your current password.';
         }
@@ -69,22 +70,8 @@ export default function ChangePasswordTab() {
             });
             setSuccess(true);
             setForm(INITIAL_STATE);
-            setTimeout(() => {
-                localStorage.removeItem("GlamlinkaccessToken");
-                localStorage.removeItem("GlamlinkrefreshToken");
-                // Remove any other auth-related keys
-                // localStorage.removeItem("user");
-                // localStorage.removeItem("profile");
-                sessionStorage.clear();
-                window.dispatchEvent(new Event("auth-change"));
-                router.replace("/login");
-            }, 1000);
         } catch (err: any) {
-            setError(
-                err?.response?.data?.message ||
-                err?.response?.data?.error ||
-                'Failed to change password. Please try again.'
-            );
+            setError(readApiError(err, 'Failed to change password. Please try again.').message);
         } finally {
             setSubmitting(false);
         }
@@ -118,13 +105,13 @@ export default function ChangePasswordTab() {
                 </p>
             </div>
             {success && (
-                <div className="mb-4 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+                <div className="mb-4 flex items-center gap-2 rounded-xl border border-success/30 bg-success/5 px-4 py-3 text-sm font-medium text-success">
                     <CheckCircle className="h-4 w-4 flex-shrink-0" />
-                    Password changed successfully.
+                    Password changed. Your other devices have been signed out.
                 </div>
             )}
             {error && (
-                <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                <div className="mb-4 flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm font-medium text-destructive">
                     <AlertCircle className="h-4 w-4 flex-shrink-0" />
                     {error}
                 </div>
@@ -132,7 +119,7 @@ export default function ChangePasswordTab() {
             <form onSubmit={handleSubmit} className="space-y-4">
                 {fields.map(({ name, label, placeholder, autoComplete }) => (
                     <div key={name}>
-                        <label htmlFor={name} className="mb-1.5 block text-xs font-medium text-foreground">
+                        <label htmlFor={name} className="label-glamlink">
                             {label}
                         </label>
                         <div className="relative">
@@ -145,7 +132,7 @@ export default function ChangePasswordTab() {
                                 placeholder={placeholder}
                                 autoComplete={autoComplete}
                                 disabled={submitting}
-                                className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-60"
+                                className="input-glamlink pl-10 pr-10"
                             />
                             <button
                                 type="button"
@@ -165,7 +152,7 @@ export default function ChangePasswordTab() {
                 <button
                     type="submit"
                     disabled={submitting}
-                    className="btn-primary flex w-full items-center justify-center gap-2 !rounded-xl !py-2.5 !text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="btn-primary flex w-full items-center justify-center gap-2 py-2.5 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                     {submitting ? (
                         <>

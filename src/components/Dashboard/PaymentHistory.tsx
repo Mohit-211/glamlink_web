@@ -7,10 +7,7 @@ import {
   ChevronUp,
   CreditCard,
   ExternalLink,
-  XCircle,
-  Loader2,
 } from 'lucide-react';
-import { CancelSubscription } from '@/api/Api';
 
 interface Payment {
   id: number;
@@ -29,63 +26,37 @@ interface PaymentHistoryProps {
   payments?: Payment[];
 }
 
-const CANCELABLE_TYPES = ['SUBSCRIPTION_ONLY', 'NFC_WITH_SUBSCRIPTION'];
 
 export default function PaymentHistory({
   payments = [],
 }: PaymentHistoryProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [confirmingId, setConfirmingId] = useState<number | null>(null);
-  const [cancellingId, setCancellingId] = useState<number | null>(null);
-  const [cancelledIds, setCancelledIds] = useState<Set<number>>(new Set());
-  const [errorId, setErrorId] = useState<number | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string>('');
 
   const getStatusConfig = (status: string) => {
     switch (status?.toUpperCase()) {
       case 'SUCCESS':
         return {
           label: 'Success',
-          cls: 'bg-green-100 text-green-700 border-green-200',
+          cls: 'bg-success/10 text-success border-success/30',
         };
       case 'PENDING':
         return {
           label: 'Pending',
-          cls: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+          cls: 'bg-warning/10 text-warning border-warning/30',
         };
       case 'FAILED':
         return {
           label: 'Failed',
-          cls: 'bg-red-100 text-red-700 border-red-200',
+          cls: 'bg-destructive/10 text-destructive border-destructive/30',
         };
       default:
         return {
           label: status || 'Unknown',
-          cls: 'bg-gray-100 text-gray-700 border-gray-200',
+          cls: 'bg-muted text-foreground/80 border-border',
         };
     }
   };
 
-  const handleCancelSubscription = async (payment: Payment) => {
-    setCancellingId(payment.id);
-    setErrorId(null);
-    setErrorMsg('');
-
-    try {
-      await CancelSubscription({}); // no payload needed, token is read internally
-      setCancelledIds((prev) => new Set(prev).add(payment.id));
-      setConfirmingId(null);
-    } catch (err: any) {
-      setErrorId(payment.id);
-      setErrorMsg(
-        err?.response?.data?.message ||
-          err?.message ||
-          'Failed to cancel subscription. Please try again.'
-      );
-    } finally {
-      setCancellingId(null);
-    }
-  };
 
   return (
     <div className="space-y-4">
@@ -118,26 +89,20 @@ export default function PaymentHistory({
           {payments.map((payment) => {
             const config = getStatusConfig(payment.payment_status);
             const isExpanded = expandedId === payment.id;
-            const canCancel =
-              CANCELABLE_TYPES.includes(payment.payment_type || '') &&
-              !cancelledIds.has(payment.id);
-            const isConfirming = confirmingId === payment.id;
-            const isCancelling = cancellingId === payment.id;
-            const hasError = errorId === payment.id;
 
             return (
               <div
                 key={payment.id}
-                className="rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden"
+                className="rounded-2xl border border-border bg-card shadow-soft overflow-hidden"
               >
-                <div className="flex items-center gap-4 px-5 py-4">
+                <div className="flex items-center gap-3 px-3 py-3 sm:gap-4 sm:px-5 sm:py-4">
                   <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-accent">
                     <Receipt className="h-5 w-5 text-accent-foreground" />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold text-foreground">
+                      <p className="break-words text-sm font-semibold text-foreground">
                         {payment.description}
                       </p>
 
@@ -147,17 +112,12 @@ export default function PaymentHistory({
                         {config.label}
                       </span>
 
-                      {cancelledIds.has(payment.id) && (
-                        <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold bg-gray-100 text-gray-500 border-gray-200">
-                          Cancelled
-                        </span>
-                      )}
                     </div>
 
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {/* {payment.transaction_id} ·{' '} */}
                       {new Date(payment.created_at).toLocaleDateString(
-                        'en-IN',
+                        'en-US',
                         {
                           day: '2-digit',
                           month: 'short',
@@ -167,7 +127,7 @@ export default function PaymentHistory({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="flex items-center gap-2 flex-shrink-0 sm:gap-3">
                     <p className="text-base font-bold text-primary">
                       ${Number(payment.amount).toFixed(2)}
                     </p>
@@ -178,7 +138,7 @@ export default function PaymentHistory({
                           isExpanded ? null : payment.id
                         )
                       }
-                      className="rounded-lg p-1.5 hover:bg-secondary transition-colors text-muted-foreground"
+                      className="rounded-lg p-1.5 hover:bg-muted transition-colors text-muted-foreground"
                     >
                       {isExpanded ? (
                         <ChevronUp className="h-4 w-4" />
@@ -190,14 +150,14 @@ export default function PaymentHistory({
                 </div>
 
                 {isExpanded && (
-                  <div className="border-t border-border bg-secondary/30 px-5 py-4">
+                  <div className="border-t border-border bg-muted/30 px-5 py-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       {/* <div>
                         <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
                           Transaction ID
                         </p>
 
-                        <p className="font-mono text-foreground break-all">
+                        <p className="tabular-nums text-foreground break-all">
                           {payment.transaction_id}
                         </p>
                       </div> */}
@@ -209,7 +169,7 @@ export default function PaymentHistory({
 
                         <p className="text-foreground">
                           {new Date(payment.created_at).toLocaleDateString(
-                            'en-IN',
+                            'en-US',
                             {
                               day: '2-digit',
                               month: 'long',
@@ -268,58 +228,15 @@ export default function PaymentHistory({
                           href={payment.receipt_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+                          className="btn-primary px-4 py-2 text-xs"
                         >
                           <ExternalLink className="h-4 w-4" />
                           View Receipt
                         </a>
                       )}
 
-                      {canCancel && !isConfirming && (
-                        <button
-                          onClick={() => setConfirmingId(payment.id)}
-                          className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
-                        >
-                          <XCircle className="h-4 w-4" />
-                          Cancel Subscription
-                        </button>
-                      )}
-
-                      {canCancel && isConfirming && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">
-                            Are you sure?
-                          </span>
-
-                          <button
-                            onClick={() => handleCancelSubscription(payment)}
-                            disabled={isCancelling}
-                            className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-60"
-                          >
-                            {isCancelling ? (
-                              <>
-                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                Cancelling...
-                              </>
-                            ) : (
-                              'Yes, cancel'
-                            )}
-                          </button>
-
-                          <button
-                            onClick={() => setConfirmingId(null)}
-                            disabled={isCancelling}
-                            className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-secondary disabled:opacity-60"
-                          >
-                            Keep it
-                          </button>
-                        </div>
-                      )}
                     </div>
 
-                    {hasError && (
-                      <p className="mt-2 text-xs text-red-600">{errorMsg}</p>
-                    )}
                   </div>
                 )}
               </div>

@@ -1,14 +1,16 @@
 import React from "react";
 import { nanoid } from "nanoid";
-import { GlamCardFormData, Location } from "../types";
+import { FieldErrors, GlamCardFormData, Location } from "../types";
 import LocationCard from "./LocationCard";
 
 interface SectionProps {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
+  errors?: FieldErrors;
+  clearError?: (key: string) => void;
 }
 
-const sectionClass = "space-y-6 rounded-xl border border-gray-200 bg-white p-6";
+const sectionClass = "space-y-6 rounded-xl border border-border bg-card p-4 sm:p-6";
 
 const createEmptyLocation = (index: number): Location => ({
   id: nanoid(),
@@ -27,12 +29,18 @@ const createEmptyLocation = (index: number): Location => ({
   isOpen: true,
 });
 
-const LocationsSection: React.FC<SectionProps> = ({ data, setData }) => {
+const LocationsSection: React.FC<SectionProps> = ({
+  data,
+  setData,
+  errors,
+  clearError,
+}) => {
   const addLocation = () => {
     setData((prev) => ({
       ...prev,
       locations: [...prev?.locations, createEmptyLocation(prev.locations?.length)],
     }));
+    clearError?.("locations");
   };
 
   const updateLocation = (id: string, updates: Partial<Location>) => {
@@ -66,8 +74,16 @@ const LocationsSection: React.FC<SectionProps> = ({ data, setData }) => {
   };
 
   return (
-    <section className={sectionClass}>
-      <h3 className="text-lg font-semibold">Business Locations *</h3>
+    <section
+      id="field-locations"
+      className={`${sectionClass} ${errors?.locations ? "border-destructive" : ""}`}
+    >
+      <h3 className="text-lg font-semibold">
+        Business Locations <span className="text-destructive">*</span>
+      </h3>
+      {errors?.locations && (
+        <p className="text-sm text-destructive">{errors.locations}</p>
+      )}
       <div className="space-y-5">
         {data.locations?.map((loc) => (
           <LocationCard
@@ -81,7 +97,7 @@ const LocationsSection: React.FC<SectionProps> = ({ data, setData }) => {
       <button
         type="button"
         onClick={addLocation}
-        className="mt-6 w-full rounded-lg border border-dashed border-gray-400 py-3 text-sm font-medium text-gray-600 hover:border-gray-500 hover:text-gray-800 transition-colors"
+        className="mt-6 w-full rounded-xl border border-dashed border-border py-3 text-sm font-semibold text-primary hover:bg-accent hover:text-secondary transition-colors"
       >
         + Add Another Location
       </button>

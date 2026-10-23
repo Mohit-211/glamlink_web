@@ -1,4 +1,6 @@
 /* ================= SHARED TYPES ================= */
+/** Keyed by validateData's field keys (see GlamCardForm.tsx) — value is the message to show under that field when it fails validation. */
+export type FieldErrors = Partial<Record<string, string>>;
 export type BusinessHour = {
   note: string;
 };
@@ -26,6 +28,24 @@ export interface GalleryMetaItem {
   is_thumbnail: boolean;
   sort_order: number;
   thumbnail_file?: File;
+}
+/* ================= FEATURED LINKS ================= */
+export interface FeaturedLink {
+  /** Client-side only — used as a React key/local reference, never sent to the server. */
+  id: string;
+  title: string;
+  url: string;
+  /** Persisted image URL — the actual key the GET response returns. */
+  image?: string;
+  /** Alternate keys seen/expected for the same thing; kept for safety. */
+  thumbnail_url?: string;
+  image_url?: string;
+  /** Newly selected image pending upload — cleared once saved. */
+  thumbnail_file?: File;
+  /** Display order (1-based on the wire); index in the array doubles as this. */
+  sort_order: number;
+  /** The one link a professional has chosen to show first/pinned. */
+  is_featured?: boolean;
 }
 /* ================= MAIN FORM ================= */
 export interface GlamCardFormData {
@@ -67,6 +87,9 @@ export interface GlamCardFormData {
   preferred_booking_methods: BookingMethod[];
   booking_link?: string;
   important_info: string[];
+  featured_links?: FeaturedLink[];
+  /** Hex color (e.g. "#16818c") the professional picked to theme their Access Card — drives the Featured Links accent. */
+  color_code?: string;
   /* MARKETING */
   offer_promotion?: boolean;
   promotion_details?: string;

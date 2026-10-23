@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { Home, Plus, Trash2, Loader2, AlertCircle, X, MapPin, Pencil, CheckCircle2 } from 'lucide-react';
-import { message } from "antd";
+import { toast } from "sonner";
+import { readApiError } from "@/lib/apiError";
 import {
   addNewAddress,
   getAllUserAddress,
@@ -16,6 +17,7 @@ interface Address {
   user_city?: { id: number; name: string };
   id: string | number;
   address_line_1: string;
+  address_line_2?: string | null;
   address_lat?: number;
   address_long?: number;
   state_id: number;
@@ -27,6 +29,7 @@ interface Address {
 }
 interface NewFormState {
   address_line_1: string;
+  address_line_2: string;
   address_lat: string;
   address_long: string;
   state_id: string;
@@ -35,12 +38,27 @@ interface NewFormState {
 }
 const EMPTY_FORM: NewFormState = {
   address_line_1: '',
+  address_line_2: '',
   address_lat: '',
   address_long: '',
   state_id: '',
   city_id: '',
   postal_code: '',
 };
+/** Shippo checks every address before it is saved and may correct it. */
+function correctionNote(saved: any): string | null {
+  if (!saved?.corrected) return null;
+  const line = [saved.address_line_1, saved.address_line_2, saved.postal_code].filter(Boolean).join(", ");
+  return line ? `We corrected your address for delivery to ${line}.` : null;
+}
+
+function addressError(error: unknown): string {
+  const { code, message } = readApiError(error, "Couldn't save the address. Please try again.");
+  if (code === "ADDRESS_INVALID") return message.replace(/^Address validation failed:\s*/i, "");
+  if (code === "ADDRESS_CHECK_UNAVAILABLE") return "We couldn't check the address just now. Please try again.";
+  return message;
+}
+
 interface StateItem {
   id: number;
   name: string;
@@ -49,9 +67,6 @@ interface CityItem {
   id: number;
   name: string;
 }
-const INPUT =
-  'w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50';
-const LABEL = 'mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-muted-foreground';
 /* ══════════════════════════════════════════════
    ADD ADDRESS MODAL
 ══════════════════════════════════════════════ */
@@ -109,6 +124,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
     try {
       const payload = {
         address_line_1: form.address_line_1.trim(),
+        ...(form.address_line_2.trim() && { address_line_2: form.address_line_2.trim() }),
         ...(form.address_lat && {
           address_lat: parseFloat(form.address_lat),
         }),
@@ -120,22 +136,11 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
         postal_code: form.postal_code.trim(),
       };
       const response = await addNewAddress(payload);
-      if (response?.success === false) {
-        setError(
-          response?.message ||
-          "Please enter a valid address, city, state and PIN code."
-        );
-        return;
-      }
-      message.success("Address added successfully.");
+      toast.success(correctionNote(response?.data) ?? "Address added.");
       await onSaved();
       onClose();
     } catch (error: any) {
-      const errorMsg =
-        error?.response?.data?.message === "Address validation failed: Unable to find a valid city, state or 5-digit zip. Please check the accuracy of the submitted address."
-          ? "Please enter a valid address, city, state and Postal Code"
-          : error?.response?.data?.message;
-      setError(errorMsg);
+      setError(addressError(error));
     } finally {
       setSaving(false);
     }
@@ -146,7 +151,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
   return (
     <div
       onClick={handleBackdrop}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/30 p-0 backdrop-blur-sm sm:p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center scrim p-0 sm:p-4"
     >
       <div className="w-full overflow-hidden rounded-t-3xl border border-border bg-card duration-200 animate-in slide-in-from-bottom-4 sm:max-w-md sm:rounded-3xl sm:slide-in-from-bottom-0">
         {/* Modal header */}
@@ -162,7 +167,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-secondary"
+            className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted"
           >
             <X className="h-4 w-4" />
           </button>
@@ -170,29 +175,39 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
         {/* Form body */}
         <div className="max-h-[65vh] space-y-3.5 overflow-y-auto p-5">
           {error && (
-            <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-700">
+            <div className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-xs text-destructive">
               <AlertCircle className="h-3.5 w-3.5 shrink-0" />
               {error}
             </div>
           )}
           {/* Address Line 1 */}
           <div>
-            <label className={LABEL}>
-              Address Line 1 <span className="text-red-500">*</span>
+            <label className="label-glamlink">
+              Address Line 1 <span className="text-destructive">*</span>
             </label>
             <input
               value={form.address_line_1}
               onChange={set('address_line_1')}
               placeholder="e.g. 3730 S Las Vegas Blvd"
               disabled={saving}
-              className={INPUT}
+              className="input-glamlink"
+            />
+          </div>
+          <div>
+            <label className="label-glamlink">Apartment, suite (optional)</label>
+            <input
+              value={form.address_line_2}
+              onChange={set('address_line_2')}
+              placeholder="e.g. Suite 5"
+              disabled={saving}
+              className="input-glamlink"
             />
           </div>
           {/* State / City — side by side */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={LABEL}>
-                State <span className="text-red-500">*</span>
+              <label className="label-glamlink">
+                State <span className="text-destructive">*</span>
               </label>
               <select
                 value={form.state_id}
@@ -204,7 +219,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
                   }))
                 }
                 disabled={saving}
-                className={INPUT}
+                className="input-glamlink"
               >
                 <option value="">Select State</option>
                 {states.map((state) => (
@@ -215,8 +230,8 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
               </select>
             </div>
             <div>
-              <label className={LABEL}>
-                City <span className="text-red-500">*</span>
+              <label className="label-glamlink">
+                City <span className="text-destructive">*</span>
               </label>
               <select
                 value={form.city_id}
@@ -227,7 +242,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
                   }))
                 }
                 disabled={!form.state_id || saving}
-                className={INPUT}
+                className="input-glamlink"
               >
                 <option value="">Select City</option>
                 {cities.map((city) => (
@@ -240,8 +255,8 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           </div>
           {/* Zip code */}
           <div>
-            <label className={LABEL}>
-              Zip Code <span className="text-red-500">*</span>
+            <label className="label-glamlink">
+              Zip Code <span className="text-destructive">*</span>
             </label>
             <input
               value={form.postal_code}
@@ -254,7 +269,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
               placeholder="Enter ZIP Code"
               maxLength={10}
               disabled={saving}
-              className={INPUT}
+              className="input-glamlink"
             />
           </div>
         </div>
@@ -263,14 +278,14 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           <button
             onClick={onClose}
             disabled={saving}
-            className="flex-1 rounded-xl border border-border bg-secondary/60 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-50"
+            className="btn-outline flex-1 disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={saving}
-            className="btn-primary flex flex-1 items-center justify-center gap-2 !rounded-xl !py-2.5 !text-sm disabled:opacity-60"
+            className="btn-primary flex-1 disabled:opacity-60"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
             {saving ? 'Saving…' : 'Save Address'}
@@ -318,6 +333,7 @@ export function AddressTab() {
     setEditError(null);
     setEditForm({
       address_line_1: addr.address_line_1,
+      address_line_2: addr.address_line_2 ?? '',
       address_lat: addr.address_lat?.toString() ?? '',
       address_long: addr.address_long?.toString() ?? '',
       state_id: addr.state_id.toString(),
@@ -370,6 +386,7 @@ export function AddressTab() {
     try {
       const payload = {
         address_line_1: editForm.address_line_1,
+        ...(editForm.address_line_2?.trim() && { address_line_2: editForm.address_line_2.trim() }),
         ...(editForm.address_lat && {
           address_lat: parseFloat(editForm.address_lat),
         }),
@@ -381,20 +398,16 @@ export function AddressTab() {
         postal_code: editForm.postal_code,
       };
       const response = await editAddress(addressId, payload);
-      if (response?.success === false) {
-        setEditError(
-          response?.message ||
-          "Please enter a valid address, city, state and PIN code."
-        );
-        return;
-      }
-      message.success("Address updated successfully.");
+      // The saved address is Shippo's corrected one.
+      const saved = response?.data ?? {};
+      toast.success(correctionNote(saved) ?? "Address updated.");
       setAddresses((prev) =>
         prev.map((a) =>
           a.id === addressId
             ? {
               ...a,
               ...payload,
+              ...(saved?.address_line_1 ? saved : {}),
             }
             : a
         )
@@ -405,7 +418,7 @@ export function AddressTab() {
       setEditError(
         error?.response?.data?.message ||
         error?.message ||
-        "Please enter a valid address, city, state and PIN code."
+        "Please enter a valid address, city, state and ZIP code."
       );
     } finally {
       setEditSaving(false);
@@ -432,7 +445,7 @@ export function AddressTab() {
           setEditing(null);
           setEditForm(null);
         }
-        message.success("Address deleted successfully.");
+        toast.success("Address deleted successfully.");
       } else {
         setDeleteError(res?.message || "Failed to delete address.");
       }
@@ -464,14 +477,14 @@ export function AddressTab() {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="btn-primary flex items-center gap-1.5 !rounded-full !px-4 !py-2.5 !text-sm"
+          className="btn-primary flex items-center gap-1.5 px-4 py-2.5 text-sm"
         >
           <Plus className="h-4 w-4" /> Add
         </button>
       </div>
       {/* Fetch error */}
       {fetchError && (
-        <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{fetchError}</span>
           <button onClick={fetchAddresses} className="ml-auto text-xs font-semibold underline underline-offset-2">
@@ -481,7 +494,7 @@ export function AddressTab() {
       )}
       {/* Delete error (surfaced at list level since delete can be triggered from any card) */}
       {deleteError && (
-        <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{deleteError}</span>
           <button onClick={() => setDeleteError(null)} className="ml-auto text-xs font-semibold underline underline-offset-2">
@@ -495,18 +508,18 @@ export function AddressTab() {
           {[1, 2].map(i => (
             <div key={i} className="animate-pulse rounded-3xl border border-border bg-card p-5">
               <div className="mb-3 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-2xl bg-secondary" />
-                <div className="h-4 w-40 rounded bg-secondary" />
+                <div className="h-10 w-10 rounded-2xl bg-muted" />
+                <div className="h-4 w-40 rounded bg-muted" />
               </div>
-              <div className="mb-2 ml-[52px] h-3 w-3/4 rounded bg-secondary" />
-              <div className="ml-[52px] h-3 w-1/2 rounded bg-secondary" />
+              <div className="mb-2 ml-[52px] h-3 w-3/4 rounded bg-muted" />
+              <div className="ml-[52px] h-3 w-1/2 rounded bg-muted" />
             </div>
           ))}
         </div>
       )}
       {/* Empty state */}
       {!loading && !fetchError && addresses.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-secondary/20 py-14 text-center">
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-muted/20 py-14 text-center">
           <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent">
             <MapPin className="h-6 w-6 text-primary" />
           </span>
@@ -516,7 +529,7 @@ export function AddressTab() {
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="btn-primary flex items-center gap-2 !rounded-full !px-5 !py-2.5 !text-sm"
+            className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm"
           >
             <Plus className="h-4 w-4" /> Add your first address
           </button>
@@ -531,7 +544,7 @@ export function AddressTab() {
             return (
               <div
                 key={addr.id}
-                className={`overflow-hidden rounded-3xl border bg-card shadow-[var(--shadow-soft)] transition-all ${addr.is_default ? 'border-primary/60 ring-1 ring-primary/20' : 'border-border'
+                className={`overflow-hidden rounded-3xl border bg-card shadow-soft transition-all ${addr.is_default ? 'border-primary/60 ring-1 ring-primary/20' : 'border-border'
                   }`}
               >
                 {/* Summary */}
@@ -545,9 +558,12 @@ export function AddressTab() {
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-bold text-foreground">{addr.address_line_1}</p>
+                      <p className="text-sm font-bold text-foreground">
+                        {addr.address_line_1}
+                        {addr.address_line_2 ? `, ${addr.address_line_2}` : ""}
+                      </p>
                       {addr.is_default && (
-                        <span className="flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-primary">
+                        <span className="flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-secondary">
                           <CheckCircle2 className="h-3 w-3" /> Default
                         </span>
                       )}
@@ -572,7 +588,7 @@ export function AddressTab() {
                       }
                       disabled={isDeleting}
                       aria-label={isEditing ? 'Close edit form' : 'Edit address'}
-                      className={`flex h-8 w-8 items-center justify-center rounded-full transition disabled:opacity-50 ${isEditing ? 'bg-primary text-primary-foreground' : 'bg-secondary text-foreground hover:bg-accent hover:text-primary'
+                      className={`flex h-8 w-8 items-center justify-center rounded-full transition disabled:opacity-50 ${isEditing ? 'bg-secondary text-primary-foreground' : 'bg-muted text-foreground hover:bg-accent hover:text-secondary'
                         }`}
                     >
                       {isEditing ? <X className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
@@ -581,7 +597,7 @@ export function AddressTab() {
                       onClick={() => handleDelete(addr.id)}
                       disabled={isDeleting || (editSaving && isEditing)}
                       aria-label="Delete address"
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-destructive/5 text-destructive transition hover:bg-destructive/10 disabled:opacity-50"
                     >
                       {isDeleting ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -593,30 +609,40 @@ export function AddressTab() {
                 </div>
                 {/* Inline edit */}
                 {isEditing && editForm && (
-                  <div className="space-y-3.5 border-t border-border bg-secondary/20 px-5 pb-5 pt-4">
+                  <div className="space-y-3.5 border-t border-border bg-muted/20 px-5 pb-5 pt-4">
                     {editError && (
-                      <p className="flex items-center gap-1.5 text-xs text-red-600">
+                      <p className="flex items-center gap-1.5 text-xs text-destructive">
                         <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {editError}
                       </p>
                     )}
                     <div>
-                      <label className={LABEL}>Address Line 1</label>
+                      <label className="label-glamlink">Address Line 1</label>
                       <input
                         value={editForm.address_line_1 ?? ''}
                         onChange={e => setEditForm(f => f && ({ ...f, address_line_1: e.target.value }))}
                         placeholder="Address Line 1"
                         disabled={editSaving}
-                        className={INPUT}
+                        className="input-glamlink"
+                      />
+                    </div>
+                    <div>
+                      <label className="label-glamlink">Apartment, suite (optional)</label>
+                      <input
+                        value={editForm.address_line_2 ?? ''}
+                        onChange={e => setEditForm(f => f && ({ ...f, address_line_2: e.target.value }))}
+                        placeholder="e.g. Suite 5"
+                        disabled={editSaving}
+                        className="input-glamlink"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className={LABEL}>State</label>
+                        <label className="label-glamlink">State</label>
                         <select
                           value={editForm.state_id ?? ""}
                           onChange={(e) => handleEditStateChange(e.target.value)}
                           disabled={editSaving}
-                          className={INPUT}
+                          className="input-glamlink"
                         >
                           <option value="">Select State</option>
                           {editStates.map((state) => (
@@ -627,7 +653,7 @@ export function AddressTab() {
                         </select>
                       </div>
                       <div>
-                        <label className={LABEL}>City</label>
+                        <label className="label-glamlink">City</label>
                         <select
                           value={editForm.city_id ?? ""}
                           onChange={(e) =>
@@ -641,7 +667,7 @@ export function AddressTab() {
                             )
                           }
                           disabled={!editForm.state_id || editSaving}
-                          className={INPUT}
+                          className="input-glamlink"
                         >
                           <option value="">Select City</option>
                           {editCities.map((city) => (
@@ -653,20 +679,20 @@ export function AddressTab() {
                       </div>
                     </div>
                     <div>
-                      <label className={LABEL}>Postal Code</label>
+                      <label className="label-glamlink">Postal Code</label>
                       <input
                         value={editForm.postal_code ?? ''}
                         onChange={e => setEditForm(f => f && ({ ...f, postal_code: e.target.value }))}
                         placeholder="89158"
                         disabled={editSaving}
-                        className={INPUT}
+                        className="input-glamlink"
                       />
                     </div>
                     <div className="flex gap-2 pt-1">
                       <button
                         onClick={() => handleSaveEdit(addr.id)}
                         disabled={editSaving || isDeleting}
-                        className="btn-primary flex flex-1 items-center justify-center gap-1.5 !rounded-xl !py-2.5 !text-xs disabled:opacity-60"
+                        className="btn-primary flex flex-1 items-center justify-center gap-1.5 py-2.5 text-xs disabled:opacity-60"
                       >
                         {editSaving && <Loader2 className="h-3 w-3 animate-spin" />}
                         {editSaving ? 'Saving…' : 'Save changes'}
@@ -674,7 +700,7 @@ export function AddressTab() {
                       <button
                         onClick={() => handleDelete(addr.id)}
                         disabled={isDeleting || editSaving}
-                        className="flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-100 disabled:opacity-60"
+                        className="flex items-center gap-1.5 rounded-full border border-destructive/30 bg-destructive/5 px-4 py-2.5 text-xs font-semibold text-destructive transition hover:bg-destructive/10 disabled:opacity-60"
                       >
                         {isDeleting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
                         {isDeleting ? 'Removing…' : 'Remove'}

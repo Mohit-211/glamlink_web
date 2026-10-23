@@ -1,0 +1,105 @@
+"use client";
+import { useEffect, useRef } from "react";
+import { Ad } from "./Useads";
+import { trackAdEvent } from "@/api/Api";
+
+/** Counts a view or a click on the API; counting never gets in the visitor's way. */
+function track(adId: number, type: "impression" | "click") {
+  trackAdEvent({ ad_id: adId, type }).catch(() => {});
+}
+
+interface AdSlotProps {
+  slotId: string;
+  ad?: Ad;
+  hideOnMobile?: boolean;
+  
+}
+const DEFAULT_SIZE = { width: 300, height: 250 };
+const BEHAVIOUR_CLASSES: Record<string, string> = {
+  static: "relative",
+  sticky: "sticky top-24",
+  "fixed-overlay":
+    "fixed left-1/2 bottom-0 -translate-x-1/2 z-[999] shadow-[0_-2px_8px_rgba(0,0,0,0.15)]",
+};
+export default function AdSlot({ slotId, ad, hideOnMobile = false }: AdSlotProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const size = ad ? { width: ad.width, height: ad.height } : DEFAULT_SIZE;
+  useEffect(() => {
+    if (!ad || !ref.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            track(ad.id, "impression");
+            observer.disconnect(); // count once per page view
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [ad]);
+
+  function handleClick() {
+    if (!ad) return;
+    track(ad.id, "click");
+  }
+
+  if (!ad) return null;
+
+  const baseClasses =
+    "overflow-hidden flex items-center justify-self-center justify-center rounded bg-muted";
+  const responsiveClasses = hideOnMobile ? "hidden lg:flex" : "flex";
+  const behaviourClass = BEHAVIOUR_CLASSES[ad.behaviour] || BEHAVIOUR_CLASSES.static;
+
+  return (
+    <>
+      <div
+        ref={ref}
+        data-slot-id={slotId}
+        data-ad-id={ad.id}
+        className={`${baseClasses} ${responsiveClasses} ${behaviourClass}`}
+        style={{ width: size?.width, height: size?.height }}
+      >
+        <a
+          href={ad.link_url}
+          target="_blank"
+          rel="noopener noreferrer sponsored"
+          onClick={handleClick}
+          className="block w-full h-full"
+        >
+          {ad.media_type === "video" ? (
+            <video
+              src={ad.image_url}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <img
+              src={ad.image_url}
+              alt={ad.alt_text || "Advertisement"}
+              width={size.width}
+              height={size.height}
+              className="w-full h-full object-cover"
+            />
+          )}
+        </a>
+      </div>
+      {/* Fixed-overlay ads are removed from flow, so reserve their height
+          here rather than relying on callers to add a static spacer. */}
+      {ad.behaviour === "fixed-overlay" && (
+        <div
+          aria-hidden="true"
+          style={{ height: size.height }}
+          className={hideOnMobile ? "hidden lg:block" : undefined}
+        />
+      )}
+    </>
+  );
+}

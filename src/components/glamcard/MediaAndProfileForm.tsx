@@ -1,22 +1,30 @@
 "use client";
+import Link from "next/link";
 
 import React, { useState, useCallback, useEffect } from "react";
 import Cropper from "react-easy-crop";
 import Modal from "./GlamCardForm/Modal";
-import { GalleryMetaItem, GlamCardFormData } from "./GlamCardForm/types";
+import { FieldErrors, GalleryMetaItem, GlamCardFormData } from "./GlamCardForm/types";
 import getCroppedImg from "./GlamCardForm/cropImageHelper";
 
 interface Props {
   data: GlamCardFormData;
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
+  errors?: FieldErrors;
+  clearError?: (key: string) => void;
+  /** Photos, video and the profile image of a live card change with Access Pro only. */
+  locked?: boolean;
 }
 
 const sectionClass =
-  "space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm";
-const labelClass = "text-sm font-medium text-gray-700";
+  "space-y-6 rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm";
 
-const MAX_MEDIA_TOTAL = 5; // shared cap across photos + videos combined
+// The API's limits for a card: 4 photos and 1 video (MP4, under 21 MB).
+const MAX_PHOTOS = 4;
+const MAX_VIDEOS = 1;
 const MAX_VIDEO_SECONDS = 60;
+const MAX_VIDEO_MB = 21;
+const MAX_VIDEO_BYTES = MAX_VIDEO_MB * 1024 * 1024;
 
 /* ================= HELPERS =================
    data.images can hold a mix of shapes:
@@ -50,13 +58,6 @@ const getThumbnailUrl = (item: any): string => {
   return "";
 };
 
-/* Crop modal can be applied to three different targets. "gallery" crops
-   are processed one file at a time via galleryCropQueue so multi-select
-   uploads still get cropped individually before being added. Each context
-   has a FIXED aspect ratio — this is intentional and shouldn't vary:
-   - profile: square (1:1), since it renders inside a circular avatar
-   - gallery: 16:9, for a consistent widescreen photo grid
-   - thumbnail: 16:9, matching the shape of a video frame/poster */
 type CropContext = "profile" | "gallery" | "thumbnail";
 
 const CROP_ASPECTS: Record<CropContext, number> = {
@@ -65,11 +66,26 @@ const CROP_ASPECTS: Record<CropContext, number> = {
   thumbnail: 16 / 9,
 };
 
+const urlToFile = async (url: string): Promise<File> => {
+  let res: Response;
+  try {
+    res = await fetch(url);
+  } catch {
+    throw new Error("Couldn't reach that URL” check the link and try again.");
+  }
+  if (!res.ok) throw new Error(`Couldn't load that image (status ${res.status}).`);
+  const blob = await res.blob();
+  if (!blob.type.startsWith("image/")) {
+    throw new Error("That URL doesn't point to an image.");
+  }
+  const filename = url.split("/").pop()?.split(/[?#]/)[0] || `image-${Date.now()}.jpg`;
+  return new File([blob], filename, { type: blob.type });
+};
+
 const isMp4File = (file: File): boolean =>
   file.type === "video/mp4" || /\.mp4$/i.test(file.name);
 
-// Reads duration via a throwaway <video> element's loaded metadata —
-// no upload or decode needed, just enough to read the header.
+
 const getVideoDuration = (file: File): Promise<number> => {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
@@ -97,9 +113,24 @@ const generateVideoThumbnail = (file: File): Promise<File> => {
     videoEl.preload = "metadata";
     videoEl.muted = true;
     videoEl.playsInline = true;
+    videoEl.setAttribute("playsinline", "true");
+    // Safari/WebKit never fires `seeked` on a video element that isn't
+    // attached to the document, so the frame capture below would hang
+    // forever on Mac/iOS. Keep it in the DOM (visually hidden) for the
+    // duration of the capture.
+    videoEl.style.position = "fixed";
+    videoEl.style.top = "-9999px";
+    videoEl.style.width = "1px";
+    videoEl.style.height = "1px";
+    videoEl.style.opacity = "0";
+    videoEl.style.pointerEvents = "none";
+    document.body.appendChild(videoEl);
     videoEl.src = url;
 
-    const cleanup = () => URL.revokeObjectURL(url);
+    const cleanup = () => {
+      URL.revokeObjectURL(url);
+      videoEl.remove();
+    };
 
     videoEl.onloadedmetadata = () => {
       // Grab a frame ~1s in (or the midpoint for very short clips) so we
@@ -143,7 +174,7 @@ const generateVideoThumbnail = (file: File): Promise<File> => {
   });
 };
 
-const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
+const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearError, locked = false }) => {
   /* ================= CROP MODAL (shared) ================= */
 
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -189,6 +220,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
 
     if (cropContext === "profile") {
       setData((prev) => ({ ...prev, profile_image: croppedFile }));
+      clearError?.("profile_image");
       setIsCropOpen(false);
       return;
     }
@@ -207,7 +239,6 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
       return;
     }
 
-    // cropContext === "gallery" (photos only — videos are never cropped)
     addMediaToGallery([croppedFile]);
 
     if (galleryCropQueue.length) {
@@ -230,7 +261,6 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
       return () => URL.revokeObjectURL(url);
     }
     if (typeof data.profile_image === "string" && data.profile_image) {
-      // Existing profile image URL from the server (edit mode) — render directly, no object URL needed.
       setProfilePreview(data.profile_image);
     } else {
       setProfilePreview(null);
@@ -244,6 +274,28 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
     e.target.value = "";
   };
 
+  const [profileUrlInput, setProfileUrlInput] = useState("");
+  const [profileUrlLoading, setProfileUrlLoading] = useState(false);
+  const [profileUrlError, setProfileUrlError] = useState<string | null>(null);
+
+  const handleProfileUrlAdd = async () => {
+    const url = profileUrlInput.trim();
+    if (!url) return;
+    setProfileUrlError(null);
+    setProfileUrlLoading(true);
+    try {
+      const file = await urlToFile(url);
+      openCropper(file, "profile");
+      setProfileUrlInput("");
+    } catch (err) {
+      setProfileUrlError(
+        err instanceof Error ? err.message : "Couldn't load that image URL."
+      );
+    } finally {
+      setProfileUrlLoading(false);
+    }
+  };
+
   /* ================= GALLERY (photos + videos) ================= */
 
   const [galleryPreview, setGalleryPreview] = useState<string[]>([]);
@@ -255,13 +307,11 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
 
   const photoCount = images.filter((img) => !isVideoItem(img)).length;
   const videoCount = images.filter((img) => isVideoItem(img)).length;
-  const totalMediaCount = photoCount + videoCount;
+  const photosFull = photoCount >= MAX_PHOTOS;
+  const videosFull = videoCount >= MAX_VIDEOS;
 
   useEffect(() => {
-    // data.images can hold a mix of new File uploads, plain string URLs, and
-    // server objects ({file_uri, file_type, thumbnail_uri, ...}) in edit mode.
-    // Only File instances need an object URL — everything else is already
-    // renderable once we pull the right field out.
+
     const urls = images.map((item) => getImageUrl(item));
     setGalleryPreview(urls);
     return () => {
@@ -298,6 +348,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
   // `thumbnailFiles` (parallel to `files`) lets videos carry an
   // auto-generated poster straight into gallery_meta.
   const addMediaToGallery = (files: File[], thumbnailFiles: (File | undefined)[] = []) => {
+    clearError?.("images");
     setData((prev) => {
       const existingImages = prev.images || [];
       const existingMeta = prev.gallery_meta || [];
@@ -324,11 +375,14 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
 
     setMediaError(null);
 
-    const remainingSlots = MAX_MEDIA_TOTAL - totalMediaCount;
+    const remainingSlots = MAX_PHOTOS - photoCount;
     if (remainingSlots <= 0) {
-      setMediaError(`You can upload up to ${MAX_MEDIA_TOTAL} media items total.`);
+      setMediaError(`You can add up to ${MAX_PHOTOS} photos.`);
       e.target.value = "";
       return;
+    }
+    if (files.length > remainingSlots) {
+      setMediaError(`Only ${remainingSlots} more photo${remainingSlots === 1 ? "" : "s"} fit; the rest were skipped.`);
     }
 
     const allowed = files.slice(0, remainingSlots);
@@ -338,15 +392,40 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
     e.target.value = "";
   };
 
+  const [galleryUrlInput, setGalleryUrlInput] = useState("");
+  const [galleryUrlLoading, setGalleryUrlLoading] = useState(false);
+
+  const handleGalleryUrlAdd = async () => {
+    const url = galleryUrlInput.trim();
+    if (!url) return;
+    setMediaError(null);
+
+    if (photosFull) {
+      setMediaError(`You can add up to ${MAX_PHOTOS} photos.`);
+      return;
+    }
+
+    setGalleryUrlLoading(true);
+    try {
+      const file = await urlToFile(url);
+      openCropper(file, "gallery");
+      setGalleryUrlInput("");
+    } catch (err) {
+      setMediaError(err instanceof Error ? err.message : "Couldn't load that image URL.");
+    } finally {
+      setGalleryUrlLoading(false);
+    }
+  };
+
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
     setMediaError(null);
 
-    const remainingSlots = MAX_MEDIA_TOTAL - totalMediaCount;
+    const remainingSlots = MAX_VIDEOS - videoCount;
     if (remainingSlots <= 0) {
-      setMediaError(`You can upload up to ${MAX_MEDIA_TOTAL} media items total.`);
+      setMediaError(`You can add ${MAX_VIDEOS} video. Remove the current one to add another.`);
       e.target.value = "";
       return;
     }
@@ -361,10 +440,14 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
         setMediaError("Only .mp4 videos are supported.");
         continue;
       }
+      if (file.size > MAX_VIDEO_BYTES) {
+        setMediaError(`Videos must be under ${MAX_VIDEO_SECONDS} seconds and under ${MAX_VIDEO_MB}MB.`);
+        continue;
+      }
       try {
         const duration = await getVideoDuration(file);
         if (duration > MAX_VIDEO_SECONDS) {
-          setMediaError("Videos must be under 60 seconds.");
+          setMediaError(`Videos must be under ${MAX_VIDEO_SECONDS} seconds and under ${MAX_VIDEO_MB}MB.`);
           continue;
         }
       } catch {
@@ -415,28 +498,28 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
     const thumbPreview = videoThumbPreviews[item.id];
 
     return (
-      <div key={item.id} className="border rounded-xl p-3 space-y-2 bg-gray-50">
+      <div key={item.id} className="border rounded-xl p-3 space-y-2 bg-muted">
         {/* Media preview */}
         <div className="relative">
           {isVideo ? (
             thumbPreview ? (
               <div className="relative w-full aspect-video rounded-lg overflow-hidden">
                 <img src={thumbPreview} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                  <svg className="w-10 h-10 text-white opacity-90" fill="currentColor" viewBox="0 0 24 24">
+                <div className="absolute inset-0 flex items-center justify-center bg-overlay/20">
+                  <svg className="w-10 h-10 text-overlay-foreground opacity-90" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
-                <span className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded">
+                <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
                   Video
                 </span>
               </div>
             ) : (
-              <div className="relative w-full aspect-video rounded-lg bg-gray-900 flex items-center justify-center">
-                <svg className="w-10 h-10 text-white opacity-70" fill="currentColor" viewBox="0 0 24 24">
+              <div className="relative w-full aspect-video rounded-lg bg-overlay flex items-center justify-center">
+                <svg className="w-10 h-10 text-overlay-foreground opacity-70" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
-                <span className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded">
+                <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
                   Video
                 </span>
               </div>
@@ -452,12 +535,12 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
         {/* Video poster (thumbnail) upload — auto-generated by default, replaceable */}
         {isVideo && (
           <div className="space-y-1">
-            <p className="text-xs text-gray-500">Video thumbnail</p>
+            <p className="text-xs text-muted-foreground">Video thumbnail</p>
 
             {thumbPreview ? (
               <div className="relative">
                 <img src={thumbPreview} className="w-full aspect-video object-cover rounded-lg" />
-                <label className="absolute bottom-1 right-1 cursor-pointer bg-black/60 text-white text-xs px-2 py-0.5 rounded hover:bg-black/80">
+                <label className="absolute bottom-1 right-1 cursor-pointer bg-overlay/60 text-overlay-foreground text-xs px-2 py-0.5 rounded hover:bg-overlay/80">
                   Change
                   <input
                     type="file"
@@ -468,8 +551,8 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
                 </label>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center gap-1 border border-dashed border-gray-300 rounded-lg py-3 cursor-pointer hover:bg-gray-100 transition-colors">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <label className="flex flex-col items-center justify-center gap-1 border border-dashed border-border rounded-lg py-3 cursor-pointer hover:bg-muted transition-colors">
+                <svg className="w-5 h-5 text-muted-foreground/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -477,7 +560,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
                     d="M3 16.5V18a1.5 1.5 0 001.5 1.5h15A1.5 1.5 0 0021 18v-1.5M12 3v12m0-12L8.5 6.5M12 3l3.5 3.5"
                   />
                 </svg>
-                <span className="text-xs text-gray-400">Upload thumbnail</span>
+                <span className="text-xs text-muted-foreground/80">Upload thumbnail</span>
                 <input
                   type="file"
                   hidden
@@ -491,7 +574,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
 
         {/* Actions */}
         <div className="flex justify-end text-xs">
-          <button onClick={() => removeMedia(item.id)} className="text-red-600 hover:underline">
+          <button onClick={() => removeMedia(item.id)} className="text-destructive hover:underline">
             Remove
           </button>
         </div>
@@ -502,85 +585,164 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
   return (
     <section className={sectionClass}>
       <h2 className="text-lg font-semibold">Media & Profile</h2>
+      {locked && (
+        <p className="rounded-xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
+          Refreshing your photos, video and profile image is part of Access Pro.{" "}
+          <Link href="/dashboard?tab=subscription-plans" className="link-glamlink text-secondary">
+            See plans
+          </Link>
+        </p>
+      )}
+      <fieldset disabled={locked} className={locked ? "pointer-events-none space-y-6 opacity-60" : "contents"}>
 
       {/* PROFILE */}
-      <div className="space-y-3">
-        <label className={labelClass}>Profile Image</label>
-        <div className="flex items-center gap-5">
-          <div className="relative w-32 h-32">
-            <div className="w-32 h-32 rounded-full border overflow-hidden bg-gray-50 flex items-center justify-center">
+      <div id="field-profile_image" className="space-y-3">
+        <label className="label-glamlink mb-0">
+          Profile Image <span className="text-destructive">*</span>
+        </label>
+        <div className="flex flex-wrap items-center gap-5">
+          <div className="relative w-32 h-32 flex-none">
+            <div
+              className={`w-32 h-32 rounded-full border overflow-hidden bg-muted flex items-center justify-center ${errors?.profile_image ? "border-2 border-destructive" : ""
+                }`}
+            >
               {profilePreview ? (
                 <img src={profilePreview} className="w-full h-full object-cover" />
               ) : (
-                <span className="text-gray-400 text-sm text-center">
+                <span className="text-muted-foreground/80 text-sm text-center">
                   Upload
                   <br />
                   Profile
                 </span>
               )}
             </div>
-            <label className="absolute bottom-0 right-0 cursor-pointer bg-teal-500 text-white p-2 rounded-full shadow hover:bg-teal-600">
-              ✎
-              <input type="file" hidden accept="image/*" onChange={handleProfileUpload} />
+            <label className="absolute bottom-1 right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition hover:bg-secondary">
+              <span className="text-sm leading-none">✎</span>
+
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleProfileUpload}
+              />
             </label>
           </div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Square image works best. Face centered. Clean background.
           </p>
         </div>
-      </div>
+        {errors?.profile_image && (
+          <p className="text-sm text-destructive">{errors.profile_image}</p>
+        )}
 
-      <p className="text-xs text-gray-500 pt-2">
-        Gallery media: {totalMediaCount}/{MAX_MEDIA_TOTAL} used (photos + videos combined)
-      </p>
-
-      {/* PHOTOS SECTION */}
-      <div className="space-y-4 pt-2 border-t border-gray-100">
-        <div className="flex justify-between items-center pt-4">
-          <label className={labelClass}>Photos ({photoCount})</label>
-          <label
-            className={`rounded-lg px-4 py-2 text-white ${
-              totalMediaCount >= MAX_MEDIA_TOTAL
-                ? "bg-gray-300 cursor-not-allowed"
-                : "cursor-pointer bg-teal-500 hover:bg-teal-600"
-            }`}
+        <div className="flex items-center gap-2">
+          <input
+            type="url"
+            className="input-glamlink min-w-0 flex-1 px-3 py-2 text-xs"
+            placeholder="Or paste an image URL"
+            value={profileUrlInput}
+            onChange={(e) => setProfileUrlInput(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={handleProfileUrlAdd}
+            disabled={!profileUrlInput.trim() || profileUrlLoading}
+            className="btn-primary px-4 py-2 text-xs disabled:opacity-50"
           >
-            + Upload Photos
-            <input
-              type="file"
-              hidden
-              multiple
-              accept="image/*"
-              disabled={totalMediaCount >= MAX_MEDIA_TOTAL}
-              onChange={handlePhotoUpload}
-            />
-          </label>
+            {profileUrlLoading ? "Loading..." : "Add"}
+          </button>
         </div>
-
-        {photoCount ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {gallery_meta.map((item, index) =>
-              !isVideoItem(images[index]) ? renderMediaCard(item, index, false) : null
-            )}
-          </div>
-        ) : (
-          <p className="text-gray-400 text-sm">No photos uploaded</p>
+        {profileUrlError && (
+          <p className="text-xs text-destructive">{profileUrlError}</p>
         )}
       </div>
 
+      <div id="field-images">
+        <p
+          className={`text-xs pt-2 ${errors?.images ? "text-destructive font-medium" : "text-muted-foreground"
+            }`}
+        >
+          Gallery <span className="text-destructive">*</span>: {photoCount}/{MAX_PHOTOS} photos · {videoCount}/{MAX_VIDEOS} video
+        </p>
+        {errors?.images && (
+          <p className="mt-1 text-sm text-destructive">{errors.images}</p>
+        )}
+
+
+
+        {/* PHOTOS SECTION */}
+        <div
+          className={`space-y-4 pt-2 border-t ${errors?.images ? "border-destructive/50" : "border-border"
+            }`}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
+            <label className="label-glamlink mb-0">Photos ({photoCount})</label>
+            <label
+              className={`btn-primary px-4 py-2 ${photosFull ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+            >
+              + Upload Photos
+              <input
+                type="file"
+                hidden
+                multiple
+                accept="image/*"
+                disabled={photosFull}
+                onChange={handlePhotoUpload}
+              />
+            </label>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="url"
+              className="input-glamlink min-w-0 flex-1 px-3 py-2 text-xs"
+              placeholder="Or paste an image URL"
+              value={galleryUrlInput}
+              onChange={(e) => setGalleryUrlInput(e.target.value)}
+              disabled={photosFull}
+            />
+            <button
+              type="button"
+              onClick={handleGalleryUrlAdd}
+              disabled={
+                !galleryUrlInput.trim() ||
+                galleryUrlLoading ||
+                photosFull
+              }
+              className="btn-primary px-4 py-2 text-xs disabled:opacity-50"
+            >
+              {galleryUrlLoading ? "Loading..." : "+ Add URL"}
+            </button>
+          </div>
+
+          {photoCount ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {gallery_meta.map((item, index) =>
+                !isVideoItem(images[index]) ? renderMediaCard(item, index, false) : null
+              )}
+            </div>
+          ) : (
+            <p className="text-muted-foreground/80 text-sm">No photos uploaded</p>
+          )}
+        </div>
+      </div>
+
       {/* VIDEOS SECTION */}
-      <div className="space-y-4 pt-2 border-t border-gray-100">
-        <div className="flex justify-between items-center pt-4">
+      <div className="space-y-4 pt-2 border-t border-border">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
           <div>
-            <label className={labelClass}>Videos ({videoCount})</label>
-            <p className="text-xs text-gray-400">Must be .mp4 and under 60 seconds</p>
+            <label className="label-glamlink">Videos ({videoCount})</label>
+            <p className="text-xs text-muted-foreground/80">
+              Must be .mp4, under 60 seconds, and under {MAX_VIDEO_MB}MB
+            </p>
+            {mediaError && (
+              <p className="mt-2 text-sm text-destructive bg-destructive/5 border border-destructive/30 rounded-lg px-3 py-2">
+                {mediaError}
+              </p>
+            )}
           </div>
           <label
-            className={`rounded-lg px-4 py-2 text-white ${
-              totalMediaCount >= MAX_MEDIA_TOTAL
-                ? "bg-gray-300 cursor-not-allowed"
-                : "cursor-pointer bg-teal-500 hover:bg-teal-600"
-            }`}
+            className={`btn-primary px-4 py-2 ${videosFull ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
           >
             + Upload Videos
             <input
@@ -588,17 +750,11 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
               hidden
               multiple
               accept="video/mp4"
-              disabled={totalMediaCount >= MAX_MEDIA_TOTAL}
+              disabled={videosFull}
               onChange={handleVideoUpload}
             />
           </label>
         </div>
-
-        {mediaError && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-            {mediaError}
-          </p>
-        )}
 
         {videoCount ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -607,27 +763,27 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
             )}
           </div>
         ) : (
-          <p className="text-gray-400 text-sm">No videos uploaded</p>
+          <p className="text-muted-foreground/80 text-sm">No videos uploaded</p>
         )}
       </div>
 
-      {/* CROP MODAL — shared by profile photo, gallery photos, and video thumbnails */}
       {isCropOpen && (
         <Modal onClose={cancelCrop}>
           <div className="w-[90vw] max-w-md space-y-4">
             {cropContext === "gallery" && galleryCropQueue.length > 0 && (
-              <p className="text-center text-xs text-gray-500">
+              <p className="text-center text-xs text-muted-foreground">
                 {galleryCropQueue.length} more photo
                 {galleryCropQueue.length > 1 ? "s" : ""} to crop after this one
               </p>
             )}
-            <div className="relative h-80 bg-black rounded overflow-hidden">
+            <div className="relative h-64 sm:h-80 bg-overlay rounded overflow-hidden">
               <Cropper
                 image={imageSrc!}
                 crop={crop}
                 zoom={zoom}
                 aspect={CROP_ASPECTS[cropContext]}
                 onCropChange={setCrop}
+                 cropShape={cropContext === "profile" ? "round" : "rect"}
                 onCropComplete={onCropComplete}
                 onZoomChange={setZoom}
               />
@@ -642,12 +798,12 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
               className="w-full"
             />
             <div className="flex gap-3">
-              <button onClick={cancelCrop} className="flex-1 border rounded py-2">
+              <button onClick={cancelCrop} className="btn-outline flex-1">
                 Cancel
               </button>
               <button
                 onClick={applyCrop}
-                className="flex-1 bg-teal-500 text-white rounded py-2 hover:bg-teal-600"
+                className="btn-primary flex-1"
               >
                 Apply Crop
               </button>
@@ -655,6 +811,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData }) => {
           </div>
         </Modal>
       )}
+      </fieldset>
     </section>
   );
 };

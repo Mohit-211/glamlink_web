@@ -1,48 +1,30 @@
+import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import Script from "next/script";
 
-import Hero from "@/components/home/Hero";
-import AccessSection from "@/components/home/AccessSection";
-import WhyGlamlinkSection from "@/components/home/WhyGlamlinkSection";
-import FounderBadge from "@/components/home/FounderBadge";
-import ProfessionalsMarketplace from "@/components/professionals/ProfessionalsMarketplace";
-import DirectoryApplySection from "@/components/home/DirectoryApplySection";
-import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
-import AccessByGlamlink from "@/components/AccessByGlamlink/AccessByGlamlink";
+import HomeLanding from "@/components/home/HomeLanding";
 
 /* --------------------------------
-   Page Metadata
+   Page Metadata (title comes from the root layout's default)
 -------------------------------- */
 
+const description =
+  "Discover beauty + wellness on Glamlink: treatments, trusted professionals, products and expert insights.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://glamlink.net"),
-
-  title: "Discover Beauty Professionals Near You",
-
-  description:
-    "Find trusted beauty and wellness professionals near you with Glamlink. Discover salons, skincare specialists, makeup artists, and book services easily.",
-
-  keywords: [
-    "beauty professionals near me",
-    "find makeup artist",
-    "beauty services near me",
-    "salons near me",
-    "skincare specialists",
-    "glamlink directory",
-  ],
+  description,
 
   alternates: {
     canonical: "/",
   },
 
   openGraph: {
-    title: "Discover Beauty Professionals Near You | Glamlink",
-    description:
-      "Explore verified beauty professionals, book services, and discover beauty insights on Glamlink.",
-    url: "https://glamlink.net",
+    title: "Glamlink | Beauty Lives Here",
+    description,
+    url: SITE_URL,
     images: [
       {
-        url: "https://glamlink.net/assets/oglayout.png",
+        url: `${SITE_URL}/assets/oglayout.png`,
         width: 1200,
         height: 630,
         alt: "Glamlink Beauty & Wellness Platform",
@@ -59,10 +41,11 @@ const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Glamlink",
-  url: "https://glamlink.net",
+  url: SITE_URL,
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://glamlink.net/directory?search={search_term_string}",
+    // Same destination as the home page search box
+    target: `${SITE_URL}/search?q={search_term_string}`,
     "query-input": "required name=search_term_string",
   },
 };
@@ -83,16 +66,7 @@ export default function HomePage() {
         }}
       />
 
-      <Hero />
-      <AccessSection />
-      <AccessByGlamlink/>
-      {/* <DirectoryApplySection /> */}
-      {/* <ProfessionalsMarketplace /> */}
-      {/* <WhyGlamlinkSection /> */}
-      {/* <FounderBadge /> */}
-      <ConditionalGetFeatured />
+      <HomeLanding />
     </>
   );
 }
-// import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
-// <ConditionalGetFeatured />

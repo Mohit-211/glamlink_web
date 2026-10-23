@@ -1,38 +1,67 @@
 // next.config.ts
 import type { NextConfig } from "next";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
+import { indexingAllowed } from "./src/lib/indexing";
 
-const nextConfig: NextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "example.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "cdn.example.com",
-        pathname: "/images/**",
-      },
-      {
-        protocol: "https",
-        hostname: "glamlink.net",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "node.glamlink.net",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "maps.googleapis.com",
-      },
-    
-      { protocol: "https", hostname: "picsum.photos" },
-    
-    ],
-  },
-};
+type RemotePattern = NonNullable<NonNullable<NextConfig["images"]>["remotePatterns"]>[number];
 
-export default nextConfig;
+/** Variables the site cannot be built without. The rest are optional; see .env.example. */
+const REQUIRED_ENV = ["NEXT_PUBLIC_SITE_URL", "NEXT_PUBLIC_API_URL"] as const;
+
+/** Allows next/image to load anything served from the origin of `url`. */
+function originPattern(url: string | undefined): RemotePattern[] {
+  if (!url) return [];
+  const { protocol, hostname, port } = new URL(url);
+  return [
+    {
+      protocol: protocol.replace(":", "") as "http" | "https",
+      hostname,
+      port,
+      pathname: "/**",
+    },
+  ];
+}
+
+export default function nextConfig(phase: string): NextConfig {
+  if (phase === PHASE_PRODUCTION_BUILD) {
+    const missing = REQUIRED_ENV.filter((name) => !process.env[name]);
+    if (missing.length > 0) {
+      throw new Error(
+        `Missing required environment variables: ${missing.join(", ")}. Copy .env.example to .env and fill them in.`
+      );
+    }
+  }
+
+  return {
+    async redirects() {
+      return [
+        // The Shop moved out of the Journal to its own page (Oct 2026).
+        { source: "/journal/shop", destination: "/shop", permanent: true },
+        { source: "/journal/shop/:id", destination: "/shop/:id", permanent: true },
+        // Education and Events are switched off for now; temporary, so they can return.
+        { source: "/journal/education", destination: "/journal", permanent: false },
+        { source: "/journal/events", destination: "/journal", permanent: false },
+      ];
+    },
+    // Test and staging builds (SITE_INDEXING=off, or any address other than
+    // glamlink.net): every response tells crawlers not to index or follow.
+    async headers() {
+      if (indexingAllowed()) return [];
+      return [
+        {
+          source: "/:path*",
+          headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+        },
+      ];
+    },
+    images: {
+      remotePatterns: [
+        // The site itself and the backend (uploaded images live under its /images path).
+        ...originPattern(process.env.NEXT_PUBLIC_SITE_URL),
+        ...originPattern(process.env.NEXT_PUBLIC_API_URL),
+        // Google Places photos for directory providers.
+        { protocol: "https", hostname: "maps.googleapis.com" },
+      ],
+    },
+  };
+}

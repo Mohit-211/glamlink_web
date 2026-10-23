@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import { Download, X, Loader2 } from "lucide-react";
-import { toPng, toJpeg } from "html-to-image";
+import { toPng, toJpeg, getFontEmbedCSS } from "html-to-image";
+import { TOKENS } from "@/lib/designTokens";
 import GlamCardLivePreview from "./GlamCardLivePreview";
 import { GlamCardFormData } from "./GlamCardForm/types";
 import BusinessCardPage from "../BusinessCardPage";
@@ -68,9 +69,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
     return () => clearTimeout(timer);
   }, [isOpen]);
 
-  // When modal opens, screenshot each iframe while it's still live.
-  // This is the ONLY reliable way to capture Google Maps — we grab it before
-  // html-to-image runs, then swap it in during download.
+
   useEffect(() => {
     if (!isOpen) return;
     const timer = setTimeout(async () => {
@@ -90,17 +89,17 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
        const dataUrl = await toPng(parent, {
   cacheBust: true,
   pixelRatio: 2,
-  skipFonts: true,          // ← skips cross-origin stylesheet iteration (kills the SecurityError)
+  skipFonts: true,         
   fetchRequestInit: { mode: "cors" as RequestMode },
 });
           screenshots.set(iframe, dataUrl);
           iframe.style.pointerEvents = originalPointerEvents;
         } catch {
-          // iframe screenshot failed (cross-origin) — will use canvas fallback
+          
         }
       }));
       setIframeScreenshots(screenshots);
-    }, 1500); // wait 1.5s for Google Maps iframe to fully load its tiles
+    }, 1500); 
     return () => clearTimeout(timer);
   }, [isOpen]);
 
@@ -218,8 +217,8 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         const value = computed[prop];
         if (value && unsupportedColorRegex.test(value)) {
           (htmlEl.style as any)[prop] = prop.toLowerCase().includes("background")
-            ? "#ffffff"
-            : "#000000";
+            ? TOKENS.card
+            : TOKENS.foreground;
         }
         unsupportedColorRegex.lastIndex = 0;
       });
@@ -271,9 +270,6 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         let placeholder: HTMLElement;
 
         if (lat !== null && lng !== null) {
-          // Use maps.geoapify.com static map — supports CORS, no API key needed for basic use
-          const mapUrl = `https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=${w * 2}&height=${h * 2}&center=lonlat:${lng},${lat}&zoom=15&marker=lonlat:${lng},${lat};color:%23e53e3e;size:medium&apiKey=YOUR_GEOAPIFY_KEY`;
-
           // Try fetching the static map as base64
           const base64Map = await toBase64DataUrl(
             `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=15&size=${w}x${h}&markers=${lat},${lng},red`
@@ -285,39 +281,37 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             mapImg.style.cssText = `width:${w}px;height:${h}px;object-fit:cover;border-radius:${radius};display:block;`;
             placeholder = mapImg;
           } else {
-            // All tile sources failed — draw a clean styled map placeholder on canvas
             const mapCanvas = document.createElement("canvas");
             mapCanvas.width = w;
             mapCanvas.height = h;
             const ctx = mapCanvas.getContext("2d")!;
 
-            // Background — light map color
-            ctx.fillStyle = "#f2efe9";
+            ctx.fillStyle = TOKENS.muted;
             ctx.roundRect(0, 0, w, h, 0);
             ctx.fill();
 
             // Draw some fake roads for visual resemblance
-            ctx.strokeStyle = "#ffffff";
+            ctx.strokeStyle = TOKENS.card;
             ctx.lineWidth = 6;
             [[0, h * 0.45, w, h * 0.45], [0, h * 0.65, w, h * 0.65], [w * 0.3, 0, w * 0.3, h], [w * 0.7, 0, w * 0.7, h]].forEach(([x1,y1,x2,y2]) => {
               ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
             });
-            ctx.strokeStyle = "#e8e0d8";
+            ctx.strokeStyle = TOKENS.border;
             ctx.lineWidth = 2;
             [[0, h * 0.3, w, h * 0.3], [w * 0.15, 0, w * 0.15, h], [w * 0.55, 0, w * 0.55, h]].forEach(([x1,y1,x2,y2]) => {
               ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
             });
 
-            // Red pin marker at center
+            // Brand-teal pin marker at center
             const cx = w / 2, cy = h / 2;
-            ctx.fillStyle = "#e53e3e";
+            ctx.fillStyle = TOKENS.primary;
             ctx.beginPath(); ctx.arc(cx, cy - 16, 12, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.moveTo(cx, cy + 4); ctx.lineTo(cx - 10, cy - 10); ctx.lineTo(cx + 10, cy - 10); ctx.closePath(); ctx.fill();
-            ctx.fillStyle = "#fff";
+            ctx.fillStyle = TOKENS.card;
             ctx.beginPath(); ctx.arc(cx, cy - 16, 5, 0, Math.PI * 2); ctx.fill();
 
             // Border
-            ctx.strokeStyle = "#d1d5db";
+            ctx.strokeStyle = TOKENS.border;
             ctx.lineWidth = 1;
             ctx.strokeRect(0, 0, w, h);
 
@@ -327,14 +321,14 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             placeholder = mapImg;
           }
         } else {
-          // No coords — plain grey placeholder
           const mapCanvas = document.createElement("canvas");
           mapCanvas.width = w; mapCanvas.height = h;
           const ctx = mapCanvas.getContext("2d")!;
-          ctx.fillStyle = "#e8edf2";
+          ctx.fillStyle = TOKENS.muted;
           ctx.fillRect(0, 0, w, h);
-          ctx.fillStyle = "#9ca3af";
-          ctx.font = "13px sans-serif";
+          ctx.fillStyle = TOKENS.mutedForeground;
+          // Canvas cannot use CSS variables; read the resolved site font (Manrope) instead.
+          ctx.font = `13px ${getComputedStyle(document.body).fontFamily}`;
           ctx.textAlign = "center";
           ctx.fillText("Map View", w / 2, h / 2 + 5);
           const mapImg = document.createElement("img");
@@ -343,7 +337,6 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
           placeholder = mapImg;
         }
 
-        // ✅ Priority: use the pre-captured screenshot taken when modal opened
         const savedScreenshot = iframeScreenshots.get(iframe);
         if (savedScreenshot) {
           const screenshotImg = document.createElement("img");
@@ -356,11 +349,6 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         iframe.parentNode!.replaceChild(placeholder, iframe);
       }));
 
-      // Step 5: Replace <video> elements.
-      // Strategy: the carousel already has thumbnail <img> elements next to each video.
-      // Find those existing thumbnails and use them — much more reliable than frame extraction.
-      // For videos with a poster attribute, convert poster to base64.
-      // For videos with no poster and no nearby thumbnail, use a canvas placeholder.
       const videos = Array.from(element.querySelectorAll<HTMLVideoElement>("video"));
 
       await Promise.all(
@@ -380,9 +368,9 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
                 const canvas = document.createElement("canvas");
                 canvas.width = w || 160; canvas.height = h || 120;
                 const ctx = canvas.getContext("2d")!;
-                ctx.fillStyle = "#d1d5db";
+                ctx.fillStyle = TOKENS.input;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "#ffffff";
+                ctx.fillStyle = TOKENS.card;
                 const cx = canvas.width / 2, cy = canvas.height / 2;
                 ctx.beginPath();
                 ctx.moveTo(cx - 14, cy - 18);
@@ -468,8 +456,6 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         })
       );
 
-      // Step 7: Strip srcset — Next.js <Image> uses srcset, which html-to-image
-      // re-fetches internally, bypassing our base64 src swap and hitting CORS again.
       const allImgs = Array.from(element.querySelectorAll<HTMLImageElement>("img"));
       await Promise.all(
         allImgs.map(async (img) => {
@@ -492,10 +478,13 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
       await waitForImagesToLoad(element);
 
       const fileName = `glam-card-${Date.now()}`;
+      // Embed the site font so the image is not drawn in a fallback typeface; if that
+      // fails (e.g. a stylesheet cannot be read), still download without it.
+      const fontEmbedCSS = await getFontEmbedCSS(element).catch(() => "");
       const options = {
         cacheBust: false,
         pixelRatio: 3,
-        skipFonts: true,
+        ...(fontEmbedCSS ? { fontEmbedCSS } : { skipFonts: true }),
         fetchRequestInit: { mode: "cors" as RequestMode, cache: "no-cache" as RequestCache },
       };
 
@@ -546,30 +535,30 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm sm:p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center scrim sm:p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative flex flex-col bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl max-h-[92vh] sm:max-h-[90vh] overflow-hidden">
+      <div className="relative flex flex-col bg-card rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl max-h-[92vh] sm:max-h-[90vh] overflow-hidden">
         {/* drag handle (mobile) */}
-        <div className="sm:hidden w-10 h-1 rounded-full bg-gray-300 mx-auto mt-3 mb-1 flex-shrink-0" />
+        <div className="sm:hidden w-10 h-1 rounded-full bg-input mx-auto mt-3 mb-1 flex-shrink-0" />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 flex-shrink-0">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-border flex-shrink-0">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">
             Preview Your Digital Card
           </h2>
           <button
             onClick={onClose}
-            className="h-8 w-8 rounded-full hover:bg-gray-100 flex items-center justify-center flex-shrink-0"
+            className="h-8 w-8 rounded-full hover:bg-muted flex items-center justify-center flex-shrink-0"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Preview */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4 bg-gray-50">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 bg-muted">
           <div ref={previewRef}>
             <BusinessCardPage
               slug={datadownload?.business_card_link?.split("/").pop()}
@@ -579,19 +568,20 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         </div>
 
         {errorMsg && (
-          <div className="px-4 sm:px-6 py-2 bg-red-50 text-red-600 text-xs sm:text-sm text-center flex-shrink-0">
+          <div className="px-4 sm:px-6 py-2 bg-destructive/5 text-destructive text-xs sm:text-sm text-center flex-shrink-0">
             {errorMsg}
           </div>
         )}
 
         {/* Footer */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex-shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-border flex-shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 font-medium">Format:</label>
+            <label htmlFor="download-format" className="label-glamlink mb-0">Format</label>
             <select
+              id="download-format"
               value={format}
               onChange={(e) => setFormat(e.target.value as "png" | "jpg")}
-              className="flex-1 sm:flex-initial border border-gray-300 rounded-lg px-2 py-2 sm:py-1 text-sm"
+              className="input-glamlink flex-1 sm:w-auto sm:flex-initial px-3 py-2"
             >
               <option value="png">PNG (High Quality)</option>
               <option value="jpg">JPG (Smaller Size)</option>
@@ -602,7 +592,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             <button
               onClick={onClose}
               disabled={isDownloading}
-              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl border border-gray-300 text-sm whitespace-nowrap disabled:opacity-50"
+              className="btn-outline flex-1 sm:flex-initial whitespace-nowrap disabled:opacity-50"
             >
               Cancel
             </button>
@@ -610,7 +600,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
             <button
               onClick={handleDownload}
               disabled={isDownloading}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold whitespace-nowrap disabled:opacity-70"
+              className="btn-primary flex-1 sm:flex-initial whitespace-nowrap disabled:opacity-70"
             >
               {isDownloading ? (
                 <>

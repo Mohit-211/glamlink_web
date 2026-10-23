@@ -2,6 +2,8 @@
 
 import { getAllStates, getCitiesByState } from "@/api/Api";
 import React, { useEffect, useRef, useState } from "react";
+import { useJsApiLoader } from "@react-google-maps/api";
+import { GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_ID } from "@/lib/googleMapsLoader";
 
 interface Location {
   location_type: "exact_address" | "city_only";
@@ -22,13 +24,8 @@ interface FieldsProps {
   onUpdate: (updates: Partial<Location>) => void;
 }
 
-const inputClass =
-  "w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-200";
 
-const labelClass = "text-sm font-medium text-gray-700 block mb-1.5";
 
-const buttonClass =
-  "min-w-[120px] rounded-lg bg-[#23AEB8] px-5 py-2.5 text-sm font-medium text-white transition";
 
 // Helper: Convert state name/abbreviation to numeric ID
 const findStateId = (stateValue: string | undefined, statesArray: any[]): string | undefined => {
@@ -44,14 +41,42 @@ const findStateId = (stateValue: string | undefined, statesArray: any[]): string
   return found ? String(found.id) : undefined;
 };
 
+// Helper: pull latitude/longitude off a city record if the API already provides them
+const extractCityCoords = (cityObj: any): { latitude: number; longitude: number } | null => {
+  if (!cityObj) return null;
+  const latitude = cityObj.latitude ?? cityObj.lat ?? cityObj.Latitude;
+  const longitude = cityObj.longitude ?? cityObj.lng ?? cityObj.Longitude;
+  if (latitude === undefined || latitude === null || longitude === undefined || longitude === null) return null;
+  const latitudeNum = Number(latitude);
+  const longitudeNum = Number(longitude);
+  if (Number.isNaN(latitudeNum) || Number.isNaN(longitudeNum)) return null;
+  return { latitude: latitudeNum, longitude: longitudeNum };
+};
+
 const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
   const addressInputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
 
   const [states, setStates] = useState<any[]>([]);
   const [cities, setCities] = useState<any[]>([]);
   const [statesLoading, setStatesLoading] = useState(false);
   const [citiesLoading, setCitiesLoading] = useState(false);
+
+  const [cityCoords, setCityCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [cityCoordsLoading, setCityCoordsLoading] = useState(false);
+
+  // Loads the Google Maps JS script (shared singleton across every
+  // useJsApiLoader/useLoadScript call in the app, so this doesn't add a
+  // second <script> tag if AddressLookup/ProfessionalsMap are also mounted).
+  // Without this, window.google never exists here and both the city
+  // geocoder below and the address Autocomplete further down silently do
+  // nothing.
+  const { isLoaded: isGoogleMapsLoaded } = useJsApiLoader({
+    id: GOOGLE_MAPS_LOADER_ID,
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+    libraries: GOOGLE_MAPS_LIBRARIES,
+  });
 
   /* Load States */
   useEffect(() => {
@@ -101,11 +126,74 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
     fetchCities();
   }, [location.state, states]);
 
+  /* Resolve latitude/longitude for the selected city:
+     1) use coords already present on the city record from the API
+     2) otherwise geocode "City, State" with Google Maps Geocoder */
+  useEffect(() => {
+    if (location.location_type !== "city_only" || !location.city || !cities.length) {
+      setCityCoords(null);
+      return;
+    }
+
+    const cityObj = cities.find((c: any) => c?.name === location.city);
+    if (!cityObj) {
+      setCityCoords(null);
+      return;
+    }
+
+    const directCoords = extractCityCoords(cityObj);
+    if (directCoords) {
+      setCityCoords(directCoords);
+      return;
+    }
+
+    // Google's script loads asynchronously — bail for now, but this effect
+    // re-runs once isGoogleMapsLoaded flips true (it's a dependency below),
+    // so the geocode still fires as soon as the script is ready instead of
+    // silently never resolving.
+    if (!isGoogleMapsLoaded || !(window as any).google?.maps?.Geocoder) {
+      setCityCoords(null);
+      return;
+    }
+
+    if (!geocoderRef.current) {
+      geocoderRef.current = new google.maps.Geocoder();
+    }
+
+    const query = [cityObj?.name, location.state].filter(Boolean).join(", ");
+    if (!query) {
+      setCityCoords(null);
+      return;
+    }
+
+    let cancelled = false;
+    setCityCoordsLoading(true);
+
+    geocoderRef.current.geocode({ address: query }, (results, status) => {
+      if (cancelled) return;
+      setCityCoordsLoading(false);
+
+      if (status === "OK" && results?.[0]?.geometry?.location) {
+        const loc = results[0].geometry.location;
+        setCityCoords({ latitude: loc.lat(), longitude: loc.lng() });
+      } else {
+        console.error("City geocode failed:", status);
+        setCityCoords(null);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [location.city, location.state, cities, states, location.location_type, isGoogleMapsLoaded]);
+
   /* Google Places Autocomplete Setup */
   useEffect(() => {
     if (location.location_type !== "exact_address") return;
     if (!addressInputRef.current) return;
-    if (!(window as any).google?.maps?.places) return;
+    // Same async-load issue as the geocoder above — re-runs once
+    // isGoogleMapsLoaded flips true instead of only checking once at mount.
+    if (!isGoogleMapsLoaded || !(window as any).google?.maps?.places) return;
 
     // Destroy existing instance if switching types
     if (autocompleteRef.current) {
@@ -141,13 +229,17 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
         google.maps.event.clearInstanceListeners(autocompleteRef.current);
       }
     };
-  }, [location.location_type, onUpdate]);
+  }, [location.location_type, onUpdate, isGoogleMapsLoaded]);
 
   const canConfirmExact =
     location.location_type === "exact_address" && !!location.address?.trim();
 
   const canSetCity =
-    location.location_type === "city_only" && !!location.city && !!location.state;
+    location.location_type === "city_only" &&
+    !!location.city &&
+    !!location.state &&
+    !!cityCoords &&
+    !cityCoordsLoading;
 
   const handleConfirmExact = () => {
     if (!canConfirmExact) return;
@@ -164,8 +256,12 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
   };
 
   const handleSetCity = () => {
-    if (!canSetCity) return;
-    onUpdate({ isSet: true });
+    if (!canSetCity || !cityCoords) return;
+    onUpdate({
+      isSet: true,
+      latitude: cityCoords.latitude,
+      longitude: cityCoords.longitude,
+    });
   };
 
   const handleTypeChange = (newType: "exact_address" | "city_only") => {
@@ -179,19 +275,21 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       isSet: false,
     });
     setCities([]);
+    setCityCoords(null);
   };
 
   return (
     <div className="space-y-6">
       {/* Location Type */}
       <div>
-        <span className={labelClass}>Location Type</span>
-        <div className="mt-2 flex gap-8">
+        <span className="label-glamlink">Location Type</span>
+        <div className="mt-2 flex flex-wrap gap-4 sm:gap-8">
           <label className="flex cursor-pointer items-center gap-2 text-sm">
             <input
               type="radio"
               checked={location.location_type === "exact_address"}
               onChange={() => handleTypeChange("exact_address")}
+              className="accent-secondary"
             />
             Exact Address
           </label>
@@ -200,6 +298,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
               type="radio"
               checked={location.location_type === "city_only"}
               onChange={() => handleTypeChange("city_only")}
+              className="accent-secondary"
             />
             City / Area Only
           </label>
@@ -208,9 +307,10 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
 
       {/* Display Label */}
       <div>
-        <label className={labelClass}>Display Label</label>
+        <label className="label-glamlink">Display Label</label>
         <input
-          className={inputClass}
+          className="input-glamlink"
+          placeholder="e.g. Downtown Studio"
           value={location.label ?? ""}
           onChange={(e) => onUpdate({ label: e.target.value })}
         />
@@ -222,9 +322,9 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
           <div className="grid gap-5 md:grid-cols-2">
             {/* STATE */}
             <div>
-              <label className={labelClass}>State</label>
+              <label className="label-glamlink">State</label>
               <select
-                className={inputClass}
+                className="input-glamlink"
                 value={String(location.state ?? "")}
                 onChange={(e) => {
                   onUpdate({
@@ -238,7 +338,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                   {statesLoading ? "Loading states..." : "Select state"}
                 </option>
                 {states.map((state: any) => (
-                  <option key={state.id} value={String(state.id)}>
+                  <option key={state.id} value={state.name}>
                     {state.name}
                   </option>
                 ))}
@@ -247,9 +347,9 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
 
             {/* CITY */}
             <div>
-              <label className={labelClass}>City</label>
+              <label className="label-glamlink">City</label>
               <select
-                className={inputClass}
+                className="input-glamlink"
                 value={location?.city ?? ""}
                 onChange={(e) => onUpdate({ city: e.target.value })}
                 disabled={!location.state || citiesLoading}
@@ -262,29 +362,33 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                     : "Select city"}
                 </option>
                 {cities?.map((city: any) => (
-                  <option key={city?.id} value={String(city?.id)}>
+                  <option key={city?.id} value={city?.name}>
                     {city?.name}
                   </option>
                 ))}
               </select>
+              {location.city && cityCoordsLoading && (
+                <p className="mt-1 text-xs text-muted-foreground/80">Resolving coordinates…</p>
+              )}
+              {location.city && !cityCoordsLoading && !cityCoords && (
+                <p className="mt-1 text-xs text-destructive">
+                  Couldn&apos;t resolve coordinates for this city.
+                </p>
+              )}
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               type="button"
-              disabled={!canSetCity || citiesLoading}
-              className={`w-full ${
-                canSetCity && !citiesLoading
-                  ? "bg-[#23AEB8] text-white hover:bg-[#1f9ba3]"
-                  : "cursor-not-allowed bg-gray-300 text-white"
-              } ${buttonClass}`}
+              disabled={!canSetCity}
+              className="btn-primary w-full disabled:opacity-50"
               onClick={handleSetCity}
             >
-              Set Location
+              {citiesLoading || cityCoordsLoading ? "Loading..." : "Set Location"}
             </button>
             {location.isSet && (
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-success/10 text-success">
                 ✓
               </span>
             )}
@@ -295,32 +399,32 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       {/* EXACT ADDRESS */}
       {location.location_type === "exact_address" && (
         <div>
-          <label className={labelClass}>Address</label>
-          <div className="flex items-center gap-3">
-            <input
-              ref={addressInputRef}
-              className={inputClass}
-              value={location.address ?? ""}
-              onChange={(e) => onUpdate({ address: e.target.value })}
-              placeholder="Start typing an address..."
-            />
-            <button
-              type="button"
-              disabled={!canConfirmExact}
-              className={`${buttonClass} ${
-                canConfirmExact
-                  ? "bg-[#23AEB8] hover:bg-[#1F9CA5]"
-                  : "cursor-not-allowed bg-gray-300"
-              }`}
-              onClick={handleConfirmExact}
-            >
-              Confirm
-            </button>
-            {location.isSet && (
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
-                ✓
-              </span>
-            )}
+          <label className="label-glamlink">Address</label>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="min-w-0 flex-1">
+              <input
+                ref={addressInputRef}
+                className="input-glamlink"
+                value={location.address ?? ""}
+                onChange={(e) => onUpdate({ address: e.target.value })}
+                placeholder="Start typing an address..."
+              />
+            </div>
+            <div className="flex flex-shrink-0 items-center gap-3">
+              <button
+                type="button"
+                disabled={!canConfirmExact}
+                className="btn-primary flex-1 sm:flex-none sm:min-w-[120px] disabled:opacity-50"
+                onClick={handleConfirmExact}
+              >
+                Confirm
+              </button>
+              {location.isSet && (
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-success/10 text-success">
+                  ✓
+                </span>
+              )}
+            </div>
           </div>
         </div>
       )}

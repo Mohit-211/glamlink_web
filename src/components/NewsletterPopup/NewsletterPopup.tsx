@@ -2,9 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { X, Loader2, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
+import { subscribeNewsletter } from "@/api/Api";
+import { readApiError } from "@/lib/apiError";
 
 interface NewsletterPopupProps {
   openDelay?: number; // milliseconds
+}
+
+const NEWSLETTER_COOKIE = "newsletter_popup_seen";
+const NEWSLETTER_COOKIE_DAYS = 365;
+
+function getCookie(name: string): string | undefined {
+  return document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${name}=`))
+    ?.split("=")[1];
+}
+
+function setCookie(name: string, value: string, days: number) {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
 }
 
 export default function NewsletterPopup({
@@ -19,16 +37,17 @@ export default function NewsletterPopup({
     email: "",
   });
 
- useEffect(() => {
-  if (sessionStorage.getItem("newsletter_popup_seen")) return;
+  useEffect(() => {
+    if (getCookie(NEWSLETTER_COOKIE)) return;
 
-  const timer = setTimeout(() => {
-    setIsOpen(true);
-    sessionStorage.setItem("newsletter_popup_seen", "true");
-  }, openDelay);
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+      setCookie(NEWSLETTER_COOKIE, "true", NEWSLETTER_COOKIE_DAYS);
+    }, openDelay);
 
-  return () => clearTimeout(timer);
-}, [openDelay]);
+    return () => clearTimeout(timer);
+  }, [openDelay]);
+
   const handleClose = () => {
     setIsOpen(false);
   };
@@ -50,20 +69,17 @@ export default function NewsletterPopup({
     try {
       setLoading(true);
 
-      // Replace with your API
-      /*
       await subscribeNewsletter({
-        first_name: formData.firstName,
-        email: formData.email,
+        first_name: formData.firstName.trim(),
+        email: formData.email.trim(),
+        source: "popup",
       });
-      */
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      localStorage.setItem(
-        "glamlink_newsletter_subscribed",
-        "true"
-      );
+      try {
+        localStorage.setItem("glamlink_newsletter_subscribed", "true");
+      } catch {
+        // Storage blocked (private mode): the cookie still keeps the popup away
+      }
 
       setSubscribed(true);
 
@@ -71,8 +87,7 @@ export default function NewsletterPopup({
         setIsOpen(false);
       }, 3000);
     } catch (error) {
-      console.error(error);
-      alert("Failed to subscribe. Please try again.");
+      toast.error(readApiError(error, "We couldn't subscribe you. Please try again.").message);
     } finally {
       setLoading(false);
     }
@@ -82,7 +97,7 @@ export default function NewsletterPopup({
     <div className="fixed inset-0 z-[999999]">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-md"
+        className="absolute inset-0 scrim"
         onClick={isFormValid && !subscribed ? handleClose : undefined}
       />
 
@@ -90,13 +105,12 @@ export default function NewsletterPopup({
       <div className="absolute inset-0 flex items-center justify-center p-4">
         <div className="relative w-full max-w-lg rounded-3xl bg-card shadow-2xl overflow-hidden border border-border/30">
           {/* Background gradient decoration */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-primary/10 to-transparent rounded-full blur-3xl -z-10" />
 
           <div className="relative p-8 md:p-10">
             {
               <button
                 onClick={handleClose}
-                className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-secondary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Close"
                 title={!isFormValid ? "Please fill in the form first" : "Close"}
               >
@@ -131,7 +145,7 @@ export default function NewsletterPopup({
                     value={formData.firstName}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30"
+                    className="input-glamlink"
                   />
 
                   <input
@@ -141,13 +155,13 @@ export default function NewsletterPopup({
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30"
+                    className="input-glamlink"
                   />
 
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full rounded-lg bg-primary hover:opacity-90 px-4 py-3 font-semibold text-primary-foreground transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-primary/25 hover:shadow-primary/35 active:scale-[0.98]"
+                    className="btn-primary w-full disabled:opacity-60"
                   >
                     {loading ? (
                       <span className="flex items-center justify-center gap-2">
@@ -178,7 +192,7 @@ export default function NewsletterPopup({
                 </h3>
 
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  Thank you for subscribing. You'll be the first to
+                  Thank you for subscribing. You&apos;ll be the first to
                   receive new articles, magazine releases, podcast
                   episodes and industry updates from Glamlink.
                 </p>

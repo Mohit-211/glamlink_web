@@ -1,14 +1,9 @@
 "use client";
+import { SITE_URL } from "@/lib/config";
 import React, { useState } from "react";
 import {QRCode} from "react-qr-code";
-const BASE_URL = "https://glamlink.net/card/";
+const BASE_URL = `${SITE_URL}/card/`;
 
-const THEME_COLORS = [
-  { name: "Teal", from: "#0d9488", to: "#0f766e" },
-  { name: "Rose", from: "#f43f5e", to: "#e11d48" },
-  { name: "Violet", from: "#7c3aed", to: "#6d28d9" },
-  { name: "Sky", from: "#0284c7", to: "#0369a1" },
-];
 
 export default function DigitalCard() {
   const [form, setForm] = useState({
@@ -18,10 +13,9 @@ export default function DigitalCard() {
     phone: "9876543210",
     email: "bhavya@email.com",
     company: "My Company",
-    website: "https://glamlink.net",
+    website: SITE_URL,
   });
 
-  const [theme, setTheme] = useState(THEME_COLORS[0]);
 
   const publicUrl = `${BASE_URL}${form.username}`;
 
@@ -37,12 +31,12 @@ export default function DigitalCard() {
     .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-background">
       
       {/* HEADER */}
-      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur border-b px-6 py-4 flex justify-between items-center">
+      <div className="sticky top-0 z-20 bg-card/80 backdrop-blur border-b px-6 py-4 flex justify-between items-center">
         <h1 className="text-lg font-semibold">Digital Card Builder</h1>
-        <span className="text-xs bg-gray-100 px-3 py-1 rounded-full">
+        <span className="text-xs bg-muted px-3 py-1 rounded-full">
           Live Preview
         </span>
       </div>
@@ -54,7 +48,7 @@ export default function DigitalCard() {
         <div className="space-y-6">
           
           {/* CARD SETTINGS */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border">
+          <div className="bg-card p-6 rounded-2xl shadow-sm border">
             <h2 className="text-lg font-semibold mb-4">Profile Info</h2>
 
             <div className="grid grid-cols-2 gap-4">
@@ -68,12 +62,12 @@ export default function DigitalCard() {
                 { name: "website", label: "Website" },
               ].map((f) => (
                 <div key={f.name} className="col-span-2">
-                  <label className="text-xs text-gray-500">{f.label}</label>
+                  <label className="label-glamlink">{f.label}</label>
                   <input
                     name={f.name}
                     value={(form as any)[f.name]}
                     onChange={handleChange}
-                    className="w-full mt-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-black/10 outline-none transition"
+                    className="input-glamlink"
                   />
                 </div>
               ))}
@@ -88,30 +82,20 @@ export default function DigitalCard() {
         <div className="flex justify-center">
           <div className="sticky top-24 w-full max-w-sm">
 
-            <div className="bg-white rounded-3xl shadow-xl overflow-hidden transition-all hover:shadow-2xl">
+            <div className="bg-card rounded-3xl shadow-xl overflow-hidden transition-all hover:shadow-2xl">
               
               {/* Banner */}
-              <div
-                className="h-32"
-                style={{
-                  background: "#23AEB8",
-                }}
-              />
+              <div className="h-32 bg-primary" />
 
               <div className="p-6 -mt-12">
                 
                 {/* Avatar + QR */}
                 <div className="flex justify-between items-end">
-                  <div
-                    className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg"
-                    style={{
-                      background: "#23AEB8",
-                    }}
-                  >
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary text-primary-foreground text-2xl font-bold shadow-lg">
                     {initials}
                   </div>
 
-                  <div className="bg-white p-2 rounded-xl shadow">
+                  <div className="bg-card p-2 rounded-xl shadow">
                     <QRCode value={publicUrl} size={70} />
                   </div>
                 </div>
@@ -121,7 +105,7 @@ export default function DigitalCard() {
                   {form.name}
                 </h2>
 
-                <p className="text-gray-500 text-sm">
+                <p className="text-muted-foreground text-sm">
                   {form.title} · {form.company}
                 </p>
 
@@ -142,13 +126,13 @@ export default function DigitalCard() {
                 {/* <div className="mt-6 grid grid-cols-2 gap-3">
                   <a
                     href={`tel:${form.phone}`}
-                    className="text-center py-2.5 rounded-xl border hover:bg-gray-50 transition"
+                    className="text-center py-2.5 rounded-xl border hover:bg-muted transition"
                   >
                     Call
                   </a>
                   <a
                     href={`mailto:${form.email}`}
-                    className="text-center py-2.5 rounded-xl border hover:bg-gray-50 transition"
+                    className="text-center py-2.5 rounded-xl border hover:bg-muted transition"
                   >
                     Email
                   </a>

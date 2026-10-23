@@ -1,13 +1,16 @@
+import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import Script from "next/script";
 import MagazineHero from "@/components/magazine/MagazineHero";
 import MagazineIssues from "@/components/magazine/MagazineIssues";
 import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
+import { pageRobots } from "@/lib/indexing";
+import { getMagazineIssues } from "@/lib/magazine";
 /* --------------------------------
    Page Metadata
 -------------------------------- */
 export const metadata: Metadata = {
-  metadataBase: new URL("https://glamlink.net"),
+  metadataBase: new URL(SITE_URL),
 
   title: "Beauty Magazine & Industry Stories | Glamlink",
 
@@ -25,12 +28,12 @@ export const metadata: Metadata = {
   ],
 
   alternates: {
-    canonical: "https://glamlink.net/magazine",
+    canonical: `${SITE_URL}/magazine`,
   },
 
   openGraph: {
     type: "website",
-    url: "https://glamlink.net/magazine", // ✅ FIXED
+    url: `${SITE_URL}/magazine`, // ✅ FIXED
 
     title: "Glamlink Beauty Magazine",
 
@@ -39,7 +42,7 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: "https://glamlink.net/assets/magazine-og.png", // ✅ FIXED
+        url: `${SITE_URL}/assets/magazine-og.png`, // ✅ FIXED
         width: 1200,
         height: 630,
         alt: "Glamlink Magazine - Beauty Trends and Industry Insights",
@@ -47,7 +50,7 @@ export const metadata: Metadata = {
     ],
 
     siteName: "Glamlink",
-    locale: "en_IN",
+    locale: "en_US",
   },
 
   twitter: {
@@ -56,12 +59,12 @@ export const metadata: Metadata = {
     description:
       "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
 
-    images: ["https://glamlink.net/assets/magazine-og.png"], // ✅ FIXED
+    images: [`${SITE_URL}/assets/magazine-og.png`], // ✅ FIXED
   },
-  robots: {
+  robots: pageRobots({
     index: true,
     follow: true,
-  },
+  }),
 };
 /* --------------------------------
    Structured Data
@@ -72,11 +75,11 @@ const magazineSchema = {
   name: "Glamlink Magazine",
   description:
     "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
-  url: "https://glamlink.net/magazine",
+  url: `${SITE_URL}/magazine`,
   publisher: {
     "@type": "Organization",
     name: "Glamlink",
-    url: "https://glamlink.net",
+    url: SITE_URL,
   },
 };
 const collectionSchema = {
@@ -85,12 +88,14 @@ const collectionSchema = {
   name: "Glamlink Magazine Issues",
   description:
     "The Professionals, Treatments and Innovations Shaping Beauty + Wellness",
-  url: "https://glamlink.net/magazine",
+  url: `${SITE_URL}/magazine`,
 };
 /* --------------------------------
    Page
 -------------------------------- */
-export default function Magazine() {
+export default async function Magazine() {
+  const issues = await getMagazineIssues();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Magazine Schema */}
@@ -109,9 +114,9 @@ export default function Magazine() {
           __html: JSON.stringify(collectionSchema),
         }}
       />
-      <main className="pt-16 lg:pt-20">
+      <main>
         <MagazineHero />
-        <MagazineIssues />
+        <MagazineIssues issues={issues} />
       </main>
       <ConditionalGetFeatured />
     </div>
