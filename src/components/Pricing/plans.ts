@@ -80,7 +80,19 @@ export interface PlanDef {
   /** What this plan charges now for each product it includes (cents). */
   proCents: number | null;
   keychainCents: number | null;
+  /** The keychain's list price, when a sale or personal price lowers it (cents). */
+  keychainListCents: number | null;
 }
+
+/**
+ * The keychain on its own is not a plan card: it is offered after Free or
+ * Access Pro is chosen, as the plan that adds it to them.
+ */
+export const ADD_ON_PLAN_IDS: PlanId[] = ["nfc_only"];
+export const WITH_KEYCHAIN: Partial<Record<PlanId, PlanId>> = {
+  free: "nfc_only",
+  subscription_only: "nfc_with_subscription",
+};
 
 /** Cents to "$4.99"; whole amounts keep their cents except zero ("$0"). */
 export const money = (cents: number) => (cents === 0 ? "$0" : `$${(cents / 100).toFixed(2)}`);
@@ -115,6 +127,7 @@ export function toPlanDef(p: ApiPlan): PlanDef {
     monthlyCents: p.monthly,
     proCents: pro?.amount ?? null,
     keychainCents: keychain?.amount ?? null,
+    keychainListCents: keychain && keychain.list > keychain.amount ? keychain.list : null,
   };
 }
 

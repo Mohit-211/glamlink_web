@@ -3,14 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-  Elements,
-  CardNumberElement,
-  CardExpiryElement,
-  CardCvcElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
+import type { Appearance } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import {
   ArrowRight,
   Loader2,
@@ -40,24 +34,29 @@ import { loginHref } from "@/lib/auth";
 import { clearCardToken } from "@/lib/cardToken";
 import { useSession } from "@/lib/useSession";
 import { getStripe } from "@/lib/stripe";
+import KeychainOffer from "./KeychainOffer";
 import { PlanCard } from "./PlanCard";
-import { money, usePlans, type PlanId } from "./plans";
+import { ADD_ON_PLAN_IDS, money, usePlans, WITH_KEYCHAIN, type PlanDef, type PlanId } from "./plans";
 
-// Card fields render inside Stripe's iframe, which cannot see the site's fonts,
-// so Manrope is loaded into it here and named in the field style.
-const ELEMENTS_OPTIONS = {
-  fonts: [{ cssSrc: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&display=swap" }],
-};
+// Stripe's Payment Element renders inside its own iframe, which cannot see the
+// site's CSS: Manrope is loaded into it and the design tokens are passed here.
+const ELEMENTS_FONTS = [{ cssSrc: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap" }];
 
-const ELEMENT_STYLE = {
-  style: {
-    base: {
-      fontFamily: "Manrope, system-ui, -apple-system, sans-serif",
-      fontSize: "14px",
-      color: TOKENS.foreground,
-      "::placeholder": { color: TOKENS.mutedForeground },
-    },
-    invalid: { color: TOKENS.destructive },
+const APPEARANCE: Appearance = {
+  theme: "stripe",
+  variables: {
+    colorPrimary: TOKENS.primary,
+    colorBackground: TOKENS.card,
+    colorText: TOKENS.foreground,
+    colorTextSecondary: TOKENS.mutedForeground,
+    colorDanger: TOKENS.destructive,
+    fontFamily: "Manrope, system-ui, -apple-system, sans-serif",
+    borderRadius: "12px",
+  },
+  rules: {
+    ".Input": { borderColor: TOKENS.input, boxShadow: "none" },
+    ".Input:focus": { borderColor: TOKENS.primary, boxShadow: `0 0 0 3px ${TOKENS.primary}26` },
+    ".Label": { fontWeight: "500" },
   },
 };
 
@@ -67,6 +66,12 @@ interface PricingStepProps {
   claim?: boolean;
   /** Preselects a plan (e.g. "nfc_only" from the dashboard's "Add keychain"). */
   initialPlan?: string | null;
+  /**
+   * Back from a payment method that leaves the site (a bank or wallet page):
+   * the checkout id from the return URL, and Stripe's `redirect_status`.
+   */
+  returnCheckout?: string | null;
+  redirectStatus?: string | null;
 }
 
 interface AddressFormState {
@@ -106,22 +111,36 @@ type Step = "plan" | "address" | "review" | "payment";
 
 const PLAN_IDS: PlanId[] = ["free", "nfc_only", "subscription_only", "nfc_with_subscription"];
 
-export default function PricingStep({ businessCardId, claim = false, initialPlan }: PricingStepProps) {
+export default function PricingStep({
+  businessCardId,
+  claim = false,
+  initialPlan,
+  returnCheckout,
+  redirectStatus,
+}: PricingStepProps) {
   const router = useRouter();
   const session = useSession();
   const signedIn = session.status === "signed-in";
   const { plans, sale, owned, loading: plansLoading, error: plansError, reload } = usePlans(businessCardId);
 
+  const requestedPlan = PLAN_IDS.includes(initialPlan as PlanId) ? (initialPlan as PlanId) : null;
+  // The plan card picked. The keychain alone is not a card: it is offered after Free or Pro.
   const [selected, setSelected] = useState<PlanId>(
-    PLAN_IDS.includes(initialPlan as PlanId) ? (initialPlan as PlanId) : "nfc_with_subscription"
+    requestedPlan && !ADD_ON_PLAN_IDS.includes(requestedPlan) ? requestedPlan : "nfc_with_subscription"
   );
+  // What is being bought: the card picked, or that card with the keychain added.
+  const [checkoutId, setCheckoutId] = useState<PlanId | null>(null);
+  // The card whose keychain offer is open, and the card the keychain was added to.
+  const [offerFor, setOfferFor] = useState<PlanId | null>(null);
+  const [keychainFrom, setKeychainFrom] = useState<PlanId | null>(null);
   const [step, setStep] = useState<Step>("plan");
   const [submitting, setSubmitting] = useState(false);
   const [claiming, setClaiming] = useState(claim);
   const [claimConflict, setClaimConflict] = useState(false);
   // "expired": the 24-hour card token is gone; the guest must start again or sign in.
   const [fatal, setFatal] = useState<"expired" | null>(null);
-  const [done, setDone] = useState<"free" | "paid" | null>(null);
+  // "processing": a bank payment that confirms later; Stripe's webhook tells the API.
+  const [done, setDone] = useState<"free" | "paid" | "processing" | null>(null);
 
   const [address, setAddress] = useState<AddressFormState>(EMPTY_ADDRESS);
   const [states, setStates] = useState<{ id: number; name: string }[]>([]);
@@ -130,10 +149,14 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
   const [addressId, setAddressId] = useState<number | null>(null);
   const [correctedTo, setCorrectedTo] = useState<string | null>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
-  const plan = plans.find((p) => p.id === selected) ?? plans[0];
+  const cardPlans = plans.filter((p) => !ADD_ON_PLAN_IDS.includes(p.id));
+  const plan = cardPlans.find((p) => p.id === selected) ?? cardPlans[0];
+  const checkoutPlan = plans.find((p) => p.id === checkoutId) ?? plan;
   // A claim must run once, even when an effect runs twice (development).
   const claimStarted = useRef(false);
+  const keychainStarted = useRef(false);
   const stripePromise = useMemo(() => getStripe(), []);
 
   // The guest signed in because their email already had an account: move the
@@ -149,6 +172,21 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
     runClaim(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [claiming, businessCardId, session.status]);
+
+  // Back from a redirect: wait for the API to see the payment (its webhook), then confirm.
+  const returnState = returnCheckout && redirectStatus ? (redirectStatus === "failed" ? "failed" : "confirming") : null;
+  useEffect(() => {
+    if (returnState !== "confirming" || !returnCheckout || !businessCardId) return;
+    let active = true;
+    waitUntilPaid(returnCheckout, businessCardId).then((paid) => {
+      if (!active) return;
+      if (paid) clearCardToken(businessCardId);
+      setDone(paid ? "paid" : "processing");
+    });
+    return () => {
+      active = false;
+    };
+  }, [returnState, returnCheckout, businessCardId]);
 
   async function runClaim(replace: boolean) {
     if (!businessCardId) return;
@@ -172,6 +210,21 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
   const isOwned = (id: PlanId) =>
     (owned.subscription && (id === "subscription_only" || id === "nfc_with_subscription")) ||
     (owned.keychain && (id === "nfc_only" || id === "nfc_with_subscription"));
+
+  /** The plan that adds the keychain to card `id`, while it can still be offered. */
+  const keychainUpgrade = (id: PlanId | null): PlanDef | null => {
+    const target = id ? WITH_KEYCHAIN[id] : undefined;
+    if (!target || owned.keychain || isOwned(target)) return null;
+    return plans.find((p) => p.id === target) ?? null;
+  };
+
+  // The dashboard's "Include NFC" asks for the keychain alone: start on its delivery address.
+  useEffect(() => {
+    if (requestedPlan !== "nfc_only" || keychainStarted.current || claiming || plansLoading || !plans.length) return;
+    keychainStarted.current = true;
+    if (!owned.keychain) void Promise.resolve().then(() => startPlan("nfc_only"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestedPlan, claiming, plansLoading, plans.length, owned.keychain]);
 
   async function loadStates() {
     if (states.length) return;
@@ -222,11 +275,11 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
     return false;
   }
 
-  async function requestQuote(rateId?: string) {
-    if (!businessCardId || !plan) return;
+  async function requestQuote(target: PlanDef, rateId?: string) {
+    if (!businessCardId) return;
     setSubmitting(true);
     try {
-      const res = await quoteCheckout({ business_card_id: businessCardId, plan_type: plan.planType, rate_id: rateId });
+      const res = await quoteCheckout({ business_card_id: businessCardId, plan_type: target.planType, rate_id: rateId });
       setQuote((res?.data ?? res) as Quote);
       setStep("review");
     } catch (error) {
@@ -244,33 +297,45 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
     }
   }
 
-  // Step 1: the plan. The server decides whether payment and shipping are needed.
-  async function handlePrimaryContinue() {
-    if (!businessCardId || !plan) {
+  // Step 1: the plan card. Free and Access Pro first offer the keychain.
+  function handlePrimaryContinue() {
+    if (!plan) return;
+    if (keychainUpgrade(plan.id)) setOfferFor(plan.id);
+    else startPlan(plan.id);
+  }
+
+  // The server decides whether payment and shipping are needed. `addedTo` is
+  // the card the keychain offer added the keychain to, so it can be dropped again.
+  async function startPlan(id: PlanId, addedTo: PlanId | null = null) {
+    const target = plans.find((p) => p.id === id);
+    if (!businessCardId || !target) {
       toast.error("Missing business card reference. Please create your card again.");
       return;
     }
+    setCheckoutId(id);
+    setKeychainFrom(addedTo);
     setSubmitting(true);
     try {
-      const res = await SelectPlanAPI({ business_card_id: businessCardId, plan_type: plan.planType });
+      const res = await SelectPlanAPI({ business_card_id: businessCardId, plan_type: target.planType });
       const data = res?.data ?? res;
-      const planType = String(data?.plan_type ?? plan.planType).trim();
+      const planType = String(data?.plan_type ?? target.planType).trim();
       if (!data?.payment_required || planType === "free") {
         clearCardToken(businessCardId);
         setDone("free");
         return;
       }
-      if (plan.hasKeychain) {
+      if (target.hasKeychain) {
         await loadStates();
         setStep("address");
         return;
       }
       setSubmitting(false);
-      await requestQuote();
+      await requestQuote(target);
     } catch (error) {
       handlePurchaseError(error);
     } finally {
       setSubmitting(false);
+      setOfferFor(null);
     }
   }
 
@@ -313,7 +378,38 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
       return;
     }
     setSubmitting(false);
-    await requestQuote();
+    await requestQuote(checkoutPlan);
+  }
+
+  // Step 3: the API starts the subscription or the keychain payment and returns
+  // its client secret, which the Payment Element is created with.
+  async function handleStartPayment() {
+    if (!quote || !businessCardId) return;
+    setSubmitting(true);
+    try {
+      const res = await payCheckout(quote.checkout_id, businessCardId);
+      const secret = res?.data?.client_secret;
+      if (!secret) {
+        toast.error("Payment could not be started. Please try again.");
+        return;
+      }
+      setClientSecret(secret);
+      setStep("payment");
+    } catch (error) {
+      const { code } = readApiError(error);
+      if (code === "ALREADY_PAID") {
+        clearCardToken(businessCardId);
+        setDone("paid");
+      } else if (code === "CHECKOUT_EXPIRED") {
+        toast.error("Prices were refreshed. Please review your order again.");
+        setSubmitting(false);
+        await requestQuote(checkoutPlan, quote.shipping?.selected?.rate_id);
+      } else {
+        handlePurchaseError(error);
+      }
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const ownerEmailNote = signedIn
@@ -339,6 +435,32 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
             Sign in
           </button>
         </div>
+      </Centered>
+    );
+  }
+
+  if (returnState === "failed" && !done) {
+    return (
+      <Centered>
+        <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
+        <h1 className="mt-4 text-xl">Your payment didn&apos;t go through</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Nothing was charged. Try again, or choose another way to pay.</p>
+        <button
+          type="button"
+          onClick={() => router.replace(`/pricing?businessCardId=${businessCardId}`)}
+          className="btn-primary mt-6 w-full"
+        >
+          Try again
+        </button>
+      </Centered>
+    );
+  }
+
+  if (returnState === "confirming" && !done) {
+    return (
+      <Centered>
+        <Loader2 className="mx-auto h-7 w-7 animate-spin text-primary" />
+        <p className="mt-4 text-sm text-muted-foreground">Confirming your payment...</p>
       </Centered>
     );
   }
@@ -370,10 +492,14 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
           {ownerEmailNote ? <MailCheck className="h-7 w-7 text-primary" /> : <CheckCircle className="h-7 w-7 text-primary" />}
         </div>
         <h2 className="mt-4 text-xl text-foreground">
-          {done === "paid" ? "Payment successful!" : "Welcome to Glamlink!"}
+          {done === "paid" ? "Payment successful!" : done === "processing" ? "Payment processing" : "Welcome to Glamlink!"}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          {done === "paid" ? "Your order is confirmed and your card is live." : "Your card is live on the Free plan."}
+          {done === "paid"
+            ? "Your order is confirmed and your card is live."
+            : done === "processing"
+              ? "Your bank is confirming the payment. We'll email you as soon as it's through."
+              : "Your card is live on the Free plan."}
           {ownerEmailNote && <> {ownerEmailNote}</>}
         </p>
         {signedIn && (
@@ -413,7 +539,7 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
         <div className="mx-auto m-10 w-full">
           {step === "plan" && (
             <>
-              <div className="mb-10">
+              <div className="mx-auto mb-10 max-w-5xl">
                 <h1 className="mt-1 text-[26px] leading-tight text-foreground sm:text-[30px]">Choose your plan</h1>
                 <p className="section-subtitle mt-2 max-w-md text-[15px] leading-6">
                   Choose the plan that best fits your business. You can upgrade anytime.
@@ -426,8 +552,8 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
                 )}
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                {plans.map((p) => (
+              <div className="mx-auto grid max-w-5xl gap-5 md:grid-cols-3">
+                {cardPlans.map((p) => (
                   <PlanCard
                     key={p.id}
                     plan={p}
@@ -466,6 +592,15 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
                   )}
                 </button>
               </div>
+
+              <KeychainOffer
+                plan={cardPlans.find((p) => p.id === offerFor) ?? null}
+                withKeychain={keychainUpgrade(offerFor)}
+                busy={submitting}
+                onAdd={() => offerFor && startPlan(WITH_KEYCHAIN[offerFor] as PlanId, offerFor)}
+                onSkip={() => offerFor && startPlan(offerFor)}
+                onClose={() => setOfferFor(null)}
+              />
             </>
           )}
 
@@ -576,12 +711,22 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
                   </>
                 )}
               </button>
+              {keychainFrom && (
+                <button
+                  type="button"
+                  onClick={() => startPlan(keychainFrom)}
+                  disabled={submitting}
+                  className="mt-3 w-full rounded-full py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
+                >
+                  Continue without the keychain
+                </button>
+              )}
             </div>
           )}
 
           {step === "review" && quote && (
             <div className="mx-auto max-w-md">
-              <BackButton onClick={() => setStep(plan.hasKeychain ? "address" : "plan")} disabled={submitting}>
+              <BackButton onClick={() => setStep(checkoutPlan.hasKeychain ? "address" : "plan")} disabled={submitting}>
                 Back
               </BackButton>
               <StepHeading icon={<Truck className="h-4.5 w-4.5 text-primary" />} title="Your order">
@@ -603,7 +748,7 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
                         type="radio"
                         name="rate"
                         checked={quote.shipping?.selected?.rate_id === o.rate_id}
-                        onChange={() => requestQuote(o.rate_id)}
+                        onChange={() => requestQuote(checkoutPlan, o.rate_id)}
                         disabled={submitting}
                         className="accent-secondary"
                       />
@@ -649,30 +794,40 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
 
               <button
                 type="button"
-                onClick={() => setStep("payment")}
+                onClick={handleStartPayment}
                 disabled={submitting}
                 className="btn-primary mt-6 w-full py-3 disabled:opacity-50"
               >
-                Continue to payment
-                <ArrowRight className="h-4 w-4" />
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Starting payment...
+                  </>
+                ) : (
+                  <>
+                    Continue to payment
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
               </button>
             </div>
           )}
 
-          {step === "payment" && quote && businessCardId && (
-            <Elements stripe={stripePromise} options={ELEMENTS_OPTIONS}>
+          {step === "payment" && quote && businessCardId && clientSecret && (
+            // A new client secret needs a new Elements: Stripe fixes it at creation.
+            <Elements
+              key={clientSecret}
+              stripe={stripePromise}
+              options={{ clientSecret, appearance: APPEARANCE, fonts: ELEMENTS_FONTS }}
+            >
               <PaymentStep
                 businessCardId={businessCardId}
                 quote={quote}
-                planLabel={plan.name}
+                planLabel={checkoutPlan.name}
                 onBack={() => setStep("review")}
-                onPaid={() => {
-                  clearCardToken(businessCardId);
-                  setDone("paid");
-                }}
-                onExpired={() => {
-                  setStep("review");
-                  requestQuote(quote.shipping?.selected?.rate_id);
+                onDone={(result) => {
+                  if (result === "paid") clearCardToken(businessCardId);
+                  setDone(result);
                 }}
               />
             </Elements>
@@ -687,62 +842,68 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/** Stripe tells the API through its webhook: waits up to 18 seconds for the checkout to be paid. */
+async function waitUntilPaid(checkoutId: number | string, businessCardId: string | number): Promise<boolean> {
+  for (let i = 0; i < 12; i++) {
+    const check = await getCheckout(checkoutId, businessCardId).catch(() => null);
+    if ((check?.data ?? check)?.status === "paid") return true;
+    await wait(1500);
+  }
+  return false;
+}
+
+/** Where a payment method that leaves the site (a bank or wallet page) sends the person back. */
+const paymentReturnUrl = (businessCardId: string | number, checkoutId: number) =>
+  `${window.location.origin}/pricing?businessCardId=${encodeURIComponent(String(businessCardId))}&checkout=${checkoutId}`;
+
 function PaymentStep({
   businessCardId,
   quote,
   planLabel,
   onBack,
-  onPaid,
-  onExpired,
+  onDone,
 }: {
   businessCardId: string | number;
   quote: Quote;
   planLabel: string;
   onBack: () => void;
-  onPaid: () => void;
-  onExpired: () => void;
+  onDone: (result: "paid" | "processing") => void;
 }) {
   const stripe = useStripe();
   const elements = useElements();
   const [status, setStatus] = useState<"idle" | "paying" | "confirming">("idle");
   const [errorMsg, setErrorMsg] = useState("");
-  const [cardName, setCardName] = useState("");
+  const [ready, setReady] = useState(false);
 
-  async function handlePay() {
+  async function handlePay(event: React.FormEvent) {
+    event.preventDefault();
     if (!stripe || !elements) return;
     setStatus("paying");
     setErrorMsg("");
-    try {
-      const cardNumber = elements.getElement(CardNumberElement);
-      if (!cardNumber) throw new Error("Card element not found");
-
-      const res = await payCheckout(quote.checkout_id, businessCardId);
-      const clientSecret = res?.data?.client_secret;
-      if (!clientSecret) throw new Error("Payment could not be started. Please try again.");
-
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: { card: cardNumber, billing_details: { name: cardName } },
-      });
-      if (result.error) throw new Error(result.error.message);
-
-      // Stripe tells the API through its webhook; wait for the checkout to be paid.
-      setStatus("confirming");
-      for (let i = 0; i < 12; i++) {
-        const check = await getCheckout(quote.checkout_id, businessCardId).catch(() => null);
-        if ((check?.data ?? check)?.status === "paid") break;
-        await wait(1500);
-      }
-      onPaid();
-    } catch (error) {
-      const { code, message } = readApiError(error);
-      if (code === "CHECKOUT_EXPIRED") {
-        toast.error("Prices were refreshed. Please review your order again.");
-        onExpired();
-        return;
-      }
-      setErrorMsg(message);
+    // Cards and wallets confirm here; bank and wallet pages that need a
+    // redirect come back to the return URL.
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      confirmParams: { return_url: paymentReturnUrl(businessCardId, quote.checkout_id) },
+      redirect: "if_required",
+    });
+    if (error) {
+      // Card and validation messages are written for the customer; others are not.
+      setErrorMsg(
+        (error.type === "card_error" || error.type === "validation_error") && error.message
+          ? error.message
+          : "Your payment could not be completed. Please try again."
+      );
       setStatus("idle");
+      return;
     }
+    if (paymentIntent?.status === "processing") {
+      onDone("processing");
+      return;
+    }
+    setStatus("confirming");
+    await waitUntilPaid(quote.checkout_id, businessCardId);
+    onDone("paid");
   }
 
   const busy = status !== "idle";
@@ -756,70 +917,45 @@ function PaymentStep({
         Complete your {planLabel} purchase.
       </StepHeading>
 
-      <div className="card-glamlink space-y-4">
-        <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-accent/40 px-4 py-3">
-          <span className="text-sm font-semibold text-foreground">Total due today</span>
-          <span className="text-sm font-semibold text-secondary">{money(quote.total_cents)}</span>
-        </div>
+      <form onSubmit={handlePay}>
+        <div className="card-glamlink space-y-4">
+          <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-accent/40 px-4 py-3">
+            <span className="text-sm font-semibold text-foreground">Total due today</span>
+            <span className="text-sm font-semibold text-secondary">{money(quote.total_cents)}</span>
+          </div>
 
-        {errorMsg && <ErrorNote>{errorMsg}</ErrorNote>}
+          {errorMsg && <ErrorNote>{errorMsg}</ErrorNote>}
 
-        <label className="block">
-          <span className="label-glamlink">Name on card</span>
-          <input
-            value={cardName}
-            onChange={(e) => setCardName(e.target.value)}
-            placeholder="Name on card"
-            autoComplete="cc-name"
-            className="input-glamlink"
+          <PaymentElement
+            options={{ layout: "tabs" }}
+            onReady={() => setReady(true)}
+            onLoadError={() => setErrorMsg("The payment form could not load. Go back and try again.")}
           />
-        </label>
-        <div>
-          <span className="label-glamlink">Card number</span>
-          <div className="flex items-center gap-2 rounded-xl border border-input bg-card px-4 py-3 transition focus-within:border-primary focus-within:ring-3 focus-within:ring-primary/15">
-            <div className="flex-1">
-              <CardNumberElement options={{ ...ELEMENT_STYLE, placeholder: "Card number" }} />
-            </div>
-            <CreditCard className="h-4 w-4 shrink-0 text-muted-foreground" />
-          </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <span className="label-glamlink">Expiry</span>
-            <div className="rounded-xl border border-input bg-card px-4 py-3 transition focus-within:border-primary focus-within:ring-3 focus-within:ring-primary/15">
-              <CardExpiryElement options={ELEMENT_STYLE} />
-            </div>
-          </div>
-          <div>
-            <span className="label-glamlink">CVC</span>
-            <div className="flex items-center gap-2 rounded-xl border border-input bg-card px-4 py-3 transition focus-within:border-primary focus-within:ring-3 focus-within:ring-primary/15">
-              <div className="flex-1">
-                <CardCvcElement options={ELEMENT_STYLE} />
-              </div>
-              <Lock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <button
-        type="button"
-        onClick={handlePay}
-        disabled={busy || !stripe}
-        className="btn-primary mt-6 w-full py-3 disabled:opacity-50"
-      >
-        {busy ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            {status === "confirming" ? "Confirming payment..." : "Processing..."}
-          </>
-        ) : (
-          <>
-            <Lock className="h-3.5 w-3.5" />
-            Pay {money(quote.total_cents)}
-          </>
-        )}
-      </button>
+        <button
+          type="submit"
+          disabled={busy || !stripe || !ready}
+          className="btn-primary mt-6 w-full py-3 disabled:opacity-50"
+        >
+          {busy ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              {status === "confirming" ? "Confirming payment..." : "Processing..."}
+            </>
+          ) : (
+            <>
+              <Lock className="h-3.5 w-3.5" />
+              Pay {money(quote.total_cents)}
+            </>
+          )}
+        </button>
+        {quote.monthly_cents ? (
+          <p className="mt-3 text-center text-[11px] text-muted-foreground">
+            Then {money(quote.monthly_cents)} / month until you cancel.
+          </p>
+        ) : null}
+      </form>
     </div>
   );
 }
