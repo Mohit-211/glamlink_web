@@ -435,10 +435,139 @@ export const partnershipInquiry = async (payload: {
   return data;
 };
 /* ============================= */
+/* 📌 Newsletter and feature requests */
+/* ============================= */
+// `source` names the form: "popup", "footer", "podcast" (the podcast's Notify me).
+export const subscribeNewsletter = async (payload: {
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  source: string;
+}) => {
+  const { data } = await api.post("newsletter/subscribe", payload);
+  return data;
+};
+// "Apply for Feature": every field is required, as on the form.
+export const submitFeatureRequest = async (payload: {
+  name: string;
+  specialty: string;
+  email: string;
+  phone: string;
+  city: string;
+  interest: string;
+}) => {
+  const { data } = await api.post("feature-request", payload);
+  return data;
+};
+/* ============================= */
 /* 📌 Ads */
 /* ============================= */
+// Only the ads to show now: active and inside their dates.
 export const getAds = async () => {
-  const { data } = await api.get("ads");
+  const { data } = await api.get("ads", { params: { live: true } });
+  return data;
+};
+export const trackAdEvent = async (payload: { ad_id: number; type: "impression" | "click" }) => {
+  const { data } = await api.post("ads/track", payload);
+  return data;
+};
+/* ============================= */
+/* 📌 Professional and brand pages */
+/* ============================= */
+export const getProfilesApi = async (params: {
+  type?: "individual" | "brand";
+  featured?: boolean;
+  search?: string;
+  page?: number;
+  limit?: number;
+}) => {
+  const { data } = await api.get("profiles", { params });
+  return data;
+};
+export const trackProfileEventApi = async (
+  slug: string,
+  payload: {
+    event_type: string;
+    event_target?: string | null;
+    visitor_id?: string;
+    session_id?: string;
+  }
+) => {
+  const { data } = await api.post(`profiles/${encodeURIComponent(slug)}/events`, payload);
+  return data;
+};
+/* ============================= */
+/* 📌 The owner's page and products (dashboard) */
+/* ============================= */
+// { user_id, slug, page, visible, hidden_because, public }
+export const getMyProfile = async () => {
+  const { data } = await api.get("my/profile", { requireAuth: true });
+  return data;
+};
+// A form: tagline, about, website, social (JSON), profile_image and images (the cover) as files
+export const updateMyProfile = async (formData: FormData) => {
+  const { data } = await api.put("my/profile", formData, { requireAuth: true });
+  return data;
+};
+export const getMyProfileAnalytics = async (params?: { from?: string; to?: string }) => {
+  const { data } = await api.get("my/profile/analytics", { params, requireAuth: true });
+  return data;
+};
+export const getMyProducts = async (params?: { page?: number; limit?: number }) => {
+  const { data } = await api.get("my/products", { params, requireAuth: true });
+  return data;
+};
+// A form: title, short_description, description, category, brand, price, link, status; the cover as `images`
+export const createMyProduct = async (formData: FormData) => {
+  const { data } = await api.post("my/products", formData, { requireAuth: true });
+  return data;
+};
+export const updateMyProduct = async (id: number | string, formData: FormData) => {
+  const { data } = await api.put(`my/products/${id}`, formData, { requireAuth: true });
+  return data;
+};
+export const deleteMyProduct = async (id: number | string) => {
+  const { data } = await api.delete(`my/products/${id}`, { requireAuth: true });
+  return data;
+};
+/* ============================= */
+/* 📌 Directory */
+/* ============================= */
+// Live Access cards and approved applications, nearest first when a place is given.
+export const searchDirectory = async (params: {
+  lat?: number;
+  lng?: number;
+  location?: string;
+  q?: string;
+  specialty?: string;
+  page?: number;
+  limit?: number;
+}) => {
+  const { data } = await api.get("directory/search", { params });
+  return data;
+};
+// Google's listings near a place; the photos come through the API, so no key reaches the browser.
+export const getGoogleListings = async (params: {
+  lat?: number;
+  lng?: number;
+  location?: string;
+  type?: string;
+  q?: string;
+}) => {
+  const { data } = await api.get("directory/google", { params });
+  return data;
+};
+export const findGoogleBusiness = async (q: string) => {
+  const { data } = await api.get("directory/google/search", { params: { q } });
+  return data;
+};
+export const getGooglePlaceForm = async (placeId: string) => {
+  const { data } = await api.get(`directory/google/places/${encodeURIComponent(placeId)}`);
+  return data;
+};
+// The directory form: kept as sent for admins to review (photos as profile_image and images).
+export const submitDirectoryApplication = async (formData: FormData) => {
+  const { data } = await api.post("directory/applications", formData);
   return data;
 };
 /* ============================= */
