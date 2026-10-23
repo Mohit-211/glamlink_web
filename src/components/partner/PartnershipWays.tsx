@@ -6,7 +6,7 @@ export default function PartnershipWays() {
     <section aria-labelledby="ways-to-partner" className="section-glamlink">
       <div className="container-glamlink">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">
+          <p className="eyebrow">
             Ways to Partner
           </p>
           <h2 id="ways-to-partner" className="section-title mt-4">

@@ -130,14 +130,14 @@ export default function AccessCardAnalytics({ cards }: { cards: CardOption[] }) 
           )}
           {cardLink && (
             <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
-              <span className="min-w-0 max-w-full truncate rounded-md bg-secondary px-2 py-1 tabular-nums text-[11px] text-muted-foreground">
+              <span className="min-w-0 max-w-full truncate rounded-md bg-muted px-2 py-1 tabular-nums text-[11px] text-muted-foreground">
                 {prettyUrl(cardLink)}
               </span>
               <a
                 href={cardLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-[11px] font-semibold text-primary-foreground hover:opacity-90"
+                className="btn-primary shrink-0 gap-1.5 px-3 py-1.5 text-[11px]"
               >
                 <ExternalLink className="h-3 w-3" />
                 View Access Card

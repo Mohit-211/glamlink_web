@@ -4,12 +4,6 @@ import React, { useState } from "react";
 import {QRCode} from "react-qr-code";
 const BASE_URL = `${SITE_URL}/card/`;
 
-const THEME_COLORS = [
-  { name: "Teal", from: "#0d9488", to: "#0f766e" },
-  { name: "Rose", from: "#f43f5e", to: "#e11d48" },
-  { name: "Violet", from: "#7c3aed", to: "#6d28d9" },
-  { name: "Sky", from: "#0284c7", to: "#0369a1" },
-];
 
 export default function DigitalCard() {
   const [form, setForm] = useState({
@@ -22,7 +16,6 @@ export default function DigitalCard() {
     website: SITE_URL,
   });
 
-  const [theme, setTheme] = useState(THEME_COLORS[0]);
 
   const publicUrl = `${BASE_URL}${form.username}`;
 
@@ -69,12 +62,12 @@ export default function DigitalCard() {
                 { name: "website", label: "Website" },
               ].map((f) => (
                 <div key={f.name} className="col-span-2">
-                  <label className="text-xs text-muted-foreground">{f.label}</label>
+                  <label className="label-glamlink">{f.label}</label>
                   <input
                     name={f.name}
                     value={(form as any)[f.name]}
                     onChange={handleChange}
-                    className="w-full mt-1 border border-border rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-black/10 outline-none transition"
+                    className="input-glamlink"
                   />
                 </div>
               ))}
@@ -92,23 +85,13 @@ export default function DigitalCard() {
             <div className="bg-card rounded-3xl shadow-xl overflow-hidden transition-all hover:shadow-2xl">
               
               {/* Banner */}
-              <div
-                className="h-32"
-                style={{
-                  background: "#24bbcb",
-                }}
-              />
+              <div className="h-32 bg-primary" />
 
               <div className="p-6 -mt-12">
                 
                 {/* Avatar + QR */}
                 <div className="flex justify-between items-end">
-                  <div
-                    className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg"
-                    style={{
-                      background: "#24bbcb",
-                    }}
-                  >
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary text-primary-foreground text-2xl font-bold shadow-lg">
                     {initials}
                   </div>
 

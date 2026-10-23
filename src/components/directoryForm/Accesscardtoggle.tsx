@@ -27,7 +27,7 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
     {/* icon */}
     <div className="
       w-[50px] h-[50px] bg-primary rounded-[13px]
-      flex items-center justify-center text-2xl shrink-0
+      flex items-center justify-center text-2xl shrink-0 text-primary-foreground
       shadow-primary
     ">
       ✦
@@ -37,7 +37,7 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
       <h3 className="text-[17px] font-semibold text-foreground mb-1.5">
         Your Access Digital Business Card{' '}
         {/* <span className="
-          inline-block bg-primary text-white
+          inline-block bg-primary text-primary-foreground
           text-[10px] font-semibold tracking-widest uppercase
           px-2.5 py-0.5 rounded-full align-middle ml-1
         ">
@@ -58,7 +58,7 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
             key={perk}
             className="
               text-[11px] font-semibold bg-primary/10
-              text-primary border border-primary/25
+              text-secondary border border-primary/25
               rounded-full px-3 py-1
             "
           >
@@ -75,7 +75,7 @@ export const AccessCardToggle: React.FC<AccessCardToggleProps> = ({
         <div
           className={`
             w-12 h-[26px] rounded-full relative transition-colors duration-250 shrink-0
-            ${enabled ? 'bg-primary' : 'bg-accent'}
+            ${enabled ? 'bg-secondary' : 'bg-accent'}
           `}
         >
           <div

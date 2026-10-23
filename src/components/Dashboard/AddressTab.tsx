@@ -67,9 +67,6 @@ interface CityItem {
   id: number;
   name: string;
 }
-const INPUT =
-  'w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50';
-const LABEL = 'mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-muted-foreground';
 /* ══════════════════════════════════════════════
    ADD ADDRESS MODAL
 ══════════════════════════════════════════════ */
@@ -154,7 +151,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
   return (
     <div
       onClick={handleBackdrop}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/30 p-0 backdrop-blur-sm sm:p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center scrim p-0 sm:p-4"
     >
       <div className="w-full overflow-hidden rounded-t-3xl border border-border bg-card duration-200 animate-in slide-in-from-bottom-4 sm:max-w-md sm:rounded-3xl sm:slide-in-from-bottom-0">
         {/* Modal header */}
@@ -170,7 +167,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-secondary"
+            className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted"
           >
             <X className="h-4 w-4" />
           </button>
@@ -185,7 +182,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           )}
           {/* Address Line 1 */}
           <div>
-            <label className={LABEL}>
+            <label className="label-glamlink">
               Address Line 1 <span className="text-destructive">*</span>
             </label>
             <input
@@ -193,23 +190,23 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
               onChange={set('address_line_1')}
               placeholder="e.g. 3730 S Las Vegas Blvd"
               disabled={saving}
-              className={INPUT}
+              className="input-glamlink"
             />
           </div>
           <div>
-            <label className={LABEL}>Apartment, suite (optional)</label>
+            <label className="label-glamlink">Apartment, suite (optional)</label>
             <input
               value={form.address_line_2}
               onChange={set('address_line_2')}
               placeholder="e.g. Suite 5"
               disabled={saving}
-              className={INPUT}
+              className="input-glamlink"
             />
           </div>
           {/* State / City — side by side */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={LABEL}>
+              <label className="label-glamlink">
                 State <span className="text-destructive">*</span>
               </label>
               <select
@@ -222,7 +219,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
                   }))
                 }
                 disabled={saving}
-                className={INPUT}
+                className="input-glamlink"
               >
                 <option value="">Select State</option>
                 {states.map((state) => (
@@ -233,7 +230,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
               </select>
             </div>
             <div>
-              <label className={LABEL}>
+              <label className="label-glamlink">
                 City <span className="text-destructive">*</span>
               </label>
               <select
@@ -245,7 +242,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
                   }))
                 }
                 disabled={!form.state_id || saving}
-                className={INPUT}
+                className="input-glamlink"
               >
                 <option value="">Select City</option>
                 {cities.map((city) => (
@@ -258,7 +255,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           </div>
           {/* Zip code */}
           <div>
-            <label className={LABEL}>
+            <label className="label-glamlink">
               Zip Code <span className="text-destructive">*</span>
             </label>
             <input
@@ -272,7 +269,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
               placeholder="Enter ZIP Code"
               maxLength={10}
               disabled={saving}
-              className={INPUT}
+              className="input-glamlink"
             />
           </div>
         </div>
@@ -281,14 +278,14 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
           <button
             onClick={onClose}
             disabled={saving}
-            className="flex-1 rounded-xl border border-border bg-secondary/60 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-50"
+            className="btn-outline flex-1 disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={saving}
-            className="btn-primary flex flex-1 items-center justify-center gap-2 !rounded-xl !py-2.5 !text-sm disabled:opacity-60"
+            className="btn-primary flex-1 disabled:opacity-60"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
             {saving ? 'Saving…' : 'Save Address'}
@@ -480,7 +477,7 @@ export function AddressTab() {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="btn-primary flex items-center gap-1.5 !rounded-full !px-4 !py-2.5 !text-sm"
+          className="btn-primary flex items-center gap-1.5 px-4 py-2.5 text-sm"
         >
           <Plus className="h-4 w-4" /> Add
         </button>
@@ -511,18 +508,18 @@ export function AddressTab() {
           {[1, 2].map(i => (
             <div key={i} className="animate-pulse rounded-3xl border border-border bg-card p-5">
               <div className="mb-3 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-2xl bg-secondary" />
-                <div className="h-4 w-40 rounded bg-secondary" />
+                <div className="h-10 w-10 rounded-2xl bg-muted" />
+                <div className="h-4 w-40 rounded bg-muted" />
               </div>
-              <div className="mb-2 ml-[52px] h-3 w-3/4 rounded bg-secondary" />
-              <div className="ml-[52px] h-3 w-1/2 rounded bg-secondary" />
+              <div className="mb-2 ml-[52px] h-3 w-3/4 rounded bg-muted" />
+              <div className="ml-[52px] h-3 w-1/2 rounded bg-muted" />
             </div>
           ))}
         </div>
       )}
       {/* Empty state */}
       {!loading && !fetchError && addresses.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-secondary/20 py-14 text-center">
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-muted/20 py-14 text-center">
           <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent">
             <MapPin className="h-6 w-6 text-primary" />
           </span>
@@ -532,7 +529,7 @@ export function AddressTab() {
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="btn-primary flex items-center gap-2 !rounded-full !px-5 !py-2.5 !text-sm"
+            className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm"
           >
             <Plus className="h-4 w-4" /> Add your first address
           </button>
@@ -566,7 +563,7 @@ export function AddressTab() {
                         {addr.address_line_2 ? `, ${addr.address_line_2}` : ""}
                       </p>
                       {addr.is_default && (
-                        <span className="flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-primary">
+                        <span className="flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-secondary">
                           <CheckCircle2 className="h-3 w-3" /> Default
                         </span>
                       )}
@@ -591,7 +588,7 @@ export function AddressTab() {
                       }
                       disabled={isDeleting}
                       aria-label={isEditing ? 'Close edit form' : 'Edit address'}
-                      className={`flex h-8 w-8 items-center justify-center rounded-full transition disabled:opacity-50 ${isEditing ? 'bg-primary text-primary-foreground' : 'bg-secondary text-foreground hover:bg-accent hover:text-primary'
+                      className={`flex h-8 w-8 items-center justify-center rounded-full transition disabled:opacity-50 ${isEditing ? 'bg-secondary text-primary-foreground' : 'bg-muted text-foreground hover:bg-accent hover:text-secondary'
                         }`}
                     >
                       {isEditing ? <X className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
@@ -612,40 +609,40 @@ export function AddressTab() {
                 </div>
                 {/* Inline edit */}
                 {isEditing && editForm && (
-                  <div className="space-y-3.5 border-t border-border bg-secondary/20 px-5 pb-5 pt-4">
+                  <div className="space-y-3.5 border-t border-border bg-muted/20 px-5 pb-5 pt-4">
                     {editError && (
                       <p className="flex items-center gap-1.5 text-xs text-destructive">
                         <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {editError}
                       </p>
                     )}
                     <div>
-                      <label className={LABEL}>Address Line 1</label>
+                      <label className="label-glamlink">Address Line 1</label>
                       <input
                         value={editForm.address_line_1 ?? ''}
                         onChange={e => setEditForm(f => f && ({ ...f, address_line_1: e.target.value }))}
                         placeholder="Address Line 1"
                         disabled={editSaving}
-                        className={INPUT}
+                        className="input-glamlink"
                       />
                     </div>
                     <div>
-                      <label className={LABEL}>Apartment, suite (optional)</label>
+                      <label className="label-glamlink">Apartment, suite (optional)</label>
                       <input
                         value={editForm.address_line_2 ?? ''}
                         onChange={e => setEditForm(f => f && ({ ...f, address_line_2: e.target.value }))}
                         placeholder="e.g. Suite 5"
                         disabled={editSaving}
-                        className={INPUT}
+                        className="input-glamlink"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className={LABEL}>State</label>
+                        <label className="label-glamlink">State</label>
                         <select
                           value={editForm.state_id ?? ""}
                           onChange={(e) => handleEditStateChange(e.target.value)}
                           disabled={editSaving}
-                          className={INPUT}
+                          className="input-glamlink"
                         >
                           <option value="">Select State</option>
                           {editStates.map((state) => (
@@ -656,7 +653,7 @@ export function AddressTab() {
                         </select>
                       </div>
                       <div>
-                        <label className={LABEL}>City</label>
+                        <label className="label-glamlink">City</label>
                         <select
                           value={editForm.city_id ?? ""}
                           onChange={(e) =>
@@ -670,7 +667,7 @@ export function AddressTab() {
                             )
                           }
                           disabled={!editForm.state_id || editSaving}
-                          className={INPUT}
+                          className="input-glamlink"
                         >
                           <option value="">Select City</option>
                           {editCities.map((city) => (
@@ -682,20 +679,20 @@ export function AddressTab() {
                       </div>
                     </div>
                     <div>
-                      <label className={LABEL}>Postal Code</label>
+                      <label className="label-glamlink">Postal Code</label>
                       <input
                         value={editForm.postal_code ?? ''}
                         onChange={e => setEditForm(f => f && ({ ...f, postal_code: e.target.value }))}
                         placeholder="89158"
                         disabled={editSaving}
-                        className={INPUT}
+                        className="input-glamlink"
                       />
                     </div>
                     <div className="flex gap-2 pt-1">
                       <button
                         onClick={() => handleSaveEdit(addr.id)}
                         disabled={editSaving || isDeleting}
-                        className="btn-primary flex flex-1 items-center justify-center gap-1.5 !rounded-xl !py-2.5 !text-xs disabled:opacity-60"
+                        className="btn-primary flex flex-1 items-center justify-center gap-1.5 py-2.5 text-xs disabled:opacity-60"
                       >
                         {editSaving && <Loader2 className="h-3 w-3 animate-spin" />}
                         {editSaving ? 'Saving…' : 'Save changes'}
@@ -703,7 +700,7 @@ export function AddressTab() {
                       <button
                         onClick={() => handleDelete(addr.id)}
                         disabled={isDeleting || editSaving}
-                        className="flex items-center gap-1.5 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-2.5 text-xs font-semibold text-destructive transition hover:bg-destructive/10 disabled:opacity-60"
+                        className="flex items-center gap-1.5 rounded-full border border-destructive/30 bg-destructive/5 px-4 py-2.5 text-xs font-semibold text-destructive transition hover:bg-destructive/10 disabled:opacity-60"
                       >
                         {isDeleting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
                         {isDeleting ? 'Removing…' : 'Remove'}

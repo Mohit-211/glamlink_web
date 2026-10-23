@@ -20,7 +20,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
   ">
     <div className="flex items-center gap-3 mb-5">
       <div className="
-        w-[30px] h-[30px] rounded-full bg-primary text-white
+        w-[30px] h-[30px] rounded-full bg-primary text-primary-foreground
         text-[13px] font-semibold flex items-center justify-center shrink-0
       ">
         {step}

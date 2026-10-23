@@ -119,7 +119,7 @@ export default function ChangePasswordTab() {
             <form onSubmit={handleSubmit} className="space-y-4">
                 {fields.map(({ name, label, placeholder, autoComplete }) => (
                     <div key={name}>
-                        <label htmlFor={name} className="mb-1.5 block text-xs font-medium text-foreground">
+                        <label htmlFor={name} className="label-glamlink">
                             {label}
                         </label>
                         <div className="relative">
@@ -132,7 +132,7 @@ export default function ChangePasswordTab() {
                                 placeholder={placeholder}
                                 autoComplete={autoComplete}
                                 disabled={submitting}
-                                className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-60"
+                                className="input-glamlink pl-10 pr-10"
                             />
                             <button
                                 type="button"
@@ -152,7 +152,7 @@ export default function ChangePasswordTab() {
                 <button
                     type="submit"
                     disabled={submitting}
-                    className="btn-primary flex w-full items-center justify-center gap-2 !rounded-xl !py-2.5 !text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="btn-primary flex w-full items-center justify-center gap-2 py-2.5 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                     {submitting ? (
                         <>

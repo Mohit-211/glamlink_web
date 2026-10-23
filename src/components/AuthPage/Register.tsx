@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { readApiError } from "@/lib/apiError";
 import { passwordProblem } from "@/lib/password";
 import { getFormDataFromSession } from "../glamcard/GlamCardForm/Formdatasessionstorage";
+import AuthShell from "./AuthShell";
 
 // Site key comes from the Cloudflare Turnstile dashboard.
 // Set NEXT_PUBLIC_TURNSTILE_SITE_KEY in your .env.local / deployment env.
@@ -276,7 +277,7 @@ export default function Register() {
   };
 
   return (
-    <div className="page-soft min-h-screen flex items-center justify-center mt-10">
+    <AuthShell>
       {/* Cloudflare Turnstile script — invisible mode, no checkbox UI */}
       {TURNSTILE_SITE_KEY && (
         <Script
@@ -287,216 +288,204 @@ export default function Register() {
       {/* Turnstile renders here; it stays empty unless a visitor must interact */}
       <div ref={turnstileContainerRef} />
 
-      {/* Background Effects */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 overflow-hidden"
-      >
-        <div className="animate-pulse-slow absolute -top-32 -right-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-        <div className="animate-pulse-slow animation-delay-500 absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-primary/8 blur-3xl" />
-      </div>
-      <div className="relative w-full max-w-md">
-        {/* Card */}
-        <div className="rounded-2xl border bg-card p-8 shadow-medium">
-          {sentTo ? (
-            <div className="text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent">
-                <MailCheck className="h-7 w-7 text-primary" />
-              </div>
-              <h1 className="mt-4 text-xl font-semibold tracking-tight text-foreground">
-                Check your email
-              </h1>
-              <p className="mt-2 text-sm text-muted-foreground">
-                We sent a link to <span className="font-medium text-foreground">{sentTo}</span>.
-                Open it within 24 hours to verify your email and sign in.
-              </p>
-              <button
-                type="button"
-                disabled={resending}
-                onClick={async () => {
-                  setResending(true);
-                  try {
-                    await resendVerification(sentTo);
-                    toast.success("A new link is on its way.");
-                  } catch (error) {
-                    toast.error(readApiError(error).message);
-                  } finally {
-                    setResending(false);
-                  }
-                }}
-                className="mt-6 text-sm font-medium text-primary hover:underline disabled:opacity-50"
-              >
-                {resending ? "Sending…" : "Didn't get it? Send a new link"}
-              </button>
-              <p className="mt-4 text-sm text-muted-foreground">
-                Already verified?{" "}
-                <Link href="/login" className="font-medium text-primary hover:underline">
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          ) : (
-          <>
-          <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
-            Create Your Access Account
+      {sentTo ? (
+        <div className="text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent">
+            <MailCheck className="h-7 w-7 text-primary" />
+          </div>
+          <h1 className="mt-4 text-xl font-semibold tracking-tight text-foreground">
+            Check your email
           </h1>
-          <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            {/* Name */}
-            <div className="grid grid-cols-1 gap-3">
-              <div className="space-y-1.5">
-                <label className="block text-sm font-medium">Name</label>
-                <input
-                  type="text"
-                  placeholder="John"
-                  value={form.name}
-                  onChange={(e) => updateField("name", e.target.value)}
-                  aria-invalid={!!errors.name}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.name ? "border-destructive" : "border-input"
-                    }`}
-                />
-                {errors.name && (
-                  <p className="text-xs text-destructive">{errors.name}</p>
-                )}
-              </div>
-            </div>
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Email Address</label>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={(e) => updateField("email", e.target.value)}
-                aria-invalid={!!errors.email}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.email ? "border-destructive" : "border-input"
-                  }`}
-              />
-              {errors.email && (
-                <p className="text-xs text-destructive">{errors.email}</p>
-              )}
-            </div>
-            {/* Mobile */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Mobile Number</label>
-              <input
-                type="tel"
-                maxLength={10}
-                placeholder="9876543210"
-                value={form.mobile}
-                onChange={(e) =>
-                  updateField("mobile", e.target.value.replace(/\D/g, ""))
-                }
-                aria-invalid={!!errors.mobile}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${errors.mobile ? "border-destructive" : "border-input"
-                  }`}
-              />
-              {errors.mobile && (
-                <p className="text-xs text-destructive">{errors.mobile}</p>
-              )}
-            </div>
-            {/* Password */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  minLength={8}
-                  placeholder="8+ characters, 2 numbers"
-                  value={form.password}
-                  onChange={(e) => updateField("password", e.target.value)}
-                  aria-invalid={!!passwordError}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm ${passwordError ? "border-destructive" : "border-input"
-                    }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-              {passwordError && (
-                <p className="text-xs text-destructive">{passwordError}</p>
-              )}
-              {form.password.length > 0 && (
-                <>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        className={`h-1 flex-1 rounded-full ${i <= passwordStrength ? strengthColor : "bg-border"
-                          }`}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Password strength:
-                    <span className="ml-1 font-medium text-foreground">
-                      {strengthLabel}
-                    </span>
-                  </p>
-                </>
-              )}
-            </div>
-            {/* Confirm Password */}
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium">Confirm Password</label>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Confirm Password"
-                value={form.confirm_password}
-                onChange={(e) => updateField("confirm_password", e.target.value)}
-                aria-invalid={!!confirmPasswordError}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm ${confirmPasswordError ? "border-destructive" : "border-input"
-                  }`}
-              />
-              {confirmPasswordError && (
-                <p className="text-xs text-destructive">{confirmPasswordError}</p>
-              )}
-            </div>
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full justify-center disabled:opacity-50"
-            >
-              {loading ? "Creating Access Account..." : "Create Access Account"}
-            </button>
-            {TURNSTILE_SITE_KEY && (
-              <p className="text-[11px] text-muted-foreground text-center">
-                This site is protected by Cloudflare Turnstile and its{" "}
-                <a
-                  href="https://www.cloudflare.com/privacypolicy/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  Privacy Policy
-                </a>{" "}
-                and{" "}
-                <a
-                  href="https://www.cloudflare.com/website-terms/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  Terms of Service
-                </a>{" "}
-                apply.
-              </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            We sent a link to <span className="font-medium text-foreground">{sentTo}</span>.
+            Open it within 24 hours to verify your email and sign in.
+          </p>
+          <button
+            type="button"
+            disabled={resending}
+            onClick={async () => {
+              setResending(true);
+              try {
+                await resendVerification(sentTo);
+                toast.success("A new link is on its way.");
+              } catch (error) {
+                toast.error(readApiError(error).message);
+              } finally {
+                setResending(false);
+              }
+            }}
+            className="link-glamlink mt-6 text-sm disabled:opacity-50"
+          >
+            {resending ? "Sending…" : "Didn't get it? Send a new link"}
+          </button>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Already verified?{" "}
+            <Link href="/login" className="link-glamlink">
+              Sign in
+            </Link>
+          </p>
+        </div>
+      ) : (
+      <>
+      <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
+        Create Your Access Account
+      </h1>
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+        {/* Name */}
+        <div className="grid grid-cols-1 gap-3">
+          <div className="space-y-1.5">
+            <label htmlFor="name" className="label-glamlink mb-0">Name</label>
+            <input
+              id="name"
+              type="text"
+              placeholder="John"
+              value={form.name}
+              onChange={(e) => updateField("name", e.target.value)}
+              aria-invalid={!!errors.name}
+              className="input-glamlink"
+            />
+            {errors.name && (
+              <p className="text-xs text-destructive">{errors.name}</p>
             )}
-            <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link href="/login" className="font-medium text-primary hover:underline">
-                Sign in
-              </Link>
-            </p>
-          </form>
-          </>
+          </div>
+        </div>
+        {/* Email */}
+        <div className="space-y-1.5">
+          <label htmlFor="email" className="label-glamlink mb-0">Email Address</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={(e) => updateField("email", e.target.value)}
+            aria-invalid={!!errors.email}
+            className="input-glamlink"
+          />
+          {errors.email && (
+            <p className="text-xs text-destructive">{errors.email}</p>
           )}
         </div>
-      </div>
-    </div>
+        {/* Mobile */}
+        <div className="space-y-1.5">
+          <label htmlFor="mobile" className="label-glamlink mb-0">Mobile Number</label>
+          <input
+            id="mobile"
+            type="tel"
+            maxLength={10}
+            placeholder="9876543210"
+            value={form.mobile}
+            onChange={(e) =>
+              updateField("mobile", e.target.value.replace(/\D/g, ""))
+            }
+            aria-invalid={!!errors.mobile}
+            className="input-glamlink"
+          />
+          {errors.mobile && (
+            <p className="text-xs text-destructive">{errors.mobile}</p>
+          )}
+        </div>
+        {/* Password */}
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="label-glamlink mb-0">Password</label>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              minLength={8}
+              placeholder="8+ characters, 2 numbers"
+              value={form.password}
+              onChange={(e) => updateField("password", e.target.value)}
+              aria-invalid={!!passwordError}
+              className="input-glamlink pr-11"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {passwordError && (
+            <p className="text-xs text-destructive">{passwordError}</p>
+          )}
+          {form.password.length > 0 && (
+            <>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-1 flex-1 rounded-full ${i <= passwordStrength ? strengthColor : "bg-border"
+                      }`}
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Password strength:
+                <span className="ml-1 font-medium text-foreground">
+                  {strengthLabel}
+                </span>
+              </p>
+            </>
+          )}
+        </div>
+        {/* Confirm Password */}
+        <div className="space-y-1.5">
+          <label htmlFor="confirm_password" className="label-glamlink mb-0">Confirm Password</label>
+          <input
+            id="confirm_password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Confirm Password"
+            value={form.confirm_password}
+            onChange={(e) => updateField("confirm_password", e.target.value)}
+            aria-invalid={!!confirmPasswordError}
+            className="input-glamlink"
+          />
+          {confirmPasswordError && (
+            <p className="text-xs text-destructive">{confirmPasswordError}</p>
+          )}
+        </div>
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary w-full justify-center disabled:opacity-50"
+        >
+          {loading ? "Creating Access Account..." : "Create Access Account"}
+        </button>
+        {TURNSTILE_SITE_KEY && (
+          <p className="text-[11px] text-muted-foreground text-center">
+            This site is protected by Cloudflare Turnstile and its{" "}
+            <a
+              href="https://www.cloudflare.com/privacypolicy/"
+              target="_blank"
+              rel="noreferrer"
+              className="link-glamlink font-normal underline"
+            >
+              Privacy Policy
+            </a>{" "}
+            and{" "}
+            <a
+              href="https://www.cloudflare.com/website-terms/"
+              target="_blank"
+              rel="noreferrer"
+              className="link-glamlink font-normal underline"
+            >
+              Terms of Service
+            </a>{" "}
+            apply.
+          </p>
+        )}
+        <p className="text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link href="/login" className="link-glamlink">
+            Sign in
+          </Link>
+        </p>
+      </form>
+      </>
+      )}
+    </AuthShell>
   );
 }

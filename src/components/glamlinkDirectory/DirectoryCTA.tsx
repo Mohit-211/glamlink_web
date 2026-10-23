@@ -11,7 +11,7 @@ export default function DirectoryCTA() {
       
       <div className="container-glamlink text-center max-w-2xl">
         {/* LABEL */}
-        <p className="text-[10px] tracking-[0.22em] uppercase text-primary/80 mb-3">
+        <p className="eyebrow text-secondary mb-3">
           For Professionals
         </p>
 

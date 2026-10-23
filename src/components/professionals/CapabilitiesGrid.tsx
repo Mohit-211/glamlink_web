@@ -103,11 +103,11 @@ const capabilities = [
 
 const CapabilitiesGrid = () => {
   return (
-    <section className="py-20 lg:py-28 bg-secondary/30">
+    <section className="py-20 lg:py-28 bg-muted/30">
       <div className="container-glamlink">
         {/* Header */}
         <div className="text-center mb-12">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+          <span className="badge-soft mb-4">
             Complete Toolkit
           </span>
           <h2 className="section-title mb-4">
@@ -128,11 +128,11 @@ const CapabilitiesGrid = () => {
               className={`relative bg-card rounded-2xl p-6 border transition-all hover:-translate-y-1 group ${
                 cap.highlight
                   ? "border-primary/30 bg-primary/5"
-                  : "border-border hover:border-primary/30"
+                  : "border-border hover:border-secondary/30"
               }`}
             >
               {cap.comingSoon && (
-                <span className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                <span className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-primary/10 text-secondary text-xs font-medium">
                   Coming Soon
                 </span>
               )}

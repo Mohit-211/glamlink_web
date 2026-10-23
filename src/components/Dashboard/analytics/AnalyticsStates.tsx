@@ -109,7 +109,7 @@ export function AnalyticsEmptyState({
     <div
       className={cn(
         'flex flex-col items-center justify-center text-center',
-        compact ? 'py-8' : 'rounded-2xl border border-dashed border-border bg-secondary/30 px-6 py-12 sm:py-16'
+        compact ? 'py-8' : 'rounded-2xl border border-dashed border-border bg-muted/30 px-6 py-12 sm:py-16'
       )}
     >
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-foreground">
@@ -132,7 +132,7 @@ export function AnalyticsErrorState({ onRetry }: { onRetry: () => void }) {
       <button
         type="button"
         onClick={onRetry}
-        className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+        className="btn-primary mt-5 px-4 py-2 text-xs"
       >
         <RefreshCw className="h-3.5 w-3.5" />
         Retry

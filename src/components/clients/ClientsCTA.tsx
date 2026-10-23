@@ -50,7 +50,7 @@ const ClientsCTA = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 md:gap-6">
               <Button
                 size="lg"
-                className="group min-w-[240px] bg-primary hover:bg-primary text-white font-semibold text-base md:text-lg rounded-full shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-3 px-8 md:px-10 py-6 md:py-7"
+                className="group min-w-[240px] bg-primary hover:bg-secondary text-primary-foreground font-semibold text-base md:text-lg rounded-full shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-3 px-8 md:px-10 py-6 md:py-7"
                            onClick={() => setIsModalOpen(true)}
 
              >

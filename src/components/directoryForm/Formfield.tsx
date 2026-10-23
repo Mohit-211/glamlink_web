@@ -18,7 +18,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   <div className={`flex flex-col gap-1.5 ${className}`}>
     <label className="label-glamlink mb-0">
       {label}
-      {required && <span className="text-primary ml-0.5">*</span>}
+      {required && <span className="text-destructive ml-0.5">*</span>}
     </label>
     {children}
     {hint && (

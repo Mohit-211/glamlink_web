@@ -7,10 +7,10 @@ import { format } from 'date-fns';
 import { AnalyticsEmptyState, AnalyticsPanel } from './AnalyticsStates';
 import { TOKENS } from '@/lib/designTokens';
 
-// Brand primary and its deep accent shade: same hue, clearly separated by lightness.
+// Brand teal against the body-text slate: the two teals sit too close (1.17:1) to tell lines apart.
 const SERIES = [
   { key: 'views', label: 'Views', color: TOKENS.primary },
-  { key: 'clicks', label: 'Clicks', color: TOKENS.accentForeground },
+  { key: 'clicks', label: 'Clicks', color: TOKENS.foreground },
 ] as const;
 
 const MARGIN = { top: 12, right: 12, bottom: 28, left: 36 };

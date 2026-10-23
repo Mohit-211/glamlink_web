@@ -59,7 +59,7 @@ export default function PartnerHero() {
             <img
               src="/podcastcover.png"
               alt="The Beauty Vault podcast"
-              className="absolute bottom-0 right-[8%] w-[38%] rounded-2xl border-4 border-white object-cover shadow-large"
+              className="absolute bottom-0 right-[8%] w-[38%] rounded-2xl border-4 border-card object-cover shadow-large"
             />
           </div>
         </div>

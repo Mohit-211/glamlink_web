@@ -108,18 +108,19 @@ export default function ContactPage() {
               >
                 {/* Name */}
                 <div>
-                  <label htmlFor="name" className="text-sm font-medium">
+                  <label htmlFor="name" className="label-glamlink">
                     Name
                   </label>
                   <input
                     id="name"
+                    aria-invalid={!!errors.name}
                     type="text"
                     placeholder="Your full name"
-                    className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    className="input-glamlink"
                     {...register("name", { required: "Please enter your name" })}
                   />
                   {errors.name && (
-                    <p className="mt-1.5 text-sm text-destructive">
+                    <p className="mt-1.5 text-xs text-destructive">
                       {errors.name.message}
                     </p>
                   )}
@@ -127,14 +128,15 @@ export default function ContactPage() {
 
                 {/* Email */}
                 <div>
-                  <label htmlFor="email" className="text-sm font-medium">
+                  <label htmlFor="email" className="label-glamlink">
                     Email
                   </label>
                   <input
                     id="email"
+                    aria-invalid={!!errors.email}
                     type="email"
                     placeholder="you@example.com"
-                    className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    className="input-glamlink"
                     {...register("email", {
                       required: "Please enter your email",
                       pattern: {
@@ -144,7 +146,7 @@ export default function ContactPage() {
                     })}
                   />
                   {errors.email && (
-                    <p className="mt-1.5 text-sm text-destructive">
+                    <p className="mt-1.5 text-xs text-destructive">
                       {errors.email.message}
                     </p>
                   )}
@@ -152,30 +154,29 @@ export default function ContactPage() {
 
                 {/* Mobile (optional) */}
                 <div>
-                  <label htmlFor="mobile" className="text-sm font-medium">
+                  <label htmlFor="mobile" className="label-glamlink">
                     Phone{" "}
-                    <span className="text-muted-foreground font-normal">
-                      (optional)
-                    </span>
+                    <span className="normal-case tracking-normal font-normal text-muted-foreground">(optional)</span>
                   </label>
                   <input
                     id="mobile"
                     type="tel"
                     placeholder="For faster follow-up, if you'd like a call"
-                    className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    className="input-glamlink"
                     {...register("mobile")}
                   />
                 </div>
 
                 {/* Subject */}
                 <div>
-                  <label htmlFor="subject" className="text-sm font-medium">
+                  <label htmlFor="subject" className="label-glamlink">
                     What&apos;s this about?
                   </label>
                   <select
                     id="subject"
+                    aria-invalid={!!errors.subject}
                     defaultValue=""
-                    className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                    className="input-glamlink"
                     {...register("subject", {
                       required: "Please choose a reason",
                     })}
@@ -187,7 +188,7 @@ export default function ContactPage() {
                     ))}
                   </select>
                   {errors.subject && (
-                    <p className="mt-1.5 text-sm text-destructive">
+                    <p className="mt-1.5 text-xs text-destructive">
                       {errors.subject.message}
                     </p>
                   )}
@@ -195,14 +196,15 @@ export default function ContactPage() {
 
                 {/* Message */}
                 <div>
-                  <label htmlFor="message" className="text-sm font-medium">
+                  <label htmlFor="message" className="label-glamlink">
                     Tell us more
                   </label>
                   <textarea
                     id="message"
+                    aria-invalid={!!errors.message}
                     rows={5}
                     placeholder="Share as much detail as you can, so our team can help quickly."
-                    className="mt-2 w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring resize-none"
+                    className="input-glamlink resize-none"
                     {...register("message", {
                       required: "Please add a short description",
                       minLength: {
@@ -212,7 +214,7 @@ export default function ContactPage() {
                     })}
                   />
                   {errors.message && (
-                    <p className="mt-1.5 text-sm text-destructive">
+                    <p className="mt-1.5 text-xs text-destructive">
                       {errors.message.message}
                     </p>
                   )}

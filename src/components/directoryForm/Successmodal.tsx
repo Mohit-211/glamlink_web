@@ -15,7 +15,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
 
   return (
     <div className="
-      fixed inset-0 bg-foreground/55 backdrop-blur-md
+      fixed inset-0 scrim
       z-50 flex items-center justify-center p-4
     ">
       <div className="
@@ -37,18 +37,18 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
             ✓ Application Received
           </span>
           {accessCard && (
-            <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-accent border-border text-primary">
+            <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-accent border-border text-secondary">
               ✦ Access Card Queued
             </span>
           )}
-          <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-accent border-border text-primary">
+          <span className="text-xs font-semibold px-3.5 py-1.5 rounded-full border-[1.5px] bg-accent border-border text-secondary">
             🗺️ Map Listing Pending
           </span>
         </div>
         <button
           onClick={onClose}
           className="
-            bg-primary hover:bg-primary text-white border-none rounded-full
+            bg-primary hover:bg-secondary text-primary-foreground border-none rounded-full
             px-10 py-3.5 text-sm font-semibold
             transition-colors duration-200
             shadow-primary

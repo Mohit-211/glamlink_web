@@ -149,7 +149,7 @@ export default function SubscriptionPlansTab({ businessCardId, onChanged }: Prop
         ) : error ? (
           <div className="text-sm text-muted-foreground">
             {error}{" "}
-            <button type="button" onClick={reload} className="font-medium text-primary hover:underline">
+            <button type="button" onClick={reload} className="link-glamlink">
               Try again
             </button>
           </div>

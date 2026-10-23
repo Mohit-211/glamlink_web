@@ -56,8 +56,8 @@ const MagazineHero = () => {
                   type="submit"
                   className="
                   h-14 px-8 min-w-[160px] 
-                  bg-primary hover:bg-primary 
-                  text-white font-medium rounded-full 
+                  bg-primary hover:bg-secondary 
+                  text-primary-foreground font-medium rounded-full 
                   shadow-md hover:shadow-lg shadow-primary/20 hover:shadow-primary/30 
                   transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
                   flex items-center gap-2

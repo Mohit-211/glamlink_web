@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { readApiError } from "@/lib/apiError";
 import { safeNextPath } from "@/lib/auth";
 import { useSession } from "@/lib/useSession";
+import AuthShell from "./AuthShell";
 import {
   getFormDataFromSession,
   clearFormDataFromSession,
@@ -141,138 +142,104 @@ export default function Login({ onSuccess }: LoginProps = {}) {
   };
 
   return (
-    <div className="page-soft min-h-screen flex items-center justify-center">
-      {/* Ambient blobs */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 overflow-hidden"
-      >
-        <div className="animate-pulse-slow absolute -top-32 -left-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-        <div className="animate-pulse-slow animation-delay-700 absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-primary/8 blur-3xl" />
-      </div>
-      <div className="relative w-full max-w-md">
-        {/* Logo */}
-        <div className="mb-8 text-center">
-          <p className="mt-3 text-sm text-muted-foreground">
-            Welcome back — sign in to your account
-          </p>
-        </div>
-
-        <div className="card-glamlink !hover:transform-none rounded-2xl border bg-card p-8 shadow-medium">
-          <h1 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
-            Sign in
-          </h1>
-          {notice && (
-            <div className="mb-5 flex gap-3 rounded-xl border border-primary/25 bg-accent/60 p-4 text-sm text-foreground">
-              <MailCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              {notice.kind === "verify" ? (
-                <p>
-                  Please verify your email first. We&apos;ve sent a new link to{" "}
-                  <span className="font-medium">{notice.email}</span>; open it to finish signing in.
-                </p>
-              ) : (
-                <p>
-                  This account doesn&apos;t have a password yet.{" "}
-                  <Link href="/forgot-password" className="font-medium text-primary hover:underline">
-                    Set one with &ldquo;Forgot password&rdquo;
-                  </Link>
-                  .
-                </p>
-              )}
-            </div>
-          )}
-          <form onSubmit={handleSubmit} noValidate className="space-y-5">
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-foreground"
-              >
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={(e) => updateField("email", e.target.value)}
-                aria-invalid={!!errors.email}
-                className={`w-full rounded-xl border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                  errors.email ? "border-destructive" : "border-input"
-                }`}
-              />
-              {errors.email && (
-                <p className="text-xs text-destructive">{errors.email}</p>
-              )}
-            </div>
-            {/* Password */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-foreground"
-                >
-                  Password
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs font-medium text-primary hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  value={form.password}
-                  onChange={(e) => updateField("password", e.target.value)}
-                  aria-invalid={!!errors.password}
-                  className={`w-full rounded-xl border bg-background px-4 py-2.5 pr-11 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 ${
-                    errors.password ? "border-destructive" : "border-input"
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-xs text-destructive">{errors.password}</p>
-              )}
-            </div>
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full justify-center disabled:opacity-50"
-            >
-              {loading ? "Signing in..." : "Sign in"}
-            </button>
-            {/* Register Link */}
-            <p className="text-center text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/register"
-                className="font-medium text-primary hover:underline"
-              >
-                Create Access Account
-              </Link>
+    <AuthShell>
+      <h1 className="text-xl font-semibold tracking-tight">Sign in</h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Welcome back — sign in to your account
+      </p>
+      {notice && (
+        <div className="mt-6 flex gap-3 rounded-xl border border-primary/25 bg-accent/60 p-4 text-sm text-foreground">
+          <MailCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          {notice.kind === "verify" ? (
+            <p>
+              Please verify your email first. We&apos;ve sent a new link to{" "}
+              <span className="font-medium">{notice.email}</span>; open it to finish signing in.
             </p>
-          </form>
+          ) : (
+            <p>
+              This account doesn&apos;t have a password yet.{" "}
+              <Link href="/forgot-password" className="link-glamlink text-secondary">
+                Set one with &ldquo;Forgot password&rdquo;
+              </Link>
+              .
+            </p>
+          )}
         </div>
-      </div>
-    </div>
+      )}
+      <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-5">
+        {/* Email */}
+        <div>
+          <label htmlFor="email" className="label-glamlink">
+            Email address
+          </label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={(e) => updateField("email", e.target.value)}
+            aria-invalid={!!errors.email}
+            className="input-glamlink"
+          />
+          {errors.email && (
+            <p className="mt-1.5 text-xs text-destructive">{errors.email}</p>
+          )}
+        </div>
+        {/* Password */}
+        <div>
+          <div className="flex items-baseline justify-between">
+            <label htmlFor="password" className="label-glamlink">
+              Password
+            </label>
+            <Link href="/forgot-password" className="link-glamlink text-xs">
+              Forgot password?
+            </Link>
+          </div>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={(e) => updateField("password", e.target.value)}
+              aria-invalid={!!errors.password}
+              className="input-glamlink pr-11"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+          {errors.password && (
+            <p className="mt-1.5 text-xs text-destructive">{errors.password}</p>
+          )}
+        </div>
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary w-full disabled:opacity-50"
+        >
+          {loading ? "Signing in..." : "Sign in"}
+        </button>
+        {/* Register Link */}
+        <p className="text-center text-sm text-muted-foreground">
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="link-glamlink">
+            Create Access Account
+          </Link>
+        </p>
+      </form>
+    </AuthShell>
   );
 }

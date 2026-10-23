@@ -27,7 +27,7 @@ const PodcastGuestCard = ({ name, role, date, index = 0 }: PodcastGuestCardProps
   const formattedDate = formatDate(date);
 
   return (
-    <div className="flex flex-col h-full bg-card rounded-2xl border border-border p-5 hover:border-primary/40 hover:shadow-lg transition-all duration-300">
+    <div className="flex flex-col h-full bg-card rounded-2xl border border-border p-5 hover:border-secondary/40 hover:shadow-lg transition-all duration-300">
       <div className="flex items-start justify-between mb-4">
         <div
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground"

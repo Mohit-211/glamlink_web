@@ -36,7 +36,7 @@ function Option({ value, label, description, icon: Icon }: OptionProps) {
       value={value}
       className="group relative flex cursor-pointer select-none items-center gap-3 rounded-xl px-3 py-2.5 pr-10 outline-none transition-colors data-[highlighted]:bg-primary/[0.07] data-[state=checked]:bg-primary/10"
     >
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground transition-colors group-data-[highlighted]:bg-card group-data-[highlighted]:text-primary group-data-[state=checked]:bg-primary group-data-[state=checked]:text-white">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground transition-colors group-data-[highlighted]:bg-card group-data-[highlighted]:text-secondary group-data-[state=checked]:bg-secondary group-data-[state=checked]:text-primary-foreground">
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
       <span className="min-w-0">
@@ -45,7 +45,7 @@ function Option({ value, label, description, icon: Icon }: OptionProps) {
         </SelectPrimitive.ItemText>
         <span className="block truncate text-xs text-muted-foreground">{description}</span>
       </span>
-      <SelectPrimitive.ItemIndicator className="absolute right-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white">
+      <SelectPrimitive.ItemIndicator className="absolute right-3 flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-primary-foreground">
         <Check className="h-3 w-3" strokeWidth={3} aria-hidden="true" />
       </SelectPrimitive.ItemIndicator>
     </SelectPrimitive.Item>
@@ -72,7 +72,7 @@ export default function ProfessionalTypeSelect({
           {createElement(iconFor(value), { className: "h-[18px] w-[18px]", "aria-hidden": true })}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block whitespace-nowrap text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <span className="label-glamlink mb-0 whitespace-nowrap">
             Professional Type
           </span>
           {/* Rendered manually so the trigger shows only the label, not the option's description. */}
@@ -85,7 +85,7 @@ export default function ProfessionalTypeSelect({
         </span>
         <SelectPrimitive.Icon asChild>
           <ChevronDown
-            className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180 group-data-[state=open]:text-primary"
+            className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180 group-data-[state=open]:text-secondary"
             aria-hidden="true"
           />
         </SelectPrimitive.Icon>

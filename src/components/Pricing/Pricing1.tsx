@@ -43,9 +43,16 @@ import { getStripe } from "@/lib/stripe";
 import { PlanCard } from "./PlanCard";
 import { money, usePlans, type PlanId } from "./plans";
 
+// Card fields render inside Stripe's iframe, which cannot see the site's fonts,
+// so Manrope is loaded into it here and named in the field style.
+const ELEMENTS_OPTIONS = {
+  fonts: [{ cssSrc: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&display=swap" }],
+};
+
 const ELEMENT_STYLE = {
   style: {
     base: {
+      fontFamily: "Manrope, system-ui, -apple-system, sans-serif",
       fontSize: "14px",
       color: TOKENS.foreground,
       "::placeholder": { color: TOKENS.mutedForeground },
@@ -598,7 +605,7 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
                         checked={quote.shipping?.selected?.rate_id === o.rate_id}
                         onChange={() => requestQuote(o.rate_id)}
                         disabled={submitting}
-                        className="accent-[hsl(var(--primary))]"
+                        className="accent-secondary"
                       />
                       <span className="flex-1">
                         {o.provider} {o.service}
@@ -653,7 +660,7 @@ export default function PricingStep({ businessCardId, claim = false, initialPlan
           )}
 
           {step === "payment" && quote && businessCardId && (
-            <Elements stripe={stripePromise}>
+            <Elements stripe={stripePromise} options={ELEMENTS_OPTIONS}>
               <PaymentStep
                 businessCardId={businessCardId}
                 quote={quote}
@@ -752,7 +759,7 @@ function PaymentStep({
       <div className="card-glamlink space-y-4">
         <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-accent/40 px-4 py-3">
           <span className="text-sm font-semibold text-foreground">Total due today</span>
-          <span className="text-sm font-semibold text-primary">{money(quote.total_cents)}</span>
+          <span className="text-sm font-semibold text-secondary">{money(quote.total_cents)}</span>
         </div>
 
         {errorMsg && <ErrorNote>{errorMsg}</ErrorNote>}

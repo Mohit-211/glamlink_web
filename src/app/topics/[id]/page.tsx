@@ -90,16 +90,14 @@ function SectionHeader({
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Icon className="h-3.5 w-3.5 text-primary" />
-          <p className="text-[10px] tracking-[.15em] uppercase text-muted-foreground/80">
-            {eyebrow}
-          </p>
+          <p className="eyebrow text-secondary">{eyebrow}</p>
         </div>
         <h2 className="text-3xl text-foreground">{title}</h2>
       </div>
       {action && (
         <Link
           href={action.href}
-          className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline flex-shrink-0 mb-1"
+          className="link-glamlink hidden sm:inline-flex items-center gap-1 text-xs flex-shrink-0 mb-1"
         >
           {action.label}
           <ArrowRight className="h-3 w-3" />
@@ -254,7 +252,7 @@ console.log(realExperts,"realExperts")
           {/* ── HERO ── */}
           <section className="grid md:grid-cols-2 gap-10 md:gap-14 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 text-[10px] tracking-[.2em] uppercase text-primary font-medium mb-5 bg-primary/8 px-3.5 py-1.5 rounded-full">
+              <div className="inline-flex items-center gap-2 text-[10px] tracking-[.2em] uppercase text-secondary font-medium mb-5 bg-primary/8 px-3.5 py-1.5 rounded-full">
                 <Sparkles className="h-3 w-3" />
                 Glamlink Topic
               </div>
@@ -289,7 +287,7 @@ console.log(realExperts,"realExperts")
                 className="object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-overlay/35 via-transparent to-transparent" />
             </div>
           </section>
         </div>
@@ -455,7 +453,7 @@ console.log(realExperts,"realExperts")
               icon={ShoppingBag}
               eyebrow="Shop"
               title={`Shop ${topic.name}-Recommended Products`}
-              action={{ label: "Shop the Journal", href: "/journal/shop" }}
+              action={{ label: "Shop the Journal", href: "/shop" }}
             />
             <JournalShopCard shop={shopProducts} heading="no" />
           </Band>
@@ -485,10 +483,10 @@ console.log(realExperts,"realExperts")
                 return (
                   <div
                     key={paragraph.id}
-                    className="group rounded-2xl border border-border bg-card p-6 shadow-sm hover:border-primary/40 hover:shadow-md transition-all duration-300"
+                    className="group rounded-2xl border border-border bg-card p-6 shadow-sm hover:border-secondary/40 hover:shadow-md transition-all duration-300"
                   >
                     {href ? (
-                      <Link href={href} className="block hover:text-primary transition-colors">
+                      <Link href={href} className="block hover:text-secondary transition-colors">
                         {textEl}
                         <span className="flex items-center gap-1 text-[11px] font-medium text-primary mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                           Read the full article
@@ -508,33 +506,33 @@ console.log(realExperts,"realExperts")
         {/* ── CTA ── */}
         <div className="max-w-[1100px] mx-auto px-5 sm:px-6 pb-20">
           <section
-            className="relative overflow-hidden rounded-[1.75rem] bg-foreground px-6 py-12 md:px-14 md:py-16 text-center"
+            className="relative overflow-hidden rounded-[1.75rem] bg-accent px-6 py-12 md:px-14 md:py-16 text-center"
           >
-            <p className="text-[10px] tracking-[.2em] uppercase text-primary font-medium mb-3">
+            <p className="eyebrow text-secondary mb-3">
               Glamlink
             </p>
-            <h2 className="text-2xl md:text-4xl text-white">
+            <h2 className="text-2xl md:text-4xl text-foreground">
               Continue Exploring Glamlink
             </h2>
-            <p className="text-sm text-white/60 font-normal mt-3 max-w-md mx-auto">
+            <p className="text-sm text-muted-foreground font-normal mt-3 max-w-md mx-auto">
               More topics, professionals, and stories are waiting for you.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
               <Link
                 href="/topics"
-                className="inline-flex items-center justify-center rounded-full bg-primary text-white text-sm font-medium px-6 py-2.5 hover:bg-primary transition-colors duration-200"
+                className="btn-primary"
               >
                 Explore Topics
               </Link>
               <Link
                 href="/journal/directory"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 text-white text-sm font-medium px-6 py-2.5 hover:border-white/40 hover:bg-card/5 transition-colors duration-200"
+                className="btn-outline"
               >
                 Discover Professionals
               </Link>
               <Link
                 href="/journal"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 text-white text-sm font-medium px-6 py-2.5 hover:border-white/40 hover:bg-card/5 transition-colors duration-200"
+                className="btn-outline"
               >
                 Explore Journal
               </Link>

@@ -44,7 +44,7 @@ function EventTarget({ event }: { event: AnalyticsEvent }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`Open ${text}`}
-          className="flex-shrink-0 rounded p-0.5 text-muted-foreground transition-colors hover:text-primary"
+          className="flex-shrink-0 rounded p-0.5 text-muted-foreground transition-colors hover:text-secondary"
         >
           <ExternalLink className="h-3.5 w-3.5" />
         </a>
@@ -102,7 +102,7 @@ export default function RecentActivity({
           {/* Desktop / tablet table */}
           <div className="hidden overflow-hidden rounded-xl border border-border md:block">
             <table className="w-full table-fixed text-left">
-              <thead className="bg-secondary/50 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <thead className="bg-muted/50 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                 <tr>
                   <th className="w-[30%] px-4 py-3">Event</th>
                   <th className="w-[32%] px-4 py-3">Target</th>
@@ -112,7 +112,7 @@ export default function RecentActivity({
               </thead>
               <tbody className="divide-y divide-border">
                 {shown.map((event) => (
-                  <tr key={event.id} className="transition-colors hover:bg-secondary/30">
+                  <tr key={event.id} className="transition-colors hover:bg-muted/30">
                     <td className="px-4 py-3">
                       <EventBadge type={event.event_type} />
                     </td>
@@ -154,7 +154,7 @@ export default function RecentActivity({
               <button
                 type="button"
                 onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                className="rounded-lg border border-border px-4 py-2 text-xs font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-primary/5"
+                className="btn-outline px-4 py-2 text-xs"
               >
                 Show more
               </button>

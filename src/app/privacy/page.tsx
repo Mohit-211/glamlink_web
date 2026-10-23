@@ -2,6 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 export default function PrivacyPolicyPage() {
   const [activeSection, setActiveSection] = useState<string>("");
@@ -72,13 +80,19 @@ export default function PrivacyPolicyPage() {
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="section-title mb-4">Privacy Policy</h1>
             <p className="text-lg text-muted-foreground mb-6">Last revised on January 25, 2025</p>
-            <nav className="flex flex-wrap gap-2 justify-center">
-              <Link href="/" className="text-primary hover:underline">
-                Home
-              </Link>
-              <span className="text-muted-foreground/80">/</span>
-              <span className="text-muted-foreground">Privacy Policy</span>
-            </nav>
+            <Breadcrumb>
+              <BreadcrumbList className="justify-center">
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/">Home</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Privacy Policy</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
           </div>
         </div>
       </section>
@@ -90,7 +104,7 @@ export default function PrivacyPolicyPage() {
             <h2 className="text-2xl font-semibold text-foreground mb-6">Table of Contents</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {sections.map((section) => (
-                <button key={section.id} onClick={() => scrollToSection(section.anchor)} className="text-left px-4 py-2 rounded-lg transition-colors" >
+                <button key={section.id} onClick={() => scrollToSection(section.anchor)} aria-current={activeSection === section.id ? "true" : undefined} className="nav-link text-left px-4 py-2 rounded-lg">
                   <span className="text-sm font-medium">{section.id}.</span> {section.title}
                 </button>
               ))}
@@ -119,7 +133,7 @@ export default function PrivacyPolicyPage() {
                 <p className="text-foreground/80 leading-relaxed mb-6">As used in this Privacy Policy, Glamlink includes all of its subsidiary and affiliated entities. Glamlink is referred to in this Privacy Policy as &quot;we,&quot; &quot;us,&quot; &quot;our,&quot; and &quot;ourselves.&quot;</p>
                 <p className="text-foreground/80 leading-relaxed mb-6">This Privacy Policy does not cover the information practices of other companies and organizations who advertise our services, and who may use cookies, web beacons (pixel tags), and other methodologies to serve personalized ads.</p>
                 <div className="bg-primary/5 border border-primary/30 rounded-lg p-6 mb-6">
-                  <p className="text-primary font-medium">BY USING THE GLAMLINK SERVICE, AND WHEN COMMUNICATE WITH US, YOU UNDERSTAND AND ACKNOWLEDGE THAT WE WILL COLLECT AND USE YOUR PERSONAL INFORMATION IN ACCORDANCE WITH THIS PRIVACY POLICY.</p>
+                  <p className="text-secondary font-medium">BY USING THE GLAMLINK SERVICE, AND WHEN COMMUNICATE WITH US, YOU UNDERSTAND AND ACKNOWLEDGE THAT WE WILL COLLECT AND USE YOUR PERSONAL INFORMATION IN ACCORDANCE WITH THIS PRIVACY POLICY.</p>
                 </div>
               </div>
 
@@ -191,7 +205,7 @@ export default function PrivacyPolicyPage() {
                       When you use the Glamlink Service we may store a small amount of information on your computer. This information will be in the form of a &quot;cookie&quot; or similar file. Cookies are small files stored on your computer, not on our site. We use cookies in our interactive
                       website areas, to deliver content specific to your interests, and so you are not required to reenter your account data every time you connect to the site. Through your web browser you can choose to have your computer warn you each time a cookie is being set, or you can choose
                       to delete or turn off all cookies at any time. Each browser is a little different, so look at your browser&#39;s Help menu to learn the correct way to modify your cookie settings. For information about cookies from the FTC website visit{" "}
-                      <a href="https://www.consumer.ftc.gov/articles/0042-online-tracking" target="_blank" className="text-primary hover:underline break-all">
+                      <a href="https://www.consumer.ftc.gov/articles/0042-online-tracking" target="_blank" className="link-glamlink break-all">
                         https://www.consumer.ftc.gov/articles/0042-online-tracking
                       </a>
                       .
@@ -574,7 +588,7 @@ export default function PrivacyPolicyPage() {
                   8090 S. Durango Dr Ste 102 #1033 <br />
                   Las Vegas, NV 89113 <br />
                   Email:{" "}
-                  <a href="mailto:support@glamlink.net" className="text-primary underline">
+                  <a href="mailto:support@glamlink.net" className="link-glamlink underline">
                     support@glamlink.net
                   </a>
                 </p>
@@ -586,10 +600,10 @@ export default function PrivacyPolicyPage() {
                   <h4 className="text-lg font-semibold text-foreground mb-4">Thank You for Reading</h4>
                   <p className="text-muted-foreground mb-6">We are committed to protecting your privacy and handling your personal information with care and respect. If you have any questions about this Privacy Policy, please don&apos;t hesitate to contact us.</p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onClick={scrollToTop} className="px-6 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary-dark transition-colors">
+                    <button onClick={scrollToTop} className="btn-primary">
                       Back to Top
                     </button>
-                    <Link href="/terms" className="px-6 py-3 bg-card text-primary font-semibold rounded-full border-2 border-primary hover:bg-muted transition-colors">
+                    <Link href="/terms" className="btn-outline">
                       View Terms of Use
                     </Link>
                   </div>
@@ -601,7 +615,7 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Floating Back to Top Button */}
-      <button onClick={scrollToTop} className="fixed bottom-8 right-8 p-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-110" aria-label="Back to top">
+      <button onClick={scrollToTop} className="fixed bottom-8 right-8 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-secondary transition-all duration-300 transform hover:scale-110" aria-label="Back to top">
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
         </svg>

@@ -93,7 +93,7 @@ export default function DeleteAccountPage() {
             })}
           </ol>
 
-          <div className="mt-12 rounded-2xl border border-border bg-secondary/50 p-6">
+          <div className="mt-12 rounded-2xl border border-border bg-muted/50 p-6">
             <h3 className="font-semibold">Before you go</h3>
             <p className="mt-2 text-muted-foreground">
               Account deletion is permanent and cannot be undone. This

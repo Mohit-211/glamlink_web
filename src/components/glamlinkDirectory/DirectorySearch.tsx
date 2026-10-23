@@ -65,7 +65,7 @@ export default function DirectorySearch({
               <MapPin className="h-[18px] w-[18px]" aria-hidden="true" />
             </span>
             <label className="flex-1 min-w-0 cursor-text">
-              <span className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <span className="label-glamlink mb-0">
                 Location
               </span>
               <input
@@ -86,7 +86,7 @@ export default function DirectorySearch({
               disabled={isLocating}
               title="Use my location"
               aria-label="Use my location"
-              className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors disabled:opacity-70"
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-semibold text-secondary hover:bg-secondary/10 transition-colors disabled:opacity-70"
             >
               {isLocating ? (
                 <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />

@@ -155,7 +155,7 @@ export default function UpcomingSchedule() {
           <button
             type="button"
             onClick={() => setVisibleCount((c) => Math.min(c + PAGE_SIZE, schedule.length))}
-            className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-primary transition-opacity hover:opacity-70"
+            className="link-glamlink text-secondary flex items-center gap-1.5 text-[11px] font-semibold tracking-wide"
           >
             Load {Math.min(PAGE_SIZE, schedule.length - visibleCount)} more
             <ChevronDown className="h-3 w-3" strokeWidth={2.5} />
@@ -164,7 +164,7 @@ export default function UpcomingSchedule() {
           <button
             type="button"
             onClick={() => setVisibleCount(PAGE_SIZE)}
-            className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-muted-foreground transition-opacity hover:opacity-70"
+            className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-muted-foreground transition-colors hover:text-secondary"
           >
             Show less
             <ChevronUp className="h-3 w-3" strokeWidth={2.5} />

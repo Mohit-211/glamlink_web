@@ -46,7 +46,7 @@ export default function WhySection() {
         {points.map((p, i) => (
           <div key={i} className="card-glamlink p-6 relative group">
             {/* NUMBER */}
-            <span className="text-primary/70 text-xs font-medium mb-3 block">
+            <span className="text-primary text-xs font-medium mb-3 block">
               {String(i + 1).padStart(2, "0")}
             </span>
 

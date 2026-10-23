@@ -138,7 +138,7 @@ export default function PaymentHistory({
                           isExpanded ? null : payment.id
                         )
                       }
-                      className="rounded-lg p-1.5 hover:bg-secondary transition-colors text-muted-foreground"
+                      className="rounded-lg p-1.5 hover:bg-muted transition-colors text-muted-foreground"
                     >
                       {isExpanded ? (
                         <ChevronUp className="h-4 w-4" />
@@ -150,7 +150,7 @@ export default function PaymentHistory({
                 </div>
 
                 {isExpanded && (
-                  <div className="border-t border-border bg-secondary/30 px-5 py-4">
+                  <div className="border-t border-border bg-muted/30 px-5 py-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       {/* <div>
                         <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
@@ -228,7 +228,7 @@ export default function PaymentHistory({
                           href={payment.receipt_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+                          className="btn-primary px-4 py-2 text-xs"
                         >
                           <ExternalLink className="h-4 w-4" />
                           View Receipt

@@ -37,7 +37,7 @@ const BlogCard = ({
         />
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-overlay/30 to-transparent" />
 
         {/* Category pill */}
         {/* {category && (
@@ -54,12 +54,12 @@ const BlogCard = ({
       {/* Body */}
       <div className="flex flex-col flex-1 min-w-0 p-4 sm:p-5">
         {category && (
-          <p className="text-[10px] uppercase tracking-widest text-primary mb-1 truncate">
+          <p className="eyebrow mb-1 truncate">
             {category}
           </p>
         )}
         {/* Title */}
-        <h3 className="text-foreground text-[16px] sm:text-[18px] leading-[1.35] mb-2 group-hover:text-primary transition-colors duration-200 line-clamp-2 wrap-break-word">
+        <h3 className="text-foreground text-[16px] sm:text-[18px] leading-[1.35] mb-2 group-hover:text-secondary transition-colors duration-200 line-clamp-2 wrap-break-word">
           {title}
         </h3>
 
@@ -74,7 +74,7 @@ const BlogCard = ({
         {(author || date) && (
           <div className="flex items-center gap-2 min-w-0 pt-3 border-t border-border mt-auto">
             {author && (
-              <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-[11px] font-medium flex-shrink-0">
+              <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[11px] font-medium flex-shrink-0">
                 {author.charAt(0)}
               </div>
             )}

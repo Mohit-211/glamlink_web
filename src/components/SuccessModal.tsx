@@ -23,7 +23,7 @@ const SuccessModal: React.FC<Props> = ({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center scrim">
       <div className="w-full max-w-md rounded-xl bg-card p-6 shadow-xl text-center">
         <h2 className="text-xl font-semibold text-foreground">
           ✅ {title}
@@ -34,7 +34,7 @@ const SuccessModal: React.FC<Props> = ({
         <div className="mt-6 flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 rounded-lg border border-border bg-muted py-2.5 text-foreground/80 font-medium hover:bg-muted"
+            className="btn-outline flex-1"
           >
             OK
           </button>

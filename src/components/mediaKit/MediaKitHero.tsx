@@ -14,7 +14,7 @@ export default function MediaKitHero() {
     <section className="hero-glamlink relative overflow-hidden bg-background">
       <div className="container-glamlink relative">
         {/* Top Label */}
-        <p className="text-xs tracking-[0.35em] uppercase text-primary/90 font-medium mb-6">
+        <p className="eyebrow mb-6">
           Partner With Glamlink 2025–2026
         </p>
 
@@ -66,8 +66,8 @@ export default function MediaKitHero() {
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
               {/* Premium cover border + shine */}
-              <div className="absolute inset-0 ring-1 ring-white/30 rounded-2xl" />
-              <div className="absolute inset-0 bg-gradient-to-br from-card/10 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 ring-1 ring-overlay-foreground/30 rounded-2xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-card/10 via-transparent to-overlay/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
 
             {/* Center card - main focus, elevated */}
@@ -80,9 +80,9 @@ export default function MediaKitHero() {
                 alt={`${issues2026[1].title} - Digital Edition Cover`}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.08]"
               />
-              <div className="absolute inset-0 ring-1 ring-white/20 rounded-2xl" />
+              <div className="absolute inset-0 ring-1 ring-overlay-foreground/20 rounded-2xl" />
               {/* Subtle inner highlight */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-card/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-overlay/30 via-transparent to-card/10" />
             </div>
 
             {/* Right card - positive rotation */}
@@ -95,8 +95,8 @@ export default function MediaKitHero() {
                 alt={`${issues2025[5].title} - Digital Edition Cover`}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
-              <div className="absolute inset-0 ring-1 ring-white/30 rounded-2xl" />
-              <div className="absolute inset-0 bg-gradient-to-br from-card/10 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 ring-1 ring-overlay-foreground/30 rounded-2xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-card/10 via-transparent to-overlay/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </div>
         </div>

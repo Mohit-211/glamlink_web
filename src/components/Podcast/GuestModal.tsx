@@ -56,13 +56,13 @@ export default function GuestModal({ open, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center scrim p-4">
       <div className="relative w-full max-w-[460px] overflow-hidden rounded-2xl bg-card shadow-large">
         {/* Header */}
         <div className="px-7 pt-7">
           <div className="mb-1 flex items-start justify-between">
             <div>
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-primary">Be on the show</p>
+              <p className="eyebrow mb-1">Be on the show</p>
               <h2 className="text-[22px] font-semibold leading-tight text-foreground">Guest application</h2>
             </div>
             <button

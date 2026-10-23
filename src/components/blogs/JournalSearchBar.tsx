@@ -52,7 +52,7 @@ const JournalSearchBar = ({
               type="button"
               onClick={() => onChange("")}
               aria-label="Clear search"
-              className="p-1 rounded-full text-muted-foreground hover:text-primary hover:bg-muted/60
+              className="p-1 rounded-full text-muted-foreground hover:text-secondary hover:bg-muted/60
                 transition-colors duration-150"
             >
               <X className="h-4 w-4" />

@@ -20,10 +20,6 @@ const EMPTY_VALUES: PartnerInquiry = {
   message: "",
 };
 
-const inputClass = (hasError: boolean) =>
-  `mt-4 w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none transition focus:ring-2 focus:ring-ring ${
-    hasError ? "border-destructive" : "border-input"
-  }`;
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
@@ -36,12 +32,12 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 
 function Label({ htmlFor, children, optional }: { htmlFor: string; children: string; optional?: boolean }) {
   return (
-    <label htmlFor={htmlFor} className="text-sm font-medium text-foreground">
+    <label htmlFor={htmlFor} className="label-glamlink">
       {children}
       {optional ? (
-        <span className="ml-1 font-normal text-muted-foreground">(optional)</span>
+        <span className="ml-1 normal-case tracking-normal font-normal text-muted-foreground">(optional)</span>
       ) : (
-        <span className="ml-0.5 text-primary" aria-hidden="true">*</span>
+        <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>
       )}
     </label>
   );
@@ -94,7 +90,7 @@ export default function PartnershipInquiryForm() {
             placeholder="Your full name"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? "partner-name-error" : undefined}
-            className={inputClass(!!errors.name)}
+            className="input-glamlink"
             {...register("name", {
               required: "Please enter your name",
               validate: (v) => v.trim().length > 0 || "Please enter your name",
@@ -112,7 +108,7 @@ export default function PartnershipInquiryForm() {
             placeholder="Your company or brand"
             aria-invalid={!!errors.company}
             aria-describedby={errors.company ? "partner-company-error" : undefined}
-            className={inputClass(!!errors.company)}
+            className="input-glamlink"
             {...register("company", {
               required: "Please enter your company or brand",
               validate: (v) => v.trim().length > 0 || "Please enter your company or brand",
@@ -130,7 +126,7 @@ export default function PartnershipInquiryForm() {
             placeholder="you@example.com"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "partner-email-error" : undefined}
-            className={inputClass(!!errors.email)}
+            className="input-glamlink"
             {...register("email", {
               required: "Please enter your email",
               pattern: {
@@ -152,7 +148,7 @@ export default function PartnershipInquiryForm() {
             inputMode="url"
             autoComplete="url"
             placeholder="yourbrand.com or @yourbrand"
-            className={inputClass(false)}
+            className="input-glamlink"
             {...register("website")}
           />
         </div>
@@ -160,9 +156,9 @@ export default function PartnershipInquiryForm() {
 
       {/* Interests — multi-select chips */}
       <fieldset>
-        <legend className="text-sm font-medium text-foreground">
+        <legend className="label-glamlink">
           I&apos;m interested in
-          <span className="ml-1 font-normal text-muted-foreground">(select all that apply)</span>
+          <span className="ml-1 normal-case tracking-normal font-normal text-muted-foreground">(select all that apply)</span>
         </legend>
         <div className="mt-4 flex flex-wrap gap-2.5">
           {PARTNER_INTEREST_OPTIONS.map((option) => {
@@ -170,11 +166,7 @@ export default function PartnershipInquiryForm() {
             return (
               <label
                 key={option}
-                className={`inline-flex cursor-pointer select-none items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring ${
-                  checked
-                    ? "border-primary bg-primary text-primary-foreground shadow-primary"
-                    : "border-input bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
-                }`}
+                className="chip inline-flex cursor-pointer select-none items-center gap-2 rounded-full px-4 py-2 text-sm has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
               >
                 <input type="checkbox" value={option} className="sr-only" {...register("interests")} />
                 {checked && <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />}
@@ -195,7 +187,7 @@ export default function PartnershipInquiryForm() {
           placeholder="Share your goals, timing and anything else that would help us understand the opportunity."
           aria-invalid={!!errors.message}
           aria-describedby={errors.message ? "partner-message-error" : undefined}
-          className={`${inputClass(!!errors.message)} resize-y min-h-[150px]`}
+          className="input-glamlink resize-y min-h-[150px]"
           {...register("message", {
             required: "Please tell us a little about your brand or business",
             validate: (v) =>

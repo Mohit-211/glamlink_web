@@ -41,7 +41,7 @@ export default function ProviderCard({ data, pagetype }: Props) {
         </div>
       ) : (
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
+          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-secondary font-semibold text-lg">
             {initials}
           </div>
 
@@ -60,7 +60,7 @@ export default function ProviderCard({ data, pagetype }: Props) {
               href={data?.details?.website || data?.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className="text-muted-foreground hover:text-secondary transition-colors"
               title="Visit Website"
             >
               <Globe size={18} />

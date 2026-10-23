@@ -14,7 +14,7 @@ export default function PartnershipCard({ way, index }: { way: PartnershipWay; i
       </div>
 
       <div className="mt-5 flex flex-1 flex-col">
-        <span className="text-xs font-semibold tracking-[0.2em] text-primary">
+        <span className="eyebrow">
           {String(index + 1).padStart(2, "0")}
         </span>
         <h3 className="mt-2 text-2xl font-semibold leading-tight text-foreground">

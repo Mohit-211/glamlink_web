@@ -51,7 +51,7 @@ const SalesSection = () => {
       <div className="container-glamlink">
         {/* Header */}
         <div className="text-center mb-12">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+          <span className="badge-soft mb-4">
             <DollarSign className="w-4 h-4" />
             Revenue Engine
           </span>
@@ -67,7 +67,7 @@ const SalesSection = () => {
 
         {/* Video Placeholder */}
         <div className="relative max-w-4xl mx-auto mb-16">
-          <div className="aspect-video rounded-3xl bg-secondary border border-border overflow-hidden relative group cursor-pointer">
+          <div className="aspect-video rounded-3xl bg-muted border border-border overflow-hidden relative group cursor-pointer">
             {/* Decorative elements */}
 
             {/* Play button */}
@@ -80,16 +80,16 @@ const SalesSection = () => {
             {/* Coming soon badge */}
             <div className="relative w-full max-w-5xl mx-auto rounded-3xl overflow-hidden shadow-2xl">
               {/* Gradient Background */}
-              <div className="bg-primary px-8 py-42 text-center text-white">
+              <div className="bg-primary px-8 py-42 text-center text-primary-foreground">
                 {/* Floating Badge */}
                 <div className="absolute top-6 left-6">
                   <span
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full 
         bg-card/15 backdrop-blur-md 
-        text-white text-sm font-medium 
-        border border-white/30 shadow-lg"
+        text-primary-foreground text-sm font-medium 
+        border border-primary-foreground/30 shadow-lg"
                   >
-                    <Video className="w-4 h-4 text-white" />
+                    <Video className="w-4 h-4 text-primary-foreground" />
                     Pro Education Series — Coming Soon
                   </span>
                 </div>
@@ -100,7 +100,7 @@ const SalesSection = () => {
                     className="w-16 h-16 flex items-center justify-center rounded-full 
         bg-card/20 backdrop-blur-md"
                   >
-                    <Play className="w-8 h-8 text-white ml-1" />
+                    <Play className="w-8 h-8 text-primary-foreground ml-1" />
                   </div>
                 </div>
 
@@ -110,7 +110,7 @@ const SalesSection = () => {
                 </h2>
 
                 {/* Subtitle */}
-                <p className="text-white/90 max-w-xl mx-auto">
+                <p className="text-primary-foreground/90 max-w-xl mx-auto">
                   Stay tuned for exclusive content showing how pros maximize
                   their earnings
                 </p>
@@ -122,7 +122,7 @@ const SalesSection = () => {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="w-16 h-12 rounded-lg bg-background/20 backdrop-blur-sm border border-white/10"
+                  className="w-16 h-12 rounded-lg bg-background/20 backdrop-blur-sm border border-primary-foreground/10"
                 />
               ))}
             </div>
@@ -134,7 +134,7 @@ const SalesSection = () => {
           {benefits.map((benefit, index) => (
             <div
               key={index}
-              className="bg-card rounded-2xl p-6 border border-border hover:border-primary/30 transition-all group hover:-translate-y-1"
+              className="bg-card rounded-2xl p-6 border border-border hover:border-secondary/30 transition-all group hover:-translate-y-1"
             >
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <benefit.icon className="w-6 h-6 text-primary" />

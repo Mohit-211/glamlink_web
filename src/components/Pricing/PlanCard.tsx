@@ -26,7 +26,7 @@ export function FeatureRow({ children, soon = false, keychain = false }: Feature
       </span>
       <span
         className={`text-[13.5px] leading-5 ${
-          soon ? "text-muted-foreground" : keychain ? "font-medium text-primary" : "text-foreground"
+          soon ? "text-muted-foreground" : keychain ? "font-medium text-secondary" : "text-foreground"
         }`}
       >
         {children}
@@ -44,7 +44,7 @@ export function PlanRadio({ selected }: { selected: boolean }) {
   return (
     <span
       className={`flex h-5 w-5 flex-none items-center justify-center rounded-full border-2 transition-colors duration-200 ${
-        selected ? "border-primary bg-primary" : "border-border bg-transparent"
+        selected ? "border-secondary bg-secondary" : "border-border bg-transparent"
       }`}
     >
       {selected && <Check className="h-3 w-3 text-primary-foreground" strokeWidth={3} />}
@@ -78,8 +78,8 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
       } ${compact ? "p-4" : ""} ${
         isSelected
           ? plan.isPro
-            ? "shadow-primary border-primary bg-accent/40"
-            : "shadow-medium border-primary"
+            ? "shadow-primary border-secondary bg-accent/40"
+            : "shadow-medium border-secondary"
           : "border-border"
       }`}
     >
@@ -111,7 +111,7 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
         {plan.priceSuffix && <span className="text-xs text-muted-foreground">{plan.priceSuffix}</span>}
       </p>
       {(plan.afterNote || plan.personal) && (
-        <p className="relative mt-1 text-[11px] font-medium text-primary">
+        <p className="relative mt-1 text-[11px] font-medium text-secondary">
           {plan.personal ? "Your personal price" : plan.afterNote}
         </p>
       )}

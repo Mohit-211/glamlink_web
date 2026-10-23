@@ -31,9 +31,9 @@ const TopicCard = ({ topic, compact = false }: TopicCardProps) => {
           fill
           className="object-cover group-hover:scale-[1.06] transition-transform duration-700"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-overlay/60 via-overlay/10 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5">
-          <h3 className="text-white text-xl leading-snug drop-shadow-sm">
+          <h3 className="text-overlay-foreground text-xl leading-snug drop-shadow-sm">
             {topic.name}
           </h3>
         </div>
@@ -44,7 +44,7 @@ const TopicCard = ({ topic, compact = false }: TopicCardProps) => {
           <p className="text-[13px] leading-relaxed text-muted-foreground font-normal line-clamp-2 flex-1">
             {blurb}
           </p>
-          <div className="flex items-center gap-1.5 pt-4 mt-4 border-t border-border text-[12px] font-medium text-primary group-hover:gap-2.5 transition-all duration-200">
+          <div className="flex items-center gap-1.5 pt-4 mt-4 border-t border-border text-[12px] font-medium text-primary group-hover:text-secondary group-hover:gap-2.5 transition-all duration-200">
             Explore topic
             <ArrowUpRight className="h-3.5 w-3.5" />
           </div>

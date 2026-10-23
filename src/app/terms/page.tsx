@@ -2,6 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 export default function TermsOfUsePage() {
   const [activeSection, setActiveSection] = useState<string>("");
@@ -87,13 +95,19 @@ export default function TermsOfUsePage() {
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="section-title mb-4">Terms of Use</h1>
             <p className="text-lg text-muted-foreground mb-6">Last revised on January 25, 2025</p>
-            <nav className="flex flex-wrap gap-2 justify-center">
-              <Link href="/" className="text-primary hover:underline">
-                Home
-              </Link>
-              <span className="text-muted-foreground/80">/</span>
-              <span className="text-muted-foreground">Terms of Use</span>
-            </nav>
+            <Breadcrumb>
+              <BreadcrumbList className="justify-center">
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/">Home</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Terms of Use</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
           </div>
         </div>
       </section>
@@ -105,7 +119,7 @@ export default function TermsOfUsePage() {
             <h2 className="text-2xl font-semibold text-foreground mb-6">Table of Contents</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {sections.map((section) => (
-                <button key={section.id} onClick={() => scrollToSection(section.anchor)} className="text-left px-4 py-2 rounded-lg transition-colors" >
+                <button key={section.id} onClick={() => scrollToSection(section.anchor)} aria-current={activeSection === section.id ? "true" : undefined} className="nav-link text-left px-4 py-2 rounded-lg">
                   <span className="text-sm font-medium">{section.id}.</span> {section.title}
                 </button>
               ))}
@@ -299,7 +313,7 @@ export default function TermsOfUsePage() {
                     <h4 className="text-lg font-semibold text-foreground mb-3">2.6. Scams</h4>
                     <p className="text-foreground/80 leading-relaxed mb-6">
                       Use common sense when using the Booking Service. Use the same common sense you would use in the real world when reading an ad. If it is too good to be true, it may be a scam. For more information about various online scams and how to avoid them, go to{" "}
-                      <a href="https://OnGuardOnline.gov" target="_blank" className="text-primary underline">
+                      <a href="https://OnGuardOnline.gov" target="_blank" className="link-glamlink underline">
                         https://OnGuardOnline.gov.
                       </a>
                     </p>
@@ -662,7 +676,7 @@ export default function TermsOfUsePage() {
                     <br />
                     Las Vegas, NV 89113
                     <br />
-                    <a href="mailto:support@glamlink.net" className="text-primary underline italic">
+                    <a href="mailto:support@glamlink.net" className="link-glamlink underline italic">
                       support@glamlink.net
                     </a>
                     <br />
@@ -706,7 +720,7 @@ export default function TermsOfUsePage() {
                   <h4 className="text-lg font-semibold text-foreground mb-3 mt-6">11.1</h4>
                   <p className="text-foreground/80 leading-relaxed mb-4">
                     Glamlink has established a Privacy Policy to explain to users how personal information is collected and used, which may be reviewed and accessed from the website:
-                    <a href="https://www.glamlink.net/" className="text-primary underline ml-1">
+                    <a href="https://www.glamlink.net/" className="link-glamlink underline ml-1">
                       https://www.glamlink.net/
                     </a>
                   </p>
@@ -812,7 +826,7 @@ export default function TermsOfUsePage() {
                   <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <a href="mailto:support@glamlink.net" className="text-primary underline">
+                  <a href="mailto:support@glamlink.net" className="link-glamlink underline">
                     support@glamlink.net
                   </a>
                 </div>
@@ -830,7 +844,7 @@ export default function TermsOfUsePage() {
       </section>
 
       {/* Floating Back to Top Button */}
-      <button onClick={scrollToTop} className="fixed bottom-8 right-8 p-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-110" aria-label="Back to top">
+      <button onClick={scrollToTop} className="fixed bottom-8 right-8 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-secondary transition-all duration-300 transform hover:scale-110" aria-label="Back to top">
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
         </svg>

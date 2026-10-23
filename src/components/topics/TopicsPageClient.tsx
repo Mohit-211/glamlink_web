@@ -105,7 +105,7 @@ const TopicsPageClient = () => {
                         type="button"
                         onClick={() => setSearchInput("")}
                         aria-label="Clear search"
-                        className="p-1 rounded-full text-muted-foreground/80 hover:text-primary hover:bg-muted transition-colors"
+                        className="p-1 rounded-full text-muted-foreground/80 hover:text-secondary hover:bg-muted transition-colors"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -123,8 +123,7 @@ const TopicsPageClient = () => {
                       <a
                         key={topic.id}
                         href={`/topics/${topic.slug || topic.id}`}
-                        className="text-[13px] font-medium text-muted-foreground bg-card px-3.5 py-1.5 rounded-full
-                          border border-border hover:border-primary/50 hover:text-primary transition-colors duration-150"
+                        className="chip text-[13px] px-3.5 py-1.5 rounded-full"
                       >
                         {topic.name}
                       </a>
@@ -145,7 +144,7 @@ const TopicsPageClient = () => {
                   className="object-cover"
                   priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/0 to-black/10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-overlay/50 via-overlay/0 to-overlay/10" />
               </div>
 
               {/* Floating stat card */}
@@ -171,7 +170,7 @@ const TopicsPageClient = () => {
       <section className="max-w-[1200px] mx-auto px-5 sm:px-6 py-16 md:py-20">
         <div className="flex items-end justify-between mb-10 gap-4">
           <div>
-            <p className="text-[10px] tracking-[.15em] uppercase text-muted-foreground/80 mb-2">
+            <p className="eyebrow mb-2">
               {normalizedQuery ? "Search results" : "Browse"}
             </p>
             <h2 className="section-title">
@@ -229,7 +228,7 @@ const TopicsPageClient = () => {
             {normalizedQuery && (
               <button
                 onClick={() => setSearchInput("")}
-                className="text-xs font-medium text-primary hover:underline mt-1"
+                className="link-glamlink text-xs mt-1"
               >
                 Clear search
               </button>

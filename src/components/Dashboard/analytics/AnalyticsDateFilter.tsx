@@ -7,7 +7,6 @@ import type { DateRange } from 'react-day-picker';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
 import type { DateRangeValue } from './types';
 import { formatRangeLabel, parseApiDate, toApiDate } from './analyticsHelpers';
 
@@ -63,7 +62,7 @@ export default function AnalyticsDateFilter({
         <button
           type="button"
           disabled={disabled}
-          className="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-primary/5 disabled:opacity-50 sm:w-auto"
+          className="inline-flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground transition-colors hover:border-secondary/50 hover:bg-secondary/5 disabled:opacity-50 sm:w-auto"
         >
           <span className="flex min-w-0 items-center gap-2">
             <CalendarDays className="h-4 w-4 flex-shrink-0 text-primary" />
@@ -79,12 +78,8 @@ export default function AnalyticsDateFilter({
               key={p.days}
               type="button"
               onClick={() => apply(presetRange(p.days))}
-              className={cn(
-                'rounded-full border px-3 py-1 text-[11px] font-medium transition-colors',
-                activePreset?.days === p.days
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border text-foreground hover:border-primary/50 hover:bg-primary/5'
-              )}
+              aria-pressed={activePreset?.days === p.days}
+              className="chip rounded-full px-3 py-1 text-[11px]"
             >
               {p.label}
             </button>
@@ -112,7 +107,7 @@ export default function AnalyticsDateFilter({
               draft?.from &&
               apply({ from: toApiDate(draft.from), to: toApiDate(draft.to ?? draft.from) })
             }
-            className="flex-shrink-0 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="btn-primary shrink-0 px-4 py-2 text-xs disabled:opacity-50"
           >
             Apply
           </button>

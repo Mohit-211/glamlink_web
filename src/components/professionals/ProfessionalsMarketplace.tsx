@@ -68,7 +68,7 @@ const ProfessionalCard = ({
   return (
     <div
       onClick={() => pro.is_details && onCardClick(pro)}
-      className={`group rounded-[22px] overflow-hidden bg-card border-2 border-primary/30 shadow-md hover:shadow-xl hover:border-primary transition-all duration-300 flex flex-col select-none ${
+      className={`group rounded-[22px] overflow-hidden bg-card border-2 border-primary/30 shadow-md hover:shadow-xl hover:border-secondary transition-all duration-300 flex flex-col select-none ${
         pro.is_details ? "cursor-pointer" : "cursor-default"
       }`}
     >
@@ -80,7 +80,7 @@ const ProfessionalCard = ({
           className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
         />
         {founderBadge && (
-          <span className="absolute top-3 left-3 bg-primary text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md tracking-wide">
+          <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md tracking-wide">
             {founderBadge}
           </span>
         )}
@@ -108,7 +108,7 @@ const ProfessionalCard = ({
 
         {(pro.specialty || pro.professional_title) && (
           <div className="mt-1">
-            <span className="inline-flex items-center gap-1.5 bg-primary/10 text-primary text-xs font-medium px-3 py-1.5 rounded-full border border-primary/20">
+            <span className="inline-flex items-center gap-1.5 bg-primary/10 text-secondary text-xs font-medium px-3 py-1.5 rounded-full border border-primary/20">
               <BadgeCheck className="w-3.5 h-3.5" />
               {pro.specialty || pro.professional_title}
             </span>
@@ -117,7 +117,7 @@ const ProfessionalCard = ({
 
         <Button
           onClick={(e) => e.stopPropagation()}
-          className="mt-auto w-full bg-primary hover:bg-primary text-white rounded-full py-5 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 gap-2"
+          className="mt-auto w-full bg-primary hover:bg-secondary text-primary-foreground rounded-full py-5 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 gap-2"
         >
           <CalendarDays className="w-4 h-4" />
          CONNECT
@@ -322,7 +322,7 @@ console.log(allSpecialties,"")
             <div className="relative" ref={sortRef}>
               <button
                 onClick={() => setSortOpen((o) => !o)}
-                className="inline-flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-full text-sm font-medium text-foreground/80 shadow-sm hover:border-primary transition whitespace-nowrap"
+                className="inline-flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-full text-sm font-medium text-foreground/80 shadow-sm hover:border-secondary transition whitespace-nowrap"
               >
                 <ChevronsUpDown className="w-4 h-4 text-muted-foreground/80" />
                 {/* FIX 1: Clean label — no "undefined" when nothing selected */}
@@ -374,14 +374,14 @@ console.log(allSpecialties,"")
                 onClick={() => setFilterOpen((o) => !o)}
                 className={`rounded-full px-4 py-3 h-auto text-sm font-medium transition ${
                   filterOpen || selectedSpecialties.length > 0 || selectedLocations.length > 0
-                    ? "border-primary text-primary"
+                    ? "border-secondary text-secondary"
                     : ""
                 }`}
               >
                 <Filter className="w-4 h-4 mr-2" />
                 Filters
                 {(selectedSpecialties.length + selectedLocations.length) > 0 && (
-                  <span className="ml-1.5 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="ml-1.5 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
                     {selectedSpecialties.length + selectedLocations.length}
                   </span>
                 )}
@@ -400,8 +400,8 @@ console.log(allSpecialties,"")
                         onClick={() => setActiveFilterTab(tab)}
                         className={`flex-1 py-3 text-sm font-semibold capitalize transition border-b-2 -mb-px ${
                           activeFilterTab === tab
-                            ? "border-primary text-primary"
-                            : "border-transparent text-muted-foreground hover:text-foreground/80"
+                            ? "border-secondary text-secondary"
+                            : "border-transparent text-muted-foreground hover:text-secondary"
                         }`}
                       >
                         {tab === "specialty" ? "Specialty" : "Location"}
@@ -442,13 +442,13 @@ console.log(allSpecialties,"")
                           <div
                             className={`w-4 h-4 rounded border-2 shrink-0 flex items-center justify-center transition ${
                               selected
-                                ? "bg-primary border-primary"
+                                ? "bg-secondary border-secondary"
                                 : "border-border"
                             }`}
                           >
                             {selected && (
                               <svg
-                                className="w-2.5 h-2.5 text-white"
+                                className="w-2.5 h-2.5 text-primary-foreground"
                                 fill="none"
                                 viewBox="0 0 10 10"
                               >
@@ -538,11 +538,8 @@ console.log(allSpecialties,"")
                     <button
                       key={page}
                       onClick={() => goToPage(page)}
-                      className={`w-10 h-10 rounded-full text-sm font-medium transition ${
-                        currentPage === page
-                          ? "bg-primary text-white shadow"
-                          : "bg-muted hover:bg-border text-foreground/80"
-                      }`}
+                      aria-current={currentPage === page ? "page" : undefined}
+                      className="chip w-10 h-10 rounded-full text-sm"
                     >
                       {page}
                     </button>
@@ -565,7 +562,7 @@ console.log(allSpecialties,"")
         {/* Modal */}
         {selectedPro && (
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 scrim flex items-center justify-center z-50 p-4"
             onClick={() => setSelectedPro(null)}
           >
             <div

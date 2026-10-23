@@ -80,10 +80,10 @@ const HowItWorks = () => {
                   className={`
                     w-16 h-16 md:w-20 md:h-20 rounded-full bg-card border-4 border-primary/30
                     flex flex-col items-center justify-center shadow-md shadow-primary/15
-                    transition-all duration-500 group-hover:border-primary/60 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-primary/25
+                    transition-all duration-500 group-hover:border-secondary/60 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-primary/25
                   `}
                 >
-                  <span className="text-xl md:text-2xl  text-primary mb-1">
+                  <span className="text-xl md:text-2xl text-primary mb-1">
                     {step.number}
                   </span>
                   <step.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
@@ -100,7 +100,7 @@ const HowItWorks = () => {
                   transition-all duration-500 group-hover:shadow-xl group-hover:shadow-primary/15 group-hover:-translate-y-1
                 `}
               >
-                <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
+                <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3 group-hover:text-secondary transition-colors">
                   {step.title}
                 </h3>
 
@@ -116,7 +116,7 @@ const HowItWorks = () => {
         <div className="text-center mt-12 md:mt-20">
           <Button
             size="lg"
-            className="group px-8 md:px-10 py-6 md:py-7 bg-primary hover:bg-primary text-white font-semibold text-base md:text-lg rounded-full shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-3 mx-auto"
+            className="group px-8 md:px-10 py-6 md:py-7 bg-primary hover:bg-secondary text-primary-foreground font-semibold text-base md:text-lg rounded-full shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-3 mx-auto"
                        onClick={() => setIsModalOpen(true)}
 
          >

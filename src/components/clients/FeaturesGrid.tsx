@@ -85,7 +85,7 @@ const FeaturesGrid = () => {
               {/* Coming Soon Badge */}
               {feature.comingSoon && (
                 <div className="absolute top-5 right-5 z-10">
-                  <span className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase">
+                  <span className="px-4 py-1.5 rounded-full bg-primary/10 text-secondary text-xs font-semibold tracking-wide uppercase">
                     Coming Soon
                   </span>
                 </div>
@@ -97,7 +97,7 @@ const FeaturesGrid = () => {
               </div>
 
               {/* Title & Description */}
-              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3 group-hover:text-secondary transition-colors">
                 {feature.title}
               </h3>
 

@@ -55,7 +55,7 @@ export default function ForgotPasswordClient() {
           <button
             type="button"
             onClick={() => setSentTo(null)}
-            className="mt-6 text-sm font-medium text-primary hover:underline"
+            className="link-glamlink mt-6 text-sm"
           >
             Use a different email
           </button>
@@ -92,7 +92,7 @@ export default function ForgotPasswordClient() {
         </button>
         <p className="text-center text-sm text-muted-foreground">
           Remembered it?{" "}
-          <Link href="/login" className="font-medium text-primary hover:underline">
+          <Link href="/login" className="link-glamlink">
             Sign in
           </Link>
         </p>

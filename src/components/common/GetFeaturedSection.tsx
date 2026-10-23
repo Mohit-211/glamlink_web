@@ -5,7 +5,7 @@ import FeatureFormModal from "@/components/mediaKit/form/FeatureFormModal";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] tracking-[0.22em] uppercase text-primary/80 mb-3">
+    <p className="eyebrow text-secondary mb-3">
       {children}
     </p>
   );
@@ -35,7 +35,7 @@ const GetFeaturedSection = () => {
           </p>
 
           {/* SCARCITY LINE */}
-          <p className="text-xs text-primary mb-8 tracking-wide">
+          <p className="text-xs text-secondary mb-8 tracking-wide">
             Limited placements per issue · Selection based
           </p>
 

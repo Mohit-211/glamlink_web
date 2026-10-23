@@ -148,12 +148,8 @@ export default function DirectoryPage() {
         <div className="flex flex-wrap gap-3 mb-14 mt-4 justify-center">
           <button
             onClick={() => handleTabClick({ title: "All" })}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-all border
-            ${
-              activeService === "All"
-                ? "bg-primary text-white border-primary shadow-md shadow-primary/30"
-                : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-primary"
-            }`}
+            aria-pressed={activeService === "All"}
+            className="chip px-5 py-2 rounded-full text-sm"
           >
             All
           </button>
@@ -162,12 +158,8 @@ export default function DirectoryPage() {
             <button
               key={service.id}
               onClick={() => handleTabClick(service)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all border
-              ${
-                activeService === service.title
-                  ? "bg-primary text-white border-primary shadow-md shadow-primary/30"
-                  : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-primary"
-              }`}
+              aria-pressed={activeService === service.title}
+              className="chip px-5 py-2 rounded-full text-sm"
             >
               {service.title}
             </button>
