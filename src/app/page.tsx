@@ -2,28 +2,25 @@ import { SITE_URL } from "@/lib/config";
 import type { Metadata } from "next";
 import Script from "next/script";
 
-import JournalLandingPage from "@/components/blogs/JournalLandingPage";
+import HomeLanding from "@/components/home/HomeLanding";
 
 /* --------------------------------
-   Page Metadata
+   Page Metadata (title comes from the root layout's default)
 -------------------------------- */
 
+const description =
+  "Discover beauty + wellness on Glamlink: treatments, trusted professionals, products and expert insights.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-
-  title: "Beauty Industry Journal & Insights",
-
-  description:
-    "Explore beauty industry insights, trends, tips, and expert articles.",
+  description,
 
   alternates: {
     canonical: "/",
   },
 
   openGraph: {
-    title: "Beauty Industry Journal & Insights | Glamlink",
-    description:
-      "Explore beauty industry insights, trends, tips, and expert articles.",
+    title: "Glamlink | Beauty Lives Here",
+    description,
     url: SITE_URL,
     images: [
       {
@@ -47,7 +44,8 @@ const websiteSchema = {
   url: SITE_URL,
   potentialAction: {
     "@type": "SearchAction",
-    target: `${SITE_URL}/journal/directory?search={search_term_string}`,
+    // Same destination as the home page search box
+    target: `${SITE_URL}/search?q={search_term_string}`,
     "query-input": "required name=search_term_string",
   },
 };
@@ -68,7 +66,7 @@ export default function HomePage() {
         }}
       />
 
-      <JournalLandingPage />
+      <HomeLanding />
     </>
   );
 }

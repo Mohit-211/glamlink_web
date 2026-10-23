@@ -1,4 +1,4 @@
-// URL-safe base64 encode/decode for ids used in shareable links (e.g. /journal/shop/[id]).
+// URL-safe base64 encode/decode for ids used in shareable links (e.g. /shop/[id]).
 export function encodeId(id: string | number): string {
   const base64 =
     typeof window !== "undefined"
