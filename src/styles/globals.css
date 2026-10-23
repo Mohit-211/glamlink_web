@@ -2,9 +2,9 @@
 
 /* ────────────────────────────────────────────────
    DESIGN TOKENS — the only colours and font the site uses.
-   Components use the generated utilities (bg-primary, text-muted-foreground,
+   Components use the generated utilities (bg-primary, hover:bg-secondary,
    border-border, bg-destructive/10 …), never raw hex, rgb() or Tailwind's
-   palette colours (gray-*, blue-* …).
+   palette colours (gray-*, blue-*, white, black …).
 ───────────────────────────────────────────────── */
 @theme static {
   --color-background: hsl(var(--background));
@@ -16,11 +16,15 @@
   --color-popover: hsl(var(--popover));
   --color-popover-foreground: hsl(var(--popover-foreground));
 
+  /* Brand teal in two shades — see :root for which one to use where. */
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
-
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  /* Scrims (modal backdrops, dark gradients over photos) and what sits on them */
+  --color-overlay: hsl(var(--overlay));
+  --color-overlay-foreground: hsl(var(--overlay-foreground));
 
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
@@ -40,7 +44,7 @@
   --shadow-soft: 0 2px 8px -2px hsl(220 20% 15% / 0.08);
   --shadow-medium: 0 4px 16px -4px hsl(220 20% 15% / 0.12);
   --shadow-large: 0 8px 32px -8px hsl(220 20% 15% / 0.16);
-  --shadow-primary: 0 4px 20px -4px hsl(185.7 69.9% 46.9% / 0.35);
+  --shadow-primary: 0 4px 20px -4px hsl(185.6 72.8% 31.8% / 0.3); /* primary #16818C */
 
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
@@ -56,30 +60,43 @@
 :root {
   --radius: 0.75rem;
 
-  /* Primary — Glamlink teal #24bbcb */
-  --primary: 185.7 69.9% 46.9%;
+  /* Brand teal: two shades and no others. Pick the shade by its job:
+       primary    #16818C  the default teal: buttons and other fills, text links, teal
+                           headings, navigation text, form labels, icons. It clears 4.5:1
+                           against both white (4.61) and black (4.55), so it works as a
+                           fill under white text and as text on a light surface.
+       secondary  #117580  the higher-contrast shade (5.41 on white, but 3.88 on black):
+                           hover states; anything selected (current page, active tab,
+                           chosen chip, checked box or radio, toggle that is on); focus
+                           rings; and teal text on a teal tint or muted surface, where
+                           primary drops to about 4:1.
+     Text on either fill is white (primary-foreground / secondary-foreground). */
+  --primary: 185.6 72.8% 31.8%; /* #16818C */
   --primary-foreground: 0 0% 100%;
+  --secondary: 185.9 76.6% 28.4%; /* #117580 */
+  --secondary-foreground: 0 0% 100%;
 
-  /* Surfaces — warm off-white rather than pure white, easier on the eyes.
-     Cards sit a shade lighter than the page so they still lift off it. */
-  --background: 40 23% 97%; /* #F9F8F6 */
+  --overlay: 0 0% 0%;
+  --overlay-foreground: 0 0% 100%;
+
+  /* Surfaces — a barely warm off-white, kept light enough that primary text still
+     clears 4.5:1 on it (4.54). Cards are pure white so they lift off the page. */
+  --background: 40 60% 99%; /* #FEFDFB */
   --foreground: 220 20% 15%;
 
-  --card: 40 33% 99%; /* #FDFCFB */
+  --card: 0 0% 100%;
   --card-foreground: 220 20% 15%;
 
-  --popover: 40 33% 99%;
+  --popover: 0 0% 100%;
   --popover-foreground: 220 20% 15%;
 
-  --secondary: 40 14% 93%;
-  --secondary-foreground: 220 20% 25%;
-
+  /* Neutral grey surface (table heads, skeletons, quiet buttons) and secondary text */
   --muted: 40 14% 93%;
   --muted-foreground: 220 9% 42%;
 
   /* Light teal tint for highlights, selected states and soft badges */
   --accent: 186 55% 93%;
-  --accent-foreground: 186 70% 28%;
+  --accent-foreground: var(--secondary);
 
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
@@ -90,8 +107,7 @@
 
   --border: 40 10% 87%;
   --input: 40 8% 82%;
-  --ring: 185.7 69.9% 46.9%;
-
+  --ring: var(--secondary);
 }
 
 /* ────────────────────────────────────────────────
@@ -144,6 +160,11 @@
     background: hsl(var(--background));
   }
 
+  /* Backdrop behind every modal, drawer and lightbox */
+  .scrim {
+    @apply bg-overlay/50 backdrop-blur-sm;
+  }
+
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-full
     bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground
@@ -152,7 +173,8 @@
     transform: translateY(0);
   }
 
-  .btn-primary:hover {
+  .btn-primary:hover:not(:disabled) {
+    @apply bg-secondary;
     transform: translateY(-1px);
   }
 
@@ -163,12 +185,42 @@
   .btn-outline {
     @apply inline-flex items-center justify-center gap-2 rounded-full border
     bg-background px-6 py-3 text-sm font-semibold text-foreground
-    transition-all hover:border-primary/50 hover:bg-primary/5;
+    transition-all hover:border-secondary hover:bg-accent hover:text-secondary;
   }
 
-  /* Form controls — every text input, select and textarea on the site */
+  /* Text links and text-only buttons ("Clear search", "Forgot password?") */
+  .link-glamlink {
+    @apply font-medium text-primary underline-offset-4 transition-colors
+    hover:text-secondary hover:underline;
+  }
+
+  /* Navigation — header menu, sidebars, tab bars. Mark the current item with
+     aria-current="page" (aria-selected / aria-pressed on buttons). */
+  .nav-link {
+    @apply font-medium text-primary transition-colors
+    not-disabled:hover:bg-accent not-disabled:hover:text-secondary;
+  }
+
+  .nav-link:is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [aria-pressed="true"]) {
+    @apply bg-accent text-secondary;
+  }
+
+  /* Choice chips — category and filter pills, date presets, page numbers.
+     Neutral until hovered; the chosen one fills with secondary.
+     Same state attributes as .nav-link, or a <label class="chip"> around a checked
+     checkbox/radio. Shape and size come from the caller. */
+  .chip {
+    @apply border border-border bg-card font-medium text-foreground transition-colors
+    not-disabled:hover:border-secondary not-disabled:hover:text-secondary;
+  }
+
+  .chip:is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [aria-pressed="true"], :has(> input:checked)) {
+    @apply border-secondary bg-secondary text-secondary-foreground;
+  }
+
+  /* Form controls — every label, text input, select and textarea on the site */
   .label-glamlink {
-    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground;
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-primary;
   }
 
   .input-glamlink {
@@ -195,14 +247,14 @@
     box-shadow: var(--shadow-medium);
   }
 
-  /* Accent words in headings — solid brand teal (no gradient) */
+  /* Accent words in display headings (24px and up) — solid brand teal, no gradient */
   .gradient-text {
     @apply text-primary;
   }
 
   .badge-soft {
     @apply inline-flex items-center gap-1.5 rounded-full
-    bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary
+    bg-primary/10 px-4 py-1.5 text-sm font-medium text-secondary
     border border-primary/20;
   }
 
@@ -222,6 +274,12 @@
 
   .section-title {
     @apply text-3xl md:text-4xl font-semibold tracking-tight;
+  }
+
+  /* Small uppercase kicker above a heading ("Curated Picks", "Resources") —
+     the site's smaller teal heading */
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-widest text-primary;
   }
 
   .section-subtitle {
@@ -391,6 +449,11 @@
 .rich-text a {
   color: hsl(var(--primary));
   text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.rich-text a:hover {
+  color: hsl(var(--secondary));
 }
 
 /* ────────────────────────────────────────────────
@@ -465,7 +528,7 @@
 .prose-article a {
   color: hsl(var(--primary));
   text-decoration: underline;
-  transition: 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .prose-article a.mention-link {
@@ -479,7 +542,7 @@
 }
 
 .prose-article a:hover {
-  color: hsl(var(--accent-foreground));
+  color: hsl(var(--secondary));
 }
 
 .prose-article blockquote {
@@ -560,6 +623,61 @@
 .prose-article ol {
   list-style: decimal;
   padding-left: 1.5rem;
+}
+
+/* ────────────────────────────────────────────────
+   THIRD-PARTY WIDGETS
+   Libraries that inject their own CSS (system fonts, their own palettes) are
+   brought onto the site font and tokens here. `html`/`body` in the selector
+   outranks the injected rules whatever order the stylesheets load in.
+───────────────────────────────────────────────── */
+
+/* Toasts (sonner) */
+html [data-sonner-toaster] {
+  font-family: var(--font-sans);
+}
+
+html [data-sonner-toaster][data-sonner-theme] {
+  --normal-bg: hsl(var(--popover));
+  --normal-bg-hover: hsl(var(--muted));
+  --normal-border: hsl(var(--border));
+  --normal-border-hover: hsl(var(--input));
+  --normal-text: hsl(var(--popover-foreground));
+  --success-bg: color-mix(in oklab, hsl(var(--success)) 10%, hsl(var(--card)));
+  --success-border: color-mix(in oklab, hsl(var(--success)) 30%, hsl(var(--card)));
+  --success-text: hsl(var(--success));
+  --error-bg: color-mix(in oklab, hsl(var(--destructive)) 8%, hsl(var(--card)));
+  --error-border: color-mix(in oklab, hsl(var(--destructive)) 30%, hsl(var(--card)));
+  --error-text: hsl(var(--destructive));
+  --warning-bg: color-mix(in oklab, hsl(var(--warning)) 12%, hsl(var(--card)));
+  --warning-border: color-mix(in oklab, hsl(var(--warning)) 35%, hsl(var(--card)));
+  --warning-text: hsl(var(--warning-foreground));
+  --info-bg: hsl(var(--accent));
+  --info-border: color-mix(in oklab, hsl(var(--primary)) 30%, hsl(var(--card)));
+  --info-text: hsl(var(--secondary));
+}
+
+/* Google Places address suggestions (Access Card location form) */
+body .pac-container {
+  font-family: var(--font-sans);
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-medium);
+  margin-top: 4px;
+}
+
+body .pac-item {
+  border-color: hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+}
+
+body .pac-item:hover,
+body .pac-item-selected {
+  background-color: hsl(var(--accent));
+}
+
+body .pac-item-query {
+  color: hsl(var(--foreground));
 }
 
 /* Hide scrollbar for horizontally scrollable rows (mobile tab bars, carousels) */

@@ -8,6 +8,7 @@ import Providers from "./providers";
 import ScrollToTop from "@/components/ScrollToTop";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { pageRobots } from "@/lib/indexing";
+import { TOKENS } from "@/lib/designTokens";
 
 import "../styles/globals.css"
 
@@ -114,7 +115,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#F9F8F6",
+  themeColor: TOKENS.background,
 };
 
 /* -------------------------

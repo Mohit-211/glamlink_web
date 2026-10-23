@@ -5,12 +5,15 @@
  * change both together.
  */
 export const TOKENS = {
-  primary: "#24BBCB",
-  accentForeground: "#156F79",
-  background: "#F9F8F6",
-  card: "#FDFDFC",
+  primary: "#16818C",
+  secondary: "#117580",
+  accentForeground: "#117580",
+  background: "#FEFDFB",
+  card: "#FFFFFF",
   foreground: "#1F242E",
+  muted: "#F0EEEB",
   mutedForeground: "#616875",
   border: "#E1DFDB",
+  input: "#D5D2CD",
   destructive: "#DC2828",
 } as const;
