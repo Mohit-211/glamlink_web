@@ -77,8 +77,6 @@ export interface FormData {
   profilePhoto: File | null
   profilePhotoPreview: string
   gallery: GalleryItem[]
-  offer_promotion: boolean
-  promotion_details: string
   elite_setup: boolean
   important_info: string[]
   excites_about_glamlink: string[]
@@ -147,8 +145,6 @@ const INITIAL_FORM: FormData = {
   profilePhoto: null,
   profilePhotoPreview: '',
   gallery: [],
-  offer_promotion: false,
-  promotion_details: '',
   elite_setup: false,
   important_info: [],
   excites_about_glamlink: [],
@@ -157,17 +153,6 @@ const INITIAL_FORM: FormData = {
 }
 
 // ── Reusable UI ───────────────────────────────────────────
-
-function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <div
-      onClick={() => onChange(!enabled)}
-      className={`w-10 h-[22px] rounded-full relative transition-colors duration-200 shrink-0 cursor-pointer ${enabled ? 'bg-secondary' : 'bg-accent'}`}
-    >
-      <div className={`absolute w-4 h-4 bg-card rounded-full top-[3px] shadow-sm transition-transform duration-200 ${enabled ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
-    </div>
-  )
-}
 
 function CheckIcon() {
   return (
@@ -602,10 +587,6 @@ useEffect(() => {
           }))
         )
       )
-
-      // ── Promotion ──
-      formData.append("offer_promotion", String(form.offer_promotion))
-      formData.append("promotion_details", form.promotion_details)
 
       // ── Elite Setup ──
       formData.append("elite_setup", String(form.elite_setup))
@@ -1211,23 +1192,6 @@ const removeLocation = (index: number) => {
             </div>
 
             <div className="flex flex-col gap-4 pt-4 border-t border-border">
-
-              {/* Promotion toggle */}
-              <div className="flex items-center gap-3 cursor-pointer" onClick={() => set('offer_promotion', !form.offer_promotion)}>
-                <Toggle enabled={form.offer_promotion} onChange={(v) => set('offer_promotion', v)} />
-                <span className="text-sm font-semibold text-foreground">
-                  I would like to offer a promotion with my digital card
-                </span>
-              </div>
-              {form.offer_promotion && (
-                <FormField label="Promotion Details" hint="e.g. 20% off Balayage for first-time clients">
-                  <Input
-                    placeholder="20% off on Balayage for first-time clients"
-                    value={form.promotion_details}
-                    onChange={(e) => set('promotion_details', e.target.value)}
-                  />
-                </FormField>
-              )}
 
               {/* Elite setup */}
               <div

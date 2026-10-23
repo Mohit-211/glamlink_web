@@ -118,8 +118,6 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
     ],
     /* ================= MARKETING ================= */
     elite_setup: false,
-    offer_promotion: true,
-    promotion_details: "20% off first booking for new clients.",
     excites_about_glamlink: ["Reaching new clients", "Easy online booking"],
     biggest_pain_points: ["Finding new clients", "Managing appointments"],
   };

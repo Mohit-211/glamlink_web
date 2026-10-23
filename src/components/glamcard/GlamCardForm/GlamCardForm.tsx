@@ -4,7 +4,6 @@ import { Loader2 } from "lucide-react";
 import { BOOKING_METHODS, FieldErrors, GlamCardFormData } from "./types";
 import BasicInfoForm from "./BasicInfoForm";
 import MediaAndProfileForm from "../MediaAndProfileForm";
-import SpecialOfferForm from "./SpecialOfferForm";
 import ServicesAndBookingForm from "./ServicesAndBookingForm";
 import { useRouter } from "next/navigation";
 import { saveFormDataToSession } from "./Formdatasessionstorage";
@@ -280,9 +279,7 @@ const GlamCardForm: React.FC<Props> = ({
       "professional_title",
       "bio",
       "booking_link",
-      "offer_promotion",
       "website",
-      "promotion_details",
       "color_code",
     ] as const;
     primitiveFields.forEach((field) => {
@@ -364,11 +361,9 @@ const GlamCardForm: React.FC<Props> = ({
         setExistingCardId(Number(details?.card_id) || null);
       } else if (code === "UPGRADE_REQUIRED") {
         toast.error(
-          details?.feature === "special_offers"
-            ? "Special offers are part of Access Pro. Upgrade to run one."
-            : details?.feature === "edit_details"
-              ? "Editing your card is part of Access Pro. Upgrade to make changes."
-              : "Changing photos and video is part of Access Pro. Upgrade to refresh them."
+          details?.feature === "edit_details"
+            ? "Editing your card is part of Access Pro. Upgrade to make changes."
+            : "Changing photos and video is part of Access Pro. Upgrade to refresh them."
         );
       } else if (code === "TOO_MANY_REQUESTS") {
         toast.error("Too many cards were created from this connection. Please try again in an hour.");
@@ -423,7 +418,6 @@ const GlamCardForm: React.FC<Props> = ({
               mode={mode}
               cardId={cardId}
             />
-            {isEdit && <SpecialOfferForm data={data} setData={setData} locked={!proAccess} />}
             <div className="mt-10 flex flex-col-reverse gap-3 sm:flex-row">
               {isEdit && onCancel && (
                 <button
