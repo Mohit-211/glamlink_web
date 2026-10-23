@@ -53,10 +53,10 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
               photos, videos, social media, business hours, location, and more.
             </p>
 
-            <div className="mt-8 flex items-center gap-4 text-xl font-semibold text-foreground">
-              <span><PlanPrice product="keychain" /> SETUP</span>
+            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-xl font-semibold text-foreground">
+              <span>FREE TO START</span>
               <span className="text-primary">•</span>
-              <span><PlanPrice product="pro" />/MONTH</span>
+              <span>PRO <PlanPrice product="pro" />/MONTH</span>
             </div>
 
             <button
@@ -67,7 +67,7 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
             </button>
 
             <p className="mt-4 text-sm italic text-muted-foreground">
-              NFC keychain included.
+              Add the NFC keychain to any plan for <PlanPrice product="keychain" />, one-time, shipping included.
             </p>
           </div>
 

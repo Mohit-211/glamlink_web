@@ -3,13 +3,12 @@ import PlanPrice from "@/components/Pricing/PlanPrice";
 
 export default function AccessPricingSection() {
   const features = [
-    "NFC Access Keychain",
-    "Digital Access Card",
-    "Glamlink Directory Profile",
-    "Booking & Contact Links",
-    "Photos & Videos",
-    "Services & Specialties",
-    "QR Code Sharing",
+    "Glamlink Directory Listing",
+    "Digital Access Card & QR Code",
+    "Bio, Specialties & Booking Link",
+    "Contact Info & Social Links",
+    "1 Featured Video & Up to 4 Photos",
+    "Update Contact Details, Hours & Booking Links Anytime",
   ];
 
   return (
@@ -33,7 +32,7 @@ export default function AccessPricingSection() {
 
         {/* Features */}
         <div className="card-glamlink mt-16">
-          <h2 className="text-2xl font-semibold">What&apos;s Included</h2>
+          <h2 className="text-2xl font-semibold">Free on Every Card</h2>
 
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             {features.map((feature) => (
@@ -52,47 +51,40 @@ export default function AccessPricingSection() {
         </div>
 
         {/* Pricing */}
-        <div className="mt-16 grid gap-8 lg:grid-cols-2">
-          {/* Setup */}
-          <div className="card-glamlink border-primary/20">
-            <span className="badge-soft">One-Time</span>
-
-            <h3 className="mt-5 text-2xl font-semibold">
-              Setup Price
-            </h3>
-
-            <div className="gradient-text mt-4 text-5xl font-bold">
-              <PlanPrice product="keychain" />
-            </div>
-
+        <div className="mt-16 grid gap-8 lg:grid-cols-3">
+          <div className="card-glamlink">
+            <span className="badge-soft">Free</span>
+            <h3 className="mt-5 text-2xl font-semibold">Free</h3>
+            <div className="mt-4 text-5xl font-bold">$0</div>
             <p className="mt-6 text-muted-foreground">
-              Includes your NFC Access Keychain and Digital Access Card.
+              Everything above, and you keep your details current anytime.
             </p>
           </div>
 
-          {/* Membership */}
-          <div className="card-glamlink">
+          <div className="card-glamlink border-primary/20">
             <span className="badge-soft">Membership</span>
-
-            <h3 className="mt-5 text-2xl font-semibold">
-              Profile Editing
-            </h3>
-
+            <h3 className="mt-5 text-2xl font-semibold">Access Pro</h3>
             <div className="mt-4">
-              <span className="text-5xl font-bold"><PlanPrice product="pro" /></span>
-              <span className="ml-2 text-lg text-muted-foreground">
-                /month
-              </span>
+              <span className="gradient-text text-5xl font-bold"><PlanPrice product="pro" /></span>
+              <span className="ml-2 text-lg text-muted-foreground">/month</span>
             </div>
-
             <p className="mt-6 text-muted-foreground">
-              Update your photos, videos, links, promotions, and business
-              information anytime.
+              Update your featured video and photos anytime, with performance
+              analytics. Priority placement in search is coming soon.
+            </p>
+          </div>
+
+          <div className="card-glamlink">
+            <span className="badge-soft">One-Time</span>
+            <h3 className="mt-5 text-2xl font-semibold">NFC Keychain</h3>
+            <div className="mt-4 text-5xl font-bold">
+              <PlanPrice product="keychain" />
+            </div>
+            <p className="mt-6 text-muted-foreground">
+              Clients tap it to open your card. Add it to Free or Access Pro.
             </p>
           </div>
         </div>
-
-      
       </div>
     </section>
   );
