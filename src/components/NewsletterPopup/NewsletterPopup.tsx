@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { X, Loader2, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
+import { subscribeNewsletter } from "@/api/Api";
+import { readApiError } from "@/lib/apiError";
 
 interface NewsletterPopupProps {
   openDelay?: number; // milliseconds
@@ -66,20 +69,17 @@ export default function NewsletterPopup({
     try {
       setLoading(true);
 
-      // Replace with your API
-      /*
       await subscribeNewsletter({
-        first_name: formData.firstName,
-        email: formData.email,
+        first_name: formData.firstName.trim(),
+        email: formData.email.trim(),
+        source: "popup",
       });
-      */
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      localStorage.setItem(
-        "glamlink_newsletter_subscribed",
-        "true"
-      );
+      try {
+        localStorage.setItem("glamlink_newsletter_subscribed", "true");
+      } catch {
+        // Storage blocked (private mode): the cookie still keeps the popup away
+      }
 
       setSubscribed(true);
 
@@ -87,8 +87,7 @@ export default function NewsletterPopup({
         setIsOpen(false);
       }, 3000);
     } catch (error) {
-      console.error(error);
-      alert("Failed to subscribe. Please try again.");
+      toast.error(readApiError(error, "We couldn't subscribe you. Please try again.").message);
     } finally {
       setLoading(false);
     }
@@ -98,7 +97,7 @@ export default function NewsletterPopup({
     <div className="fixed inset-0 z-[999999]">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-md"
+        className="absolute inset-0 scrim"
         onClick={isFormValid && !subscribed ? handleClose : undefined}
       />
 
@@ -111,7 +110,7 @@ export default function NewsletterPopup({
             {
               <button
                 onClick={handleClose}
-                className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-secondary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label="Close"
                 title={!isFormValid ? "Please fill in the form first" : "Close"}
               >
@@ -146,7 +145,7 @@ export default function NewsletterPopup({
                     value={formData.firstName}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30"
+                    className="input-glamlink"
                   />
 
                   <input
@@ -156,13 +155,13 @@ export default function NewsletterPopup({
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30"
+                    className="input-glamlink"
                   />
 
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full rounded-lg bg-primary hover:opacity-90 px-4 py-3 font-semibold text-primary-foreground transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-primary/25 hover:shadow-primary/35 active:scale-[0.98]"
+                    className="btn-primary w-full disabled:opacity-60"
                   >
                     {loading ? (
                       <span className="flex items-center justify-center gap-2">

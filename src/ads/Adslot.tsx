@@ -1,6 +1,12 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { Ad } from "./Useads";
+import { trackAdEvent } from "@/api/Api";
+
+/** Counts a view or a click on the API; counting never gets in the visitor's way. */
+function track(adId: number, type: "impression" | "click") {
+  trackAdEvent({ ad_id: adId, type }).catch(() => {});
+}
 
 interface AdSlotProps {
   slotId: string;
@@ -25,11 +31,7 @@ export default function AdSlot({ slotId, ad, hideOnMobile = false }: AdSlotProps
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            fetch("/api/ads/track", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ ad_id: ad.id, type: "impression" }),
-            }).catch((err) => console.error("AdSlot: impression tracking failed", err));
+            track(ad.id, "impression");
             observer.disconnect(); // count once per page view
           }
         });
@@ -43,11 +45,7 @@ export default function AdSlot({ slotId, ad, hideOnMobile = false }: AdSlotProps
 
   function handleClick() {
     if (!ad) return;
-    fetch("/api/ads/track", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ad_id: ad.id, type: "click" }),
-    }).catch((err) => console.error("AdSlot: click tracking failed", err));
+    track(ad.id, "click");
   }
 
   if (!ad) return null;

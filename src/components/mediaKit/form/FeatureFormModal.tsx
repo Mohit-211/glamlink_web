@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
+import { submitFeatureRequest } from "@/api/Api";
+import { readApiError } from "@/lib/apiError";
 
 interface Props {
     onClose: () => void;
@@ -41,6 +43,8 @@ export default function FeatureFormModal({ onClose }: Props) {
     const [form, setForm] = useState<FormState>(INITIAL_FORM);
     const [touched, setTouched] = useState<Partial<Record<FieldKey, boolean>>>({});
     const [submitAttempted, setSubmitAttempted] = useState(false);
+    const [sending, setSending] = useState(false);
+    const [sendError, setSendError] = useState("");
 
     const handleChange = (key: FieldKey, value: string) => {
         setForm((prev) => ({ ...prev, [key]: value }));
@@ -70,10 +74,30 @@ export default function FeatureFormModal({ onClose }: Props) {
     const isFormValid = () =>
         (Object.keys(INITIAL_FORM) as FieldKey[]).every((key) => !isFieldInvalid(key));
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         setSubmitAttempted(true);
-        if (!isFormValid()) return;
-        setStep(2);
+        if (!isFormValid() || sending) return;
+        setSending(true);
+        setSendError("");
+        try {
+            await submitFeatureRequest({
+                name: form.name.trim(),
+                specialty: form.specialty.trim(),
+                email: form.email.trim(),
+                phone: form.phone.trim(),
+                city: form.city.trim(),
+                interest: form.interest,
+            });
+            setStep(2);
+        } catch (err) {
+            const error = readApiError(err, "We couldn't send your request. Please try again.");
+            // The API names the field it refused: show that field's error
+            const field = error.details?.field as FieldKey | undefined;
+            if (field && field in INITIAL_FORM) setTouched((prev) => ({ ...prev, [field]: true }));
+            setSendError(error.message);
+        } finally {
+            setSending(false);
+        }
     };
 
     const textFields: { key: Exclude<FieldKey, "interest">; label: string; placeholder: string; type?: string; error: string }[] = [
@@ -85,7 +109,7 @@ export default function FeatureFormModal({ onClose }: Props) {
     ];
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center scrim p-4">
             <div className="flex max-h-[90vh] w-full max-w-[620px] flex-col overflow-hidden rounded-2xl bg-card shadow-large">
 
                 {/* HEADER */}
@@ -157,9 +181,17 @@ export default function FeatureFormModal({ onClose }: Props) {
                         </div>
 
                         {/* Actions */}
+                        {sendError && (
+                            <p role="alert" className="text-sm text-destructive">
+                                {sendError}
+                            </p>
+                        )}
                         <div className="mt-2 flex items-center gap-3">
-                            <button onClick={handleSubmit} className="btn-primary">Submit</button>
-                            <button onClick={handleClear} className="text-sm font-medium text-primary hover:underline">
+                            <button onClick={handleSubmit} className="btn-primary" disabled={sending}>
+                                {sending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+                                Submit
+                            </button>
+                            <button onClick={handleClear} className="link-glamlink text-sm">
                                 Clear form
                             </button>
                         </div>

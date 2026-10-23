@@ -37,7 +37,6 @@ function fetchAds(): Promise<AdSource[]> {
     adsPromise = getAds()
       .then((res) => {
         const rows: AdSource[] = res?.data?.rows ?? [];
-        console.log(rows,"rows")
         adsCache = rows;
         return rows;
       })

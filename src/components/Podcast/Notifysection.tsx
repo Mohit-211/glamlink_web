@@ -1,6 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { subscribeNewsletter } from "@/api/Api";
+import { readApiError } from "@/lib/apiError";
 
 // ─── Input field ──────────────────────────────────────────────────────────────
 function Field({
@@ -56,10 +59,20 @@ export default function NotifySection() {
     e.preventDefault();
     if (!email || !firstName) return;
     setLoading(true);
-    // Simulate API call — wire up your actual endpoint here
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    setSubmitted(true);
+    try {
+      // "Notify me" joins the newsletter list, marked as coming from the podcast
+      await subscribeNewsletter({
+        email: email.trim(),
+        first_name: firstName.trim(),
+        last_name: lastName.trim() || undefined,
+        source: "podcast",
+      });
+      setSubmitted(true);
+    } catch (error) {
+      toast.error(readApiError(error, "We couldn't sign you up. Please try again.").message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Staggered fade-up once the section scrolls into view.
@@ -84,7 +97,7 @@ export default function NotifySection() {
 
           {/* LEFT — copy */}
           <div>
-            <p className={`${fade("delay-0")} mb-5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-primary`}>
+            <p className={`${fade("delay-0")} mb-5 eyebrow text-secondary flex items-center gap-2`}>
               <span className="inline-block h-px w-5 bg-primary" />
               Never Miss an Episode
             </p>
@@ -167,7 +180,7 @@ export default function NotifySection() {
                     </p>
                   </div>
                   <div className="h-px w-full bg-border" />
-                  <p className="text-[10px] uppercase tracking-[0.15em] text-primary">✦ New episodes every Sunday</p>
+                  <p className="eyebrow">✦ New episodes every Sunday</p>
                 </div>
               )}
             </div>
