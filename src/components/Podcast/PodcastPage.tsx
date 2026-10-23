@@ -1,20 +1,28 @@
 "use client";
-import { useEffect, useState, type ComponentType } from "react";
+import { useEffect, useMemo, useState, type ComponentType } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Play, X } from "lucide-react";
 import GuestModal from "./GuestModal";
 import NotifySection from "./Notifysection";
 import UpcomingSchedule from "./UpcomingSchedule";
 import HeroSection from "./HeroSection";
+import { videoHref } from "@/lib/routes";
+import type { VideoCard } from "@/lib/api/types";
+import { PODCAST_SERIES } from "./podcastSeries";
 
 interface Video {
   id: string;
+  /** The episode's page on the site (/watch/<slug>), for episodes from the API. */
+  slug?: string;
   title: string;
   thumbnail: string;
   publishedAt: string;
   duration?: string;
 }
 
+// Only for the fallback below: once the API imports the playlist (backend handoff
+// 10.9), the key can be removed from the build.
 const YOUTUBE_API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY || "";
 const YOUTUBE_PLAYLIST_ID = "PLJPmuOJKw5YbrNAxnyi7SuQx9gNisadgY";
 const YOUTUBE_PLAYLIST_URL = `https://www.youtube.com/playlist?list=${YOUTUBE_PLAYLIST_ID}`;
@@ -73,6 +81,16 @@ const FALLBACK_EPISODES: Video[] = [
   { id: "fallback-4", title: "Inside the Pretty Kitty: How Tricia Evans Built a Multi-Location Waxing Brand", thumbnail: "", publishedAt: "2025-01-22" },
 ];
 
+/** An episode from the API (the Beauty Vault Podcast series) in this page's shape. */
+const fromApi = (video: VideoCard): Video => ({
+  id: video.youtube_id || String(video.id),
+  slug: video.slug,
+  title: video.title,
+  thumbnail: video.thumbnail || "",
+  publishedAt: video.published_at || "",
+});
+
+/** Fallback while the API has no episodes: the playlist read in the browser. */
 async function fetchPlaylistVideos(playlistId: string): Promise<{ videos: Video[]; totalCount: number }> {
   if (!YOUTUBE_API_KEY) return { videos: [], totalCount: 0 };
   const allItems: Video[] = [];
@@ -97,7 +115,6 @@ async function fetchPlaylistVideos(playlistId: string): Promise<{ videos: Video[
   return { videos: [...allItems], totalCount: allItems.length };
 }
 
-const eyebrow = "text-[10px] font-semibold uppercase tracking-[0.25em] text-primary";
 
 // ─── Video Modal ──────────────────────────────────────────────────────────────
 function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
@@ -110,15 +127,15 @@ function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/95 p-4 backdrop-blur-sm sm:p-8"
+      className="fixed inset-0 z-50 flex items-center justify-center scrim bg-overlay/90 p-4 sm:p-8"
       onClick={onClose}
     >
       <div className="relative mt-5 w-full max-w-[1030px]" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          className="absolute -top-12 right-0 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-white/60 transition-colors hover:text-white"
+          className="absolute -top-12 right-0 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-overlay-foreground/60 transition-colors hover:text-overlay-foreground"
         >
-          <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/20">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full border border-overlay-foreground/20">
             <X className="h-3.5 w-3.5" />
           </span>
           Close
@@ -132,7 +149,7 @@ function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
             className="absolute inset-0 h-full w-full border-0"
           />
         </div>
-        <p className="mt-5 text-center text-[13px] font-medium leading-snug text-white/70">{video.title}</p>
+        <p className="mt-5 text-center text-[13px] font-medium leading-snug text-overlay-foreground/70">{video.title}</p>
       </div>
     </div>
   );
@@ -164,7 +181,7 @@ function EpisodeCard({
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center bg-accent text-primary">
+          <div className="flex h-full w-full flex-col items-center justify-center bg-accent text-secondary">
             <span className="mb-1 text-4xl font-light leading-none sm:text-5xl">{episodeNum}</span>
             <span className="text-[9px] font-semibold uppercase tracking-[0.3em] opacity-70">Episode</span>
           </div>
@@ -177,12 +194,12 @@ function EpisodeCard({
 
         {/* Play overlay */}
         {!isFallback && (
-          <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/55 to-transparent to-55% p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <div className="absolute inset-0 flex items-end bg-gradient-to-t from-overlay/55 to-transparent to-55% p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             <div className="flex items-center gap-2.5">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary shadow-medium">
                 <Play className="ml-0.5 h-5 w-5 fill-primary-foreground text-primary-foreground" />
               </span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white">Watch Now</span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-overlay-foreground">Watch Now</span>
             </div>
           </div>
         )}
@@ -201,7 +218,7 @@ function EpisodeCard({
 function ListenOnCard() {
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-      <p className={`${eyebrow} mb-1`}>Listen On</p>
+      <p className="eyebrow mb-1">Listen On</p>
       <p className="mb-4 text-xs text-muted-foreground">Available on all major platforms</p>
       <div className="flex flex-col gap-2">
         {PLATFORMS.map(({ label, href, icon: Icon }) => (
@@ -210,7 +227,7 @@ function ListenOnCard() {
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-accent"
+            className="flex items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-secondary/40 hover:bg-accent"
           >
             <Icon className="h-4 w-4 text-primary" />
             {label}
@@ -244,20 +261,27 @@ function StatsBar({ episodeCount }: { episodeCount: number }) {
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
-export default function PodcastMain({ initialSlug }: { initialSlug?: string } = {}) {
+export default function PodcastMain({
+  initialSlug,
+  episodes = [],
+  episodeTotal = 0,
+}: { initialSlug?: string; episodes?: VideoCard[]; episodeTotal?: number } = {}) {
   const router = useRouter();
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [totalCount, setTotalCount] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+  const serverVideos = useMemo(() => episodes.map(fromApi), [episodes]);
+  const fromServer = serverVideos.length > 0;
+  const [videos, setVideos] = useState<Video[]>(serverVideos);
+  const [totalCount, setTotalCount] = useState<number>(episodeTotal || serverVideos.length);
+  const [loading, setLoading] = useState(!fromServer);
   const [activeVideo, setActiveVideo] = useState<Video | null>(null);
   const [guestModalOpen, setGuestModalOpen] = useState(false);
   const [filter, setFilter] = useState<"all" | "recent">("all");
 
   useEffect(() => {
+    if (fromServer) return;
     fetchPlaylistVideos(YOUTUBE_PLAYLIST_ID)
       .then(({ videos, totalCount }) => { setVideos(videos); setTotalCount(totalCount); })
       .finally(() => setLoading(false));
-  }, []);
+  }, [fromServer]);
 
   const finalVideos = videos.length > 0 ? videos : FALLBACK_EPISODES;
   const episodeCount = totalCount > 0 ? totalCount : FALLBACK_EPISODES.length;
@@ -278,7 +302,8 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
   }, [initialSlug, loading]);
 
   const playVideo = (video: Video) => {
-    router.push(`/podcast/${getVideoSlug(video)}`);
+    // Episodes from the API have their own page; the fallback plays in the modal.
+    router.push(video.slug ? videoHref(video.slug) : `/podcast/${getVideoSlug(video)}`);
   };
 
   const closeVideo = () => {
@@ -299,21 +324,18 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
             {/* Section header */}
             <div className="mb-8 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
               <div>
-                <p className={`${eyebrow} mb-1.5`}>✦ Now Streaming</p>
+                <p className="eyebrow mb-1.5">✦ Now Streaming</p>
                 <h2 className="text-2xl font-semibold leading-tight tracking-tight md:text-3xl">Latest Episodes</h2>
               </div>
 
               {/* Filter pills */}
-              <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-muted p-1">
+              <div className="flex shrink-0 items-center gap-1 rounded-full border border-border bg-card p-1">
                 {(["all", "recent"] as const).map((f) => (
                   <button
                     key={f}
                     onClick={() => setFilter(f)}
-                    className={`whitespace-nowrap rounded-full px-4 py-1.5 text-[11px] font-semibold tracking-wide transition-all ${
-                      filter === f
-                        ? "bg-card text-accent-foreground shadow-soft"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
+                    aria-pressed={filter === f}
+                    className="nav-link whitespace-nowrap rounded-full px-4 py-1.5 text-[11px] font-semibold tracking-wide"
                   >
                     {f === "all" ? "All Episodes" : "Recent"}
                   </button>
@@ -348,10 +370,17 @@ export default function PodcastMain({ initialSlug }: { initialSlug?: string } = 
 
             {/* View All */}
             <div className="mt-12 flex flex-wrap items-center gap-4">
-              <a href={YOUTUBE_PLAYLIST_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
-                View All Episodes
-                <ArrowRight className="h-4 w-4" />
-              </a>
+              {fromServer ? (
+                <Link href={`/watch?series=${PODCAST_SERIES}`} className="btn-primary">
+                  View All Episodes
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              ) : (
+                <a href={YOUTUBE_PLAYLIST_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
+                  View All Episodes
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+              )}
               <span className="text-[11px] text-muted-foreground">{episodeCount} episodes total</span>
             </div>
           </div>

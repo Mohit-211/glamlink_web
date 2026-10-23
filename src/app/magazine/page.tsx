@@ -5,6 +5,7 @@ import MagazineHero from "@/components/magazine/MagazineHero";
 import MagazineIssues from "@/components/magazine/MagazineIssues";
 import ConditionalGetFeatured from "@/components/common/ConditionalGetFeatured";
 import { pageRobots } from "@/lib/indexing";
+import { getMagazineIssues } from "@/lib/magazine";
 /* --------------------------------
    Page Metadata
 -------------------------------- */
@@ -49,7 +50,7 @@ export const metadata: Metadata = {
     ],
 
     siteName: "Glamlink",
-    locale: "en_IN",
+    locale: "en_US",
   },
 
   twitter: {
@@ -92,7 +93,9 @@ const collectionSchema = {
 /* --------------------------------
    Page
 -------------------------------- */
-export default function Magazine() {
+export default async function Magazine() {
+  const issues = await getMagazineIssues();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Magazine Schema */}
@@ -113,7 +116,7 @@ export default function Magazine() {
       />
       <main>
         <MagazineHero />
-        <MagazineIssues />
+        <MagazineIssues issues={issues} />
       </main>
       <ConditionalGetFeatured />
     </div>

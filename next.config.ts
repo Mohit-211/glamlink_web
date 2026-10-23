@@ -33,6 +33,16 @@ export default function nextConfig(phase: string): NextConfig {
   }
 
   return {
+    async redirects() {
+      return [
+        // The Shop moved out of the Journal to its own page (Oct 2026).
+        { source: "/journal/shop", destination: "/shop", permanent: true },
+        { source: "/journal/shop/:id", destination: "/shop/:id", permanent: true },
+        // Education and Events are switched off for now; temporary, so they can return.
+        { source: "/journal/education", destination: "/journal", permanent: false },
+        { source: "/journal/events", destination: "/journal", permanent: false },
+      ];
+    },
     // Test and staging builds (SITE_INDEXING=off, or any address other than
     // glamlink.net): every response tells crawlers not to index or follow.
     async headers() {

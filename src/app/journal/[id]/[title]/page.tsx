@@ -1,12 +1,16 @@
 import { SITE_URL } from "@/lib/config";
 import { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
+import { notFound, permanentRedirect } from "next/navigation";
 import AdSenseScript from "@/ads/AdSenseScript";
-import Image from "next/image";
 
-import { getBlogsById } from "@/api/Api";
+import { getArticle, getArticles } from "@/lib/api/public";
+import type { ArticleMention } from "@/lib/api/types";
+import { articleHref, topicHref } from "@/lib/routes";
+import ApiImage from "@/components/common/ApiImage";
+import ArticleTile from "@/components/content/ArticleTile";
 import ArticleContent from "@/components/blogs/ArticleContent";
-import RelatedArticles from "@/components/blogs/RelatedArticles";
 import DownloadButton from "@/components/Downloadbutton";
 import JournalShopCard from "@/components/blogs/JournalShopCard";
 import ArticleAdSlot from "@/ads/ArticleAdSlot";
@@ -53,6 +57,8 @@ interface BlogData {
   meta_description?: string;
   faqs?: FaqItem[];
   topics?: TopicItem[];
+  /** The people the article features who have a page (backend handoff, 10.7). */
+  mentions?: ArticleMention[];
 }
 
 /* --------------------------------
@@ -76,14 +82,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id, title } = await params;
 
-  const response = await getBlogsById(id);
-  const article: BlogData = response?.data;
+  // Cached and shared with the page below: one request per article
+  const article = await getArticle<BlogData>(id);
 
   if (!article) {
-    return { title: "Article Not Found | Glamlink" };
+    return { title: "Article not found" };
   }
 
-  const articleUrl = `${SITE_URL}/journal/${id}/${title}`;
+  // One URL per article, whatever title text a link carried
+  const articleUrl = `${SITE_URL}${articleHref(article)}`;
   const imageUrl =
     article.cover_image || `${SITE_URL}/default-blog.jpg`;
 
@@ -130,14 +137,24 @@ export default async function Article({
 }) {
   const { id, title } = await params;
 
-  const response = await getBlogsById(id);
-  const article: BlogData = response?.data;
+  const article = await getArticle<BlogData>(id);
 
-  if (!article) {
-    return <div className="text-center py-20">Article not found.</div>;
-  }
+  if (!article) notFound();
 
-  const articleUrl = `${SITE_URL}/journal/${id}/${title}`;
+  // Links carry the title as it was; send them to the article's one URL
+  const canonicalPath = articleHref(article);
+  if (`/journal/${id}/${decodeURIComponent(title)}` !== canonicalPath) permanentRedirect(canonicalPath);
+
+  // More from the same category; rows from another category (an older API
+  // ignoring the filter) are left out.
+  const categorySlug: string | undefined = article.journal_category?.slug;
+  const related = categorySlug
+    ? (await getArticles({ category: categorySlug, limit: 4, exclude: article.id })).rows
+        .filter((item) => item.id !== article.id && item.journal_category?.slug === categorySlug)
+        .slice(0, 3)
+    : [];
+
+  const articleUrl = `${SITE_URL}${canonicalPath}`;
   const imageUrl = article.cover_image || "/assets/fallback-blog.jpg";
 
 const formattedDate = article?.publish_date
@@ -277,7 +294,7 @@ const formattedDate = article?.publish_date
             {/* Category pill */}
             <div className="mb-6 mt-6">
               <span
-                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest text-primary"
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest text-secondary"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 {article?.journal_category?.title ?? "From the Treatment Room"}
@@ -295,19 +312,20 @@ const formattedDate = article?.publish_date
               {/* Image 16:9 */}
               <div className="relative rounded-2xl overflow-hidden w-full">
                 <div className="relative w-full aspect-video">
-                  <Image
-                    unoptimized={process.env.NODE_ENV === "development"}
+                  <ApiImage
                     src={imageUrl}
                     alt={article.title}
                     fill
+                    priority
+                    sizes="(min-width: 900px) 420px, (min-width: 768px) 45vw, 100vw"
                     className="object-cover hover:scale-[1.03] transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-overlay/55 via-transparent to-transparent" />
                   <div
-                    className="absolute bottom-0 left-0 right-0 bg-black/50 px-4 py-3"
+                    className="absolute bottom-0 left-0 right-0 bg-overlay/50 px-4 py-3"
                   >
 
-                    <p className="text-[13px] text-white font-medium">
+                    <p className="text-[13px] text-overlay-foreground font-medium">
                       {article?.journal_category?.title ?? "Glamlink Journal"}
                     </p>
                   </div>
@@ -325,7 +343,7 @@ const formattedDate = article?.publish_date
 
               {/* Author */}
               <div className="flex items-center gap-3 md:pl-6 md:border-l md:border-border flex-shrink-0">
-                <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium flex-shrink-0">
                   {article?.journal_author?.name?.charAt(0) ?? "A"}
                 </div>
                 <div>
@@ -347,12 +365,13 @@ const formattedDate = article?.publish_date
             {topics.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 mt-6">
                 {topics.map((topic) => (
-                  <span
+                  <Link
                     key={topic.id}
-                    className="text-xs font-medium text-muted-foreground px-3 py-1 rounded-full border border-border hover:border-primary/40 hover:text-primary transition-colors duration-200"
+                    href={topicHref(topic)}
+                    className="text-xs font-medium text-muted-foreground px-3 py-1 rounded-full border border-border hover:border-secondary/40 hover:text-secondary transition-colors duration-200"
                   >
                     {topic.name}
-                  </span>
+                  </Link>
                 ))}
               </div>
             )}
@@ -367,7 +386,7 @@ const formattedDate = article?.publish_date
           {/* ── BODY CONTENT ── */}
           <section className="mx-auto">
             <div>
-              <ArticleContent content={article.content ?? ""} />
+              <ArticleContent content={article.content ?? ""} mentions={article.mentions} />
 
             </div>
           </section>
@@ -389,7 +408,7 @@ const formattedDate = article?.publish_date
 
               <section>
                 <div className="mb-8">
-                  <p className="text-[10px] tracking-[.15em] uppercase text-muted-foreground/80 mb-2">
+                  <p className="eyebrow mb-2">
                     Resources
                   </p>
                   <h2 className="text-3xl text-foreground">
@@ -401,7 +420,7 @@ const formattedDate = article?.publish_date
                   {downloads.map((item) => (
                     <div
                       key={item.id}
-                      className="flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-soft"
+                      className="flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:border-secondary/40 hover:shadow-soft"
                     >
                       <div>
                         <div className="flex items-start justify-between gap-3 mb-2">
@@ -410,7 +429,7 @@ const formattedDate = article?.publish_date
                           </h3>
                           {getFileExt(item.file_name) && (
                             <span
-                              className="shrink-0 rounded-md border border-primary/25 bg-primary/10 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-primary"
+                              className="shrink-0 rounded-md border border-primary/25 bg-primary/10 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-secondary"
                             >
                               {getFileExt(item.file_name)}
                             </span>
@@ -424,7 +443,7 @@ const formattedDate = article?.publish_date
                       <DownloadButton
                         fileUrl={item.file_name}
                         label={item.button_text || "Download"}
-                        className="mt-5 inline-flex items-center justify-center gap-2 text-sm font-medium text-white px-4 py-2.5 rounded-full bg-primary hover:bg-primary transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                        className="mt-5 inline-flex items-center justify-center gap-2 text-sm font-medium text-primary-foreground px-4 py-2.5 rounded-full bg-primary hover:bg-secondary transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                       />
                     </div>
                   ))}
@@ -440,7 +459,7 @@ const formattedDate = article?.publish_date
 
               <section>
                 <div className="mb-8">
-                  <p className="text-[10px] tracking-[.15em] uppercase text-muted-foreground/80 mb-2">
+                  <p className="eyebrow mb-2">
                     Questions
                   </p>
                   <h2 className="text-3xl text-foreground">
@@ -477,18 +496,26 @@ const formattedDate = article?.publish_date
           <ArticleAdSlot slotId="journal-article-bottom" />
 
           {/* ── RELATED ARTICLES ── */}
-          <section style={{ justifyItems: "center" }}>
-            <div className="text-center mb-8 mx-auto max-w-2xl">
-              <p className="text-[10px] tracking-[.15em] uppercase text-muted-foreground/80 mb-2">
-                Continue reading
-              </p>
-              <h2 className="text-3xl text-foreground">
-                Related articles
-              </h2>
-            </div>
+          {related.length > 0 && (
+            <section aria-labelledby="related-heading">
+              <div className="text-center mb-8 mx-auto max-w-2xl">
+                <p className="eyebrow mb-2">
+                  Continue reading
+                </p>
+                <h2 id="related-heading" className="text-3xl text-foreground">
+                  More in {article.journal_category?.title?.trim() || "the Journal"}
+                </h2>
+              </div>
 
-            <RelatedArticles category_id={article?.category_id} />
-          </section>
+              <ul className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+                {related.map((item) => (
+                  <li key={item.id}>
+                    <ArticleTile article={item} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
         </article>
 

@@ -12,7 +12,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { encodeId } from "@/lib/idCodec";
+import { productHref } from "@/lib/routes";
 
 const PRODUCTS_PER_PAGE = 3;
 
@@ -57,7 +57,7 @@ const ProductCard = ({ product, onSelect, compact = false }: ProductCardProps) =
   return (
     <div
       onClick={() => onSelect(product)}
-      className={`group flex flex-col h-full border border-border/50 ${c.card} overflow-hidden bg-background shadow-sm hover:border-primary/50 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer`}
+      className={`group flex flex-col h-full border border-border/50 ${c.card} overflow-hidden bg-background shadow-sm hover:border-secondary/50 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer`}
     >
       <div className="relative aspect-[5/5.5] bg-muted/30 overflow-hidden">
         <img
@@ -80,7 +80,7 @@ const ProductCard = ({ product, onSelect, compact = false }: ProductCardProps) =
 
         <h3
           title={compact ? name : undefined}
-          className={`${c.title} leading-snug group-hover:text-primary transition-colors`}
+          className={`${c.title} leading-snug group-hover:text-secondary transition-colors`}
         >
           {name}
         </h3>
@@ -97,7 +97,7 @@ const ProductCard = ({ product, onSelect, compact = false }: ProductCardProps) =
               e.stopPropagation();
               if (product.link) window.open(product.link, "_blank");
             }}
-            className={`rounded-full ${c.button} border-primary/40 hover:border-primary hover:text-primary hover:bg-primary/5 cursor-pointer`}
+            className={`rounded-full ${c.button} border-primary/40 hover:border-secondary hover:text-secondary hover:bg-secondary/5 cursor-pointer`}
           >
             <ShoppingBag className={`h-3 w-3 ${c.icon}`} />
             Shop
@@ -112,9 +112,19 @@ interface JournalShopCardProps {
   shop?: any[];
   heading:string
   compact?: boolean;
+  /** Products per page: 3 beside an article, more on the Shop page. */
+  perPage?: number;
+  /** Columns from the lg breakpoint up. */
+  columns?: 3 | 4;
 }
 
-const JournalShopCard = ({ shop,heading, compact = false }: JournalShopCardProps) => {
+const JournalShopCard = ({
+  shop,
+  heading,
+  compact = false,
+  perPage = PRODUCTS_PER_PAGE,
+  columns = 3,
+}: JournalShopCardProps) => {
   const router = useRouter();
   const products = shop ?? [];
   const [currentPage, setCurrentPage] = useState(1);
@@ -123,10 +133,10 @@ const JournalShopCard = ({ shop,heading, compact = false }: JournalShopCardProps
     return null;
   }
 
-  const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
+  const totalPages = Math.ceil(products.length / perPage);
   const paginatedProducts = products.slice(
-    (currentPage - 1) * PRODUCTS_PER_PAGE,
-    currentPage * PRODUCTS_PER_PAGE
+    (currentPage - 1) * perPage,
+    currentPage * perPage
   );
 
   const goToPage = (page: number) => {
@@ -135,7 +145,7 @@ const JournalShopCard = ({ shop,heading, compact = false }: JournalShopCardProps
   };
 
   const goToProductDetails = (product: any) => {
-    router.push(`/journal/shop/${encodeId(product.id)}`);
+    router.push(productHref(product));
   };
 
   return (
@@ -143,7 +153,7 @@ const JournalShopCard = ({ shop,heading, compact = false }: JournalShopCardProps
       {/* Header */}
       {heading==="yes"&&
       <div className="text-center space-y-2">
-        <p className="text-[11px] uppercase tracking-widest text-primary font-semibold">
+        <p className="eyebrow">
           Curated Picks
         </p>
 
@@ -158,7 +168,7 @@ const JournalShopCard = ({ shop,heading, compact = false }: JournalShopCardProps
       </div>
 }
       {/* Grid */}
-      <div className={`grid sm:grid-cols-2 lg:grid-cols-3 ${compact ? "grid-cols-3 gap-2 sm:gap-6" : "gap-6"}`}>
+      <div className={`grid sm:grid-cols-2 ${columns === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"} ${compact ? "grid-cols-3 gap-2 sm:gap-6" : "gap-6"}`}>
         {paginatedProducts.map((product: any) => (
           <ProductCard
             key={product.id}
