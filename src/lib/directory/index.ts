@@ -1,14 +1,8 @@
-import { mockDirectoryProvider } from "./mockProvider";
+import { apiDirectoryProvider } from "./apiProvider";
 import type { DirectoryProvider } from "./types";
 
-/**
- * The active directory data source.
- *
- * To go live with Google Places, implement `DirectoryProvider` (ideally
- * calling a Next.js route handler so the API key stays server-side),
- * map Places results into `DirectoryBusiness`, and swap it in here.
- */
-export const directoryProvider: DirectoryProvider = mockDirectoryProvider;
+/** The directory's data: the API's Google listings and Glamlink's own professionals. */
+export const directoryProvider: DirectoryProvider = apiDirectoryProvider;
 
 export * from "./types";
 export * from "./categories";

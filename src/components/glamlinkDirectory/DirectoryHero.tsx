@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { BadgeCheck, MapPin } from "lucide-react";
-import { unsplash } from "@/lib/directory/mockData";
+/** Decorative stock photos for the hero (Unsplash). */
+const unsplash = (id: string, width = 800) =>
+  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${width}&q=75`;
 
 const HERO_IMAGES = {
   hair: unsplash("1562322140-8baeececf3df", 700),
@@ -86,7 +88,7 @@ export default function DirectoryHero({ children }: { children: ReactNode }) {
               </figure>
 
               {/* Floating makeup accent */}
-              <div className="absolute -left-10 top-1/2 -translate-y-1/2 h-28 w-28 overflow-hidden rounded-full border-4 border-white shadow-large animate-float">
+              <div className="absolute -left-10 top-1/2 -translate-y-1/2 h-28 w-28 overflow-hidden rounded-full border-4 border-card shadow-large animate-float">
                 <img
                   src={HERO_IMAGES.makeup}
                   alt="Makeup artistry"

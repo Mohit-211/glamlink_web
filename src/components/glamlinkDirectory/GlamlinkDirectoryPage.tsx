@@ -9,6 +9,7 @@ import {
   PROFESSIONAL_TYPES,
   type DirectoryBusiness,
   type FeaturedProfile,
+  type GeoCoordinates,
   type ProfessionalTypeId,
 } from "@/lib/directory";
 import { useDirectorySearch } from "@/hooks/useDirectorySearch";
@@ -37,6 +38,8 @@ export default function GlamlinkDirectoryPage() {
   const [claimTarget, setClaimTarget] = useState<DirectoryBusiness | null>(null);
 
   const locationInputRef = useRef<HTMLInputElement>(null);
+  // "Use my location": the point, kept while the box still shows its label
+  const myLocation = useRef<{ label: string; coordinates: GeoCoordinates } | null>(null);
   const { state, search, loadPopular } = useDirectorySearch();
 
   /* Initial load: featured profiles + results (from URL or nationwide picks). */
@@ -78,8 +81,10 @@ export default function GlamlinkDirectoryPage() {
     }
 
     setSearchError(null);
-    syncUrl(professionalType, trimmed);
-    search({ professionalType: professionalType || null, location: trimmed });
+    const here = myLocation.current?.label === trimmed ? myLocation.current.coordinates : undefined;
+    // A point is not shareable as text: the URL keeps the place only when one was typed
+    syncUrl(professionalType, here ? "" : trimmed);
+    search({ professionalType: professionalType || null, location: trimmed, coordinates: here });
     scrollToResults();
   };
 
@@ -95,12 +100,12 @@ export default function GlamlinkDirectoryPage() {
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
         try {
-          const resolved = await directoryProvider.reverseGeocode({
-            lat: coords.latitude,
-            lng: coords.longitude,
-          });
-          if (resolved) setLocation(resolved.label);
-          else setSearchError("We couldn't find your city. Enter a city, state or ZIP instead.");
+          const point = { lat: coords.latitude, lng: coords.longitude };
+          const resolved = await directoryProvider.reverseGeocode(point);
+          if (resolved) {
+            myLocation.current = { label: resolved.label, coordinates: resolved.coordinates ?? point };
+            setLocation(resolved.label);
+          } else setSearchError("We couldn't find your city. Enter a city, state or ZIP instead.");
         } finally {
           setIsLocating(false);
         }
@@ -171,7 +176,16 @@ export default function GlamlinkDirectoryPage() {
         />
       </DirectoryHero>
 
-      <FeaturedProfiles profiles={featured} />
+      {state.mode === "search" && state.status === "success" && state.profiles.length > 0 ? (
+        <FeaturedProfiles
+          profiles={state.profiles}
+          badge="On Glamlink"
+          title={`Glamlink professionals near ${state.location?.label ?? state.params?.location ?? "you"}`}
+          subtitle="Professionals with a Glamlink page, nearest first."
+        />
+      ) : (
+        <FeaturedProfiles profiles={featured} />
+      )}
 
       <DirectoryResults
         status={state.status}

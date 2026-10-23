@@ -1,47 +1,51 @@
-import { MapPin, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { MapPin, Sparkles, UserRound } from "lucide-react";
 import type { FeaturedProfile } from "@/lib/directory";
 
 export default function FeaturedProfileCard({ profile }: { profile: FeaturedProfile }) {
-  console.log(profile,"profile")
-  const locationText = [profile.address, profile.city, profile.state]
-    .filter(Boolean)
-    .join(", ");
+  const locationText = [profile.address, profile.city, profile.state].filter(Boolean).join(", ");
 
   return (
     <article
       className="group relative shrink-0 snap-start w-[78%] min-[480px]:w-[calc((100%_-_1rem)/2)] md:w-[calc((100%_-_3rem)/3)] lg:w-[calc((100%_-_4.5rem)/4)]"
-      aria-label={`${profile.name}, ${profile.title}`}
+      aria-label={[profile.name, profile.title].filter(Boolean).join(", ")}
     >
-      <div className="relative aspect-[3/4] overflow-hidden rounded-[1.75rem] bg-muted shadow-medium ring-1 ring-black/5">
-        <img
-          src={profile.imageUrl}
-          alt={profile.name}
-          loading="lazy"
-          draggable={false}
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-        />
+      <div className="relative aspect-3/4 overflow-hidden rounded-[1.75rem] bg-muted shadow-medium ring-1 ring-overlay/5">
+        {profile.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- photos come from any host the API stores
+          <img
+            src={profile.imageUrl}
+            alt=""
+            loading="lazy"
+            draggable={false}
+            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          />
+        ) : (
+          <div aria-hidden="true" className="flex h-full w-full items-center justify-center bg-accent text-secondary/40">
+            <UserRound className="h-20 w-20" />
+          </div>
+        )}
 
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent"
+          className="absolute inset-0 bg-linear-to-t from-overlay/80 via-overlay/15 to-transparent"
         />
 
-        {/* Featured indicator */}
         <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-card/95 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary shadow-sm">
           <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-          Featured
+          {profile.distanceLabel ?? "Featured"}
         </span>
 
         <div className="absolute inset-x-0 bottom-0 p-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/75">
-            {profile.featuredIn}
-          </p>
-          <h3 className="mt-1.5 text-2xl leading-tight font-semibold text-white">
-            {profile.name}
-          </h3>
-          <p className="mt-1 text-sm text-white/85">{profile.title}</p>
+          {profile.featuredIn && (
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-overlay-foreground/75">
+              {profile.featuredIn}
+            </p>
+          )}
+          <h3 className="mt-1.5 text-2xl leading-tight font-semibold text-overlay-foreground">{profile.name}</h3>
+          {profile.title && <p className="mt-1 text-sm text-overlay-foreground/85">{profile.title}</p>}
           {locationText && (
-            <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-white/80">
+            <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-overlay-foreground/80">
               <MapPin className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
               {locationText}
             </p>
@@ -49,7 +53,7 @@ export default function FeaturedProfileCard({ profile }: { profile: FeaturedProf
         </div>
 
         {profile.href && (
-          <a href={profile.href} className="absolute inset-0" aria-label={`Read about ${profile.name}`} />
+          <Link href={profile.href} className="absolute inset-0" aria-label={`See ${profile.name}'s page`} />
         )}
       </div>
     </article>

@@ -6,6 +6,7 @@ import {
   type DirectoryBusiness,
   type DirectoryLocation,
   type DirectorySearchParams,
+  type FeaturedProfile,
 } from "@/lib/directory";
 
 export type DirectoryResultsStatus = "loading" | "success" | "error";
@@ -15,6 +16,8 @@ export interface DirectoryResultsState {
   /** "popular" = nationwide picks before a search; "search" = user query. */
   mode: "popular" | "search";
   businesses: DirectoryBusiness[];
+  /** Glamlink's own professionals near the searched place. */
+  profiles: FeaturedProfile[];
   params: DirectorySearchParams | null;
   location: DirectoryLocation | null;
 }
@@ -23,6 +26,7 @@ const INITIAL_STATE: DirectoryResultsState = {
   status: "loading",
   mode: "popular",
   businesses: [],
+  profiles: [],
   params: null,
   location: null,
 };
@@ -61,11 +65,12 @@ export function useDirectorySearch() {
         mode: "search",
         params,
         businesses: result.businesses,
+        profiles: result.profiles,
         location: result.location,
       });
     } catch {
       if (id !== requestId.current) return;
-      setState((prev) => ({ ...prev, status: "error", businesses: [] }));
+      setState((prev) => ({ ...prev, status: "error", businesses: [], profiles: [] }));
     }
   }, []);
 

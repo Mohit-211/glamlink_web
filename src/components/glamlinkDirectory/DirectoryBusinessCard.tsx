@@ -1,4 +1,4 @@
-import { BadgeCheck, ExternalLink, MapPin } from "lucide-react";
+import { BadgeCheck, ExternalLink, MapPin, Store } from "lucide-react";
 import { getProfessionalType, type DirectoryBusiness } from "@/lib/directory";
 import StarRating from "./StarRating";
 import { GoogleWordmark } from "./GoogleAttribution";
@@ -14,13 +14,20 @@ export default function DirectoryBusinessCard({ business, onClaim }: DirectoryBu
 
   return (
     <article className="group flex w-full flex-col overflow-hidden rounded-2xl border bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-medium">
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-        <img
-          src={business.imageUrl}
-          alt={business.name}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-        />
+      <div className="relative aspect-4/3 overflow-hidden bg-muted">
+        {business.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- Google's photo, through the API's redirect
+          <img
+            src={business.imageUrl}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          />
+        ) : (
+          <div aria-hidden="true" className="flex h-full w-full items-center justify-center bg-accent text-secondary/40">
+            <Store className="h-14 w-14" />
+          </div>
+        )}
         <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
           {category}
         </span>
@@ -34,7 +41,7 @@ export default function DirectoryBusinessCard({ business, onClaim }: DirectoryBu
         <p className="mt-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
           <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span className="truncate">
-            {business.city}, {business.state}
+            {[business.city, business.state].filter(Boolean).join(", ") || business.neighborhood}
           </span>
         </p>
 
@@ -62,7 +69,7 @@ export default function DirectoryBusinessCard({ business, onClaim }: DirectoryBu
             <button
               type="button"
               onClick={() => onClaim(business)}
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-primary/40 bg-primary/[0.03] px-4 py-2 text-sm font-semibold text-primary transition-colors hover:border-primary hover:bg-primary/10"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-primary/40 bg-primary/[0.03] px-4 py-2 text-sm font-semibold text-primary transition-colors hover:border-secondary hover:bg-secondary/10 hover:text-secondary"
             >
               <BadgeCheck className="w-4 h-4" aria-hidden="true" />
               Claim This Profile

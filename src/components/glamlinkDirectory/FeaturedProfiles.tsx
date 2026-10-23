@@ -4,47 +4,22 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import type { FeaturedProfile } from "@/lib/directory";
 import FeaturedProfileCard from "./FeaturedProfileCard";
-import { getBusinessProfile } from "@/api/Api";
 
-/* Maps a public card (`businessCard/getAllProfiles`: accepted cards only) to the featured card shape. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const toFeaturedProfile = (card: any): FeaturedProfile => {
-  const location =
-    card?.locations?.find((loc: { is_primary?: boolean }) => loc?.is_primary) ??
-    card?.locations?.[0] ??
-    {};
-  return {
-    id: String(card?.id ?? card?._id ?? ""),
-    name: card?.name || card?.business_name || "",
-    title: card?.professional_title || card?.primary_specialty || "",
-    city: location?.city ?? card?.city ?? "",
-    state: location?.state || card?.state || "",
-    address: location?.address || card?.address || "",
-    imageUrl: card?.profile_image || "",
-    featuredIn: card?.featured_in || "Editorial",
-    href: card?.business_card_link || undefined,
-  };
-};
-
-export default function FeaturedProfiles({
-  profiles: fallbackProfiles = [],
-}: {
+interface FeaturedProfilesProps {
   profiles?: FeaturedProfile[];
-}) {
-  const [apiProfiles, setApiProfiles] = useState<FeaturedProfile[]>([]);
-  const profiles = apiProfiles.length ? apiProfiles : fallbackProfiles;
+  /** "Featured on Glamlink" before a search; "On Glamlink near …" after one. */
+  title?: string;
+  subtitle?: string;
+  badge?: string;
+}
 
-  useEffect(() => {
-    let active = true;
-    getBusinessProfile()
-      .then((res: any) => {
-        if (active) setApiProfiles((res?.data || []).map(toFeaturedProfile));
-      })
-      .catch((error) => console.log("API error:", error));
-    return () => {
-      active = false;
-    };
-  }, []);
+/** A row of Glamlink professionals; each card opens their page. */
+export default function FeaturedProfiles({
+  profiles = [],
+  title = "Featured on Glamlink",
+  subtitle = "Meet professionals and businesses featured across our editorial, The Beauty Vault and Expert Takes.",
+  badge = "Curated by Glamlink",
+}: FeaturedProfilesProps) {
 
   const trackRef = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
@@ -87,15 +62,12 @@ export default function FeaturedProfiles({
           <div className="max-w-2xl">
             <span className="badge-soft text-xs">
               <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-              Curated by Glamlink
+              {badge}
             </span>
             <h2 id="featured-on-glamlink" className="section-title mt-4">
-              Featured on Glamlink
+              {title}
             </h2>
-            <p className="section-subtitle">
-              Meet professionals and businesses featured across our editorial, The Beauty Vault
-              and Expert Takes.
-            </p>
+            <p className="section-subtitle">{subtitle}</p>
           </div>
 
           <div className="flex gap-2 shrink-0">
@@ -105,7 +77,7 @@ export default function FeaturedProfiles({
               disabled={!canPrev}
               aria-label="Previous featured profiles"
               aria-controls="featured-track"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border bg-card text-foreground shadow-soft transition hover:border-primary/50 hover:text-primary disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border bg-card text-foreground shadow-soft transition hover:border-secondary/50 hover:text-secondary disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground"
             >
               <ChevronLeft className="w-5 h-5" aria-hidden="true" />
             </button>
@@ -115,7 +87,7 @@ export default function FeaturedProfiles({
               disabled={!canNext}
               aria-label="Next featured profiles"
               aria-controls="featured-track"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border bg-card text-foreground shadow-soft transition hover:border-primary/50 hover:text-primary disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border bg-card text-foreground shadow-soft transition hover:border-secondary/50 hover:text-secondary disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground"
             >
               <ChevronRight className="w-5 h-5" aria-hidden="true" />
             </button>

@@ -40,9 +40,11 @@ export interface DirectorySearchParams {
   professionalType: ProfessionalTypeId | null;
   /** Raw user input: "City, State", a state, or a ZIP. */
   location: string;
+  /** The visitor's point ("Use my location"): searched instead of the text. */
+  coordinates?: GeoCoordinates;
 }
 
-/** A business listing sourced from Google (or the mock stand-in). */
+/** A business listing sourced from Google, through the API. */
 export interface DirectoryBusiness {
   /** Google `place_id` once connected to Places. */
   id: string;
@@ -64,13 +66,15 @@ export interface DirectoryBusiness {
 
 export interface DirectorySearchResult {
   businesses: DirectoryBusiness[];
+  /** Glamlink's own professionals near the place, nearest first. */
+  profiles: FeaturedProfile[];
   /** `null` when the location could not be resolved. */
   location: DirectoryLocation | null;
 }
 
 export type FeatureSource = "Editorial" | "The Beauty Vault" | "Expert Takes";
 
-/** A manually curated Glamlink profile (not Google-sourced). */
+/** A Glamlink professional (a page on the site, not a Google listing). */
 export interface FeaturedProfile {
   id: string;
   name: string;
@@ -79,14 +83,15 @@ export interface FeaturedProfile {
   state: string;
   address?: string;
   imageUrl: string;
-  featuredIn: FeatureSource;
+  /** Where they were featured, when known. */
+  featuredIn?: FeatureSource;
+  /** "2.4 mi away", after a search near a place. */
+  distanceLabel?: string;
   href?: string;
 }
 
 /**
- * Contract every directory data source implements.
- * Swap the mock for a Google Places-backed implementation in
- * `src/lib/directory/index.ts` without touching any component.
+ * Contract every directory data source implements (see `src/lib/directory/index.ts`).
  */
 export interface DirectoryProvider {
   searchBusinesses(params: DirectorySearchParams): Promise<DirectorySearchResult>;

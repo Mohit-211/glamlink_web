@@ -1,4 +1,4 @@
-import { AlertCircle, Pencil, RotateCcw, X } from "lucide-react";
+import { AlertCircle, MapPin, Pencil, RotateCcw, X } from "lucide-react";
 import type { DirectoryBusiness } from "@/lib/directory";
 import type { DirectoryResultsStatus } from "@/hooks/useDirectorySearch";
 import DirectoryBusinessCard from "./DirectoryBusinessCard";
@@ -46,6 +46,8 @@ export default function DirectoryResults({
 }: DirectoryResultsProps) {
   const isSearch = mode === "search";
   const isLoading = status === "loading";
+  // Google's listings need a place: before a search, invite one
+  const isIdle = !isSearch && status === "success" && businesses.length === 0;
 
   const countLabel = isLoading
     ? "Searching…"
@@ -72,40 +74,42 @@ export default function DirectoryResults({
         </div>
 
         {/* SEARCH CRITERIA */}
-        <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border bg-muted/40 px-4 py-3 sm:px-5">
-          <div className="min-w-0" aria-live="polite">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              {isSearch ? "Showing" : "Popular across the U.S."}
-            </p>
-            <p className="font-semibold text-foreground truncate">
-              {criteriaLabel}
-              {countLabel && (
-                <span className="ml-2 text-sm font-normal text-muted-foreground">· {countLabel}</span>
-              )}
-            </p>
-          </div>
+        {!isIdle && (
+          <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border bg-muted/40 px-4 py-3 sm:px-5">
+            <div className="min-w-0" aria-live="polite">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {isSearch ? "Showing" : "Popular across the U.S."}
+              </p>
+              <p className="font-semibold text-foreground truncate">
+                {criteriaLabel}
+                {countLabel && (
+                  <span className="ml-2 text-sm font-normal text-muted-foreground">· {countLabel}</span>
+                )}
+              </p>
+            </div>
 
-          <div className="flex shrink-0 gap-2">
-            <button
-              type="button"
-              onClick={onModifySearch}
-              className="inline-flex items-center gap-1.5 rounded-full border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary/50 hover:text-primary"
-            >
-              <Pencil className="w-3.5 h-3.5" aria-hidden="true" />
-              {isSearch ? "Modify" : "Search near you"}
-            </button>
-            {isSearch && (
+            <div className="flex shrink-0 gap-2">
               <button
                 type="button"
-                onClick={onClearSearch}
-                className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition hover:bg-card hover:text-foreground"
+                onClick={onModifySearch}
+                className="inline-flex items-center gap-1.5 rounded-full border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:border-secondary/50 hover:text-secondary"
               >
-                <X className="w-3.5 h-3.5" aria-hidden="true" />
-                Clear
+                <Pencil className="w-3.5 h-3.5" aria-hidden="true" />
+                {isSearch ? "Modify" : "Search near you"}
               </button>
-            )}
+              {isSearch && (
+                <button
+                  type="button"
+                  onClick={onClearSearch}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition hover:bg-card hover:text-foreground"
+                >
+                  <X className="w-3.5 h-3.5" aria-hidden="true" />
+                  Clear
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* BODY */}
         <div className="mt-8" aria-busy={isLoading}>
@@ -129,7 +133,22 @@ export default function DirectoryResults({
             </div>
           )}
 
-          {status === "success" && businesses.length === 0 && (
+          {isIdle && (
+            <div className="flex flex-col items-center rounded-3xl border border-dashed bg-background px-6 py-14 text-center sm:py-20">
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-card text-primary shadow-medium">
+                <MapPin className="h-7 w-7" aria-hidden="true" />
+              </span>
+              <h3 className="mt-6 text-2xl font-semibold sm:text-3xl">Find businesses near you</h3>
+              <p className="mt-3 max-w-md text-muted-foreground">
+                Search a city, state or ZIP, or use your location, to see beauty and wellness businesses nearby.
+              </p>
+              <button type="button" onClick={onModifySearch} className="btn-primary mt-8">
+                Search near you
+              </button>
+            </div>
+          )}
+
+          {isSearch && status === "success" && businesses.length === 0 && (
             <DirectoryEmptyState onModifySearch={onModifySearch} />
           )}
 
