@@ -170,7 +170,8 @@ export default function DashboardPage() {
   const [userdata, setUserData] = useState<any>(null);
   const [signingOut, setSigningOut] = useState(false);
   const [editCardId, setEditCardId] = useState<string | null>(null);
-  const [subscription, setSubscription] = useState<AccessSubscription | null>(null);
+  // null: no Access Pro seat (Free). undefined: not known (not loaded, or the call failed).
+  const [subscription, setSubscription] = useState<AccessSubscription | null | undefined>(undefined);
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -178,8 +179,8 @@ export default function DashboardPage() {
       setBusinessCard(cardRes?.data || cardRes);
       const paymentRes = await getPaymenthistory();
       setPaymentHistory(paymentRes?.data ?? []);
-      const subscriptionRes = await getAccessSubscription().catch(() => null);
-      setSubscription((subscriptionRes?.data ?? null) as AccessSubscription | null);
+      const subscriptionRes = await getAccessSubscription().catch(() => undefined);
+      setSubscription(subscriptionRes === undefined ? undefined : ((subscriptionRes?.data ?? null) as AccessSubscription | null));
     } catch (error: any) {
       setError(
         error?.response?.data?.message ||
@@ -245,6 +246,8 @@ export default function DashboardPage() {
   // Every owner can keep their details current; media and offers follow the plan.
   const editCardEnabled = !!editingCard;
   const proAccess = !isLiveCard(editingCard) || Boolean(subscription?.pro);
+  // Performance analytics are part of Access Pro: Free owners are offered the subscription.
+  const analyticsLocked = subscription !== undefined && !subscription?.pro;
   const PLAN_TYPE_LABELS: Record<string, string> = {
     free: "Free",
     pro: "Pro",
@@ -295,11 +298,12 @@ export default function DashboardPage() {
                 {NAV_ITEMS.map((item) => {
                   const isEditCard = item.id === 'edit-card';
                   const isDisabled = isEditCard && !editCardEnabled;
+                  const isProOnly = analyticsLocked && (item.id === 'analytics' || item.id === 'page-analytics');
                   return (
                     <button
                       key={item.id}
                       disabled={isDisabled}
-                      title={isDisabled ? 'Create a card first' : undefined}
+                      title={isDisabled ? 'Create a card first' : isProOnly ? 'Part of Access Pro' : undefined}
                       onClick={() => {
                         if (isDisabled) return;
                         if (item.id === 'edit-card') {
@@ -316,7 +320,7 @@ export default function DashboardPage() {
                         <p className="whitespace-nowrap text-sm font-medium lg:whitespace-normal">{item.label}</p>
                         <p className="hidden text-[11px] opacity-70 lg:block">{item.description}</p>
                       </div>
-                      {isDisabled ? (
+                      {isDisabled || isProOnly ? (
                         <Lock className="hidden h-4 w-4 lg:block" />
                       ) : (
                         <ChevronRight className="hidden h-4 w-4 lg:block" />
@@ -367,10 +371,18 @@ export default function DashboardPage() {
                     }}
                   />
                 )}
-                {activeTab === 'analytics' && <AccessCardAnalytics cards={cardsArray} />}
+                {activeTab === 'analytics' && (
+                  <AccessCardAnalytics
+                    cards={cardsArray}
+                    locked={analyticsLocked}
+                    onUpgrade={() => setActiveTab('subscription-plans')}
+                  />
+                )}
                 {activeTab === 'my-page' && <MyPageTab />}
                 {activeTab === 'products' && <ProductsTab />}
-                {activeTab === 'page-analytics' && <PageAnalytics />}
+                {activeTab === 'page-analytics' && (
+                  <PageAnalytics locked={analyticsLocked} onUpgrade={() => setActiveTab('subscription-plans')} />
+                )}
                 {activeTab === 'payment-history' && <PaymentHistory payments={paymentHistory} />}
                 {activeTab === 'qr-code' && <ShowQRCode cardData={businessCard} error={error} />}
                 {activeTab === 'subscription-plans' && (

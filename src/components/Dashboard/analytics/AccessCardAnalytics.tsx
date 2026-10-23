@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { getAccessCardAnalytics, getAccessCardAnalyticsEvents } from '@/api/Api';
+import { readApiError } from '@/lib/apiError';
 import type { AccessCardData } from '../types';
 import type {
   AnalyticsEvents,
@@ -22,6 +23,7 @@ import {
   AnalyticsEmptyState,
   AnalyticsErrorState,
   AnalyticsSkeleton,
+  AnalyticsUpgradeState,
 } from './AnalyticsStates';
 
 type CardOption = Pick<AccessCardData, 'id' | 'name' | 'business_name' | 'business_card_link'>;
@@ -33,12 +35,20 @@ interface LoadedAnalytics {
 
 const DEFAULT_PRESET_DAYS = 30;
 
-export default function AccessCardAnalytics({ cards }: { cards: CardOption[] }) {
+interface Props {
+  cards: CardOption[];
+  /** Free owners: analytics are part of Access Pro, so the tab offers the subscription instead. */
+  locked?: boolean;
+  onUpgrade?: () => void;
+}
+
+export default function AccessCardAnalytics({ cards, locked = false, onUpgrade }: Props) {
   const [selectedId, setSelectedId] = useState<string>(() => String(cards[0]?.id ?? ''));
   const [range, setRange] = useState<DateRangeValue>(() => presetRange(DEFAULT_PRESET_DAYS));
   const [data, setData] = useState<LoadedAnalytics | null>(null);
   const [loading, setLoading] = useState(false);
-  const [failed, setFailed] = useState(false);
+  // "upgrade": analytics are part of Access Pro (the API answers UPGRADE_REQUIRED).
+  const [failed, setFailed] = useState<false | 'error' | 'upgrade'>(false);
   const [reloadKey, setReloadKey] = useState(0);
   const requestRef = useRef(0);
 
@@ -52,7 +62,7 @@ export default function AccessCardAnalytics({ cards }: { cards: CardOption[] }) 
   const selectedCard = cards.find((c) => String(c.id) === selectedId) ?? null;
 
   useEffect(() => {
-    if (!selectedId) return;
+    if (!selectedId || locked) return;
     const requestId = ++requestRef.current;
     setLoading(true);
     setFailed(false);
@@ -75,15 +85,19 @@ export default function AccessCardAnalytics({ cards }: { cards: CardOption[] }) 
       })
       .catch((err: unknown) => {
         if (requestId !== requestRef.current) return;
-        console.error('Access card analytics failed:', err);
         setData(null);
-        setFailed(true);
+        if (readApiError(err).code === 'UPGRADE_REQUIRED') {
+          setFailed('upgrade');
+          return;
+        }
+        console.error('Access card analytics failed:', err);
+        setFailed('error');
         toast.error('Unable to load analytics', { id: 'access-card-analytics-error' });
       })
       .finally(() => {
         if (requestId === requestRef.current) setLoading(false);
       });
-  }, [selectedId, range.from, range.to, reloadKey]);
+  }, [selectedId, range.from, range.to, reloadKey, locked]);
 
   const retry = useCallback(() => setReloadKey((k) => k + 1), []);
 
@@ -161,7 +175,7 @@ export default function AccessCardAnalytics({ cards }: { cards: CardOption[] }) 
               ))}
             </select>
           )}
-          <AnalyticsDateFilter value={range} onChange={setRange} disabled={loading} />
+          {!locked && <AnalyticsDateFilter value={range} onChange={setRange} disabled={loading} />}
           {summary && !loading && (
             <p className="text-[11px] text-muted-foreground">Showing {rangeLabel}</p>
           )}
@@ -169,7 +183,9 @@ export default function AccessCardAnalytics({ cards }: { cards: CardOption[] }) 
       </div>
 
       {/* Body */}
-      {loading || (!data && !failed) ? (
+      {locked || failed === 'upgrade' ? (
+        <AnalyticsUpgradeState onUpgrade={onUpgrade} />
+      ) : loading || (!data && !failed) ? (
         <AnalyticsSkeleton />
       ) : failed || !summary || !data ? (
         <AnalyticsErrorState onRetry={retry} />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, BarChart3, RefreshCw } from 'lucide-react';
+import { AlertCircle, BarChart3, Lock, RefreshCw } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -117,6 +117,26 @@ export function AnalyticsEmptyState({
       </div>
       <p className="mt-4 text-sm font-semibold text-foreground">{title}</p>
       <p className="mt-1 max-w-sm text-xs text-muted-foreground sm:text-sm">{message}</p>
+    </div>
+  );
+}
+
+/** Performance analytics are part of Access Pro: what Free owners see instead of their numbers. */
+export function AnalyticsUpgradeState({ onUpgrade }: { onUpgrade?: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 px-6 py-12 text-center sm:py-16">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-secondary">
+        <Lock className="h-5 w-5" />
+      </div>
+      <p className="mt-4 text-sm font-semibold text-foreground">Subscribe to Access Pro to see your analytics</p>
+      <p className="mt-1 max-w-sm text-xs text-muted-foreground sm:text-sm">
+        Performance analytics show how many people view your card and page, and which links they tap.
+      </p>
+      {onUpgrade && (
+        <button type="button" onClick={onUpgrade} className="btn-primary mt-5 px-4 py-2 text-xs">
+          Subscribe to Access Pro
+        </button>
+      )}
     </div>
   );
 }

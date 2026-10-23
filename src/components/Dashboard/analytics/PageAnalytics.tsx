@@ -12,7 +12,13 @@ import ViewsClicksChart from './ViewsClicksChart';
 import ClickActivity from './ClickActivity';
 import DeviceBreakdown from './DeviceBreakdown';
 import { getEventConfig } from './eventConfig';
-import { AnalyticsEmptyState, AnalyticsErrorState, AnalyticsPanel, AnalyticsSkeleton } from './AnalyticsStates';
+import {
+  AnalyticsEmptyState,
+  AnalyticsErrorState,
+  AnalyticsPanel,
+  AnalyticsSkeleton,
+  AnalyticsUpgradeState,
+} from './AnalyticsStates';
 
 /*
  * Views and clicks on the owner's page (/profiles/<slug>), from
@@ -43,7 +49,8 @@ const targetLabel = (type: string, target: string | null) => {
   }
 };
 
-export default function PageAnalytics() {
+/** `locked`: a Free owner; analytics are part of Access Pro, so the tab offers the subscription instead. */
+export default function PageAnalytics({ locked = false, onUpgrade }: { locked?: boolean; onUpgrade?: () => void }) {
   const [range, setRange] = useState<DateRangeValue>(() => presetRange(DEFAULT_PRESET_DAYS));
   const [data, setData] = useState<PageAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,6 +59,7 @@ export default function PageAnalytics() {
   const requestRef = useRef(0);
 
   useEffect(() => {
+    if (locked) return;
     const requestId = ++requestRef.current;
     getMyProfileAnalytics({ from: range.from, to: range.to })
       .then((res) => {
@@ -64,13 +72,18 @@ export default function PageAnalytics() {
         if (requestId !== requestRef.current) return;
         const error = readApiError(err, 'Unable to load page analytics');
         setData(null);
+        // "upgrade": analytics are part of Access Pro; other 403s and 404s mean no page yet.
+        if (error.code === 'UPGRADE_REQUIRED') {
+          setFailed('upgrade');
+          return;
+        }
         setFailed(error.status === 404 || error.status === 403 ? error.message : 'error');
         if (error.status !== 404 && error.status !== 403) toast.error('Unable to load page analytics', { id: 'page-analytics-error' });
       })
       .finally(() => {
         if (requestId === requestRef.current) setLoading(false);
       });
-  }, [range.from, range.to, reloadKey]);
+  }, [range.from, range.to, reloadKey, locked]);
 
   const retry = useCallback(() => {
     setLoading(true);
@@ -102,19 +115,23 @@ export default function PageAnalytics() {
           </p>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-shrink-0 sm:items-end">
-          <AnalyticsDateFilter
-            value={range}
-            onChange={(next) => {
-              setLoading(true);
-              setRange(next);
-            }}
-            disabled={loading}
-          />
+          {!locked && (
+            <AnalyticsDateFilter
+              value={range}
+              onChange={(next) => {
+                setLoading(true);
+                setRange(next);
+              }}
+              disabled={loading}
+            />
+          )}
           {data && !loading && <p className="text-[11px] text-muted-foreground">Showing {rangeLabel}</p>}
         </div>
       </div>
 
-      {loading ? (
+      {locked || failed === 'upgrade' ? (
+        <AnalyticsUpgradeState onUpgrade={onUpgrade} />
+      ) : loading ? (
         <AnalyticsSkeleton />
       ) : failed && failed !== 'error' ? (
         <AnalyticsEmptyState title="No page yet" message={failed} />
