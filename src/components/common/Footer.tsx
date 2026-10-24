@@ -13,11 +13,9 @@ const footerLinks = {
   navigation: [
     { label: "Journal", href: "/journal" },
     { label: "Magazine", href: "/magazine" },
-    { label: "Watch + Learn", href: "/watch" },
     { label: "The Beauty Vault Podcast", href: "/podcast" },
     { label: "Shop", href: "/shop" },
     { label: "Find a Professional", href: "/directory" },
-    { label: "Find a Brand", href: "/industry" },
     { label: "Topics", href: "/topics" },
     { label: "Partner With Glamlink", href: "/partner" },
   ],

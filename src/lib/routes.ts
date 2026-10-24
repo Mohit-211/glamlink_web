@@ -1,4 +1,5 @@
 import slugify from "slugify";
+import { PODCAST_SERIES } from "@/components/Podcast/podcastSeries";
 import { encodeId } from "@/lib/idCodec";
 import type { SearchGroup } from "@/lib/api/types";
 
@@ -24,7 +25,12 @@ export const profileHref = (slug: string) => `/profiles/${encodeURIComponent(slu
 export const topicHref = (topic: { id: number | string; slug?: string | null }) =>
   `/topics/${topic.slug ? encodeURIComponent(topic.slug) : topic.id}`;
 
-export const videoHref = (slug: string) => `/watch/${encodeURIComponent(slug)}`;
+/** A Beauty Vault episode's page, on the podcast's own page. */
+export const episodeHref = (slug: string) => `/podcast/${encodeURIComponent(slug)}`;
+
+/** A video's page: the podcast's episodes are on the podcast, other series under /watch. */
+export const videoHref = (video: { slug: string; series?: { slug: string } | null }) =>
+  video.series?.slug === PODCAST_SERIES ? episodeHref(video.slug) : `/watch/${encodeURIComponent(video.slug)}`;
 
 export const issueHref = (slug: string) => `/magazine/${encodeURIComponent(slug)}`;
 

@@ -10,15 +10,16 @@ import logo from "../../../public/header_logo.png";
 import { LogoutUser } from "@/api/Api";
 import { useSession } from "@/lib/useSession";
 
-// The menu of the Oct 2026 home page mockup. The magazine and the podcast are
-// reached from the Journal, Watch and the footer.
+// The menu of the Oct 2026 home page mockup, with the magazine beside the
+// Journal and the podcast's own page where the mockup has Watch. Brands are
+// found in the Directory, beside professionals.
 const navLinks = [
   { label: "Home", href: "/", id: "home" },
   { label: "Journal", href: "/journal", id: "journal" },
-  { label: "Watch", href: "/watch", id: "watch" },
+  { label: "Magazine", href: "/magazine", id: "magazine" },
+  { label: "Podcast", href: "/podcast", id: "podcast" },
   { label: "Shop", href: "/shop", id: "shop" },
   { label: "Directory", href: "/directory", id: "directory" },
-  { label: "Industry", href: "/industry", id: "industry" },
   { label: "Access", href: "/access", id: "access" },
 ];
 

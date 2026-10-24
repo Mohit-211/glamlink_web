@@ -1,19 +1,17 @@
 "use client";
 import { useEffect, useMemo, useState, type ComponentType } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Play, X } from "lucide-react";
 import GuestModal from "./GuestModal";
 import NotifySection from "./Notifysection";
 import UpcomingSchedule from "./UpcomingSchedule";
 import HeroSection from "./HeroSection";
-import { videoHref } from "@/lib/routes";
+import { episodeHref } from "@/lib/routes";
 import type { VideoCard } from "@/lib/api/types";
-import { PODCAST_SERIES } from "./podcastSeries";
 
 interface Video {
   id: string;
-  /** The episode's page on the site (/watch/<slug>), for episodes from the API. */
+  /** The episode's page on the site (/podcast/<slug>), for episodes from the API. */
   slug?: string;
   title: string;
   thumbnail: string;
@@ -94,14 +92,17 @@ const fromApi = (video: VideoCard): Video => ({
 async function fetchPlaylistVideos(playlistId: string): Promise<{ videos: Video[]; totalCount: number }> {
   if (!YOUTUBE_API_KEY) return { videos: [], totalCount: 0 };
   const allItems: Video[] = [];
+  const asked = new Set<string>();
   let pageToken = "";
   do {
+    asked.add(pageToken);
     const pageParam = pageToken ? `&pageToken=${pageToken}` : "";
     const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}${pageParam}`;
     const res = await fetch(url);
     if (!res.ok) break;
     const data = await res.json();
-    const items: Video[] = (data.items || [])
+    const page = data.items || [];
+    const items: Video[] = page
       .filter((item: any) => item.snippet?.resourceId?.videoId && item.snippet.title !== "Deleted video" && item.snippet.title !== "Private video")
       .map((item: any) => ({
         id: item.snippet.resourceId.videoId,
@@ -110,7 +111,8 @@ async function fetchPlaylistVideos(playlistId: string): Promise<{ videos: Video[
         publishedAt: item.snippet.publishedAt,
       }));
     allItems.push(...items);
-    pageToken = data.nextPageToken || "";
+    // YouTube can end with an empty page whose next token is its own: stop there rather than ask forever.
+    pageToken = page.length && !asked.has(data.nextPageToken) ? data.nextPageToken || "" : "";
   } while (pageToken);
   return { videos: [...allItems], totalCount: allItems.length };
 }
@@ -303,7 +305,7 @@ export default function PodcastMain({
 
   const playVideo = (video: Video) => {
     // Episodes from the API have their own page; the fallback plays in the modal.
-    router.push(video.slug ? videoHref(video.slug) : `/podcast/${getVideoSlug(video)}`);
+    router.push(video.slug ? episodeHref(video.slug) : `/podcast/${getVideoSlug(video)}`);
   };
 
   const closeVideo = () => {
@@ -370,17 +372,10 @@ export default function PodcastMain({
 
             {/* View All */}
             <div className="mt-12 flex flex-wrap items-center gap-4">
-              {fromServer ? (
-                <Link href={`/watch?series=${PODCAST_SERIES}`} className="btn-primary">
-                  View All Episodes
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              ) : (
-                <a href={YOUTUBE_PLAYLIST_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
-                  View All Episodes
-                  <ArrowRight className="h-4 w-4" />
-                </a>
-              )}
+              <a href={YOUTUBE_PLAYLIST_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
+                View All Episodes
+                <ArrowRight className="h-4 w-4" />
+              </a>
               <span className="text-[11px] text-muted-foreground">{episodeCount} episodes total</span>
             </div>
           </div>

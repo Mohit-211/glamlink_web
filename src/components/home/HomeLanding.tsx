@@ -7,9 +7,9 @@ import ApiImage from "@/components/common/ApiImage";
 import ArticleTile from "@/components/content/ArticleTile";
 import ProductTile from "@/components/content/ProductTile";
 import ProfileTile from "@/components/content/ProfileTile";
-import SectionHeading from "@/components/content/SectionHeading";
 import TopicTile from "@/components/content/TopicTile";
 import VideoTile from "@/components/content/VideoTile";
+import HomeCarousel from "@/components/home/HomeCarousel";
 import {
   getArticles,
   getFeaturedTopics,
@@ -18,15 +18,17 @@ import {
   getProfiles,
   getVideos,
 } from "@/lib/api/public";
+import type { Paged } from "@/lib/api/types";
 import { searchHref } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import accessWordmark from "../../../public/assets/ACCESS-3.png";
 
 /*
- * Home page (Oct 2026 mockup). Every row reads the API: topic tiles, featured
- * products, brands and videos, the newest articles, and the images and popular
- * searches admins set in the home settings. A row with nothing to show is left
- * out; an image admins have not set yet shows a quiet panel instead.
+ * Home page (Oct 2026 mockup, with Brands where the mockup has Inside the
+ * Industry). Every row reads the API: topic tiles, products, brands and videos
+ * (the featured ones, else the first few), the newest articles, and the images
+ * and popular searches admins set in the home settings. A row with nothing to
+ * show is left out; an image admins have not set yet shows a quiet panel instead.
  */
 
 const DEFAULT_POPULAR_SEARCHES = ["Botox", "Skin Rejuvenation", "Weight Loss", "Facials", "Plastic Surgery"];
@@ -40,47 +42,93 @@ const ACCESS_POINTS: { icon: LucideIcon; label: string }[] = [
 
 /* ── Building blocks ─────────────────────────────────────────── */
 
+type SectionLink = { label: string; href: string };
+
+/** A section's "Explore all …" link, in small capitals as in the mockup. */
+function MoreLink({ label, href }: SectionLink) {
+  return (
+    <Link href={href} className="eyebrow inline-flex shrink-0 items-center gap-1.5 transition-colors hover:text-secondary">
+      {label}
+      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+    </Link>
+  );
+}
+
+/** A section with its title row above the content. `band` sets it on the grey band. */
 function HomeSection({
   id,
   title,
   subtitle,
   action,
+  band = false,
   children,
 }: {
   id: string;
   title: string;
   subtitle?: string;
-  action?: { label: string; href: string };
+  action?: SectionLink;
+  band?: boolean;
   children: ReactNode;
 }) {
   return (
-    <section aria-labelledby={`${id}-heading`} className="py-10 md:py-14">
+    <section aria-labelledby={`${id}-heading`} className={cn("py-10 md:py-14", band && "bg-muted/60")}>
       <div className="container-glamlink">
-        <SectionHeading id={`${id}-heading`} title={title} subtitle={subtitle} action={action} />
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 md:mb-8">
+          <div className="min-w-0">
+            <h2 id={`${id}-heading`} className="section-title">
+              {title}
+            </h2>
+            {subtitle && <p className="mt-2 text-sm text-muted-foreground md:text-base">{subtitle}</p>}
+          </div>
+          {action && <MoreLink {...action} />}
+        </div>
         {children}
       </div>
     </section>
   );
 }
 
-/** Swipeable row on phones and tablets, a plain grid from lg up. */
-function CardRow({ label, columns, children }: { label: string; columns: 4 | 5; children: ReactNode }) {
+/** Shop Products and Brands: from lg up, the title sits beside the row, with the link above the row. */
+function ShelfSection({
+  id,
+  title,
+  subtitle,
+  action,
+  band = false,
+  children,
+}: {
+  id: string;
+  title: string;
+  subtitle: string;
+  action: SectionLink;
+  band?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <ul
-      aria-label={label}
-      className={cn(
-        // Bleeds to the screen edge; scroll-padding keeps the first card on the page gutter
-        "no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-2",
-        "sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:overflow-visible lg:px-0 lg:pb-0",
-        columns === 5 ? "lg:grid-cols-5" : "lg:grid-cols-4"
-      )}
-    >
-      {children}
-    </ul>
+    <section aria-labelledby={`${id}-heading`} className={cn("py-10 md:py-14", band && "bg-muted/60")}>
+      <div className="container-glamlink grid gap-x-12 gap-y-4 lg:grid-cols-[15rem_minmax(0,1fr)] xl:grid-cols-[17rem_minmax(0,1fr)]">
+        <div className="lg:pt-10">
+          <h2 id={`${id}-heading`} className="section-title">
+            {title}
+          </h2>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground md:text-base">{subtitle}</p>
+        </div>
+        <div className="min-w-0">
+          <div className="mb-4 flex justify-end">
+            <MoreLink {...action} />
+          </div>
+          {children}
+        </div>
+      </div>
+    </section>
   );
 }
 
-const ROW_ITEM = "w-[45%] shrink-0 snap-start sm:w-[30%] lg:w-auto";
+/** Card widths in a carousel: the next card peeks in on phones; five or four side by side from lg up. */
+const SLIDE = {
+  5: "w-[45%] shrink-0 snap-start sm:w-[30%] lg:w-[calc((100%-4rem)/5)]",
+  4: "w-[75%] shrink-0 snap-start sm:w-[45%] lg:w-[calc((100%-3rem)/4)]",
+};
 
 /** A photo with a short line over it, or a tinted panel with the line while there is no photo. */
 function PhotoPanel({
@@ -88,12 +136,15 @@ function PhotoPanel({
   tagline,
   sizes,
   priority = false,
+  fadeLeft = false,
   className,
 }: {
   src: string | null | undefined;
   tagline: ReactNode;
   sizes: string;
   priority?: boolean;
+  /** From lg up, fade the photo's left side into the page, for text laid over it. */
+  fadeLeft?: boolean;
   className?: string;
 }) {
   if (!src) {
@@ -107,8 +158,11 @@ function PhotoPanel({
   }
   return (
     <div className={cn("relative overflow-hidden", className)}>
-      <ApiImage src={src} alt="" fill priority={priority} sizes={sizes} className="object-cover" />
+      <ApiImage src={src} alt="" fill priority={priority} sizes={sizes} className="object-cover lg:object-right" />
       <div className="absolute inset-0 bg-linear-to-t from-overlay/50 via-overlay/5 to-transparent" />
+      {fadeLeft && (
+        <div className="absolute inset-0 hidden bg-linear-to-r from-background via-background/80 via-35% to-transparent to-65% lg:block" />
+      )}
       <p className="absolute bottom-6 right-6 text-right text-xs font-semibold uppercase leading-relaxed tracking-[0.2em] text-overlay-foreground md:bottom-8 md:right-8 md:text-sm">
         {tagline}
       </p>
@@ -118,58 +172,62 @@ function PhotoPanel({
 
 /* ── Sections ────────────────────────────────────────────────── */
 
+/** On phones the text comes first and the photo under it; from lg the photo fills the band behind the text. */
 function Hero({ image, popularSearches }: { image: string | null | undefined; popularSearches: string[] }) {
   return (
-    <section aria-labelledby="home-hero-heading" className="pt-20 md:pt-24">
-      <div className="container-glamlink grid items-center gap-8 py-8 lg:grid-cols-[1fr_1.05fr] lg:gap-14 lg:py-12">
-        <div>
-          <h1 id="home-hero-heading" className="hero-title">
-            Beauty Lives Here
-          </h1>
-          <p className="mt-4 text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground md:text-base">
-            Discover. Learn. Shop. Connect.
-          </p>
+    <section aria-labelledby="home-hero-heading" className="pt-16 md:pt-20">
+      <div className="grid lg:min-h-128">
+        <div className="container-glamlink relative z-10 py-8 lg:col-start-1 lg:row-start-1 lg:self-center lg:py-16">
+          <div className="max-w-2xl">
+            <h1 id="home-hero-heading" className="hero-title">
+              Beauty Lives Here
+            </h1>
+            <p className="mt-4 text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground md:text-base">
+              Discover. Learn. Shop. Connect.
+            </p>
 
-          <Form action="/search" role="search" className="relative mt-8 max-w-xl">
-            <label htmlFor="home-search" className="sr-only">
-              Search Glamlink
-            </label>
-            <input
-              id="home-search"
-              name="q"
-              type="search"
-              required
-              minLength={2}
-              maxLength={100}
-              placeholder="Search treatments, professionals, products and more..."
-              className="input-glamlink h-14 rounded-full pl-6 pr-16 shadow-soft"
-            />
-            <button
-              type="submit"
-              aria-label="Search"
-              className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-secondary"
-            >
-              <Search className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </Form>
+            <Form action="/search" role="search" className="relative mt-8 max-w-xl">
+              <label htmlFor="home-search" className="sr-only">
+                Search Glamlink
+              </label>
+              <input
+                id="home-search"
+                name="q"
+                type="search"
+                required
+                minLength={2}
+                maxLength={100}
+                placeholder="Search treatments, professionals, products and more..."
+                className="input-glamlink h-14 rounded-full pl-6 pr-16 shadow-soft"
+              />
+              <button
+                type="submit"
+                aria-label="Search"
+                className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-secondary"
+              >
+                <Search className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </Form>
 
-          {popularSearches.length > 0 && (
-            <div className="mt-5 flex flex-wrap items-center gap-2">
-              <span className="mr-1 text-sm font-semibold">Popular Searches:</span>
-              {popularSearches.map((term) => (
-                <Link key={term} href={searchHref(term)} className="chip rounded-full px-3.5 py-1.5 text-xs">
-                  {term}
-                </Link>
-              ))}
-            </div>
-          )}
+            {popularSearches.length > 0 && (
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <span className="mr-1 text-sm font-semibold">Popular Searches:</span>
+                {popularSearches.map((term) => (
+                  <Link key={term} href={searchHref(term)} className="chip rounded-full px-3.5 py-1.5 text-xs">
+                    {term}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <PhotoPanel
           src={image}
           priority
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          className="aspect-4/3 rounded-3xl lg:aspect-auto lg:h-130"
+          fadeLeft
+          sizes="100vw"
+          className="mx-5 aspect-4/3 rounded-3xl sm:mx-6 lg:col-start-1 lg:row-start-1 lg:mx-0 lg:aspect-auto lg:rounded-none"
           tagline={
             <>
               Real people.
@@ -186,34 +244,32 @@ function Hero({ image, popularSearches }: { image: string | null | undefined; po
 
 function FindProfessional({ image }: { image: string | null | undefined }) {
   return (
-    <section aria-labelledby="find-pro-heading" className="py-10 md:py-14">
-      <div className="container-glamlink">
-        <div className="grid overflow-hidden rounded-3xl border border-border bg-card lg:grid-cols-[1fr_1.4fr]">
-          <div className="flex flex-col items-start justify-center gap-4 p-8 md:p-12">
-            <h2 id="find-pro-heading" className="section-title">
-              Find a Professional
-            </h2>
-            <p className="max-w-sm text-muted-foreground">
-              Search trusted beauty + wellness professionals across the U.S.
-            </p>
-            <Link href="/directory" className="btn-primary mt-2">
-              Search Directory
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-          <PhotoPanel
-            src={image}
-            sizes="(min-width: 1024px) 58vw, 100vw"
-            className="min-h-60 lg:min-h-80"
-            tagline={
-              <>
-                Real experts.
-                <br />
-                Real results.
-              </>
-            }
-          />
+    <section aria-labelledby="find-pro-heading" className="bg-muted/60 py-10 md:py-14">
+      <div className="container-glamlink grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-12">
+        <div className="flex flex-col items-start gap-4">
+          <h2 id="find-pro-heading" className="section-title">
+            Find a Professional
+          </h2>
+          <p className="max-w-sm text-muted-foreground">
+            Search trusted beauty + wellness professionals across the U.S.
+          </p>
+          <Link href="/directory" className="btn-primary mt-2">
+            Search Directory
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
+        <PhotoPanel
+          src={image}
+          sizes="(min-width: 1024px) 66vw, 100vw"
+          className="aspect-video rounded-3xl lg:aspect-3/1"
+          tagline={
+            <>
+              Real experts.
+              <br />
+              Real results.
+            </>
+          }
+        />
       </div>
     </section>
   );
@@ -221,31 +277,27 @@ function FindProfessional({ image }: { image: string | null | undefined }) {
 
 function AccessBand() {
   return (
-    <section aria-labelledby="access-heading" className="py-10 md:py-14">
-      <div className="container-glamlink">
-        <div className="grid items-center gap-10 rounded-3xl border border-border bg-accent/60 p-8 md:p-12 lg:grid-cols-[1.2fr_1fr]">
-          <div>
-            <h2 id="access-heading">
-              <Image src={accessWordmark} alt="Access by Glamlink" className="h-auto w-48 md:w-60" />
-            </h2>
-            <p className="mt-6 text-xl font-semibold md:text-2xl">A smarter way to connect</p>
-            <p className="mt-2 text-muted-foreground">Digital profiles. Instant sharing. Lasting impressions.</p>
-            <Link href="/access" className="btn-primary mt-8">
-              Learn more
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            {ACCESS_POINTS.map(({ icon: Icon, label }) => (
-              <li key={label} className="flex items-center gap-4 rounded-2xl bg-card p-4 shadow-soft">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-secondary">
-                  <Icon className="h-5 w-5" aria-hidden="true" />
-                </span>
-                <span className="text-sm font-semibold md:text-base">{label}</span>
-              </li>
-            ))}
-          </ul>
+    <section aria-labelledby="access-heading" className="bg-muted/60 py-10 md:py-14">
+      <div className="container-glamlink grid items-center gap-8 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-12">
+        <h2 id="access-heading">
+          <Image src={accessWordmark} alt="Access by Glamlink" className="h-auto w-48 md:w-60" />
+        </h2>
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em]">A smarter way to connect</p>
+          <p className="mt-2 text-muted-foreground">Digital profiles. Instant sharing. Lasting impressions.</p>
+          <Link href="/access" className="btn-primary mt-6">
+            Learn more
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
+        <ul className="grid gap-4 sm:grid-cols-2 md:col-span-2 lg:col-span-1 lg:grid-cols-1 lg:border-l lg:border-border lg:pl-12">
+          {ACCESS_POINTS.map(({ icon: Icon, label }) => (
+            <li key={label} className="flex items-center gap-3">
+              <Icon className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+              <span className="text-sm font-medium">{label}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
@@ -253,26 +305,27 @@ function AccessBand() {
 
 /* ── Page ────────────────────────────────────────────────────── */
 
-async function getWatchRow() {
-  const featured = await getVideos({ featured: true, limit: 4 });
-  return featured.rows.length > 0 ? featured : getVideos({ limit: 4 });
+/** The rows admins featured, in their order; while they have featured none, the first ones anyway. */
+async function featuredOr<T>(featured: Promise<Paged<T>>, others: () => Promise<Paged<T>>) {
+  const rows = await featured;
+  return rows.rows.length > 0 ? rows : others();
 }
 
 export default async function HomeLanding() {
   const [settings, topics, products, brands, articles, videos] = await Promise.all([
     getHomeSettings(),
     getFeaturedTopics(),
-    getProducts({ featured: true, limit: 5 }),
-    getProfiles({ type: "brand", featured: true, limit: 5 }),
+    featuredOr(getProducts({ featured: true, limit: 10 }), () => getProducts({ limit: 10 })),
+    featuredOr(getProfiles({ type: "brand", featured: true, limit: 10 }), () => getProfiles({ type: "brand", limit: 10 })),
     getArticles({ limit: 3 }),
-    getWatchRow(),
+    featuredOr(getVideos({ featured: true, limit: 8 }), () => getVideos({ limit: 8 })),
   ]);
 
   const popularSearches = settings?.popular_searches?.length ? settings.popular_searches : DEFAULT_POPULAR_SEARCHES;
   const tiles = topics.slice(0, 6);
 
   return (
-    <div className="pb-8">
+    <div>
       <Hero image={settings?.hero_image} popularSearches={popularSearches} />
 
       {tiles.length > 0 && (
@@ -294,37 +347,38 @@ export default async function HomeLanding() {
       <FindProfessional image={settings?.find_professional_image} />
 
       {products.rows.length > 0 && (
-        <HomeSection
+        <ShelfSection
           id="shop"
           title="Shop Products"
           subtitle="Discover professional skincare, wellness and beauty products from brands you trust."
           action={{ label: "Shop all products", href: "/shop" }}
         >
-          <CardRow label="Featured products" columns={5}>
+          <HomeCarousel label="Products">
             {products.rows.map((product) => (
-              <li key={product.id} className={ROW_ITEM}>
-                <ProductTile product={product} sizes="(min-width: 1024px) 20vw, (min-width: 640px) 30vw, 45vw" />
+              <li key={product.id} className={SLIDE[5]}>
+                <ProductTile product={product} sizes="(min-width: 1024px) 16vw, (min-width: 640px) 30vw, 45vw" />
               </li>
             ))}
-          </CardRow>
-        </HomeSection>
+          </HomeCarousel>
+        </ShelfSection>
       )}
 
       {brands.rows.length > 0 && (
-        <HomeSection
-          id="industry"
-          title="Inside the Industry"
+        <ShelfSection
+          id="brands"
+          title="Brands"
           subtitle="Innovative brands. Advanced technology. Education. Opportunities."
-          action={{ label: "View all companies", href: "/industry" }}
+          action={{ label: "View all brands", href: "/directory" }}
+          band
         >
-          <CardRow label="Featured brands" columns={5}>
+          <HomeCarousel label="Brands">
             {brands.rows.map((brand) => (
-              <li key={brand.id} className={ROW_ITEM}>
-                <ProfileTile profile={brand} />
+              <li key={brand.id} className={SLIDE[5]}>
+                <ProfileTile profile={brand} sizes="(min-width: 1024px) 16vw, (min-width: 640px) 30vw, 45vw" />
               </li>
             ))}
-          </CardRow>
-        </HomeSection>
+          </HomeCarousel>
+        </ShelfSection>
       )}
 
       {articles.rows.length > 0 && (
@@ -348,16 +402,16 @@ export default async function HomeLanding() {
         <HomeSection
           id="watch"
           title="Watch + Learn"
-          subtitle="Podcasts, Expert Takes, Educational content."
-          action={{ label: "Explore all episodes", href: "/watch" }}
+          subtitle="Podcasts. Expert Takes. Educational content."
+          action={{ label: "Explore all episodes", href: "/podcast" }}
         >
-          <CardRow label="Videos" columns={4}>
+          <HomeCarousel label="Videos">
             {videos.rows.map((video) => (
-              <li key={video.id} className={cn(ROW_ITEM, "w-[70%] sm:w-[45%]")}>
-                <VideoTile video={video} />
+              <li key={video.id} className={SLIDE[4]}>
+                <VideoTile video={video} layout="overlay" />
               </li>
             ))}
-          </CardRow>
+          </HomeCarousel>
         </HomeSection>
       )}
 

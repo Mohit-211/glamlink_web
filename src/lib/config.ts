@@ -14,7 +14,7 @@ export const SITE_URL = withoutTrailingSlash(
   process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
 );
 
-/** Backend API base URL, e.g. https://node.glamlink.net/api/v1 */
+/** Backend API base URL, e.g. https://api.glamlink.net/api/v1 */
 export const API_URL = withoutTrailingSlash(process.env.NEXT_PUBLIC_API_URL || "");
 
 /** Origin of the backend, which also serves uploaded files under /images. */

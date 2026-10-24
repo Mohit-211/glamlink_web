@@ -4,11 +4,12 @@ import fs from "fs";
 import path from "path";
 
 import { getAllBlogs, getAllTopics } from "@/api/Api";
-import { getSitemapFeed } from "@/lib/api/public";
+import { PODCAST_SERIES } from "@/components/Podcast/podcastSeries";
+import { getSitemapFeed, getVideos } from "@/lib/api/public";
 import type { SitemapEntry } from "@/lib/api/types";
 import { ALLOW_INDEXING } from "@/lib/indexing";
 import { getMagazineIssues } from "@/lib/magazine";
-import { articleHref, issueHref, productHref, profileHref, topicHref, videoHref } from "@/lib/routes";
+import { articleHref, episodeHref, issueHref, productHref, profileHref, topicHref, videoHref } from "@/lib/routes";
 
 type Entry = MetadataRoute.Sitemap[number];
 
@@ -51,10 +52,23 @@ function staticRoutes(): Entry[] {
 
 const lastModified = (entry: SitemapEntry) => (entry.updated_at ? new Date(entry.updated_at) : undefined);
 
+/** The podcast's episodes, whose pages are on the podcast: the feed doesn't say a video's series. */
+async function podcastSlugs() {
+  const slugs = new Set<string>();
+  for (let page = 1; page <= 20; page++) {
+    const { count, rows } = await getVideos({ series: PODCAST_SERIES, page, limit: 50 });
+    const before = slugs.size;
+    rows.forEach((video) => slugs.add(video.slug));
+    if (slugs.size === before || slugs.size >= count) break;
+  }
+  return slugs;
+}
+
 /** Every public page from the API's sitemap feed (backend handoff, 10.16). */
 async function fromFeed(): Promise<Entry[] | null> {
   const feed = await getSitemapFeed();
   if (!feed) return null;
+  const podcast = await podcastSlugs();
 
   const withSlug = (entries: SitemapEntry[] | undefined) => (entries ?? []).filter((e) => e.slug);
   const page = (url: string, entry: SitemapEntry, priority: number): Entry => ({
@@ -69,7 +83,10 @@ async function fromFeed(): Promise<Entry[] | null> {
     ...withSlug(feed.topics).map((e) => page(topicHref({ id: e.id, slug: e.slug }), e, 0.6)),
     ...withSlug(feed.profiles).map((e) => page(profileHref(e.slug as string), e, 0.6)),
     ...withSlug(feed.products).map((e) => page(productHref({ id: e.id, slug: e.slug }), e, 0.5)),
-    ...withSlug(feed.videos).map((e) => page(videoHref(e.slug as string), e, 0.5)),
+    ...withSlug(feed.videos).map((e) => {
+      const slug = e.slug as string;
+      return page(podcast.has(slug) ? episodeHref(slug) : videoHref({ slug }), e, 0.5);
+    }),
     ...withSlug(feed.issues).flatMap((e) => [
       page(issueHref(e.slug as string), e, 0.6),
       page(`${issueHref(e.slug as string)}/digital`, e, 0.5),

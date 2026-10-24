@@ -54,6 +54,13 @@ export type CacheTag = (typeof CACHE_TAGS)[number];
 
 const REVALIDATE_SECONDS = 3600;
 
+/**
+ * `next dev` reads the API afresh on every request: the backend's refresh hook
+ * can't reach a laptop, so cached answers would hide changes made through the
+ * API (an admin's edit, an episode import) for up to the hour above.
+ */
+const ALWAYS_FRESH = process.env.NODE_ENV === "development";
+
 /** What a profile page shows: the page itself plus its products, articles, videos and issues. */
 const PROFILE_TAGS: CacheTag[] = ["profiles", "cards", "shop", "journal", "videos", "magazine"];
 
@@ -86,7 +93,7 @@ async function getData<T>(path: string, { tags, query, noStore }: FetchOptions):
   try {
     const res = await fetch(url, {
       headers: { Accept: "application/json" },
-      ...(noStore ? { cache: "no-store" as const } : { next: { revalidate: REVALIDATE_SECONDS, tags } }),
+      ...(noStore || ALWAYS_FRESH ? { cache: "no-store" as const } : { next: { revalidate: REVALIDATE_SECONDS, tags } }),
     });
     if (!res.ok) {
       if (res.status !== 404) console.error(`API ${res.status} for ${path}`);

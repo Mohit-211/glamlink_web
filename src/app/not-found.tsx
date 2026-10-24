@@ -19,10 +19,9 @@ export const metadata: Metadata = {
 
 const SECTIONS = [
   { label: "Journal", href: "/journal" },
-  { label: "Watch + Learn", href: "/watch" },
+  { label: "Podcast", href: "/podcast" },
   { label: "Shop", href: "/shop" },
   { label: "Find a Professional", href: "/directory" },
-  { label: "Find a Brand", href: "/industry" },
 ];
 
 export default function NotFound() {

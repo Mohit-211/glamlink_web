@@ -41,6 +41,8 @@ export default function nextConfig(phase: string): NextConfig {
         // Education and Events are switched off for now; temporary, so they can return.
         { source: "/journal/education", destination: "/journal", permanent: false },
         { source: "/journal/events", destination: "/journal", permanent: false },
+        // Brands are browsed in the Directory, beside professionals, not on a page of their own.
+        { source: "/industry", destination: "/directory", permanent: false },
       ];
     },
     // Test and staging builds (SITE_INDEXING=off, or any address other than
