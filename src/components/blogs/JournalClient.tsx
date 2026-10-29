@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ApiImage from "@/components/common/ApiImage";
+import PageHero from "@/components/common/PageHero";
 import PageLinks from "@/components/content/PageLinks";
 import EmptyState from "@/components/content/EmptyState";
 import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
@@ -24,9 +25,9 @@ import type { ArticleCard, JournalCategory, MagazineIssue, Paged } from "@/lib/a
 /*
  * The Journal (/journal), laid out like a magazine's front page. The page reads
  * one page of articles on the server (section, search and page come from the
- * URL). The front page (no section, no search, page 1) leads with the cover
- * story, then Top Stories, The Latest beside the magazine, and an In Focus shelf
- * for the biggest sections; a section, a search or a later page is a grid.
+ * URL). On the front page (no section, no search, page 1) the hero carries the
+ * cover story, then come Top Stories, The Latest beside the magazine, and an In
+ * Focus shelf for the biggest sections; a section, a search or a later page is a grid.
  * Choosing a section or a page is a link; typing a search updates the URL.
  */
 
@@ -140,8 +141,9 @@ const FlipbookPanel = ({ issue, onClose }: { issue: MagazineIssue | null; onClos
         aria-modal="true"
         aria-label={issue ? issue.title : "Magazine issue"}
         aria-hidden={!isOpen}
-        className={`fixed inset-y-0 right-0 z-40 flex w-full flex-col border-l border-border/40 bg-background shadow-2xl transition-transform duration-300 ease-out sm:w-120 lg:w-115 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+        // Hidden once it has slid away, so its shadow doesn't show at the page's edge and its buttons leave the tab order
+        className={`fixed inset-y-0 right-0 z-40 flex w-full flex-col border-l border-border/40 bg-background shadow-2xl transition-[translate,visibility] duration-300 ease-out sm:w-120 lg:w-115 ${
+          isOpen ? "visible translate-x-0" : "invisible translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between border-b border-border/30 bg-muted/20 px-4 py-3">
@@ -281,9 +283,9 @@ function TheEdit({
   );
 }
 
-/* ── The masthead and the section bar ─────────────────────────── */
+/* ── The section bar ─────────────────────────────────────────── */
 
-/** The sections, under the masthead and pinned below the site header while reading. */
+/** The sections, under the hero and pinned below the site header while reading. */
 function SectionNav({ categories, current, search }: { categories: JournalCategory[]; current: string; search: string }) {
   const items = [{ slug: "", title: "All Stories" }, ...categories];
   const listRef = useRef<HTMLUListElement>(null);
@@ -324,59 +326,52 @@ function SectionNav({ categories, current, search }: { categories: JournalCatego
 
 /* ── The front page ──────────────────────────────────────────── */
 
-/** The featured story (else the newest), large: the photo beside the headline, standfirst and byline. */
+/** The featured story (else the newest), in the hero beside the title: the photo over the headline and byline. */
 function CoverStory({ article }: { article: ArticleCard }) {
   const href = articleHref(article);
   return (
-    <section aria-labelledby="cover-story-heading" className="container-glamlink pt-10 md:pt-14">
-      <article className="group grid items-center gap-8 lg:grid-cols-12 lg:gap-14">
-        <Link
-          href={href}
-          tabIndex={-1}
-          aria-hidden="true"
-          className="relative block aspect-3/2 overflow-hidden rounded-3xl bg-muted lg:col-span-7"
-        >
-          <ApiImage
-            src={article.cover_image}
-            alt=""
-            fill
-            preload
-            sizes="(min-width: 1280px) 700px, (min-width: 1024px) 58vw, 100vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-          />
-        </Link>
+    <article
+      aria-labelledby="cover-story-heading"
+      className="group w-full max-w-xl overflow-hidden rounded-3xl border border-border bg-card shadow-large"
+    >
+      <Link href={href} tabIndex={-1} aria-hidden="true" className="relative block aspect-video overflow-hidden bg-muted">
+        <ApiImage
+          src={article.cover_image}
+          alt=""
+          fill
+          preload
+          sizes="(min-width: 1280px) 576px, (min-width: 1024px) 45vw, 100vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+        />
+      </Link>
 
-        <div className="lg:col-span-5">
-          <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="text-[11px] font-semibold uppercase tracking-widest text-foreground">The Cover Story</span>
-            {article.journal_category?.title && (
-              <>
-                <span aria-hidden="true" className="h-px w-8 bg-border" />
-                <Kicker article={article} />
-              </>
-            )}
-          </p>
-          <h2
-            id="cover-story-heading"
-            className="mt-5 text-3xl font-semibold leading-[1.12] tracking-tight text-balance md:text-4xl xl:text-[2.75rem]"
-          >
-            <Link href={href} className="transition-colors hover:text-secondary">
-              {article.title.trim()}
-            </Link>
-          </h2>
-          {article.short_description && (
-            <p className="mt-5 line-clamp-4 text-base leading-relaxed text-muted-foreground md:text-lg">
-              {article.short_description}
-            </p>
+      <div className="p-6 md:p-8">
+        <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-foreground">The Cover Story</span>
+          {article.journal_category?.title && (
+            <>
+              <span aria-hidden="true" className="h-px w-8 bg-border" />
+              <Kicker article={article} />
+            </>
           )}
-          <Byline article={article} className="mt-6" />
-          <Link href={href} className="btn-primary mt-8">
+        </p>
+        <h2
+          id="cover-story-heading"
+          className="mt-3 text-2xl font-semibold leading-tight tracking-tight text-balance md:text-[1.75rem]"
+        >
+          <Link href={href} className="transition-colors hover:text-secondary">
+            {article.title.trim()}
+          </Link>
+        </h2>
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <Byline article={article} />
+          <Link href={href} className="eyebrow inline-flex items-center gap-1.5 transition-colors hover:text-secondary">
             Read the Story
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </Link>
         </div>
-      </article>
-    </section>
+      </div>
+    </article>
   );
 }
 
@@ -514,22 +509,25 @@ const JournalClient = ({
     <>
       <NewsletterPopup openDelay={3000} />
 
-      <header className="container-glamlink pb-8 pt-28 text-center md:pb-10 md:pt-36">
-        <p className="eyebrow">Beauty + Wellness, In Depth</p>
-        <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
-          The Glamlink Journal
-        </h1>
-        <p className="mx-auto mt-4 max-w-xl text-muted-foreground md:text-lg">
-          Expert insights. Real stories. The latest in beauty + wellness.
-        </p>
-        <div className="mx-auto mt-8 max-w-xl text-left">
+      <PageHero
+        id="journal"
+        eyebrow="Beauty + Wellness, In Depth"
+        title={
+          <>
+            The Glamlink <span className="text-primary">Journal</span>
+          </>
+        }
+        subtitle="Expert insights. Real stories. The latest in beauty + wellness."
+        media={front && hero ? <CoverStory article={hero} /> : undefined}
+      >
+        <div className="max-w-xl">
           <JournalSearchBar
             value={searchInput}
             onChange={setSearchInput}
             isSearching={pending || searchInput.trim() !== search}
           />
         </div>
-      </header>
+      </PageHero>
 
       <SectionNav categories={categories} current={category} search={search} />
 
@@ -537,10 +535,8 @@ const JournalClient = ({
 
       {front ? (
         <>
-          {hero && <CoverStory article={hero} />}
-
           {topStories.length > 0 && (
-            <section aria-labelledby="top-stories-heading" className="container-glamlink mt-16 md:mt-24">
+            <section aria-labelledby="top-stories-heading" className="container-glamlink mt-12 md:mt-16">
               <SectionLabel id="top-stories-heading">Top Stories</SectionLabel>
               <ul className="mt-8 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
                 {topStories.map((article, index) => (

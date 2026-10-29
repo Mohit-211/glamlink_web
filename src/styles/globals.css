@@ -29,6 +29,9 @@
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
 
+  /* The faint teal of the hero bands — see :root */
+  --color-tint: hsl(var(--tint));
+
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
 
@@ -93,6 +96,11 @@
   /* Neutral grey surface (table heads, skeletons, quiet buttons) and secondary text */
   --muted: 40 14% 93%;
   --muted-foreground: 220 9% 42%;
+
+  /* Hero bands — the brand teal's hue, all but white: the band behind every hero's
+     text, and what a hero photo fades into. Teal text on it is secondary (primary
+     drops to 4.3:1); body text keeps its usual colours. */
+  --tint: 186 45% 96%; /* #F0F9F9 */
 
   /* Light teal tint for highlights, selected states and soft badges */
   --accent: 186 55% 93%;
@@ -263,6 +271,16 @@
     @apply pt-28 pb-16 md:pt-36 md:pb-24;
   }
 
+  /* The kicker above a hero's title, led by a short teal rule */
+  .hero-eyebrow {
+    @apply flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-secondary;
+  }
+
+  .hero-eyebrow::before {
+    @apply h-px w-8 shrink-0 bg-primary;
+    content: "";
+  }
+
   .hero-title {
     @apply font-sans text-4xl leading-[1.1] sm:text-5xl lg:text-6xl
     font-semibold tracking-tight text-foreground text-balance;
@@ -352,7 +370,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .animate-banner-in {
+    .animate-banner-in,
+    .animate-fade-up {
       animation: none;
       opacity: 1;
       transform: none;

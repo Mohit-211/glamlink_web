@@ -26,11 +26,11 @@ const JournalSearchBar = ({
   return (
     <div className="w-full">
       <div
-        className="relative flex items-center rounded-full border border-border/40 bg-background
-          shadow-sm transition-colors duration-200 focus-within:border-primary
-          focus-within:ring-2 focus-within:ring-primary/20"
+        className="relative flex items-center rounded-full border border-input bg-card
+          shadow-soft transition-[border-color,box-shadow] duration-200 focus-within:border-primary
+          focus-within:ring-3 focus-within:ring-primary/15"
       >
-        <Search className="absolute left-4 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <Search className="absolute left-5 h-4 w-4 text-muted-foreground pointer-events-none" />
         <input
           type="text"
           role="searchbox"
@@ -38,10 +38,10 @@ const JournalSearchBar = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full bg-transparent pl-11 pr-11 py-3 text-sm text-foreground
+          className="h-14 w-full bg-transparent pl-12 pr-12 text-sm text-foreground
             placeholder:text-muted-foreground focus:outline-none"
         />
-        <div className="absolute right-3 flex items-center">
+        <div className="absolute right-4 flex items-center">
           {isSearching ? (
             <Loader2
               className="h-4 w-4 text-primary animate-spin"

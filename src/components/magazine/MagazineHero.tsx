@@ -1,80 +1,55 @@
 "use client";
 
-import { Mail, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Mail } from "lucide-react";
+import PageHero from "@/components/common/PageHero";
 import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
+import heroPhoto from "../../../public/home-hero/magazine-hero.png";
 
+/** A reader with the latest issue, the wall behind her lined with Glamlink covers. */
 const MagazineHero = () => {
-
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    window.open("https://mailchi.mp/glamlink/subscribe", "_blank");
+    window.open("https://mailchi.mp/glamlink/subscribe", "_blank", "noopener,noreferrer");
   };
 
   return (
     <>
       <NewsletterPopup openDelay={3000} />
 
-      <section className="hero-glamlink relative overflow-hidden bg-background">
-        <div className="container-glamlink relative z-10">
-          <div className="max-w-5xl mx-auto text-center">
-
-            {/* Single-line friendly headline */}
-            <h1 className="hero-title">
-              <span className="text-primary">The Glamlink Edit</span>
-            </h1>
-
-            {/* Subtitle */}
-            <p className="hero-subtitle mt-6 max-w-3xl mx-auto mb-10 md:mb-12">
-              The Glamlink Edit is your inside look at beauty and wellness. Where top professionals, top treatments and evolving innovation are spotlighted. Stories go deeper and insight actually mean something. Watch, shop beauty products and connect with professionals behind the stories.
-            </p>
-
-            {/* Newsletter form – aligned heights, clean layout */}
-            <div className="max-w-xl mx-auto">
-              <form
-                onSubmit={handleSubscribe}
-                className="flex flex-col sm:flex-row items-stretch gap-4"
-              >
-                {/* Input wrapper */}
-                <div className="relative flex-1 min-w-0">
-                  <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/80 pointer-events-none" />
-                  <input
-                    type="email"
-                    placeholder="Your email address"
-                    className="
-                    w-full h-14 pl-14 pr-6 rounded-full 
-                    border border-border bg-card text-foreground 
-                    placeholder:text-muted-foreground/80 
-                    outline-none focus:border-primary focus:ring-4 focus:ring-primary/15 
-                    transition-all duration-300 shadow-sm hover:shadow
-                  "
-                  />
-                </div>
-
-                {/* Button – same height as input */}
-                <Button
-                  type="submit"
-                  className="
-                  h-14 px-8 min-w-[160px] 
-                  bg-primary hover:bg-secondary 
-                  text-primary-foreground font-medium rounded-full 
-                  shadow-md hover:shadow-lg shadow-primary/20 hover:shadow-primary/30 
-                  transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
-                  flex items-center gap-2
-                "
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Subscribe
-                </Button>
-              </form>
-
-              <p className="mt-5 text-sm text-muted-foreground">
-                Join beauty enthusiasts • Unsubscribe anytime
-              </p>
-            </div>
+      <PageHero
+        id="magazine-hero"
+        title={
+          <>
+            The Glamlink <span className="text-primary">Edit</span>
+          </>
+        }
+        subtitle="The Glamlink Edit is your inside look at beauty and wellness. Where top professionals, top treatments and evolving innovation are spotlighted. Stories go deeper and insight actually mean something. Watch, shop beauty products and connect with professionals behind the stories."
+        image={heroPhoto}
+      >
+        <form onSubmit={handleSubscribe} className="flex max-w-xl flex-col gap-3 sm:flex-row">
+          <div className="relative min-w-0 flex-1">
+            <label htmlFor="magazine-email" className="sr-only">
+              Email address
+            </label>
+            <Mail
+              className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <input
+              id="magazine-email"
+              type="email"
+              autoComplete="email"
+              placeholder="Your email address"
+              className="input-glamlink h-14 rounded-full pl-13 pr-6 shadow-soft"
+            />
           </div>
-        </div>
-      </section>
+          <button type="submit" className="btn-primary btn-lg">
+            Subscribe
+          </button>
+        </form>
+
+        <p className="mt-4 text-sm text-muted-foreground">Join beauty enthusiasts • Unsubscribe anytime</p>
+      </PageHero>
     </>
   );
 };

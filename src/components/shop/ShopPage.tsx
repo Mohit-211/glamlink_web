@@ -6,6 +6,7 @@ import PageLinks from "@/components/content/PageLinks";
 import ProductTile from "@/components/content/ProductTile";
 import { listHref, pageCountFor } from "@/lib/searchParams";
 import type { Paged, ProductCard, ShopFilters } from "@/lib/api/types";
+import { cn } from "@/lib/utils";
 import ShopHero from "./ShopHero";
 import { SHOP_PRODUCTS_ID } from "./shopIds";
 import ShopToolbar from "./ShopToolbar";
@@ -32,13 +33,14 @@ export default function ShopPage({ products, filters, page, search, category, br
   const hrefWith = (changes: Partial<Record<"search" | "category" | "brand" | "page", string | number>>) =>
     listHref("/shop", { search, category, brand, ...changes });
 
+  // The hero is for arriving at the shop, not for paging through it
+  const showHero = !filtered && page === 1;
+
   return (
     <>
       <NewsletterPopup openDelay={3000} />
-      <div className="container-glamlink pb-16 pt-24 md:pt-28 lg:pb-24">
-        {/* The hero is for arriving at the shop, not for paging through it */}
-        {!filtered && page === 1 && <ShopHero />}
-
+      {showHero && <ShopHero />}
+      <div className={cn("container-glamlink pb-16 lg:pb-24", !showHero && "pt-24 md:pt-28")}>
         <section
           id={SHOP_PRODUCTS_ID}
           tabIndex={-1}

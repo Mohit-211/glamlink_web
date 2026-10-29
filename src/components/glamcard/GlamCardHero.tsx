@@ -1,10 +1,11 @@
 "use client";
 
 import React from "react";
-import PlanPrice from "@/components/Pricing/PlanPrice";
+import PageHero from "@/components/common/PageHero";
 
 interface GlamCardHeroProps {
-  onApplyClick: () => void;
+  /** The id of the profile form's section: the hero's button scrolls to it. */
+  formId: string;
 }
 
 const features = [
@@ -35,62 +36,46 @@ const features = [
   },
 ];
 
-const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
+const GlamCardHero: React.FC<GlamCardHeroProps> = ({ formId }) => {
+  const scrollToForm = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    e.preventDefault();
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    form.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    // Keyboard and screen reader users continue from the form
+    form.focus({ preventScroll: true });
+    history.replaceState(null, "", `#${formId}`);
+  };
+
   return (
-    <section className="hero-glamlink bg-background">
-      <div className="container-glamlink">
-        {/* Hero */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left */}
-          <div className="max-w-2xl animate-fade-up">
-            <h1 className="hero-title">
-              Everything your clients need to know—{" "}
-              <span className="text-primary sm:block">in one tap.</span>
-            </h1>
-
-            <p className="hero-subtitle mt-6">
-              One profile. One QR code. One link for your services, booking,
-              photos, videos, social media, business hours, location, and more.
-            </p>
-
-            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-xl font-semibold text-foreground">
-              <span>FREE TO START</span>
-              <span className="text-primary">•</span>
-              <span>PRO <PlanPrice product="pro" />/MONTH</span>
-            </div>
-
-            <button
-              onClick={onApplyClick}
-              className="btn-primary btn-lg mt-10"
-            >
-              CREATE YOUR ACCESS CARD
-            </button>
-
-            <p className="mt-4 text-sm italic text-muted-foreground">
-              Add the NFC keychain to any plan for <PlanPrice product="keychain" />, one-time, shipping included.
-            </p>
+    <>
+      <PageHero
+        id="access-hero"
+        title={
+          <>
+            Your Business <span className="whitespace-nowrap text-primary">All-in-One Profile</span>
+          </>
+        }
+        subtitle="Create your free professional profile to showcase your work, share your services, connect with clients, and make booking easier."
+        media={
+          // The phone-shaped clip, sized to the hero's height
+          <div className="aspect-9/16 w-60 overflow-hidden rounded-3xl border border-border bg-card shadow-large sm:w-64 xl:w-72">
+            <video className="h-full w-full object-cover" autoPlay muted loop playsInline preload="metadata">
+              <source src="/magazine/6641.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
           </div>
+        }
+      >
+        <a href={`#${formId}`} onClick={scrollToForm} className="btn-primary btn-lg">
+          CREATE YOUR FREE PROFILE
+        </a>
+      </PageHero>
 
-          {/* Right */}
-          <div className="flex justify-center lg:justify-end">
-            <div className="w-full max-w-md overflow-hidden rounded-3xl border border-border bg-card shadow-large">
-              <video
-                className="aspect-[9/16] w-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-              >
-                <source src="/magazine/6641.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div>
-        </div>
-
-        {/* Features */}
-        <div className="mx-auto mt-28 max-w-3xl">
+      {/* Features */}
+      <section className="container-glamlink py-20 md:py-28">
+        <div className="mx-auto max-w-3xl">
           {features.map((feature) => (
             <div
               key={feature.title}
@@ -117,8 +102,8 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ onApplyClick }) => {
             </p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 

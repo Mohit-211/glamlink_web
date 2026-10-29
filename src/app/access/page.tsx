@@ -1,31 +1,21 @@
 ﻿"use client";
 import { SITE_URL } from "@/lib/config";
 
-import React, { useRef } from "react";
+import React from "react";
 import dynamic from "next/dynamic";
 import Script from "next/script";
 import AccessPricingSection from "@/components/AccessPricingSection/AccessPricingSection";
-
-const GlamCardHero = dynamic(
-  () => import("@/components/glamcard/GlamCardHero"),
-  { ssr: false }
-);
+import GlamCardHero from "@/components/glamcard/GlamCardHero";
 
 const GlamCardApplication = dynamic(
   () => import("@/components/glamcard/GlamCardForm/GlamCardApplication"),
   { ssr: false }
 );
 
+/** The profile form: the hero's button scrolls to it, and /access#create-profile opens on it. */
+const FORM_ID = "create-profile";
+
 export default function DigitalApplyPage() {
-  const applyRef = useRef<HTMLDivElement | null>(null);
-
-  const scrollToApply = () => {
-    applyRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  };
-
   const schema = {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -54,13 +44,16 @@ export default function DigitalApplyPage() {
       />
 
       <main>
-        <section className="pb-20">
-          <GlamCardHero onApplyClick={scrollToApply} />
-        </section>
+        <GlamCardHero formId={FORM_ID} />
         {/* <section className="pb-20">
           <AccessPricingSection />
         </section> */}
-        <section ref={applyRef} className="bg-muted/30 py-20 scroll-mt-24">
+        <section
+          id={FORM_ID}
+          tabIndex={-1}
+          aria-label="Create your profile"
+          className="scroll-mt-16 bg-muted/30 py-10 outline-none md:scroll-mt-20 md:py-14"
+        >
           <div className="px-4 sm:px-6 lg:px-8">
             <GlamCardApplication />
           </div>

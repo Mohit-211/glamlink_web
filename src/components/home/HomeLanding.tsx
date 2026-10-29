@@ -3,7 +3,7 @@ import Form from "next/form";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { ArrowRight, Search, Share2, Sparkles, TrendingUp, Users, type LucideIcon } from "lucide-react";
-import ApiImage from "@/components/common/ApiImage";
+import PageHero, { HeroPhoto } from "@/components/common/PageHero";
 import ArticleTile from "@/components/content/ArticleTile";
 import ProductTile from "@/components/content/ProductTile";
 import ProfileTile from "@/components/content/ProfileTile";
@@ -134,143 +134,62 @@ const SLIDE = {
   4: "w-[75%] shrink-0 snap-start sm:w-[45%] lg:w-[calc((100%-3rem)/4)]",
 };
 
-/** An image admins set (a link from the API) or one of the site's own photos. */
-type PhotoSource = string | StaticImageData | null | undefined;
-
-/** A photo filling its frame: the API's sized copies for an admin's image, the site's own optimized from disk. */
-function Photo({
-  src,
-  sizes,
-  preload = false,
-  className,
-}: {
-  src: string | StaticImageData;
-  sizes: string;
-  preload?: boolean;
-  className?: string;
-}) {
-  if (typeof src === "string") {
-    return <ApiImage src={src} alt="" fill preload={preload} sizes={sizes} className={className} />;
-  }
-  return <Image src={src} alt="" fill preload={preload} placeholder="blur" sizes={sizes} className={className} />;
-}
-
-/** A photo with a short line over it, or a tinted panel with the line while there is no photo. */
-function PhotoPanel({
-  src,
-  tagline,
-  sizes,
-  preload = false,
-  fadeLeft = false,
-  className,
-}: {
-  src: PhotoSource;
-  tagline: ReactNode;
-  sizes: string;
-  preload?: boolean;
-  /** From lg up, fade the photo's left side into the page, for text laid over it. */
-  fadeLeft?: boolean;
-  className?: string;
-}) {
-  if (!src) {
-    return (
-      <div className={cn("flex items-end justify-end bg-accent p-6 md:p-8", className)}>
-        <p className="text-right text-sm font-semibold uppercase leading-relaxed tracking-[0.2em] text-secondary md:text-base">
-          {tagline}
-        </p>
-      </div>
-    );
-  }
-  return (
-    <div className={cn("relative overflow-hidden", className)}>
-      <Photo src={src} preload={preload} sizes={sizes} className="object-cover lg:object-right" />
-      <div className="absolute inset-0 bg-linear-to-t from-overlay/50 via-overlay/5 to-transparent" />
-      {fadeLeft && (
-        <div className="absolute inset-0 hidden bg-linear-to-r from-background via-background/80 via-30% to-transparent to-55% lg:block" />
-      )}
-      <p className="absolute bottom-6 right-6 text-right text-xs font-semibold uppercase leading-relaxed tracking-[0.2em] text-overlay-foreground md:bottom-8 md:right-8 md:text-sm">
-        {tagline}
-      </p>
-    </div>
-  );
-}
-
 /* ── Sections ────────────────────────────────────────────────── */
 
-/** On phones the text comes first and the photo under it; from lg the photo fills the band behind the text. */
-function Hero({ image, popularSearches }: { image: PhotoSource; popularSearches: string[] }) {
+function Hero({ image, popularSearches }: { image: string | StaticImageData; popularSearches: string[] }) {
   return (
-    <section aria-labelledby="home-hero-heading" className="pt-16 md:pt-20">
-      <div className="grid lg:min-h-128">
-        <div className="container-glamlink relative z-10 py-8 lg:col-start-1 lg:row-start-1 lg:self-center lg:py-16">
-          <div className="max-w-2xl">
-            <h1 id="home-hero-heading" className="hero-title">
-              Beauty Lives Here
-            </h1>
-            <p className="mt-4 text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground md:text-base">
-              Discover. Learn. Shop. Connect.
-            </p>
-
-            <Form action="/search" role="search" className="relative mt-8 max-w-xl">
-              <label htmlFor="home-search" className="sr-only">
-                Search Glamlink
-              </label>
-              <input
-                id="home-search"
-                name="q"
-                type="search"
-                required
-                minLength={2}
-                maxLength={100}
-                placeholder="Search treatments, professionals, products and more..."
-                className="input-glamlink h-14 rounded-full pl-6 pr-16 shadow-soft"
-              />
-              <button
-                type="submit"
-                aria-label="Search"
-                className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-secondary"
-              >
-                <Search className="h-4 w-4" aria-hidden="true" />
-              </button>
-            </Form>
-
-            {popularSearches.length > 0 && (
-              <div className="mt-5 flex flex-wrap items-center gap-2">
-                <span className="mr-1 text-sm font-semibold">Popular Searches:</span>
-                {popularSearches.map((term) => (
-                  <Link key={term} href={searchHref(term)} className="chip rounded-full px-3.5 py-1.5 text-xs">
-                    {term}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <PhotoPanel
-          src={image}
-          preload
-          fadeLeft
-          sizes="100vw"
-          className="mx-5 aspect-4/3 rounded-3xl sm:mx-6 lg:col-start-1 lg:row-start-1 lg:mx-0 lg:aspect-auto lg:rounded-none"
-          tagline={
-            <>
-              Real people.
-              <br />
-              Real expertise.
-              <br />A more beautiful you.
-            </>
-          }
+    <PageHero
+      id="home-hero"
+      eyebrow="Discover. Learn. Shop. Connect."
+      title={
+        <>
+          Beauty Lives <span className="text-primary">Here</span>
+        </>
+      }
+      subtitle="Real people. Real expertise. A more beautiful you."
+      image={image}
+    >
+      <Form action="/search" role="search" className="relative max-w-xl">
+        <label htmlFor="home-search" className="sr-only">
+          Search Glamlink
+        </label>
+        <input
+          id="home-search"
+          name="q"
+          type="search"
+          required
+          minLength={2}
+          maxLength={100}
+          placeholder="Search treatments, professionals, products and more..."
+          className="input-glamlink h-14 rounded-full pl-6 pr-16 shadow-soft"
         />
-      </div>
-    </section>
+        <button
+          type="submit"
+          aria-label="Search"
+          className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-secondary"
+        >
+          <Search className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </Form>
+
+      {popularSearches.length > 0 && (
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-sm font-semibold">Popular Searches:</span>
+          {popularSearches.map((term) => (
+            <Link key={term} href={searchHref(term)} className="chip rounded-full px-3.5 py-1.5 text-xs">
+              {term}
+            </Link>
+          ))}
+        </div>
+      )}
+    </PageHero>
   );
 }
 
 /**
- * Find a Professional and Find a Brand: a photo whose quiet left side carries the
- * text. From lg up the photo fills the band behind the text; on phones the text
- * comes first and the photo under it.
+ * Find a Professional and Find a Brand: the hero's look for a section, its photo
+ * filling the band behind the text from lg up. On phones the text comes first and
+ * the photo under it.
  */
 function FeatureBand({
   id,
@@ -288,12 +207,12 @@ function FeatureBand({
   action: SectionLink;
 }) {
   return (
-    <section aria-labelledby={`${id}-heading`} className="bg-muted/60 lg:bg-transparent">
+    <section aria-labelledby={`${id}-heading`} className="bg-tint">
       <div className="grid">
         <div className="container-glamlink relative z-10 pb-6 pt-10 md:pt-14 lg:col-start-1 lg:row-start-1 lg:self-center lg:py-16">
           <div className="max-w-md">
-            <p className="eyebrow">{eyebrow}</p>
-            <h2 id={`${id}-heading`} className="section-title mt-3">
+            <p className="hero-eyebrow">{eyebrow}</p>
+            <h2 id={`${id}-heading`} className="section-title mt-4">
               {title}
             </h2>
             <p className="mt-3 text-muted-foreground md:text-lg">{text}</p>
@@ -304,8 +223,7 @@ function FeatureBand({
           </div>
         </div>
         <div className="relative mx-5 mb-10 aspect-video overflow-hidden rounded-3xl sm:mx-6 md:mb-14 lg:col-start-1 lg:row-start-1 lg:m-0 lg:aspect-5/2 lg:max-h-144 lg:rounded-none">
-          <Photo src={image} sizes="100vw" className="object-cover object-[right_top]" />
-          <div className="absolute inset-0 hidden bg-linear-to-r from-background via-background/70 via-30% to-transparent to-55% lg:block" />
+          <HeroPhoto src={image} position="object-[right_top]" />
         </div>
       </div>
     </section>
