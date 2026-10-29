@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, User, LogOut, LayoutDashboard, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import logo from "../../../public/header_logo.png";
+import logo from "../../../public/logo.png";
 import { LogoutUser } from "@/api/Api";
 import { useSession } from "@/lib/useSession";
 
@@ -51,7 +51,9 @@ export default function Header({ activeRoute }: any) {
 
   // A section stays highlighted on its inner pages too (an article under /journal).
   const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+    href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`);
 
   const hideAuthButton = pathname.startsWith("/dashboard");
 
@@ -127,9 +129,7 @@ export default function Header({ activeRoute }: any) {
 
                     {/* Dropdown Menu */}
                     {profileDropdownOpen && (
-                      <div
-                        className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-card shadow-medium"
-                      >
+                      <div className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-card shadow-medium">
                         {/* Dashboard Option */}
                         <button
                           onClick={handleDashboard}

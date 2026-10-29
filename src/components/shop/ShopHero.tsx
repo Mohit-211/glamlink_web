@@ -3,9 +3,11 @@
 import Image from "next/image";
 import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import heroPhoto from "../../../public/home-hero/shop-hero.png";
 
 import { SHOP_PRODUCTS_ID } from "./shopIds";
 
+/** On phones the photo comes first and the text under it; from md the photo fills the card behind the text. */
 const ShopHero = () => {
   const scrollToProducts = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const target = document.getElementById(SHOP_PRODUCTS_ID);
@@ -26,30 +28,31 @@ const ShopHero = () => {
   return (
     <section
       aria-labelledby="shop-hero-heading"
-      className="bg-muted rounded-2xl overflow-hidden"
+      className="overflow-hidden rounded-3xl bg-muted"
     >
-      <div className="grid md:grid-cols-[1fr_1.1fr] items-center">
-        {/* IMAGE (top on mobile, right on desktop) */}
-        <div className="relative aspect-[16/9] md:aspect-auto md:h-full md:min-h-[360px] md:order-2">
+      <div className="grid">
+        <div className="relative aspect-video md:col-start-1 md:row-start-1 md:aspect-auto md:min-h-104 lg:min-h-120">
           <Image
-            src="/assets/shop-hero.jpg"
-            alt="Flat lay of assorted skincare bottles, makeup brushes and beauty accessories arranged on a white marble surface"
+            src={heroPhoto}
+            alt="Three women with glowing skin in a sunlit studio, one applying makeup with a brush"
             fill
-            priority
-            sizes="(min-width: 768px) 460px, 100vw"
-            className="object-cover"
+            preload
+            placeholder="blur"
+            sizes="(min-width: 1280px) 1216px, 100vw"
+            className="object-cover object-top"
           />
+          <div className="absolute inset-0 hidden bg-linear-to-r from-background via-background/60 via-20% to-transparent to-45% md:block" />
         </div>
 
         {/* CONTENT */}
-        <div className="px-6 py-7 md:px-10 md:py-12 space-y-4 md:space-y-5">
+        <div className="relative z-10 space-y-4 px-6 py-7 md:col-start-1 md:row-start-1 md:max-w-md md:self-center md:space-y-5 md:px-10 md:py-12 lg:max-w-lg lg:px-14">
           <p className="eyebrow text-secondary flex items-center gap-2">
             <span aria-hidden="true" className="h-px w-6 bg-primary" />
             The Glamlink Shop
           </p>
           <h1
             id="shop-hero-heading"
-            className="text-2xl md:text-3xl leading-tight tracking-tight text-foreground text-balance"
+            className="text-3xl md:text-4xl leading-tight tracking-tight text-foreground text-balance"
           >
             Professional Beauty + Wellness Products
           </h1>

@@ -1,54 +1,89 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, ChevronLeft, ChevronRight, Download, X } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ApiImage from "@/components/common/ApiImage";
-import ArticleTile from "@/components/content/ArticleTile";
 import PageLinks from "@/components/content/PageLinks";
 import EmptyState from "@/components/content/EmptyState";
 import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
 import JournalSearchBar from "./JournalSearchBar";
+import StoryCard, { Byline, Kicker } from "./StoryCard";
 import { useDeviceType } from "@/ads/Usedevicetype";
 import { useAds } from "@/ads/Useads";
 import AdSlot from "@/ads/Adslot";
 import { formatDate } from "@/lib/format";
 import { flipbookEmbedUrl, issueNumber } from "@/lib/magazineFormat";
-import { articleHref, issueHref } from "@/lib/routes";
+import { articleHref, issueHref, journalCategoryHref } from "@/lib/routes";
 import { listHref } from "@/lib/searchParams";
+import { cn } from "@/lib/utils";
 import type { ArticleCard, JournalCategory, MagazineIssue, Paged } from "@/lib/api/types";
 
 /*
- * The Journal (/journal). The page reads one page of articles on the server
- * (category, search and page come from the URL); this view lays them out with
- * the category nav, the magazine sidebar, the flipbook drawer and the ad slots.
- * Choosing a category or a page is a link; typing a search updates the URL.
+ * The Journal (/journal), laid out like a magazine's front page. The page reads
+ * one page of articles on the server (section, search and page come from the
+ * URL). The front page (no section, no search, page 1) leads with the cover
+ * story, then Top Stories, The Latest beside the magazine, and an In Focus shelf
+ * for the biggest sections; a section, a search or a later page is a grid.
+ * Choosing a section or a page is a link; typing a search updates the URL.
  */
 
-const MOBILE_ISSUES_PER_PAGE = 4;
-const SIDEBAR_ISSUES_PER_PAGE = 3;
+const PAST_ISSUES_PER_PAGE = 3;
 const SEARCH_DEBOUNCE_MS = 400;
+/** Stories in the Top Stories row; the rest of the front page's stories are The Latest. */
+const TOP_STORIES = 3;
 
-/* ── Pagination for the small magazine lists ─────────────────── */
+/** A section of the front page: one of the biggest sections, with stories not already shown. */
+export interface JournalSpotlight {
+  category: JournalCategory;
+  articles: ArticleCard[];
+}
+
+type Ads = ReturnType<typeof useAds>;
+
+/** The ads of one slot, side by side; nothing when the slot has none. */
+function AdRow({ ads, slot, className }: { ads: Ads; slot: string; className?: string }) {
+  const list = ads[slot] ?? [];
+  if (list.length === 0) return null;
+  return (
+    <div className={cn("flex flex-wrap justify-center gap-4", className)}>
+      {list.map((ad) => (
+        <AdSlot key={ad.id} slotId={slot} ad={ad} />
+      ))}
+    </div>
+  );
+}
+
+/** A small label over a section, with a hairline to its right: "TOP STORIES ———". */
+function SectionLabel({ id, children }: { id: string; children: ReactNode }) {
+  return (
+    <div className="flex items-center gap-4">
+      <h2 id={id} className="shrink-0 text-xs font-semibold uppercase tracking-[0.2em] text-foreground">
+        {children}
+      </h2>
+      <span aria-hidden="true" className="h-px flex-1 bg-border" />
+    </div>
+  );
+}
+
+/* ── Pagination for the small magazine list ──────────────────── */
 
 const PaginationControls = ({
   page,
   totalPages,
   onPrev,
   onNext,
-  compact = false,
 }: {
   page: number;
   totalPages: number;
   onPrev: () => void;
   onNext: () => void;
-  compact?: boolean;
 }) => {
   if (totalPages <= 1) return null;
   return (
-    <div className={`flex items-center justify-between gap-2 ${compact ? "pt-2" : "pt-3"}`}>
+    <div className="flex items-center justify-between gap-2 pt-3">
       <button
         onClick={onPrev}
         disabled={page === 1}
@@ -56,7 +91,7 @@ const PaginationControls = ({
         className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground transition-colors duration-150 hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
       >
         <ChevronLeft className="h-3.5 w-3.5" />
-        {!compact && "Prev"}
+        Prev
       </button>
       <span className="text-[11px] text-muted-foreground">
         {page} / {totalPages}
@@ -67,7 +102,7 @@ const PaginationControls = ({
         aria-label="Next issues"
         className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground transition-colors duration-150 hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
       >
-        {!compact && "Next"}
+        Next
         <ChevronRight className="h-3.5 w-3.5" />
       </button>
     </div>
@@ -87,50 +122,7 @@ function usePagedIssues(issues: MagazineIssue[], perPage: number) {
   };
 }
 
-/* ── Magazine: mobile carousel, desktop sidebar, flipbook drawer ── */
-
-const MobileMagazineCarousel = ({
-  issues,
-  onIssueClick,
-}: {
-  issues: MagazineIssue[];
-  onIssueClick: (issue: MagazineIssue) => void;
-}) => {
-  const { page, totalPages, visible, prev, next } = usePagedIssues(issues, MOBILE_ISSUES_PER_PAGE);
-  if (issues.length === 0) return null;
-  return (
-    <div className="mt-2 px-0.5 lg:hidden">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="eyebrow">Latest Issues</h2>
-        <span className="text-[10px] text-muted-foreground">{issues.length} issues</span>
-      </div>
-      <div className="no-scrollbar flex gap-3 overflow-x-auto pb-2">
-        {visible.map((issue) => (
-          <button
-            key={issue.slug}
-            type="button"
-            onClick={() => onIssueClick(issue)}
-            className="group min-w-25 shrink-0 text-left"
-          >
-            <span className="relative block h-33.5 w-full overflow-hidden rounded-lg border border-border/30 bg-muted/30 transition-colors group-hover:border-secondary/50">
-              <ApiImage
-                src={issue.cover_image}
-                alt=""
-                fill
-                sizes="100px"
-                className="object-cover transition-transform duration-200 group-hover:scale-105"
-              />
-            </span>
-            <span className="mt-1.5 line-clamp-1 block text-center text-[11px] font-medium text-foreground transition-colors group-hover:text-secondary">
-              Issue {issueNumber(issue)}
-            </span>
-          </button>
-        ))}
-      </div>
-      <PaginationControls page={page} totalPages={totalPages} onPrev={prev} onNext={next} compact />
-    </div>
-  );
-};
+/* ── The magazine: the sidebar module and the flipbook drawer ─── */
 
 const FlipbookPanel = ({ issue, onClose }: { issue: MagazineIssue | null; onClose: () => void }) => {
   const isOpen = !!issue;
@@ -192,7 +184,18 @@ const FlipbookPanel = ({ issue, onClose }: { issue: MagazineIssue | null; onClos
   );
 };
 
-const MagazineSidebar = ({
+/** An issue's own title, or "Issue 117" when it has none beyond its number. */
+const issueTitle = (issue: MagazineIssue) => issue.title.trim() || `Issue ${issueNumber(issue)}`;
+
+/** Under the title: the number (when the title doesn't say it) and the date. */
+const issueMeta = (issue: MagazineIssue) => {
+  const label = `Issue ${issueNumber(issue)}`;
+  const saysNumber = issue.title.trim().toLowerCase() === label.toLowerCase();
+  return [saysNumber ? null : label, formatDate(issue.publish_date)].filter(Boolean).join(" · ");
+};
+
+/** In the Magazine: the latest issue large, then the past ones; each opens in the flipbook drawer. */
+function TheEdit({
   issues,
   activeIssue,
   onIssueClick,
@@ -200,108 +203,117 @@ const MagazineSidebar = ({
   issues: MagazineIssue[];
   activeIssue: MagazineIssue | null;
   onIssueClick: (issue: MagazineIssue) => void;
-}) => {
-  const { page, totalPages, visible, prev, next } = usePagedIssues(issues, SIDEBAR_ISSUES_PER_PAGE);
-  if (issues.length === 0) return null;
-  return (
-    <div className="overflow-hidden rounded-xl border border-border/40 bg-background shadow-sm">
-      <div className="border-b border-border/30 px-4 pb-4 pt-5">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-foreground">The Glamlink Edit</h2>
-        <p className="mt-1 text-xs font-semibold text-primary">Interactive Edition</p>
-        <p className="mt-2 text-[11px] text-muted-foreground">Explore | Discover | Watch | Shop</p>
-      </div>
-      <div className="space-y-2 p-3">
-        {visible.map((issue) => {
-          const isActive = activeIssue?.slug === issue.slug;
-          return (
-            <button
-              key={issue.slug}
-              type="button"
-              onClick={() => onIssueClick(issue)}
-              aria-pressed={isActive}
-              className={`group flex w-full items-center gap-3 rounded-lg border p-2.5 text-left transition-all duration-200 ${
-                isActive ? "border-secondary/40 bg-accent" : "border-transparent hover:bg-secondary/5"
-              }`}
-            >
-              <span className="relative h-16 w-12 shrink-0 overflow-hidden rounded-md bg-muted/30">
-                <ApiImage src={issue.cover_image} alt="" fill sizes="48px" className="object-cover transition group-hover:scale-105" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[11px] font-semibold text-secondary">Issue {issueNumber(issue)}</span>
-                <span className="line-clamp-2 block text-xs font-medium text-foreground transition-colors group-hover:text-secondary">
-                  {issue.title}
-                </span>
-              </span>
-            </button>
-          );
-        })}
-      </div>
-      <div className="px-4 pb-3">
-        <PaginationControls page={page} totalPages={totalPages} onPrev={prev} onNext={next} />
-      </div>
-      <div className="border-t border-border/30 bg-muted/5 px-4 py-3">
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="w-full rounded-full border-primary/40 text-xs hover:border-secondary hover:text-secondary"
-        >
-          <Link href="/magazine">View All Issues</Link>
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-/* ── Categories ──────────────────────────────────────────────── */
-
-function CategoryLinks({
-  categories,
-  current,
-  search,
-  vertical = false,
-}: {
-  categories: JournalCategory[];
-  current: string;
-  search: string;
-  vertical?: boolean;
 }) {
-  const items = [{ slug: "", title: "All" }, ...categories];
-
-  if (vertical) {
-    return (
-      <nav aria-label="Categories" className="rounded-xl border border-border/40 bg-background p-4 shadow-sm">
-        <h2 className="eyebrow mb-4">Categories</h2>
-        <ul className="flex flex-col gap-1">
-          {items.map((category) => (
-            <li key={category.slug || "all"}>
-              <Link
-                href={listHref("/journal", { category: category.slug, search })}
-                aria-current={current === category.slug ? "page" : undefined}
-                scroll={false}
-                className="nav-link block w-full rounded-md px-3 py-2 text-left text-sm"
-              >
-                {category.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    );
-  }
+  const [latest, ...past] = issues;
+  const { page, totalPages, visible, prev, next } = usePagedIssues(past, PAST_ISSUES_PER_PAGE);
+  if (!latest) return null;
 
   return (
-    <nav aria-label="Categories" className="sticky top-15 z-40 border-b border-border bg-card lg:hidden">
-      <ul className="scrollbar-hide mt-5 flex items-center gap-3 overflow-x-auto whitespace-nowrap px-4 py-3">
-        {items.map((category) => (
-          <li key={category.slug || "all"} className="shrink-0">
+    <section aria-labelledby="the-edit-heading" className="rounded-3xl bg-muted/60 p-6">
+      <p className="eyebrow">The Glamlink Edit</p>
+      <h2 id="the-edit-heading" className="mt-1 text-xl font-semibold tracking-tight">
+        In the Magazine
+      </h2>
+
+      <button
+        type="button"
+        onClick={() => onIssueClick(latest)}
+        aria-pressed={activeIssue?.slug === latest.slug}
+        className="group mt-5 grid w-full grid-cols-[7rem_minmax(0,1fr)] items-center gap-5 text-left lg:block"
+      >
+        <span className="relative block aspect-3/4 overflow-hidden rounded-xl bg-muted shadow-medium">
+          <ApiImage
+            src={latest.cover_image}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 272px, 112px"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          />
+        </span>
+        <span className="block lg:mt-4">
+          <span className="block text-[11px] font-semibold uppercase tracking-widest text-secondary">Latest Issue</span>
+          <span className="mt-1 block font-semibold leading-snug transition-colors group-hover:text-secondary">
+            {issueTitle(latest)}
+          </span>
+          {issueMeta(latest) && <span className="mt-0.5 block text-xs text-muted-foreground">{issueMeta(latest)}</span>}
+          <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+            Read this issue
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </span>
+        </span>
+      </button>
+
+      {past.length > 0 && (
+        <div className="mt-6 border-t border-border pt-5">
+          <h3 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Past Issues</h3>
+          <ul className="mt-3 space-y-1">
+            {visible.map((issue) => (
+              <li key={issue.slug}>
+                <button
+                  type="button"
+                  onClick={() => onIssueClick(issue)}
+                  aria-pressed={activeIssue?.slug === issue.slug}
+                  className="group flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-card aria-pressed:bg-card"
+                >
+                  <span className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md bg-muted">
+                    <ApiImage src={issue.cover_image} alt="" fill sizes="40px" className="object-cover" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="line-clamp-2 block text-sm font-medium text-foreground transition-colors group-hover:text-secondary">
+                      {issueTitle(issue)}
+                    </span>
+                    {issueMeta(issue) && (
+                      <span className="block text-[11px] text-muted-foreground">{issueMeta(issue)}</span>
+                    )}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <PaginationControls page={page} totalPages={totalPages} onPrev={prev} onNext={next} />
+        </div>
+      )}
+
+      <Link href="/magazine" className="btn-outline mt-5 w-full">
+        View All Issues
+      </Link>
+    </section>
+  );
+}
+
+/* ── The masthead and the section bar ─────────────────────────── */
+
+/** The sections, under the masthead and pinned below the site header while reading. */
+function SectionNav({ categories, current, search }: { categories: JournalCategory[]; current: string; search: string }) {
+  const items = [{ slug: "", title: "All Stories" }, ...categories];
+  const listRef = useRef<HTMLUListElement>(null);
+
+  // The current section in view, however far along the row it is
+  useEffect(() => {
+    const list = listRef.current;
+    const active = list?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!list || !active) return;
+    list.scrollLeft = active.offsetLeft - (list.clientWidth - active.offsetWidth) / 2;
+  }, [current]);
+
+  return (
+    <nav
+      aria-label="Journal sections"
+      className="sticky top-16 z-30 border-y border-border bg-background/95 backdrop-blur md:top-20"
+    >
+      {/* The right edge fades, so a row longer than the screen reads as one that scrolls */}
+      <ul
+        ref={listRef}
+        className="no-scrollbar container-glamlink relative flex justify-center-safe gap-x-7 overflow-x-auto mask-r-from-85% pr-20 sm:pr-24 lg:pr-28"
+      >
+        {items.map((item) => (
+          <li key={item.slug || "all"} className="shrink-0">
             <Link
-              href={listHref("/journal", { category: category.slug, search })}
-              aria-current={current === category.slug ? "page" : undefined}
-              scroll={false}
-              className="chip inline-flex rounded-full px-4 py-2 text-sm"
+              href={listHref("/journal", { category: item.slug, search })}
+              aria-current={current === item.slug ? "page" : undefined}
+              className="block border-b-2 border-transparent py-3.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground transition-colors hover:text-secondary aria-[current=page]:border-secondary aria-[current=page]:text-secondary"
             >
-              {category.title}
+              {item.title}
             </Link>
           </li>
         ))}
@@ -310,40 +322,95 @@ function CategoryLinks({
   );
 }
 
-/* ── Featured article ────────────────────────────────────────── */
+/* ── The front page ──────────────────────────────────────────── */
 
-function JournalHero({ article }: { article: ArticleCard }) {
-  const date = formatDate(article.publish_date ?? article.created_at);
+/** The featured story (else the newest), large: the photo beside the headline, standfirst and byline. */
+function CoverStory({ article }: { article: ArticleCard }) {
+  const href = articleHref(article);
   return (
-    <section aria-label="Featured article" className="relative rounded-2xl bg-muted px-6 py-10 md:px-10 md:py-12">
-      <Link href={articleHref(article)} className="group block space-y-6">
-        <div className="grid items-center gap-8 md:grid-cols-[1.1fr_1fr]">
-          <div className="relative aspect-16/10 overflow-hidden rounded-xl">
-            <ApiImage
-              src={article.cover_image}
-              alt=""
-              fill
-              priority
-              sizes="(min-width: 1024px) 40vw, 100vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-            />
-          </div>
-          <div className="space-y-4">
-            {article.journal_category?.title && <p className="eyebrow mb-1">{article.journal_category.title}</p>}
-            <h2 className="text-xl leading-snug tracking-tight transition-colors group-hover:text-secondary md:text-2xl">
-              {article.title}
-            </h2>
-            {article.short_description && (
-              <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">{article.short_description}</p>
+    <section aria-labelledby="cover-story-heading" className="container-glamlink pt-10 md:pt-14">
+      <article className="group grid items-center gap-8 lg:grid-cols-12 lg:gap-14">
+        <Link
+          href={href}
+          tabIndex={-1}
+          aria-hidden="true"
+          className="relative block aspect-3/2 overflow-hidden rounded-3xl bg-muted lg:col-span-7"
+        >
+          <ApiImage
+            src={article.cover_image}
+            alt=""
+            fill
+            preload
+            sizes="(min-width: 1280px) 700px, (min-width: 1024px) 58vw, 100vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+          />
+        </Link>
+
+        <div className="lg:col-span-5">
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="text-[11px] font-semibold uppercase tracking-widest text-foreground">The Cover Story</span>
+            {article.journal_category?.title && (
+              <>
+                <span aria-hidden="true" className="h-px w-8 bg-border" />
+                <Kicker article={article} />
+              </>
             )}
-          </div>
+          </p>
+          <h2
+            id="cover-story-heading"
+            className="mt-5 text-3xl font-semibold leading-[1.12] tracking-tight text-balance md:text-4xl xl:text-[2.75rem]"
+          >
+            <Link href={href} className="transition-colors hover:text-secondary">
+              {article.title.trim()}
+            </Link>
+          </h2>
+          {article.short_description && (
+            <p className="mt-5 line-clamp-4 text-base leading-relaxed text-muted-foreground md:text-lg">
+              {article.short_description}
+            </p>
+          )}
+          <Byline article={article} className="mt-6" />
+          <Link href={href} className="btn-primary mt-8">
+            Read the Story
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
-        <div className="flex items-center gap-3 border-t border-border/40 pt-4 text-xs">
-          {article.journal_author?.name && <span className="font-medium">{article.journal_author.name}</span>}
-          {article.journal_author?.name && date && <span className="h-1 w-1 rounded-full bg-border" />}
-          {date && <span className="text-muted-foreground">{date}</span>}
+      </article>
+    </section>
+  );
+}
+
+/** In Focus: one of the biggest sections, its lead story large and three more beside it. */
+function Spotlight({ category, articles }: JournalSpotlight) {
+  const [lead, ...more] = articles;
+  const id = `in-focus-${category.slug}`;
+  return (
+    <section aria-labelledby={id} className="container-glamlink mt-20 md:mt-24">
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-t-2 border-foreground pt-6">
+        <div>
+          <p className="eyebrow">In Focus</p>
+          <h2 id={id} className="section-title mt-2">
+            {category.title}
+          </h2>
         </div>
-      </Link>
+        <Link
+          href={journalCategoryHref(category.slug)}
+          className="eyebrow inline-flex items-center gap-1.5 transition-colors hover:text-secondary"
+        >
+          More {category.title}
+          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+        </Link>
+      </div>
+      <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-14">
+        <StoryCard article={lead} layout="lead" showKicker={false} />
+        <div className="divide-y divide-border">
+          {more.map((article) => (
+            <div key={article.id} className="py-6 first:pt-0 last:pb-0">
+              <StoryCard article={article} layout="compact" showKicker={false} />
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
@@ -355,13 +422,25 @@ export interface JournalClientProps {
   articles: Paged<ArticleCard>;
   categories: JournalCategory[];
   issues: MagazineIssue[];
+  /** The front page's In Focus shelves; empty elsewhere. */
+  spotlights: JournalSpotlight[];
   category: string;
   search: string;
   page: number;
   perPage: number;
 }
 
-const JournalClient = ({ hero, articles, categories, issues, category, search, page, perPage }: JournalClientProps) => {
+const JournalClient = ({
+  hero,
+  articles,
+  categories,
+  issues,
+  spotlights,
+  category,
+  search,
+  page,
+  perPage,
+}: JournalClientProps) => {
   const router = useRouter();
   const [selectedIssue, setSelectedIssue] = useState<MagazineIssue | null>(null);
   const device = useDeviceType();
@@ -396,147 +475,173 @@ const JournalClient = ({ hero, articles, categories, issues, category, search, p
     setSelectedIssue((prev) => (prev?.slug === issue.slug ? null : issue));
   };
 
+  const front = !category && !search && page === 1;
   const pageCount = Math.max(1, Math.ceil(articles.count / perPage));
   const categoryTitle = categories.find((c) => c.slug === category)?.title;
 
-  const main = (
-    <main className="min-w-0 space-y-6">
-      {hero && <JournalHero article={hero} />}
-
-      {search && (
-        <p role="status" aria-live="polite" className="text-[11px] text-muted-foreground">
-          {articles.count} {articles.count === 1 ? "result" : "results"} for &ldquo;{search}&rdquo;
-          {categoryTitle && ` in ${categoryTitle}`}
-        </p>
-      )}
-
-      {articles.rows.length === 0 ? (
-        <EmptyState
-          title={search ? `No articles match “${search}”` : "No articles here yet"}
-          action={
-            <div className="flex items-center gap-4">
-              {search && (
-                <button type="button" onClick={() => setSearchInput("")} className="link-glamlink text-sm">
-                  Clear search
-                </button>
-              )}
-              {category && (
-                <Link href={listHref("/journal", { search })} className="link-glamlink text-sm">
-                  View all categories
-                </Link>
-              )}
-            </div>
-          }
-        >
-          {search
-            ? "Try a different keyword. You can search by title, category or author."
-            : "There are no articles in this category yet."}
-        </EmptyState>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 lg:gap-x-12 lg:gap-y-16">
-          {articles.rows.map((article, index) => (
-            <Fragment key={article.id}>
-              <ArticleTile article={article} priority={!hero && index < 2} />
-
-              {/* In-feed ad(s) after the 1st and the 2nd row */}
-              {index === 1 && !!ads["journal-listing-in-feed"]?.length && (
-                <div className="flex flex-wrap justify-center gap-4 md:col-span-2">
-                  {ads["journal-listing-in-feed"].map((ad) => (
-                    <AdSlot key={ad.id} slotId="journal-listing-in-feed" ad={ad} />
-                  ))}
-                </div>
-              )}
-              {index === 3 && !!ads["journal-listing-in-feed-2"]?.length && (
-                <div className="flex flex-wrap justify-center gap-4 md:col-span-2">
-                  {ads["journal-listing-in-feed-2"].map((ad) => (
-                    <AdSlot key={ad.id} slotId="journal-listing-in-feed-2" ad={ad} />
-                  ))}
-                </div>
-              )}
-            </Fragment>
-          ))}
-        </div>
-      )}
-
-      <PageLinks
-        className="pt-6"
-        page={page}
-        pageCount={pageCount}
-        hrefFor={(p) => listHref("/journal", { category, search, page: p })}
-      />
-    </main>
+  const pageLinks = (
+    <PageLinks
+      className="mt-14"
+      page={page}
+      pageCount={pageCount}
+      hrefFor={(p) => listHref("/journal", { category, search, page: p })}
+    />
   );
+
+  /** The stories beside the magazine (and, from lg, the sidebar ads). */
+  const withSidebar = (content: ReactNode, className?: string) => (
+    <div
+      className={cn(
+        "container-glamlink grid gap-14 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-16",
+        className
+      )}
+    >
+      <div className="min-w-0">{content}</div>
+      <aside aria-label="The magazine" className="space-y-10">
+        <TheEdit issues={issues} activeIssue={selectedIssue} onIssueClick={handleIssueClick} />
+        <div className="hidden space-y-6 lg:sticky lg:top-36 lg:block">
+          <AdRow ads={ads} slot="journal-sidebar-right" />
+          <AdRow ads={ads} slot="journal-sidebar-left" />
+        </div>
+      </aside>
+    </div>
+  );
+
+  const topStories = front ? articles.rows.slice(0, TOP_STORIES) : [];
+  const latest = front ? articles.rows.slice(TOP_STORIES) : [];
 
   return (
     <>
       <NewsletterPopup openDelay={3000} />
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto mt-30 max-w-[1700px] px-4 pb-8 sm:px-6 lg:pb-14 xl:px-14">
-          <header className="mb-6 text-center lg:mb-8">
-            <h1 className="text-3xl tracking-tight md:text-4xl">The Glamlink Journal</h1>
-            <p className="mt-2 text-sm text-muted-foreground md:text-base">
-              Beauty industry insights, trends, tips and expert articles.
-            </p>
-          </header>
 
-          <div className="flex flex-wrap justify-center gap-4 py-4">
-            {(ads["journal-top-banner"] ?? []).map((ad) => (
-              <AdSlot key={ad.id} slotId="journal-top-banner" ad={ad} />
-            ))}
-          </div>
-
-          <div className="mx-auto mb-6 w-full max-w-2xl lg:mb-8">
-            <JournalSearchBar
-              value={searchInput}
-              onChange={setSearchInput}
-              isSearching={pending || searchInput.trim() !== search}
-            />
-          </div>
-
-          {/* Mobile */}
-          <div className="space-y-4 lg:hidden">
-            <CategoryLinks categories={categories} current={category} search={search} />
-            <MobileMagazineCarousel issues={issues} onIssueClick={handleIssueClick} />
-            {main}
-          </div>
-
-          {/* Desktop: categories, articles, magazine */}
-          <div className="hidden grid-cols-[200px_1fr_300px] gap-10 lg:grid xl:grid-cols-[220px_1fr_300px] xl:gap-14 2xl:grid-cols-[240px_1fr_320px]">
-            <aside>
-              <div className="sticky top-28 space-y-6 pr-4">
-                <CategoryLinks categories={categories} current={category} search={search} vertical />
-                {(ads["journal-sidebar-left"] ?? []).map((ad) => (
-                  <AdSlot key={ad.id} slotId="journal-sidebar-left" ad={ad} />
-                ))}
-              </div>
-            </aside>
-
-            {main}
-
-            <aside>
-              <div className="sticky top-28 space-y-10 pl-4">
-                <MagazineSidebar issues={issues} activeIssue={selectedIssue} onIssueClick={handleIssueClick} />
-                {(ads["journal-sidebar-right"] ?? []).map((ad) => (
-                  <AdSlot key={ad.id} slotId="journal-sidebar-right" ad={ad} />
-                ))}
-              </div>
-            </aside>
-          </div>
-
-          <div className="lg:hidden">
-            {(ads["journal-mobile-bottom"] ?? []).map((ad) => (
-              <AdSlot key={ad.id} slotId="journal-mobile-bottom" ad={ad} />
-            ))}
-          </div>
-
-          <FlipbookPanel issue={selectedIssue} onClose={() => setSelectedIssue(null)} />
+      <header className="container-glamlink pb-8 pt-28 text-center md:pb-10 md:pt-36">
+        <p className="eyebrow">Beauty + Wellness, In Depth</p>
+        <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
+          The Glamlink Journal
+        </h1>
+        <p className="mx-auto mt-4 max-w-xl text-muted-foreground md:text-lg">
+          Expert insights. Real stories. The latest in beauty + wellness.
+        </p>
+        <div className="mx-auto mt-8 max-w-xl text-left">
+          <JournalSearchBar
+            value={searchInput}
+            onChange={setSearchInput}
+            isSearching={pending || searchInput.trim() !== search}
+          />
         </div>
-        <div className="flex flex-wrap justify-center gap-4">
-          {(ads["journal-bottom"] ?? []).map((ad) => (
-            <AdSlot key={ad.id} slotId="journal-bottom" ad={ad} />
+      </header>
+
+      <SectionNav categories={categories} current={category} search={search} />
+
+      <AdRow ads={ads} slot="journal-top-banner" className="container-glamlink pt-8" />
+
+      {front ? (
+        <>
+          {hero && <CoverStory article={hero} />}
+
+          {topStories.length > 0 && (
+            <section aria-labelledby="top-stories-heading" className="container-glamlink mt-16 md:mt-24">
+              <SectionLabel id="top-stories-heading">Top Stories</SectionLabel>
+              <ul className="mt-8 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+                {topStories.map((article, index) => (
+                  <li key={article.id} className={cn(index === 2 && "sm:col-span-2 lg:col-span-1")}>
+                    <StoryCard article={article} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {withSidebar(
+            latest.length > 0 && (
+              <section aria-labelledby="latest-heading">
+                <SectionLabel id="latest-heading">The Latest</SectionLabel>
+                <div className="mt-8 divide-y divide-border">
+                  {latest.map((article, index) => (
+                    <Fragment key={article.id}>
+                      <div className="py-8 first:pt-0">
+                        <StoryCard article={article} layout="row" />
+                      </div>
+                      {/* In-feed ads after the 2nd and the 4th story */}
+                      {index === 1 && <AdRow ads={ads} slot="journal-listing-in-feed" className="py-8" />}
+                      {index === 3 && <AdRow ads={ads} slot="journal-listing-in-feed-2" className="py-8" />}
+                    </Fragment>
+                  ))}
+                </div>
+                {pageLinks}
+              </section>
+            ),
+            "mt-16 md:mt-24"
+          )}
+
+          {spotlights.map((spotlight) => (
+            <Spotlight key={spotlight.category.slug} {...spotlight} />
           ))}
-        </div>
-      </div>
+        </>
+      ) : (
+        <>
+          <div className="container-glamlink pt-12 md:pt-16">
+            <p className="eyebrow">{search ? "Search" : category ? "Section" : "All Stories"}</p>
+            <h2 className="section-title mt-2 text-balance">
+              {search ? <>Results for &ldquo;{search}&rdquo;</> : (categoryTitle ?? "The Latest")}
+            </h2>
+            <p role="status" aria-live="polite" className="mt-2 text-sm text-muted-foreground">
+              {articles.count} {articles.count === 1 ? "story" : "stories"}
+              {search && categoryTitle && ` in ${categoryTitle}`}
+              {pageCount > 1 && ` · Page ${page} of ${pageCount}`}
+            </p>
+          </div>
+
+          {withSidebar(
+            articles.rows.length === 0 ? (
+              <EmptyState
+                title={search ? `No stories match “${search}”` : "No stories here yet"}
+                action={
+                  <div className="flex items-center gap-4">
+                    {search && (
+                      <button type="button" onClick={() => setSearchInput("")} className="link-glamlink text-sm">
+                        Clear search
+                      </button>
+                    )}
+                    {category && (
+                      <Link href={listHref("/journal", { search })} className="link-glamlink text-sm">
+                        View all sections
+                      </Link>
+                    )}
+                  </div>
+                }
+              >
+                {search
+                  ? "Try a different keyword. You can search by title, section or author."
+                  : "There are no stories in this section yet."}
+              </EmptyState>
+            ) : (
+              <>
+                <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
+                  {articles.rows.map((article, index) => (
+                    <Fragment key={article.id}>
+                      <StoryCard article={article} showKicker={!category} preload={index < 2} />
+                      {/* After six stories: whole rows in both the two- and the three-column grid */}
+                      {index === 5 && (
+                        <AdRow ads={ads} slot="journal-listing-in-feed" className="sm:col-span-2 xl:col-span-3" />
+                      )}
+                    </Fragment>
+                  ))}
+                </div>
+                <AdRow ads={ads} slot="journal-listing-in-feed-2" className="mt-12" />
+                {pageLinks}
+              </>
+            ),
+            "mt-10"
+          )}
+        </>
+      )}
+
+      <AdRow ads={ads} slot="journal-mobile-bottom" className="container-glamlink mt-16 lg:hidden" />
+      <AdRow ads={ads} slot="journal-bottom" className="container-glamlink mt-16" />
+      <div className="pb-20 md:pb-28" />
+
+      <FlipbookPanel issue={selectedIssue} onClose={() => setSelectedIssue(null)} />
     </>
   );
 };

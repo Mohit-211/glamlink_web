@@ -1,29 +1,19 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { BadgeCheck, MapPin } from "lucide-react";
-/** Decorative stock photos for the hero (Unsplash). */
-const unsplash = (id: string, width = 800) =>
-  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${width}&q=75`;
+import heroPhoto from "../../../public/home-hero/directory-hero.png";
 
-const HERO_IMAGES = {
-  hair: unsplash("1562322140-8baeececf3df", 700),
-  medSpa: unsplash("1552693673-1bf958298935", 600),
-  wellness: unsplash("1600334129128-685c5582fd35", 600),
-  makeup: unsplash("1487412947147-5cebf100ffc2", 300),
-};
-
-const MOBILE_STRIP = [
-  { src: HERO_IMAGES.hair, alt: "Hair stylist styling a client" },
-  { src: HERO_IMAGES.medSpa, alt: "Med spa skin treatment" },
-  { src: HERO_IMAGES.wellness, alt: "Hot stone wellness massage" },
-];
-
+/**
+ * The directory's hero: copy and the search (children). On phones the text and the
+ * search come first and the group photo under them; from lg the photo fills the band
+ * behind them, its left side faded into the page.
+ */
 export default function DirectoryHero({ children }: { children: ReactNode }) {
   return (
-    <section className="hero-glamlink relative overflow-hidden bg-background">
-      <div className="container-glamlink relative">
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          {/* COPY + SEARCH */}
-          <div className="lg:col-span-7 animate-fade-up">
+    <section className="bg-background pt-16 md:pt-20">
+      <div className="grid lg:min-h-152">
+        <div className="container-glamlink relative z-10 py-10 md:py-14 lg:col-start-1 lg:row-start-1 lg:self-center lg:py-16">
+          <div className="max-w-2xl animate-fade-up">
             <span className="badge-soft text-xs sm:text-sm">
               <MapPin className="w-4 h-4" aria-hidden="true" />
               Nationwide Beauty + Wellness Directory
@@ -40,7 +30,7 @@ export default function DirectoryHero({ children }: { children: ReactNode }) {
 
             <div className="mt-8 md:mt-10">{children}</div>
 
-            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground lg:text-foreground">
               {["Glamlink-featured experts", "Google-powered listings", "Across the U.S."].map((item) => (
                 <li key={item} className="flex items-center gap-2">
                   <BadgeCheck className="w-4 h-4 text-primary" aria-hidden="true" />
@@ -49,63 +39,20 @@ export default function DirectoryHero({ children }: { children: ReactNode }) {
               ))}
             </ul>
           </div>
-
-          {/* DESKTOP COLLAGE */}
-          <div className="hidden lg:block lg:col-span-5">
-            <div className="relative grid grid-cols-2 gap-4 h-[540px]">
-              <figure className="relative row-span-2 overflow-hidden rounded-[2rem] shadow-large">
-                <img
-                  src={HERO_IMAGES.hair}
-                  alt="Hair stylist styling a client"
-                  className="h-full w-full object-cover"
-                  fetchPriority="high"
-                />
-                <figcaption className="absolute bottom-4 left-4 rounded-full bg-card/90 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur">
-                  Hair
-                </figcaption>
-              </figure>
-
-              <figure className="relative overflow-hidden rounded-[2rem] shadow-large mt-10">
-                <img
-                  src={HERO_IMAGES.medSpa}
-                  alt="Med spa skin treatment"
-                  className="h-full w-full object-cover"
-                />
-                <figcaption className="absolute bottom-4 left-4 rounded-full bg-card/90 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur">
-                  Skin + Med Spa
-                </figcaption>
-              </figure>
-
-              <figure className="relative overflow-hidden rounded-[2rem] shadow-large mb-10">
-                <img
-                  src={HERO_IMAGES.wellness}
-                  alt="Hot stone wellness massage"
-                  className="h-full w-full object-cover"
-                />
-                <figcaption className="absolute bottom-4 left-4 rounded-full bg-card/90 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur">
-                  Wellness
-                </figcaption>
-              </figure>
-
-              {/* Floating makeup accent */}
-              <div className="absolute -left-10 top-1/2 -translate-y-1/2 h-28 w-28 overflow-hidden rounded-full border-4 border-card shadow-large animate-float">
-                <img
-                  src={HERO_IMAGES.makeup}
-                  alt="Makeup artistry"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* MOBILE / TABLET IMAGE STRIP */}
-        <div className="lg:hidden mt-10 grid grid-cols-3 gap-3">
-          {MOBILE_STRIP.map((image) => (
-            <div key={image.src} className="aspect-[4/5] overflow-hidden rounded-2xl shadow-medium">
-              <img src={image.src} alt={image.alt} className="h-full w-full object-cover" loading="lazy" />
-            </div>
-          ))}
+        {/* Hair, med spa, injectors, estheticians, wellness and grooming professionals */}
+        <div className="relative mx-5 mb-10 aspect-2/1 overflow-hidden rounded-3xl sm:mx-6 lg:col-start-1 lg:row-start-1 lg:m-0 lg:aspect-auto lg:rounded-none">
+          <Image
+            src={heroPhoto}
+            alt=""
+            fill
+            preload
+            placeholder="blur"
+            sizes="100vw"
+            className="object-cover object-top"
+          />
+          <div className="absolute inset-0 hidden bg-linear-to-r from-background via-background/90 via-40% to-transparent to-75% lg:block" />
         </div>
       </div>
     </section>

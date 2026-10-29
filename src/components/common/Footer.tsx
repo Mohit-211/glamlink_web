@@ -4,8 +4,14 @@ import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import logo from "../../../public/header_logo.png";
-import { Instagram, Twitter, Facebook, Linkedin, Youtube } from "@/components/icons/BrandIcons";
+import logo from "../../../public/logo.png";
+import {
+  Instagram,
+  Twitter,
+  Facebook,
+  Linkedin,
+  Youtube,
+} from "@/components/icons/BrandIcons";
 import { subscribeNewsletter } from "@/api/Api";
 import { readApiError } from "@/lib/apiError";
 
@@ -25,7 +31,6 @@ const footerLinks = {
     { label: "Terms of Use", href: "/terms" },
     { label: "Sitemap", href: "/sitemap.xml" },
     { label: "Contact Us", href: "/contact-us" },
-
   ],
 };
 
@@ -51,14 +56,20 @@ function FooterNewsletter() {
       await subscribeNewsletter({ email: email.trim(), source: "footer" });
       setStatus("done");
     } catch (err) {
-      setError(readApiError(err, "We couldn't subscribe you. Please try again.").message);
+      setError(
+        readApiError(err, "We couldn't subscribe you. Please try again.")
+          .message,
+      );
       setStatus("idle");
     }
   };
 
   if (status === "done") {
     return (
-      <p role="status" className="flex items-center gap-2 text-sm font-medium text-success">
+      <p
+        role="status"
+        className="flex items-center gap-2 text-sm font-medium text-success"
+      >
         <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
         Thanks for subscribing.
       </p>
@@ -83,12 +94,27 @@ function FooterNewsletter() {
           aria-describedby={error ? "footer-newsletter-error" : undefined}
           className="input-glamlink flex-1"
         />
-        <button type="submit" className="btn-primary px-5 text-sm" disabled={status === "sending"}>
-          {status === "sending" ? <Loader2 className="h-4 w-4 animate-spin" aria-label="Subscribing" /> : "Join"}
+        <button
+          type="submit"
+          className="btn-primary px-5 text-sm"
+          disabled={status === "sending"}
+        >
+          {status === "sending" ? (
+            <Loader2
+              className="h-4 w-4 animate-spin"
+              aria-label="Subscribing"
+            />
+          ) : (
+            "Join"
+          )}
         </button>
       </div>
       {error && (
-        <p id="footer-newsletter-error" role="alert" className="text-xs text-destructive">
+        <p
+          id="footer-newsletter-error"
+          role="alert"
+          className="text-xs text-destructive"
+        >
           {error}
         </p>
       )}
@@ -105,11 +131,7 @@ export default function Footer() {
           {/* BRAND */}
           <div className="space-y-6">
             <Link href="/" className="inline-block">
-              <Image
-                src={logo}
-                alt="Glamlink"
-                className="h-11 w-auto"
-              />
+              <Image src={logo} alt="Glamlink" className="h-11 w-auto" />
             </Link>
 
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">

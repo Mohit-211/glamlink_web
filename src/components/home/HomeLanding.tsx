@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Form from "next/form";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { ArrowRight, Search, Share2, Sparkles, TrendingUp, Users, type LucideIcon } from "lucide-react";
 import ApiImage from "@/components/common/ApiImage";
@@ -22,13 +22,17 @@ import type { Paged } from "@/lib/api/types";
 import { searchHref } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import accessWordmark from "../../../public/assets/ACCESS-3.png";
+import brandsPhoto from "../../../public/home-hero/brands-home.png";
+import heroPhoto from "../../../public/home-hero/homepage-hero.png";
+import professionalsPhoto from "../../../public/home-hero/professionals-home.png";
 
 /*
- * Home page (Oct 2026 mockup, with Brands where the mockup has Inside the
- * Industry). Every row reads the API: topic tiles, products, brands and videos
- * (the featured ones, else the first few), the newest articles, and the images
- * and popular searches admins set in the home settings. A row with nothing to
- * show is left out; an image admins have not set yet shows a quiet panel instead.
+ * Home page (Oct 2026 mockup, with Find a Brand and Brands where the mockup has
+ * Inside the Industry). Every row reads the API: topic tiles, products, brands
+ * and videos (the featured ones, else the first few), the newest articles, and
+ * the images and popular searches admins set in the home settings. A row with
+ * nothing to show is left out; until admins set an image, the site's own photo
+ * shows.
  */
 
 const DEFAULT_POPULAR_SEARCHES = ["Botox", "Skin Rejuvenation", "Weight Loss", "Facials", "Plastic Surgery"];
@@ -130,19 +134,40 @@ const SLIDE = {
   4: "w-[75%] shrink-0 snap-start sm:w-[45%] lg:w-[calc((100%-3rem)/4)]",
 };
 
+/** An image admins set (a link from the API) or one of the site's own photos. */
+type PhotoSource = string | StaticImageData | null | undefined;
+
+/** A photo filling its frame: the API's sized copies for an admin's image, the site's own optimized from disk. */
+function Photo({
+  src,
+  sizes,
+  preload = false,
+  className,
+}: {
+  src: string | StaticImageData;
+  sizes: string;
+  preload?: boolean;
+  className?: string;
+}) {
+  if (typeof src === "string") {
+    return <ApiImage src={src} alt="" fill preload={preload} sizes={sizes} className={className} />;
+  }
+  return <Image src={src} alt="" fill preload={preload} placeholder="blur" sizes={sizes} className={className} />;
+}
+
 /** A photo with a short line over it, or a tinted panel with the line while there is no photo. */
 function PhotoPanel({
   src,
   tagline,
   sizes,
-  priority = false,
+  preload = false,
   fadeLeft = false,
   className,
 }: {
-  src: string | null | undefined;
+  src: PhotoSource;
   tagline: ReactNode;
   sizes: string;
-  priority?: boolean;
+  preload?: boolean;
   /** From lg up, fade the photo's left side into the page, for text laid over it. */
   fadeLeft?: boolean;
   className?: string;
@@ -158,10 +183,10 @@ function PhotoPanel({
   }
   return (
     <div className={cn("relative overflow-hidden", className)}>
-      <ApiImage src={src} alt="" fill priority={priority} sizes={sizes} className="object-cover lg:object-right" />
+      <Photo src={src} preload={preload} sizes={sizes} className="object-cover lg:object-right" />
       <div className="absolute inset-0 bg-linear-to-t from-overlay/50 via-overlay/5 to-transparent" />
       {fadeLeft && (
-        <div className="absolute inset-0 hidden bg-linear-to-r from-background via-background/80 via-35% to-transparent to-65% lg:block" />
+        <div className="absolute inset-0 hidden bg-linear-to-r from-background via-background/80 via-30% to-transparent to-55% lg:block" />
       )}
       <p className="absolute bottom-6 right-6 text-right text-xs font-semibold uppercase leading-relaxed tracking-[0.2em] text-overlay-foreground md:bottom-8 md:right-8 md:text-sm">
         {tagline}
@@ -173,7 +198,7 @@ function PhotoPanel({
 /* ── Sections ────────────────────────────────────────────────── */
 
 /** On phones the text comes first and the photo under it; from lg the photo fills the band behind the text. */
-function Hero({ image, popularSearches }: { image: string | null | undefined; popularSearches: string[] }) {
+function Hero({ image, popularSearches }: { image: PhotoSource; popularSearches: string[] }) {
   return (
     <section aria-labelledby="home-hero-heading" className="pt-16 md:pt-20">
       <div className="grid lg:min-h-128">
@@ -224,7 +249,7 @@ function Hero({ image, popularSearches }: { image: string | null | undefined; po
 
         <PhotoPanel
           src={image}
-          priority
+          preload
           fadeLeft
           sizes="100vw"
           className="mx-5 aspect-4/3 rounded-3xl sm:mx-6 lg:col-start-1 lg:row-start-1 lg:mx-0 lg:aspect-auto lg:rounded-none"
@@ -242,34 +267,46 @@ function Hero({ image, popularSearches }: { image: string | null | undefined; po
   );
 }
 
-function FindProfessional({ image }: { image: string | null | undefined }) {
+/**
+ * Find a Professional and Find a Brand: a photo whose quiet left side carries the
+ * text. From lg up the photo fills the band behind the text; on phones the text
+ * comes first and the photo under it.
+ */
+function FeatureBand({
+  id,
+  image,
+  eyebrow,
+  title,
+  text,
+  action,
+}: {
+  id: string;
+  image: string | StaticImageData;
+  eyebrow: string;
+  title: string;
+  text: string;
+  action: SectionLink;
+}) {
   return (
-    <section aria-labelledby="find-pro-heading" className="bg-muted/60 py-10 md:py-14">
-      <div className="container-glamlink grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-12">
-        <div className="flex flex-col items-start gap-4">
-          <h2 id="find-pro-heading" className="section-title">
-            Find a Professional
-          </h2>
-          <p className="max-w-sm text-muted-foreground">
-            Search trusted beauty + wellness professionals across the U.S.
-          </p>
-          <Link href="/directory" className="btn-primary mt-2">
-            Search Directory
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
+    <section aria-labelledby={`${id}-heading`} className="bg-muted/60 lg:bg-transparent">
+      <div className="grid">
+        <div className="container-glamlink relative z-10 pb-6 pt-10 md:pt-14 lg:col-start-1 lg:row-start-1 lg:self-center lg:py-16">
+          <div className="max-w-md">
+            <p className="eyebrow">{eyebrow}</p>
+            <h2 id={`${id}-heading`} className="section-title mt-3">
+              {title}
+            </h2>
+            <p className="mt-3 text-muted-foreground md:text-lg">{text}</p>
+            <Link href={action.href} className="btn-primary mt-6">
+              {action.label}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
         </div>
-        <PhotoPanel
-          src={image}
-          sizes="(min-width: 1024px) 66vw, 100vw"
-          className="aspect-video rounded-3xl lg:aspect-3/1"
-          tagline={
-            <>
-              Real experts.
-              <br />
-              Real results.
-            </>
-          }
-        />
+        <div className="relative mx-5 mb-10 aspect-video overflow-hidden rounded-3xl sm:mx-6 md:mb-14 lg:col-start-1 lg:row-start-1 lg:m-0 lg:aspect-5/2 lg:max-h-144 lg:rounded-none">
+          <Photo src={image} sizes="100vw" className="object-cover object-[right_top]" />
+          <div className="absolute inset-0 hidden bg-linear-to-r from-background via-background/70 via-30% to-transparent to-55% lg:block" />
+        </div>
       </div>
     </section>
   );
@@ -326,7 +363,7 @@ export default async function HomeLanding() {
 
   return (
     <div>
-      <Hero image={settings?.hero_image} popularSearches={popularSearches} />
+      <Hero image={settings?.hero_image || heroPhoto} popularSearches={popularSearches} />
 
       {tiles.length > 0 && (
         <HomeSection
@@ -344,7 +381,14 @@ export default async function HomeLanding() {
         </HomeSection>
       )}
 
-      <FindProfessional image={settings?.find_professional_image} />
+      <FeatureBand
+        id="find-pro"
+        image={settings?.find_professional_image || professionalsPhoto}
+        eyebrow="Real experts. Real results."
+        title="Find a Professional"
+        text="Search trusted beauty + wellness professionals across the U.S."
+        action={{ label: "Search Directory", href: "/directory" }}
+      />
 
       {products.rows.length > 0 && (
         <ShelfSection
@@ -363,13 +407,21 @@ export default async function HomeLanding() {
         </ShelfSection>
       )}
 
+      <FeatureBand
+        id="find-brand"
+        image={brandsPhoto}
+        eyebrow="Innovative brands. Advanced technology."
+        title="Find a Brand"
+        text="Discover the brands shaping beauty + wellness, from professional skincare to the devices experts trust."
+        action={{ label: "Browse Brands", href: "/directory" }}
+      />
+
       {brands.rows.length > 0 && (
         <ShelfSection
           id="brands"
-          title="Brands"
+          title="Featured Brands"
           subtitle="Innovative brands. Advanced technology. Education. Opportunities."
           action={{ label: "View all brands", href: "/directory" }}
-          band
         >
           <HomeCarousel label="Brands">
             {brands.rows.map((brand) => (
