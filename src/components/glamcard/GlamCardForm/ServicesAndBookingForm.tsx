@@ -428,7 +428,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       {/* Additional Specialties */}
       <div id="field-specialties" className="space-y-3">
         <label className="label-glamlink">
-          Additional Specialties <span className="text-destructive">*</span>
+          Additional Specialties{" "}
+          {data.professional_type === "brand" ? (
+            <span className="normal-case tracking-normal text-muted-foreground">(optional)</span>
+          ) : (
+            <span className="text-destructive">*</span>
+          )}
         </label>
 
         <div className="relative flex gap-2" ref={specialtyWrapperRef}>
@@ -455,7 +460,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
             />
 
             {specialtyDropdownOpen && (
-              <div className="absolute z-10 mt-1 w-full max-h-56 overflow-auto rounded-lg border border-border bg-card shadow-lg">
+              <div className="absolute z-10 mt-1 w-full max-h-56 overflow-auto rounded-lg border border-border bg-card shadow-large">
                 {loadingSpecialties ? (
                   <div className="px-4 py-2 text-sm text-muted-foreground/80">Loading…</div>
                 ) : (
@@ -829,7 +834,7 @@ const ServicesAndBookingForm: React.FC<Props> = ({
                         type="button"
                         onClick={() => removeFeaturedLinkThumbnail(index)}
                         title="Remove thumbnail"
-                        className="absolute -right-1 -top-1 rounded-full bg-card p-0.5 text-muted-foreground shadow hover:text-destructive"
+                        className="absolute -right-1 -top-1 rounded-full bg-card p-0.5 text-muted-foreground shadow-soft hover:text-destructive"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -890,7 +895,12 @@ const ServicesAndBookingForm: React.FC<Props> = ({
       <div id="field-preferred_booking_methods">
         <div className="flex items-center gap-2 relative">
           <label className="label-glamlink">
-            Ways To Connects <span className="text-destructive">*</span>
+            Ways to Connect{" "}
+            {data.professional_type === "brand" ? (
+              <span className="normal-case tracking-normal text-muted-foreground">(optional)</span>
+            ) : (
+              <span className="text-destructive">*</span>
+            )}
           </label>
         </div>
 

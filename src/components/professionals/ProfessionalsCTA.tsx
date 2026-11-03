@@ -19,7 +19,7 @@ const ProfessionalsCTA = () => {
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
           {/* Primary */}
-          <Button className="bg-card text-primary hover:bg-card hover:text-secondary px-10 py-6 text-lg font-semibold rounded-full shadow-md">
+          <Button className="bg-card text-primary hover:bg-card hover:text-secondary px-10 py-6 text-lg font-semibold rounded-full shadow-medium">
             Become a Founding Pro
           </Button>
 

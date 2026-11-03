@@ -144,14 +144,14 @@ export default function AccessCardAnalytics({ cards, locked = false, onUpgrade }
           )}
           {cardLink && (
             <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
-              <span className="min-w-0 max-w-full truncate rounded-md bg-muted px-2 py-1 tabular-nums text-[11px] text-muted-foreground">
+              <span className="min-w-0 max-w-full truncate rounded-md bg-muted px-2 py-1 tabular-nums text-xs text-muted-foreground">
                 {prettyUrl(cardLink)}
               </span>
               <a
                 href={cardLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary shrink-0 gap-1.5 px-3 py-1.5 text-[11px]"
+                className="btn-primary shrink-0 gap-1.5 px-3 py-1.5 text-xs"
               >
                 <ExternalLink className="h-3 w-3" />
                 View Access Card
@@ -175,9 +175,11 @@ export default function AccessCardAnalytics({ cards, locked = false, onUpgrade }
               ))}
             </select>
           )}
-          {!locked && <AnalyticsDateFilter value={range} onChange={setRange} disabled={loading} />}
+          {!locked && failed !== 'upgrade' && (
+            <AnalyticsDateFilter value={range} onChange={setRange} disabled={loading} />
+          )}
           {summary && !loading && (
-            <p className="text-[11px] text-muted-foreground">Showing {rangeLabel}</p>
+            <p className="text-xs text-muted-foreground">Showing {rangeLabel}</p>
           )}
         </div>
       </div>

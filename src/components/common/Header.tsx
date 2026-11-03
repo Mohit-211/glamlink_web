@@ -122,7 +122,7 @@ export default function Header({ activeRoute }: any) {
                       onClick={() =>
                         setProfileDropdownOpen(!profileDropdownOpen)
                       }
-                      className="flex items-center justify-center w-12 h-12 rounded-full bg-primary hover:bg-secondary hover:shadow-lg transition-all"
+                      className="flex items-center justify-center w-12 h-12 rounded-full bg-primary hover:bg-secondary hover:shadow-large transition-all"
                     >
                       <User className="w-6 h-6 text-primary-foreground" />
                     </button>
@@ -190,7 +190,7 @@ export default function Header({ activeRoute }: any) {
 
       {/* MOBILE MENU */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-card shadow-lg max-h-[calc(100dvh-4rem)] overflow-y-auto">
+        <div className="lg:hidden border-t border-border bg-card shadow-large max-h-[calc(100dvh-4rem)] overflow-y-auto">
           <div className="container-glamlink py-6 flex flex-col gap-2">
             {navLinks.map((link) => (
               <Link

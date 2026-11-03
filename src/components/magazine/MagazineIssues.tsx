@@ -25,7 +25,7 @@ function IssueCard({ issue }: { issue: MagazineIssue }) {
   const hasFlipbook = Boolean(flipbookEmbedUrl(issue));
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border/30 bg-card shadow-md transition-all duration-300 hover:border-secondary/30 hover:shadow-xl hover:shadow-primary/20">
+    <article className="group overflow-hidden rounded-2xl border border-border/30 bg-card shadow-medium transition-all duration-300 hover:border-secondary/30 hover:shadow-large hover:shadow-primary/20">
       <Link href={issueHref(issue.slug)} className="relative block aspect-3/4 overflow-hidden">
         <ApiImage
           src={issue.cover_image}
@@ -35,7 +35,7 @@ function IssueCard({ issue }: { issue: MagazineIssue }) {
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
         />
         <span className="pointer-events-none absolute inset-0 bg-linear-to-t from-overlay/55 via-overlay/15 to-transparent" />
-        <span className="absolute bottom-5 left-5 inline-flex rounded-full border border-primary/40 bg-primary/85 px-2.5 py-1 text-sm font-semibold text-primary-foreground shadow-sm backdrop-blur-sm">
+        <span className="absolute bottom-5 left-5 inline-flex rounded-full border border-primary/40 bg-primary/85 px-2.5 py-1 text-sm font-semibold text-primary-foreground shadow-soft backdrop-blur-sm">
           {number ? `Issue ${number}` : issue.title}
         </span>
       </Link>

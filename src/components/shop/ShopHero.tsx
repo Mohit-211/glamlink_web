@@ -30,7 +30,7 @@ const ShopHero = () => {
       eyebrow="The Glamlink Shop"
       title={
         <>
-          Professional Beauty + Wellness <span className="text-primary">Products</span>
+          Professional Beauty + Wellness Products
         </>
       }
       subtitle="Discover professional brands and products across beauty + wellness, from trusted names to the products experts are talking about."

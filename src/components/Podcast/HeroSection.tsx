@@ -15,7 +15,7 @@ export default function HeroSection({ onGuestClick }: HeroSectionProps) {
       eyebrow="New Episode Every Week"
       title={
         <>
-          The Beauty <span className="text-primary">Vault</span>
+          The Beauty Vault
         </>
       }
       subtitle="Unfiltered conversations with the professionals, founders, and innovators actively shaping the future of beauty and wellness."

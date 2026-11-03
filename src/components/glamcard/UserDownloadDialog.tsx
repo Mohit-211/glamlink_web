@@ -13,7 +13,7 @@ const UserDownloadDialog = ({ isOpen, onClose }: DownloadModalProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center scrim px-4">
-      <div className="relative w-full max-w-md bg-card rounded-2xl shadow-2xl p-8 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-md bg-card rounded-2xl shadow-large p-8 fade-in duration-200">
         
         {/* Close Button */}
         <button

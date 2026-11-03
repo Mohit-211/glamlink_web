@@ -13,7 +13,7 @@ const PromosHero = () => {
 
           {/* Headline */}
           <h1 className="hero-title mt-6">
-            Glamlink <span className="gradient-text">Launch Perks</span>
+            Glamlink Launch Perks
           </h1>
 
           {/* Subtitle */}

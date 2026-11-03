@@ -4,6 +4,10 @@
  * reads are typed; the API may send more.
  */
 
+import type { EducationCard, ProfileMedia, ProfileQuickInfo, ShippingOption } from "./profileContent";
+
+export type { EducationCard, EducationDetail, EducationVideo, ProfileMedia, ProfileQuickInfo } from "./profileContent";
+
 /** Every list answer: `count` is all matching rows, `rows` one page of them. */
 export interface Paged<T> {
   count: number;
@@ -115,7 +119,12 @@ export interface ShopFilterValue {
 export interface ShopFilters {
   categories: ShopFilterValue[];
   brands: ShopFilterValue[];
+  /** Since Nov 3: the lowest and highest price in the shop; null when no product has one. */
+  price?: { min: number; max: number } | null;
 }
+
+/** How `GET /discover/shop` orders its rows (Nov 3); without one, the admins' order (or the saved ids' order). */
+export type ShopSort = "featured" | "newest" | "price_asc" | "price_desc" | "name";
 
 /* ── Professional and brand pages ────────────────────────── */
 
@@ -133,6 +142,74 @@ export interface ProfileCard {
   state: string | null;
   specialty: string | null;
   is_featured?: boolean;
+  /** Since Nov 3: a brand's category key or a professional's specialty, set on the page. */
+  category?: string | null;
+  /** "Skincare Brand", or the professional's specialty as they named it. */
+  category_label?: string | null;
+  /** A brand's shipping key (`BRAND_SHIPPING`). */
+  shipping?: string | null;
+  /** Miles from the visitor, when the list was asked with their point; null without coordinates. */
+  distance_miles?: number | null;
+}
+
+/** How `GET /profiles` orders its rows (`nearest` needs the visitor's point). */
+export type ProfileSort = "recommended" | "newest" | "name" | "nearest";
+
+export interface FilterCount {
+  name: string;
+  count: number;
+}
+
+export interface KeyedFilterCount {
+  key: string;
+  label: string;
+  count: number;
+}
+
+/** `GET /directory/filters?type=individual`: what the Professionals page can be narrowed by. */
+export interface ProfessionalFilters {
+  type: "individual";
+  count: number;
+  specialties: FilterCount[];
+  /** `code` is null for a place outside the U.S. states, named as written. */
+  states: { code: string | null; name: string; count: number; cities: FilterCount[] }[];
+}
+
+/** `GET /directory/filters?type=brand`: every category and shipping choice, with how many brands have it. */
+export interface BrandFilters {
+  type: "brand";
+  count: number;
+  categories: KeyedFilterCount[];
+  shipping: KeyedFilterCount[];
+}
+
+/** A pin of `GET /directory/map`: a professional's page, at their main location (rounded to about 100 m). */
+export interface MapPin {
+  id: number;
+  slug: string;
+  name: string;
+  image: string | null;
+  specialty: string | null;
+  city: string | null;
+  state: string | null;
+  latitude: number;
+  longitude: number;
+}
+
+/** A Google listing of `GET /directory/google`. */
+export interface GoogleListing {
+  place_id: string;
+  name: string;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  rating?: number | null;
+  review_count?: number | null;
+  photo_url?: string | null;
+  maps_url?: string | null;
+  website?: string | null;
+  type?: string | null;
+  distance_miles?: number | null;
 }
 
 export interface SocialLink {
@@ -162,7 +239,32 @@ export interface ProfileDetail extends ProfileCard {
   products: Paged<ProductCard>;
   journal: Paged<ArticleCard>;
   magazine: Paged<ProfileIssue>;
+  /** Every video the account is in, of any series (the podcast's episodes too). */
   videos: Paged<VideoCard>;
+
+  /*
+   * Added on Nov 3 (profile pages for brands and professionals). An API deployed
+   * before then leaves them out, so each is optional and the page hides what is
+   * missing.
+   */
+  /** The hero's short intro: the page's, else the card bio as plain text (at most 300 characters). */
+  intro?: string | null;
+  /** A brand's category key, or a professional's specialty name. */
+  category?: string | null;
+  /** "Skincare Brand", or the professional's specialty. */
+  category_label?: string | null;
+  shipping?: ShippingOption | null;
+  shipping_label?: string | null;
+  /** The About section's picture (the page's, else the first gallery image, else the card's cover photo). */
+  about_image?: string | null;
+  /** The automatic Quick Info lines. */
+  quick_info?: ProfileQuickInfo | null;
+  /** The first 5 of the gallery (the Access card's gallery until the owner adds their own). */
+  media?: Paged<ProfileMedia> | null;
+  /** The first 3 published education posts. */
+  education?: Paged<EducationCard> | null;
+  /** The newest episode of The Beauty Vault the account is in. */
+  podcast?: Paged<VideoCard> | null;
 }
 
 /* ── Watch ───────────────────────────────────────────────── */

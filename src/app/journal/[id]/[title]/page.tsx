@@ -15,6 +15,7 @@ import DownloadButton from "@/components/Downloadbutton";
 import JournalShopCard from "@/components/blogs/JournalShopCard";
 import ArticleAdSlot from "@/ads/ArticleAdSlot";
 import ShareProductButton from "@/components/blogs/ShareProductButton";
+import AuthorAvatar from "@/components/blogs/AuthorAvatar";
 
 interface DownloadItem {
   id: number;
@@ -294,7 +295,7 @@ const formattedDate = article?.publish_date
             {/* Category pill */}
             <div className="mb-6 mt-6">
               <span
-                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest text-secondary"
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 eyebrow text-secondary"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 {article?.journal_category?.title ?? "From the Treatment Room"}
@@ -305,7 +306,7 @@ const formattedDate = article?.publish_date
             <div className="grid md:grid-cols-2 gap-8 items-center mb-7">
 
               {/* Title only */}
-              <h1 className="text-[clamp(30px,4vw,44px)] leading-[1.08] tracking-tight text-foreground">
+              <h1 className="text-[clamp(30px,4vw,44px)] leading-tight tracking-tight text-foreground">
                 {article.title}
               </h1>
 
@@ -320,12 +321,12 @@ const formattedDate = article?.publish_date
                     sizes="(min-width: 900px) 420px, (min-width: 768px) 45vw, 100vw"
                     className="object-cover hover:scale-[1.03] transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-overlay/55 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-overlay/55 via-transparent to-transparent" />
                   <div
                     className="absolute bottom-0 left-0 right-0 bg-overlay/50 px-4 py-3"
                   >
 
-                    <p className="text-[13px] text-overlay-foreground font-medium">
+                    <p className="text-sm text-overlay-foreground font-medium">
                       {article?.journal_category?.title ?? "Glamlink Journal"}
                     </p>
                   </div>
@@ -337,15 +338,18 @@ const formattedDate = article?.publish_date
             <div className="flex flex-col md:flex-row md:items-start gap-6 pt-6 border-t border-border">
 
               {/* Description */}
-              <p className="flex-1 text-[15px] leading-[1.75] text-muted-foreground font-normal">
+              <p className="flex-1 text-base leading-relaxed text-muted-foreground font-normal">
                 {article.short_description}
               </p>
 
               {/* Author */}
               <div className="flex items-center gap-3 md:pl-6 md:border-l md:border-border flex-shrink-0">
-                <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium flex-shrink-0">
-                  {article?.journal_author?.name?.charAt(0) ?? "A"}
-                </div>
+                <AuthorAvatar
+                  name={article?.journal_author?.name}
+                  image={article?.journal_author?.profile_image}
+                  size={36}
+                  className="text-sm"
+                />
                 <div>
                   <p className="text-sm font-medium text-foreground whitespace-nowrap">
                     {article?.journal_author?.name}
@@ -429,7 +433,7 @@ const formattedDate = article?.publish_date
                           </h3>
                           {getFileExt(item.file_name) && (
                             <span
-                              className="shrink-0 rounded-md border border-primary/25 bg-primary/10 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-secondary"
+                              className="shrink-0 rounded-md border border-primary/25 bg-primary/10 px-2 py-1 eyebrow text-secondary"
                             >
                               {getFileExt(item.file_name)}
                             </span>
@@ -443,7 +447,7 @@ const formattedDate = article?.publish_date
                       <DownloadButton
                         fileUrl={item.file_name}
                         label={item.button_text || "Download"}
-                        className="mt-5 inline-flex items-center justify-center gap-2 text-sm font-medium text-primary-foreground px-4 py-2.5 rounded-full bg-primary hover:bg-secondary transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                        className="btn-primary mt-5 px-4 py-2.5 font-medium disabled:opacity-60"
                       />
                     </div>
                   ))}

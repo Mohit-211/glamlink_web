@@ -65,7 +65,7 @@ const JournalSearchBar = ({
         <p
           role="status"
           aria-live="polite"
-          className="mt-2 px-1 text-[11px] text-muted-foreground"
+          className="mt-2 px-1 text-xs text-muted-foreground"
         >
           {resultCount === 0
             ? `No results for "${value}"`

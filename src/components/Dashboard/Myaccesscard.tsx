@@ -12,7 +12,7 @@ import {
     X,    Nfc,
     AlertCircle,
 } from 'lucide-react';
-import { AccessCardData } from './types';
+import { AccessCardData, type AccessOrder } from './types';
 import type { PlanId } from '../Pricing/plans';
 
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -53,6 +53,20 @@ const getNfcStatus = (card: AccessCardData): string =>
 
 const isNfcAlreadyPaid = (card: AccessCardData): boolean =>
     cardHasNfcPlan(card) || getNfcStatus(card) === 'paid';
+
+/** Newest order first (the API sends them in database order). */
+const newestFirst = (orders: AccessOrder[]) =>
+    [...orders].sort((a, b) => (Date.parse(b.created_at) || 0) - (Date.parse(a.created_at) || 0));
+
+/** An order's state: cancelled or refunded by an admin, else where its delivery is. */
+const orderStatusLabel = (order: AccessOrder): string | null => {
+    const payment = (order.payment_status || '').toLowerCase();
+    const delivery = (order.fulfillment_status || '').toLowerCase();
+    if (payment === 'cancelled' || payment === 'canceled' || delivery === 'cancelled' || delivery === 'canceled') return 'Cancelled';
+    if (payment === 'refunded') return 'Refunded';
+    if (payment === 'failed') return 'Payment failed';
+    return delivery ? delivery.charAt(0).toUpperCase() + delivery.slice(1) : null;
+};
 
 
 interface Props {
@@ -109,7 +123,7 @@ export default function MyAccessCard({
         }
     };
 
-    // Every owner can edit their details; photos, video and offers follow the plan
+    // Every owner can edit their details; photos and video follow the plan
     // (locked inside the editor, and enforced by the API).
     const handleEditClick = (card: AccessCardData) => onEdit?.(card);
 
@@ -165,7 +179,7 @@ export default function MyAccessCard({
                                     {showIncludeNfcButton && (
                                         <button
                                             onClick={() => onPayNow?.(card, 'nfc_only')}
-                                            className="btn-outline gap-1.5 px-2.5 py-1 text-[11px]"
+                                            className="btn-outline gap-1.5 px-2.5 py-1 text-xs"
                                         >
                                             <Nfc className="h-3 w-3" />
                                             Include NFC
@@ -173,7 +187,7 @@ export default function MyAccessCard({
                                     )}
                                     <button
                                         onClick={() => handleEditClick(card)}
-                                        className="btn-outline gap-1.5 px-2.5 py-1 text-[11px]"
+                                        className="btn-outline gap-1.5 px-2.5 py-1 text-xs"
                                     >
                                         <Edit3 className="h-3 w-3" />
                                         Edit
@@ -200,18 +214,18 @@ export default function MyAccessCard({
                                                 </div>
                                             )}
                                             <div className="text-center">
-                                                <p className="text-[15px] font-semibold text-foreground leading-tight">{card?.name}</p>
+                                                <p className="text-base font-semibold text-foreground leading-tight">{card?.name}</p>
                                                 <p className="mt-0.5 text-xs font-medium text-primary">{card?.professional_title}</p>
                                                 {card?.business_name && (
-                                                    <p className="mt-0.5 text-[11px] text-muted-foreground">{card?.business_name}</p>
+                                                    <p className="mt-0.5 text-xs text-muted-foreground">{card?.business_name}</p>
                                                 )}
                                             </div>
                                         </div>
                                         <div className="flex flex-1 flex-col justify-center gap-4 border-b border-border px-6 py-6 lg:min-w-0 lg:border-b-0 lg:border-r lg:px-7">
                                             <div>
-                                                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">About</p>
+                                                <p className="mb-1.5 eyebrow text-muted-foreground">About</p>
                                                 <div
-                                                    className="rich-text text-[13px] leading-relaxed text-foreground/80 break-words"
+                                                    className="rich-text text-sm leading-relaxed text-foreground/80 break-words"
                                                     dangerouslySetInnerHTML={{ __html: bioSummary || "" }}
                                                 />
                                             </div>
@@ -219,9 +233,9 @@ export default function MyAccessCard({
                                         <div className="flex flex-col justify-center gap-4 px-6 py-6 lg:w-[220px] lg:flex-shrink-0 lg:px-7">
                                             {card?.website && (
                                                 <div className="min-w-0">
-                                                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Website</p>
+                                                    <p className="mb-1 eyebrow text-muted-foreground">Website</p>
                                                     <a href={card?.website} target="_blank" rel="noopener noreferrer"
-                                                        className="link-glamlink flex min-w-0 items-center gap-1.5 text-[13px]">
+                                                        className="link-glamlink flex min-w-0 items-center gap-1.5 text-sm">
                                                         <Globe className="h-3.5 w-3.5 flex-shrink-0" />
                                                         <span className="truncate">{card?.website.replace(/https?:\/\/(www\.)?/, '')}</span>
                                                     </a>
@@ -229,9 +243,9 @@ export default function MyAccessCard({
                                             )}
                                             {card?.booking_link && (
                                                 <div>
-                                                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Booking</p>
+                                                    <p className="mb-1 eyebrow text-muted-foreground">Booking</p>
                                                     <a href={card?.booking_link} target="_blank" rel="noopener noreferrer"
-                                                        className="link-glamlink flex items-center gap-1.5 text-[13px]">
+                                                        className="link-glamlink flex items-center gap-1.5 text-sm">
                                                         <CalendarCheck className="h-3.5 w-3.5 flex-shrink-0" />
                                                         Book now
                                                     </a>
@@ -242,7 +256,7 @@ export default function MyAccessCard({
                                             )}
                                             {Object.keys(socialMedia).length > 0 && (
                                                 <div>
-                                                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                                                    <p className="mb-2 eyebrow text-muted-foreground">
                                                         Social
                                                     </p>
                                                     <div className="flex flex-wrap gap-3">
@@ -286,7 +300,7 @@ export default function MyAccessCard({
                                             </div>
                                         ) : (
                                             <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
-                                                <span className="min-w-0 flex-1 truncate tabular-nums text-[12px] text-muted-foreground">
+                                                <span className="min-w-0 flex-1 truncate tabular-nums text-xs text-muted-foreground">
                                                     {card?.business_card_link}
                                                 </span>
                                                 <button
@@ -323,10 +337,12 @@ export default function MyAccessCard({
                                 </div>
                                 {(card?.access_orders?.length ?? 0) > 0 && (
                                     <div className="space-y-2">
-                                        {card.access_orders!.map((order) => (
+                                        {newestFirst(card.access_orders!).map((order) => {
+                                            const status = orderStatusLabel(order);
+                                            return (
                                             <div
                                                 key={order.id}
-                                                className="flex flex-col gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-[12px] sm:flex-row sm:items-center sm:justify-between sm:px-6"
+                                                className="flex flex-col gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-6"
                                             >
                                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                                                     <span className="text-muted-foreground">
@@ -337,9 +353,9 @@ export default function MyAccessCard({
                                                         <span className="font-semibold text-foreground">Order #:</span>{' '}
                                                         {order.order_number}
                                                     </span>
-                                                    {order.fulfillment_status && (
-                                                        <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[10px] font-semibold capitalize text-muted-foreground">
-                                                            {order.fulfillment_status}
+                                                    {status && (
+                                                        <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-xs font-semibold text-muted-foreground">
+                                                            {status}
                                                         </span>
                                                     )}
                                                 </div>
@@ -361,7 +377,8 @@ export default function MyAccessCard({
                                                     </div>
                                                 )}
                                             </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>
@@ -380,7 +397,7 @@ export default function MyAccessCard({
                         <div className="mb-4 flex items-center justify-between">
                             <div>
                                 <h3 className="text-sm font-semibold text-foreground">Your GlamCard QR</h3>
-                                <p className="text-[11px] text-muted-foreground mt-0.5">Scan to view access card</p>
+                                <p className="text-xs text-muted-foreground mt-0.5">Scan to view access card</p>
                             </div>
                             <button onClick={() => setQrKey(null)} className="rounded-lg p-1.5 hover:bg-muted transition-colors">
                                 <X className="h-4 w-4 text-muted-foreground" />
@@ -397,10 +414,10 @@ export default function MyAccessCard({
                         </div>
                         <div className="mt-4 text-center">
                             <p className="text-sm font-semibold text-foreground">{qrCard?.name}</p>
-                            <p className="text-[11px] text-muted-foreground">{qrCard?.professional_title}</p>
+                            <p className="text-xs text-muted-foreground">{qrCard?.professional_title}</p>
                         </div>
                         <div className="mt-4 flex min-w-0 items-center gap-2 rounded-xl border border-border bg-muted/60 px-3 py-2">
-                            <span className="min-w-0 flex-1 truncate tabular-nums text-[11px] text-muted-foreground">{qrCard?.business_card_link}</span>
+                            <span className="min-w-0 flex-1 truncate tabular-nums text-xs text-muted-foreground">{qrCard?.business_card_link}</span>
                             <button
                                 onClick={() => handleCopy(qrCard, qrKey as CardKey)}
                                 className="flex-shrink-0 rounded-md p-1 hover:bg-accent transition-colors"

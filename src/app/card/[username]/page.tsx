@@ -31,7 +31,7 @@ const PublicCard = () => {
     <div className="min-h-screen flex items-center justify-center pt-20">
       
       {/* CARD */}
-      <div className="w-full max-w-sm bg-card rounded-3xl shadow-2xl overflow-hidden animate-fadeIn">
+      <div className="w-full max-w-sm bg-card rounded-3xl shadow-large overflow-hidden animate-fade-up">
         
         {/* BANNER */}
         <div className="h-32 bg-primary" />
@@ -40,11 +40,11 @@ const PublicCard = () => {
           
           {/* AVATAR + QR */}
           <div className="flex justify-between items-end">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary text-primary-foreground text-2xl font-bold shadow-lg">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary text-primary-foreground text-2xl font-bold shadow-large">
               {initials}
             </div>
 
-            <div className="bg-card p-2 rounded-xl shadow">
+            <div className="bg-card p-2 rounded-xl shadow-soft">
               <QRCode value={publicUrl} size={70} />
             </div>
           </div>
@@ -98,7 +98,7 @@ const PublicCard = () => {
               a.download = `${user.name}.vcf`;
               a.click();
             }}
-            className="mt-4 w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold shadow-md hover:bg-secondary transition"
+            className="btn-primary mt-4 w-full rounded-xl py-3"
           >
             📥 Save Contact
           </button>

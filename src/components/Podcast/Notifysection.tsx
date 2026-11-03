@@ -87,7 +87,7 @@ export default function NotifySection() {
       {/* Large background word */}
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-0 right-0 select-none pb-2 pr-8 text-[clamp(80px,16vw,180px)] font-semibold leading-[0.9] tracking-tight text-primary/10"
+        className="pointer-events-none absolute bottom-0 right-0 select-none pb-2 pr-8 text-[clamp(80px,16vw,180px)] font-semibold leading-none tracking-tight text-primary/10"
       >
         notify
       </div>
@@ -102,7 +102,7 @@ export default function NotifySection() {
               Never Miss an Episode
             </p>
 
-            <h2 className={`${fade("delay-100")} mb-6 text-[clamp(34px,5vw,58px)] font-semibold leading-[1.1] tracking-tight md:mb-8`}>
+            <h2 className={`${fade("delay-100")} mb-6 text-[clamp(34px,5vw,58px)] font-semibold leading-tight tracking-tight md:mb-8`}>
               Get notified
               <br />
               when <span className="text-primary">your guest drops.</span>
@@ -163,7 +163,7 @@ export default function NotifySection() {
                     )}
                   </button>
 
-                  <p className="text-center text-[11px] text-muted-foreground">
+                  <p className="text-center text-xs text-muted-foreground">
                     No spam. Just your episode, your guest, your moment.
                   </p>
                 </form>

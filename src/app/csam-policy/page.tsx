@@ -61,7 +61,7 @@ const CsamPolicy: React.FC = () => {
       <section className="py-16">
         <div className="container-glamlink">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-card rounded-lg shadow-sm border p-8 md:p-12">
+            <div className="bg-card rounded-lg shadow-soft border p-8 md:p-12">
               <div className="mb-12">
                 <p className="text-foreground/80 leading-relaxed mb-6">
                   At GlamLink, we are committed to maintaining a safe and respectful

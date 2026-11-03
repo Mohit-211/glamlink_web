@@ -23,11 +23,17 @@ interface Props {
   onSuccess?: (result: any) => void;
   /** shown as a Cancel action when mode === "edit" */
   onCancel?: () => void;
-  /** Edit mode: whether the owner may change photos, video and offers (Access Pro,
-   *  or a card that is not live yet). Details can always be edited. */
+  /** Edit mode: whether the owner may change photos and video (Access Pro, or a card
+   *  that is not live yet). Details can always be edited. */
   proAccess?: boolean;
 }
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Locations are optional. A row left completely empty is dropped before sending; one that was
+// started needs what the API needs: an address, or a state and a city.
+const isBlankLocation = (l: any) => !l?.address?.trim() && !l?.city?.trim() && !l?.state;
+const isIncompleteLocation = (l: any) =>
+  !isBlankLocation(l) &&
+  (l.location_type === "city_only" ? !(l.city?.trim() && l.state) : !l.address?.trim());
 // Digits only — no letters, spaces, or symbols (+, -, parens, etc).
 const PHONE_DIGITS_REGEX = /^\d+$/;
 const isValidPhone = (value: string) =>
@@ -81,8 +87,12 @@ const GlamCardForm: React.FC<Props> = ({
       }
     };
 
+    // A brand's tagline, specialties and booking method are optional.
+    const brand = data.professional_type === "brand";
+    if (!isEdit && !data.professional_type)
+      fail("professional_type", "Please choose Professional or Brand");
     if (!data.name?.trim()) fail("name", "Please enter your Name");
-    if (!data.professional_title?.trim())
+    if (!brand && !data.professional_title?.trim())
       fail("professional_title", "Please enter your Professional Title");
     if (!data.email?.trim()) fail("email", "Please enter your Email");
     else if (!EMAIL_REGEX.test(data.email.trim()))
@@ -103,8 +113,8 @@ const GlamCardForm: React.FC<Props> = ({
       fail("business_name", "Please enter your Business Name");
     if (!data.bio?.trim()) fail("bio", "Please enter your Bio");
     if (
-      !Array.isArray(data.preferred_booking_methods) ||
-      data.preferred_booking_methods.length === 0
+      !brand &&
+      (!Array.isArray(data.preferred_booking_methods) || data.preferred_booking_methods.length === 0)
     ) {
       fail("preferred_booking_methods", "Please select Preferred Booking Method");
     }
@@ -127,9 +137,10 @@ const GlamCardForm: React.FC<Props> = ({
     }
     if (!data.profile_image) fail("profile_image", "Please upload Profile Image");
     if (!data.images?.length) fail("images", "Please upload Gallery Images");
-    if (!data.specialties?.length)
+    if (!brand && !data.specialties?.length)
       fail("specialties", "Please add at least one Specialty");
-    if (!data.locations?.length) fail("locations", "Please add a Location");
+    if (data.locations?.some(isIncompleteLocation))
+      fail("locations", "Finish the location you started, or remove it");
 
     setErrors(newErrors);
     if (firstMessage) {
@@ -260,7 +271,8 @@ const GlamCardForm: React.FC<Props> = ({
       "locations",
     ] as const;
     jsonFields.forEach((field) => {
-      const value = data[field];
+      const value =
+        field === "locations" ? data.locations?.filter((l) => !isBlankLocation(l)) : data[field];
       if (value !== undefined) {
         formData.append(field, JSON.stringify(value));
       }
@@ -272,6 +284,8 @@ const GlamCardForm: React.FC<Props> = ({
       );
     }
     const primitiveFields = [
+      "professional_type",
+      "claimed_place_id",
       "name",
       "email",
       "phone",
@@ -284,6 +298,10 @@ const GlamCardForm: React.FC<Props> = ({
     ] as const;
     primitiveFields.forEach((field) => {
       const value = data[field];
+      // The type and a claim go with a new card only (admins change them later). An empty one is left out: the API
+      // reads a missing type as a professional's.
+      const createOnly = field === "professional_type" || field === "claimed_place_id";
+      if (createOnly && (isEdit || !value)) return;
       if (value !== undefined && value !== null) {
         formData.append(field, String(value));
       }
@@ -332,9 +350,11 @@ const GlamCardForm: React.FC<Props> = ({
       }
 
       if (session.status === "signed-in") {
-        // The card belongs to the signed-in professional; choose a plan next.
+        // The card belongs to the signed-in professional; choose a plan next. The API answers the card itself,
+        // whose id is `id` (newer APIs add `business_card_id`).
         const result = await createCard(formData);
-        router.push(`/pricing?businessCardId=${result?.data?.business_card_id}`);
+        const createdId = result?.data?.business_card_id ?? result?.data?.id;
+        router.push(createdId ? `/pricing?businessCardId=${createdId}` : "/dashboard");
         return;
       }
 
@@ -402,6 +422,7 @@ const GlamCardForm: React.FC<Props> = ({
               setData={setData}
               errors={errors}
               clearError={clearError}
+              typeLocked={isEdit}
             />
             <MediaAndProfileForm
               data={data}

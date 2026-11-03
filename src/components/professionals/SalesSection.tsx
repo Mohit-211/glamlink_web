@@ -72,13 +72,13 @@ const SalesSection = () => {
 
             {/* Play button */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-full bg-primary flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-primary/30">
+              <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-full bg-primary flex items-center justify-center group-hover:scale-110 transition-transform shadow-large shadow-primary/30">
                 <Play className="w-8 h-8 lg:w-10 lg:h-10 text-primary-foreground ml-1" />
               </div>
             </div>
 
             {/* Coming soon badge */}
-            <div className="relative w-full max-w-5xl mx-auto rounded-3xl overflow-hidden shadow-2xl">
+            <div className="relative w-full max-w-5xl mx-auto rounded-3xl overflow-hidden shadow-large">
               {/* Gradient Background */}
               <div className="bg-primary px-8 py-42 text-center text-primary-foreground">
                 {/* Floating Badge */}

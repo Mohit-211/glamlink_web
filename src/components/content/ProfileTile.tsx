@@ -22,7 +22,12 @@ export default function ProfileTile({
 }: ProfileTileProps) {
   const brand = profile.type === "brand";
   const place = formatPlace(profile.city, profile.state);
-  const detail = brand ? profile.tagline : profile.specialty || profile.tagline;
+  // The category set on the page ("Skincare Brand", a specialty) before older details
+  const detail = brand
+    ? profile.category_label || profile.tagline
+    : profile.category_label || profile.specialty || profile.tagline;
+  const miles = profile.distance_miles;
+  const distance = typeof miles === "number" ? `${miles < 10 ? miles.toFixed(1) : Math.round(miles)} mi` : null;
 
   return (
     <Link
@@ -43,15 +48,15 @@ export default function ProfileTile({
       </div>
 
       <div className={cn("flex flex-1 flex-col gap-1 p-4", brand && "border-t border-border")}>
-        <h3 className="flex items-center gap-1.5 text-sm font-semibold leading-snug transition-colors group-hover:text-secondary md:text-[15px]">
+        <h3 className="flex items-center gap-1.5 text-sm font-semibold leading-snug transition-colors group-hover:text-secondary md:text-base">
           <span className="truncate">{profile.name}</span>
           {profile.is_featured && <BadgeCheck className="h-4 w-4 shrink-0 text-primary" aria-label="Featured" />}
         </h3>
         {detail && <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground md:text-sm">{detail}</p>}
-        {!brand && place && (
+        {!brand && (place || distance) && (
           <p className="mt-auto flex items-center gap-1 pt-1 text-xs text-muted-foreground">
             <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            <span className="truncate">{place}</span>
+            <span className="truncate">{[place, distance && `${distance} away`].filter(Boolean).join(" · ")}</span>
           </p>
         )}
       </div>

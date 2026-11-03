@@ -102,7 +102,7 @@ export default function RecentActivity({
           {/* Desktop / tablet table */}
           <div className="hidden overflow-hidden rounded-xl border border-border md:block">
             <table className="w-full table-fixed text-left">
-              <thead className="bg-muted/50 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <thead className="bg-muted/50 eyebrow text-muted-foreground">
                 <tr>
                   <th className="w-[30%] px-4 py-3">Event</th>
                   <th className="w-[32%] px-4 py-3">Target</th>

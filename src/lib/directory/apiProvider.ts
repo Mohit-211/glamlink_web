@@ -1,9 +1,9 @@
-import { getGoogleListings, getProfilesApi, searchDirectory } from "@/api/Api";
-import { API_ORIGIN, API_URL } from "@/lib/config";
+import { getGoogleListings } from "@/api/Api";
+import { searchDirectoryProfessionals as searchDirectory } from "@/api/directory";
+import type { GoogleListing } from "@/lib/api/types";
 import { profileHref } from "@/lib/routes";
-import { isProfessionalTypeId } from "./categories";
+import { toBusiness } from "./listings";
 import type {
-  DirectoryBusiness,
   DirectoryLocation,
   DirectoryProvider,
   DirectorySearchParams,
@@ -12,24 +12,11 @@ import type {
 } from "./types";
 
 /*
- * The directory on the API (backend handoff, 10.13): Google's listings near a
- * place (GET /directory/google, photos proxied so no key reaches the browser)
- * and Glamlink's own professionals (GET /directory/search, GET /profiles).
+ * The directory's searches on the API (backend handoff, 10.13): Google's listings
+ * near a place (GET /directory/google, photos proxied so no key reaches the
+ * browser) and Glamlink's own professionals near it (GET /directory/search). What
+ * the page shows before a search is fetched on the server (app/directory/page.tsx).
  */
-
-interface GoogleListing {
-  place_id: string;
-  name: string;
-  address?: string | null;
-  city?: string | null;
-  state?: string | null;
-  rating?: number | null;
-  review_count?: number | null;
-  photo_url?: string | null;
-  maps_url?: string | null;
-  website?: string | null;
-  type?: string | null;
-}
 
 interface DirectoryRow {
   kind: "profile" | "listing";
@@ -44,60 +31,11 @@ interface DirectoryRow {
   distance_miles?: number | null;
 }
 
-/** The API answers its own photo link as a path or a full URL. */
-function apiLink(url: string | null | undefined): string {
-  if (!url) return "";
-  if (/^https?:\/\//i.test(url)) return url;
-  if (url.startsWith("/api/")) return `${API_ORIGIN}${url}`;
-  return `${API_URL}/${url.replace(/^\/+/, "")}`;
-}
-
 const rows = <T>(data: unknown): T[] => {
   const d = data as { data?: T[] | { rows?: T[] } };
   if (Array.isArray(d?.data)) return d.data;
   return Array.isArray(d?.data?.rows) ? d.data.rows : [];
 };
-
-function toBusiness(listing: GoogleListing, fallbackType: string | null): DirectoryBusiness {
-  const type = isProfessionalTypeId(listing.type) ? listing.type : isProfessionalTypeId(fallbackType) ? fallbackType : "esthetician";
-  return {
-    id: listing.place_id,
-    name: listing.name,
-    professionalType: type,
-    city: listing.city ?? "",
-    state: listing.state ?? "",
-    neighborhood: listing.address ?? undefined,
-    rating: Number(listing.rating ?? 0),
-    reviewCount: Number(listing.review_count ?? 0),
-    imageUrl: apiLink(listing.photo_url),
-    websiteUrl: listing.website || undefined,
-    mapsUrl: listing.maps_url || `https://www.google.com/maps/place/?q=place_id:${listing.place_id}`,
-    source: "google",
-    // Claimed listings are left out by the API
-    isClaimed: false,
-  };
-}
-
-interface ProfileRow {
-  id: number;
-  slug: string;
-  name: string;
-  image?: string | null;
-  tagline?: string | null;
-  city?: string | null;
-  state?: string | null;
-  specialty?: string | null;
-}
-
-const fromPage = (row: ProfileRow): FeaturedProfile => ({
-  id: `profile-${row.id}`,
-  name: row.name,
-  title: row.tagline || row.specialty || "",
-  city: row.city ?? "",
-  state: row.state ?? "",
-  imageUrl: row.image ?? "",
-  href: profileHref(row.slug),
-});
 
 function toProfile(row: DirectoryRow): FeaturedProfile {
   const miles = row.distance_miles;
@@ -153,18 +91,6 @@ export const apiDirectoryProvider: DirectoryProvider = {
       profiles: rows<DirectoryRow>(ours).map(toProfile),
       location,
     };
-  },
-
-  // Google needs a place; before a search the page shows Glamlink's own professionals
-  async getPopularBusinesses() {
-    return [];
-  },
-
-  /** The professionals admins featured; else the directory's own, by name. */
-  async getFeaturedProfiles() {
-    const featured = rows<ProfileRow>(await getProfilesApi({ type: "individual", featured: true, limit: 12 }));
-    if (featured.length > 0) return featured.map(fromPage);
-    return rows<DirectoryRow>(await searchDirectory({ limit: 12 })).map(toProfile);
   },
 
   // The search itself names the place (from the listings found near the point),

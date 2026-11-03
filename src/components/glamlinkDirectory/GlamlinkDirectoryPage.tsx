@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   directoryProvider,
@@ -15,47 +15,73 @@ import {
 import { useDirectorySearch } from "@/hooks/useDirectorySearch";
 import DirectoryHero from "./DirectoryHero";
 import DirectorySearch from "./DirectorySearch";
+import ExploreHeading from "./ExploreHeading";
 import FeaturedProfiles from "./FeaturedProfiles";
 import DirectoryResults from "./DirectoryResults";
 import ClaimProfileModal from "./ClaimProfileModal";
-import DirectoryCTA, { CLAIM_PROFILE_HREF } from "./DirectoryCTA";
+import DirectoryCTA from "./DirectoryCTA";
 
-export default function GlamlinkDirectoryPage() {
+interface GlamlinkDirectoryPageProps {
+  /** The hero's map of a city's Glamlink professionals (rendered on the server). */
+  map: ReactNode;
+  /** Glamlink professionals, featured first: the first part of Explore Professionals before a search. */
+  featured: FeaturedProfile[];
+  /** Google's listings around the default place, shown until the visitor searches. */
+  popular: DirectoryBusiness[];
+  /** "Las Vegas, NV": where `popular` comes from. */
+  popularPlace: string;
+  /** The Explore Brands section (rendered on the server). */
+  brands: ReactNode;
+}
+
+/**
+ * A search in the page's URL (a shared link, or back from a page), run once on arrival. Apart from the page, so
+ * reading the URL doesn't keep the rest of it from rendering on the server.
+ */
+function UrlSearch({ onSearch }: { onSearch: (type: ProfessionalTypeId | "", location: string) => void }) {
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type");
+  const location = searchParams.get("location") ?? "";
+  const done = useRef(false);
+
+  // Only the URL the visitor arrived with: the page's own searches write theirs into it too
+  useEffect(() => {
+    if (done.current) return;
+    done.current = true;
+    if (location.trim()) onSearch(isProfessionalTypeId(type) ? type : "", location);
+  }, [type, location, onSearch]);
+
+  return null;
+}
+
+/**
+ * The directory (/directory, the owner's Nov 3 layout): the hero with the search beside a map of a city's
+ * professionals, then Explore Professionals (Glamlink's own, then Google's listings) and Explore Brands, each
+ * with a button to the full list.
+ */
+export default function GlamlinkDirectoryPage({ map, featured, popular, popularPlace, brands }: GlamlinkDirectoryPageProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  const initialType = searchParams.get("type");
-  const initialLocation = searchParams.get("location") ?? "";
-
-  const [professionalType, setProfessionalType] = useState<ProfessionalTypeId | "">(
-    isProfessionalTypeId(initialType) ? initialType : ""
-  );
-  const [location, setLocation] = useState(initialLocation);
+  const [professionalType, setProfessionalType] = useState<ProfessionalTypeId | "">("");
+  const [location, setLocation] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
   const [isLocating, setIsLocating] = useState(false);
-  const [featured, setFeatured] = useState<FeaturedProfile[]>([]);
   const [claimTarget, setClaimTarget] = useState<DirectoryBusiness | null>(null);
 
   const locationInputRef = useRef<HTMLInputElement>(null);
   // "Use my location": the point, kept while the box still shows its label
   const myLocation = useRef<{ label: string; coordinates: GeoCoordinates } | null>(null);
-  const { state, search, loadPopular } = useDirectorySearch();
+  const { state, search, clear } = useDirectorySearch(popular);
 
-  /* Initial load: featured profiles + results (from URL or nationwide picks). */
-  useEffect(() => {
-    directoryProvider.getFeaturedProfiles().then(setFeatured).catch(() => setFeatured([]));
-
-    if (initialLocation.trim()) {
-      search({
-        professionalType: isProfessionalTypeId(initialType) ? initialType : null,
-        location: initialLocation,
-      });
-    } else {
-      loadPopular();
-    }
-    // Only on mount — later searches are user-driven.
-  }, []);
+  const runUrlSearch = useCallback(
+    (type: ProfessionalTypeId | "", loc: string) => {
+      setProfessionalType(type);
+      setLocation(loc);
+      search({ professionalType: type || null, location: loc });
+    },
+    [search]
+  );
 
   const syncUrl = useCallback(
     (type: ProfessionalTypeId | "", loc: string) => {
@@ -69,7 +95,7 @@ export default function GlamlinkDirectoryPage() {
   );
 
   const scrollToResults = () => {
-    document.getElementById("directory-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("explore-professionals")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const handleSubmit = () => {
@@ -133,31 +159,32 @@ export default function GlamlinkDirectoryPage() {
     setLocation("");
     setSearchError(null);
     syncUrl("", "");
-    loadPopular();
+    clear();
   };
 
   const handleRetry = () => {
-    if (state.mode === "search" && state.params) search(state.params);
-    else loadPopular();
+    if (state.mode === "search") search(state.params);
   };
 
+  // The Access form, filled from the Google listing; an admin verifies the claim.
   const handleConfirmClaim = (business: DirectoryBusiness) => {
     setClaimTarget(null);
-    // Prototype: hand off to the existing Glamlink application flow.
-    router.push(`${CLAIM_PROFILE_HREF}?claim=${encodeURIComponent(business.id)}`);
+    router.push(`/access?claim=${encodeURIComponent(business.id)}#create-profile`);
   };
 
   /* "Estheticians near Miami, FL" */
-  const searchedType = getProfessionalType(state.params?.professionalType);
-  const typeLabel = searchedType?.pluralLabel ?? "Beauty + wellness professionals";
-  const criteriaLabel =
-    state.mode === "search"
-      ? `${typeLabel} near ${state.location?.label ?? state.params?.location ?? ""}`
-      : "Top-rated beauty + wellness businesses";
+  const searchedPlace = state.mode === "search" ? (state.location?.label ?? state.params.location) : "";
+  const typeLabel = getProfessionalType(state.params?.professionalType)?.pluralLabel ?? "Beauty + wellness businesses";
+  const criteriaLabel = state.mode === "search" ? `${typeLabel} near ${searchedPlace}` : `Popular in ${popularPlace}`;
+  const nearby = state.mode === "search" && state.status === "success" ? state.profiles : [];
 
   return (
     <div className="overflow-x-clip">
-      <DirectoryHero>
+      <Suspense fallback={null}>
+        <UrlSearch onSearch={runUrlSearch} />
+      </Suspense>
+
+      <DirectoryHero map={map}>
         <DirectorySearch
           professionalTypes={PROFESSIONAL_TYPES}
           professionalType={professionalType}
@@ -176,27 +203,48 @@ export default function GlamlinkDirectoryPage() {
         />
       </DirectoryHero>
 
-      {state.mode === "search" && state.status === "success" && state.profiles.length > 0 ? (
-        <FeaturedProfiles
-          profiles={state.profiles}
-          badge="On Glamlink"
-          title={`Glamlink professionals near ${state.location?.label ?? state.params?.location ?? "you"}`}
-          subtitle="Professionals with a Glamlink page, nearest first."
-        />
-      ) : (
-        <FeaturedProfiles profiles={featured} />
-      )}
+      <section
+        id="explore-professionals"
+        aria-labelledby="explore-professionals-heading"
+        className="scroll-mt-24 py-16 md:py-24"
+      >
+        <div className="container-glamlink">
+          <ExploreHeading
+            id="explore-professionals-heading"
+            title="Explore Professionals"
+            subtitle="Glamlink's professionals, each with their own page, and more beauty and wellness businesses from Google."
+            href="/professionals"
+            label="Explore all professionals"
+          />
 
-      <DirectoryResults
-        status={state.status}
-        mode={state.mode}
-        businesses={state.businesses}
-        criteriaLabel={criteriaLabel}
-        onModifySearch={handleModifySearch}
-        onClearSearch={handleClearSearch}
-        onRetry={handleRetry}
-        onClaim={setClaimTarget}
-      />
+          <div className="mt-10 md:mt-12">
+            {nearby.length > 0 ? (
+              <FeaturedProfiles
+                profiles={nearby}
+                title={`Glamlink professionals near ${searchedPlace || "you"}`}
+                subtitle="Professionals with a Glamlink page, nearest first."
+              />
+            ) : (
+              <FeaturedProfiles profiles={featured} />
+            )}
+          </div>
+
+          <div className="mt-16 border-t border-border/60 pt-16 md:mt-20 md:pt-20">
+            <DirectoryResults
+              status={state.status}
+              mode={state.mode}
+              businesses={state.businesses}
+              criteriaLabel={criteriaLabel}
+              onModifySearch={handleModifySearch}
+              onClearSearch={handleClearSearch}
+              onRetry={handleRetry}
+              onClaim={setClaimTarget}
+            />
+          </div>
+        </div>
+      </section>
+
+      {brands}
 
       <DirectoryCTA />
 

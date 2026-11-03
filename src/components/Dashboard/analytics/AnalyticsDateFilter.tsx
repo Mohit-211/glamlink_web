@@ -79,7 +79,7 @@ export default function AnalyticsDateFilter({
               type="button"
               onClick={() => apply(presetRange(p.days))}
               aria-pressed={activePreset?.days === p.days}
-              className="chip rounded-full px-3 py-1 text-[11px]"
+              className="chip rounded-full px-3 py-1 text-xs"
             >
               {p.label}
             </button>

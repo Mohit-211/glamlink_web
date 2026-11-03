@@ -6,12 +6,17 @@ import { Loader2, LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import { resendVerification, verifyEmail } from "@/api/Api";
 import { readApiError } from "@/lib/apiError";
+import { afterSignInPath } from "@/lib/auth";
+import { getSessionState } from "@/lib/session";
 import AuthShell from "./AuthShell";
 
 // A link works once: guard against the effect running twice in development.
 const attempted = new Set<string>();
 
-/** Opened from the verification email (valid 24 hours). Verifying signs the person in. */
+/**
+ * Opened from the verification email (valid 24 hours). Verifying signs the
+ * person in, then brings them back to a draft card they were claiming, if any.
+ */
 export default function VerifyEmail() {
   const router = useRouter();
   const token = useSearchParams().get("token") ?? "";
@@ -25,7 +30,7 @@ export default function VerifyEmail() {
     verifyEmail(token)
       .then(() => {
         toast.success("Your email is verified.");
-        router.replace("/dashboard");
+        router.replace(afterSignInPath(null, getSessionState().user?.email));
       })
       .catch((error) => {
         const { code, message } = readApiError(error);

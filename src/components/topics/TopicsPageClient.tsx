@@ -94,7 +94,7 @@ const TopicsPageClient = () => {
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     placeholder="Search topics, concerns, treatments..."
-                    className="w-full bg-transparent pl-13 pr-12 py-4 text-[15px] text-foreground
+                    className="w-full bg-transparent pl-13 pr-12 py-4 text-base text-foreground
                       placeholder:text-muted-foreground/80 focus:outline-none rounded-full"
                   />
                   <div className="absolute right-4 flex items-center">
@@ -116,14 +116,14 @@ const TopicsPageClient = () => {
                 {/* Popular topic chips */}
                 {!loading && popularTopics.length > 0 && !searchInput && (
                   <div className="flex flex-wrap items-center gap-2 mt-4">
-                    <span className="text-[11px] uppercase tracking-widest text-muted-foreground/80 mr-1">
+                    <span className="eyebrow text-muted-foreground/80 mr-1">
                       Popular
                     </span>
                     {popularTopics.map((topic) => (
                       <a
                         key={topic.id}
                         href={`/topics/${topic.slug || topic.id}`}
-                        className="chip text-[13px] px-3.5 py-1.5 rounded-full"
+                        className="chip text-sm px-3.5 py-1.5 rounded-full"
                       >
                         {topic.name}
                       </a>
@@ -135,7 +135,7 @@ const TopicsPageClient = () => {
 
             {/* Editorial image panel */}
             <div className="relative hidden lg:block">
-              <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-primary">
+              <div className="relative aspect-[4/5] rounded-4xl overflow-hidden shadow-primary">
                 <Image
                   src="/assets/blog-featured.jpg"
                   alt="Glamlink beauty editorial"
@@ -144,11 +144,11 @@ const TopicsPageClient = () => {
                   className="object-cover"
                   priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-overlay/50 via-overlay/0 to-overlay/10" />
+                <div className="absolute inset-0 bg-linear-to-t from-overlay/50 via-overlay/0 to-overlay/10" />
               </div>
 
               {/* Floating stat card */}
-              <div className="absolute -bottom-6 -left-8 bg-card rounded-2xl shadow-xl border border-border px-5 py-4 flex items-center gap-4">
+              <div className="absolute -bottom-6 -left-8 bg-card rounded-2xl shadow-large border border-border px-5 py-4 flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <Sparkles className="h-4 w-4 text-primary" />
                 </div>
@@ -156,7 +156,7 @@ const TopicsPageClient = () => {
                   <p className="text-lg text-foreground leading-none">
                     {topics.length || "—"}
                   </p>
-                  <p className="text-[11px] text-muted-foreground/80 mt-1">
+                  <p className="text-xs text-muted-foreground/80 mt-1">
                     {topics.length === 1 ? "topic" : "topics"} covered
                   </p>
                 </div>
@@ -185,7 +185,7 @@ const TopicsPageClient = () => {
             )}
           </div>
           {!loading && (
-            <p className="text-[12px] text-muted-foreground/80 hidden sm:block">
+            <p className="text-xs text-muted-foreground/80 hidden sm:block">
               {filteredTopics.length}{" "}
               {filteredTopics.length === 1 ? "topic" : "topics"}
             </p>

@@ -54,7 +54,7 @@ export function Byline({ article, className }: { article: ArticleCard; className
   const date = formatDate(published);
   if (!author && !date) return null;
   return (
-    <p className={cn("text-[11px] font-semibold uppercase tracking-widest text-muted-foreground", className)}>
+    <p className={cn("eyebrow text-muted-foreground", className)}>
       {author && <span>By {author}</span>}
       {author && date && <span aria-hidden="true"> · </span>}
       {date && <time dateTime={published ?? undefined}>{date}</time>}
@@ -125,7 +125,7 @@ export default function StoryCard({
           </Link>
         </h3>
         {article.short_description && (
-          <p className={cn("mt-2 text-sm leading-relaxed text-muted-foreground md:text-[15px]", STANDFIRST[layout])}>
+          <p className={cn("mt-2 text-sm leading-relaxed text-muted-foreground md:text-base", STANDFIRST[layout])}>
             {article.short_description}
           </p>
         )}

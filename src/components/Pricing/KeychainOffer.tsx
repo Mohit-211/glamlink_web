@@ -17,7 +17,9 @@ interface KeychainOfferProps {
 
 /**
  * Offered after a plan without the keychain is chosen, Free included: the NFC
- * keychain as a one-time add-on. Closing it goes back to the plans.
+ * keychain as a one-time add-on. Closing it goes back to the plans. Shipping is
+ * not promised here: the order review shows it, or says it is included, once
+ * the address is known.
  */
 export default function KeychainOffer({ plan, withKeychain, busy = false, onAdd, onSkip, onClose }: KeychainOfferProps) {
   const cents = withKeychain?.keychainCents ?? null;
@@ -45,8 +47,8 @@ export default function KeychainOffer({ plan, withKeychain, busy = false, onAdd,
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {plan.isPro
-                ? "Added to your first Access Pro payment. Shipping and tax included."
-                : "Your card stays on the Free plan. Shipping and tax included."}
+                ? "Added to your first Access Pro payment. Ships within the US."
+                : "Your card stays on the Free plan. Ships within the US."}
             </p>
 
             <button type="button" onClick={onAdd} disabled={busy} className="btn-primary mt-7 w-full py-3.5 disabled:opacity-50">
@@ -65,5 +67,35 @@ export default function KeychainOffer({ plan, withKeychain, busy = false, onAdd,
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+/**
+ * The keychain on its own, for someone with no plan card left that offers it
+ * (they have Access Pro), or on the dashboard.
+ */
+export function KeychainAddOn({ plan, busy = false, onAdd }: { plan: PlanDef; busy?: boolean; onAdd: () => void }) {
+  const cents = plan.keychainCents;
+  if (cents === null) return null;
+  return (
+    <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-soft sm:flex-row sm:items-center">
+      <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-accent text-secondary">
+        <Nfc className="h-5 w-5" aria-hidden="true" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-foreground">Add the NFC keychain</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Clients tap it with their phone to open your Access card.{" "}
+          {plan.keychainListCents !== null && (
+            <span className="line-through">{money(plan.keychainListCents)}</span>
+          )}{" "}
+          <span className="font-medium text-foreground">{money(cents)}</span> one-time.
+        </p>
+      </div>
+      <button type="button" onClick={onAdd} disabled={busy} className="btn-outline shrink-0 disabled:opacity-50">
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Nfc className="h-4 w-4" aria-hidden="true" />}
+        Add keychain
+      </button>
+    </div>
   );
 }

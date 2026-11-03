@@ -43,12 +43,12 @@ export default function DirectorySearch({
       role="search"
       aria-label="Search the Glamlink directory"
       onSubmit={handleSubmit}
-      className="scroll-mt-28 w-full"
+      className="@container scroll-mt-28 w-full"
     >
-      <div className="rounded-3xl md:rounded-full border border-border/80 bg-card p-2 shadow-large">
-        <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-0">
+      <div className="rounded-3xl @xl:rounded-full border border-border/80 bg-card p-2 shadow-large">
+        <div className="flex flex-col @xl:flex-row @xl:items-center gap-1.5 @xl:gap-0">
           {/* PROFESSIONAL TYPE */}
-          <div className="md:w-[236px] md:shrink-0">
+          <div className="@xl:w-[246px] @xl:shrink-0">
             <ProfessionalTypeSelect
               professionalTypes={professionalTypes}
               value={professionalType}
@@ -56,11 +56,11 @@ export default function DirectorySearch({
             />
           </div>
 
-          <span className="hidden md:block h-10 w-px bg-border" aria-hidden="true" />
-          <span className="md:hidden mx-4 h-px bg-border" aria-hidden="true" />
+          <span className="hidden @xl:block h-10 w-px bg-border" aria-hidden="true" />
+          <span className="@xl:hidden mx-4 h-px bg-border" aria-hidden="true" />
 
           {/* LOCATION */}
-          <div className="flex items-center gap-3 rounded-2xl md:rounded-full px-4 py-2.5 md:py-2 md:flex-[1.2] hover:bg-muted/60 focus-within:bg-muted/60 transition-colors">
+          <div className="flex items-center gap-3 rounded-2xl @xl:rounded-full px-4 py-2.5 @xl:py-2 @xl:flex-[1.2] hover:bg-muted/60 focus-within:bg-muted/60 transition-colors">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
               <MapPin className="h-[18px] w-[18px]" aria-hidden="true" />
             </span>
@@ -77,7 +77,7 @@ export default function DirectorySearch({
                 autoComplete="address-level2"
                 aria-invalid={!!error}
                 aria-describedby={error ? "directory-search-error" : undefined}
-                className="w-full bg-transparent text-sm sm:text-[15px] font-medium text-foreground placeholder:text-muted-foreground/70 placeholder:font-normal outline-none"
+                className="w-full bg-transparent text-sm sm:text-base font-medium text-foreground placeholder:text-muted-foreground/70 placeholder:font-normal outline-none"
               />
             </label>
             <button
@@ -93,7 +93,7 @@ export default function DirectorySearch({
               ) : (
                 <LocateFixed className="w-4 h-4" aria-hidden="true" />
               )}
-              <span className="hidden sm:inline md:hidden">
+              <span className="hidden @sm:inline @xl:hidden">
                 {isLocating ? "Locating…" : "Use my location"}
               </span>
             </button>
@@ -103,7 +103,7 @@ export default function DirectorySearch({
           <button
             type="submit"
             disabled={isSearching}
-            className="btn-primary mt-1 md:mt-0 md:ml-1 h-12 md:h-14 w-full md:w-auto md:px-8 text-[15px] disabled:opacity-80"
+            className="btn-primary mt-1 @xl:mt-0 @xl:ml-1 h-12 @xl:h-14 w-full @xl:w-auto @xl:px-6 @2xl:px-8 text-base disabled:opacity-80"
           >
             {isSearching ? (
               <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />

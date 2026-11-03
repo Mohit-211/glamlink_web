@@ -49,7 +49,10 @@ export interface DirectoryBusiness {
   /** Google `place_id` once connected to Places. */
   id: string;
   name: string;
-  professionalType: ProfessionalTypeId;
+  /** The type searched for; null when the search had none. */
+  professionalType: ProfessionalTypeId | null;
+  /** What the card calls it: the type searched for, else Google's own ("Hair salon"). */
+  category: string;
   city: string;
   state: string;
   neighborhood?: string;
@@ -87,6 +90,8 @@ export interface FeaturedProfile {
   featuredIn?: FeatureSource;
   /** "2.4 mi away", after a search near a place. */
   distanceLabel?: string;
+  /** Featured by Glamlink's admins. */
+  featured?: boolean;
   href?: string;
 }
 
@@ -95,7 +100,5 @@ export interface FeaturedProfile {
  */
 export interface DirectoryProvider {
   searchBusinesses(params: DirectorySearchParams): Promise<DirectorySearchResult>;
-  getPopularBusinesses(): Promise<DirectoryBusiness[]>;
-  getFeaturedProfiles(): Promise<FeaturedProfile[]>;
   reverseGeocode(coords: GeoCoordinates): Promise<DirectoryLocation | null>;
 }

@@ -17,7 +17,7 @@ interface Props {
 }
 
 const sectionClass =
-  "space-y-6 rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm";
+  "space-y-6 rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-soft";
 
 // The API's limits for a card: 4 photos and 1 video (MP4, under 21 MB).
 const MAX_PHOTOS = 4;
@@ -106,7 +106,7 @@ const getVideoDuration = (file: File): Promise<number> => {
 // Auto-generates a poster image for a video by grabbing a frame partway
 // through it. Used as the default thumbnail immediately on upload; the
 // user can still replace it manually afterwards.
-const generateVideoThumbnail = (file: File): Promise<File> => {
+export const generateVideoThumbnail = (file: File): Promise<File> => {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const videoEl = document.createElement("video");
@@ -616,7 +616,7 @@ const MediaAndProfileForm: React.FC<Props> = ({ data, setData, errors, clearErro
                 </span>
               )}
             </div>
-            <label className="absolute bottom-1 right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition hover:bg-secondary">
+            <label className="absolute bottom-1 right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-medium transition hover:bg-secondary">
               <span className="text-sm leading-none">✎</span>
 
               <input

@@ -4,6 +4,7 @@ import Script from "next/script";
 import { Manrope } from "next/font/google";
 
 import { ADSENSE_CLIENT_ID, GTM_ID, SITE_URL } from "@/lib/config";
+import { CONSENT_DEFAULTS_SCRIPT } from "@/lib/consent";
 import Providers from "./providers";
 import ScrollToTop from "@/components/ScrollToTop";
 import LayoutWrapper from "@/components/LayoutWrapper";
@@ -130,6 +131,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={manrope.variable}>
       <head>
+        {/* Google's consent mode: cookies denied until the visitor accepts them (lib/consent.ts); runs before
+            Tag Manager and AdSense load */}
+        <Script id="consent-defaults" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: CONSENT_DEFAULTS_SCRIPT }} />
+
         {/* Google Tag Manager */}
         {GTM_ID && (
           <Script

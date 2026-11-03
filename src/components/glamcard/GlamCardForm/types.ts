@@ -48,9 +48,15 @@ export interface FeaturedLink {
   is_featured?: boolean;
 }
 /* ================= MAIN FORM ================= */
+/** Who the card is for: a beauty or wellness professional, or a brand (users.professional_type). */
+export type ProfessionalType = "individual" | "brand";
 export interface GlamCardFormData {
   [x: string]: any;
   other_links: any;
+  /* WHO: chosen first; empty until the person picks */
+  professional_type?: ProfessionalType | "";
+  /** A Google listing claimed from the directory ("Claim This Profile"); an admin verifies it. */
+  claimed_place_id?: string;
   /* BASIC INFO */
   name: string;
  business_name: string;
@@ -91,8 +97,6 @@ export interface GlamCardFormData {
   /** Hex color (e.g. "#16818c") the professional picked to theme their Access Card — drives the Featured Links accent. */
   color_code?: string;
   /* MARKETING */
-  offer_promotion?: boolean;
-  promotion_details?: string;
   excites_about_glamlink: string[];
   biggest_pain_points: string[];
   elite_setup: boolean;

@@ -34,7 +34,7 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
       .toUpperCase() || "P";
 
   const content = (
-    <div className="group relative flex flex-col h-full bg-card rounded-2xl border border-border p-6 hover:border-secondary/40 hover:shadow-lg transition-all duration-300">
+    <div className="group relative flex flex-col h-full bg-card rounded-2xl border border-border p-6 hover:border-secondary/40 hover:shadow-large transition-all duration-300">
       {expert.business_card_qr && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -57,11 +57,11 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
           </div>
         )}
         <div className="min-w-0">
-          <h3 className="text-foreground text-[15px] leading-snug truncate">
+          <h3 className="text-foreground text-base leading-snug truncate">
             {expert.name?.trim()}
           </h3>
           {(expert.professional_title || expert.business_name) && (
-            <p className="text-[12px] text-muted-foreground/80 truncate">
+            <p className="text-xs text-muted-foreground/80 truncate">
               {expert.professional_title || expert.business_name}
             </p>
           )}
@@ -73,7 +73,7 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
           {specialties.map((item, i) => (
             <span
               key={i}
-              className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-medium text-secondary"
+              className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-secondary"
             >
               {item}
             </span>
@@ -83,7 +83,7 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
 
       <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">
         {locationLine ? (
-          <span className="flex items-center gap-1 text-[11px] text-muted-foreground/80 truncate">
+          <span className="flex items-center gap-1 text-xs text-muted-foreground/80 truncate">
             <MapPin className="h-3 w-3 flex-shrink-0" />
             <span className="truncate">{locationLine}</span>
           </span>
@@ -91,7 +91,7 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
           <span />
         )}
         {expert.business_card_link && (
-          <span className="flex items-center gap-1 text-[11px] font-medium text-primary group-hover:text-secondary group-hover:gap-1.5 transition-all duration-200">
+          <span className="flex items-center gap-1 text-xs font-medium text-primary group-hover:text-secondary group-hover:gap-1.5 transition-all duration-200">
             View profile
             <ArrowUpRight className="h-3 w-3" />
           </span>

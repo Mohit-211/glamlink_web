@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { getAccessPlans } from "@/api/Api";
 import { readApiError } from "@/lib/apiError";
+import { useSession } from "@/lib/useSession";
 
 export type PlanId = "free" | "nfc_only" | "subscription_only" | "nfc_with_subscription";
 export type BackendPlanType = PlanId;
@@ -65,13 +66,13 @@ export interface PlanDef {
   features: PlanFeature[];
   hasKeychain: boolean;
   isPro: boolean;
-  /** "$4.99" */
+  /** "$9.99", from the API */
   priceLabel: string;
   /** "/ month + $39.99 one-time" */
   priceSuffix?: string;
   /** The list price, struck through, when a sale or personal price lowers it. */
   listPriceLabel?: string;
-  /** "then $4.99 / month" when the discounted monthly price is temporary. */
+  /** "then $9.99 / month" when the discounted monthly price is temporary. */
   afterNote?: string;
   /** Whether this price is the client's own (set by an admin). */
   personal: boolean;
@@ -94,8 +95,66 @@ export const WITH_KEYCHAIN: Partial<Record<PlanId, PlanId>> = {
   subscription_only: "nfc_with_subscription",
 };
 
-/** Cents to "$4.99"; whole amounts keep their cents except zero ("$0"). */
+/** Cents to "$9.99"; whole amounts keep their cents except zero ("$0"). */
 export const money = (cents: number) => (cents === 0 ? "$0" : `$${(cents / 100).toFixed(2)}`);
+
+/** The products of each plan. */
+const PRODUCTS: Record<PlanId, { subscription: boolean; keychain: boolean }> = {
+  free: { subscription: false, keychain: false },
+  nfc_only: { subscription: false, keychain: true },
+  subscription_only: { subscription: true, keychain: false },
+  nfc_with_subscription: { subscription: true, keychain: true },
+};
+
+/**
+ * Whether plan `id` can't be bought by someone who owns `owned`: it would sell
+ * them Access Pro or the keychain again. Free is included in Access Pro.
+ */
+export function isOwnedPlan(id: PlanId, owned: PlansState["owned"]): boolean {
+  const plan = PRODUCTS[id];
+  if (!plan) return false;
+  if (id === "free") return owned.subscription;
+  return (plan.subscription && owned.subscription) || (plan.keychain && owned.keychain);
+}
+
+/** "Your plan" when the person has everything in plan `id`, else what keeps it from being bought. */
+export function ownedNote(id: PlanId, owned: PlansState["owned"]): string | null {
+  if (!isOwnedPlan(id, owned)) return null;
+  const plan = PRODUCTS[id];
+  if (id === "free") return "Included in Pro";
+  if (plan.subscription && plan.keychain && !(owned.subscription && owned.keychain)) {
+    return owned.subscription ? "You have Pro" : "You have the keychain";
+  }
+  return "Your plan";
+}
+
+const featureKey = (text: string) => text.trim().replace(/\s+/g, " ").toLowerCase();
+
+export interface PlanFeatureList {
+  /** The card before this one ("Everything in Free, plus:"); null on the first card. */
+  includes: string | null;
+  /** What this card adds: no feature an earlier card already lists. */
+  features: PlanFeature[];
+}
+
+/**
+ * The features each plan card lists, in the order the cards are shown: the
+ * first card lists all of its own; every later card says "Everything in <the
+ * card before>, plus:" and lists only what no earlier card has. The API words a
+ * shared feature the same way on every plan, so the text decides.
+ */
+export function featureLists(cards: PlanDef[]): PlanFeatureList[] {
+  const seen = new Set<string>();
+  return cards.map((plan, index) => {
+    const features = plan.features.filter((feature) => {
+      const k = featureKey(feature.text);
+      if (!k || seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+    return { includes: index > 0 ? cards[index - 1].name : null, features };
+  });
+}
 
 export function toPlanDef(p: ApiPlan): PlanDef {
   const pro = p.lines.find((l) => l.product === "pro");
@@ -134,8 +193,8 @@ export function toPlanDef(p: ApiPlan): PlanDef {
 // Several price labels on one page share one request: anonymous answers are
 // cached briefly (personal prices depend on the card or sign-in, so not those).
 let publicCache: { at: number; promise: Promise<any> } | null = null;
-const loadPlans = (businessCardId?: string | number | null) => {
-  if (businessCardId) return getAccessPlans(businessCardId);
+const loadPlans = (businessCardId: string | number | null | undefined, signedIn: boolean) => {
+  if (businessCardId || signedIn) return getAccessPlans(businessCardId);
   if (!publicCache || Date.now() - publicCache.at > 60_000) {
     publicCache = { at: Date.now(), promise: getAccessPlans() };
     publicCache.promise.catch(() => (publicCache = null));
@@ -156,9 +215,11 @@ export interface PlansState {
 /**
  * The plans with prices for whoever is looking: a signed-in professional sees
  * their personal prices and what they own; a guest passes their draft card id
- * (with its card token) for a personal price set on their email.
+ * (with its card token) for a personal price set on their email. Waits for the
+ * session to be restored, and loads again when someone signs in or out.
  */
 export function usePlans(businessCardId?: string | number | null, enabled = true): PlansState {
+  const { status } = useSession();
   const [state, setState] = useState<Omit<PlansState, "reload">>({
     plans: [],
     sale: null,
@@ -170,10 +231,10 @@ export function usePlans(businessCardId?: string | number | null, enabled = true
   const reload = useCallback(() => setAttempt((n) => n + 1), []);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || status === "loading") return;
     let active = true;
     setState((s) => ({ ...s, loading: true, error: null }));
-    loadPlans(businessCardId)
+    loadPlans(businessCardId, status === "signed-in")
       .then((res) => {
         if (!active) return;
         const data = res?.data ?? res;
@@ -192,7 +253,7 @@ export function usePlans(businessCardId?: string | number | null, enabled = true
     return () => {
       active = false;
     };
-  }, [businessCardId, enabled, attempt]);
+  }, [businessCardId, enabled, attempt, status]);
 
   return { ...state, reload };
 }

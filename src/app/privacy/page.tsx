@@ -117,7 +117,7 @@ export default function PrivacyPolicyPage() {
       <section className="py-16">
         <div className="container-glamlink">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-card rounded-lg shadow-sm border p-8 md:p-12">
+            <div className="bg-card rounded-lg shadow-soft border p-8 md:p-12">
               {/* Introduction */}
               <div className="mb-12">
                 <p className="text-foreground/80 leading-relaxed mb-6">Glamlink Inc, a Nevada limited liability company (&quot;Glamlink&quot; &quot;us&quot; or &quot;we&quot;) are dedicated to protecting your privacy and handling any personally identifiable information we obtain from you with care and respect.</p>
@@ -615,7 +615,7 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Floating Back to Top Button */}
-      <button onClick={scrollToTop} className="fixed bottom-8 right-8 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-secondary transition-all duration-300 transform hover:scale-110" aria-label="Back to top">
+      <button onClick={scrollToTop} className="fixed bottom-8 right-8 p-3 bg-primary text-primary-foreground rounded-full shadow-large hover:bg-secondary transition-all duration-300 transform hover:scale-110" aria-label="Back to top">
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
         </svg>

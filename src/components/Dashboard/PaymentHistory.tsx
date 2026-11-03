@@ -32,11 +32,13 @@ export default function PaymentHistory({
 }: PaymentHistoryProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
+  // The API's payment statuses: SUCCESS, PENDING, REJECTED and CANCELLED (an
+  // admin cancels or refunds; there is no refund in the site), and REFUNDED.
   const getStatusConfig = (status: string) => {
     switch (status?.toUpperCase()) {
       case 'SUCCESS':
         return {
-          label: 'Success',
+          label: 'Paid',
           cls: 'bg-success/10 text-success border-success/30',
         };
       case 'PENDING':
@@ -44,14 +46,26 @@ export default function PaymentHistory({
           label: 'Pending',
           cls: 'bg-warning/10 text-warning border-warning/30',
         };
+      case 'REJECTED':
       case 'FAILED':
         return {
-          label: 'Failed',
+          label: 'Declined',
           cls: 'bg-destructive/10 text-destructive border-destructive/30',
+        };
+      case 'CANCELLED':
+      case 'CANCELED':
+        return {
+          label: 'Cancelled',
+          cls: 'bg-muted text-muted-foreground border-border',
+        };
+      case 'REFUNDED':
+        return {
+          label: 'Refunded',
+          cls: 'bg-muted text-muted-foreground border-border',
         };
       default:
         return {
-          label: status || 'Unknown',
+          label: status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Unknown',
           cls: 'bg-muted text-foreground/80 border-border',
         };
     }
@@ -107,7 +121,7 @@ export default function PaymentHistory({
                       </p>
 
                       <span
-                        className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${config.cls}`}
+                        className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${config.cls}`}
                       >
                         {config.label}
                       </span>
@@ -153,7 +167,7 @@ export default function PaymentHistory({
                   <div className="border-t border-border bg-muted/30 px-5 py-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       {/* <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
+                        <p className="eyebrow text-muted-foreground mb-0.5">
                           Transaction ID
                         </p>
 
@@ -163,7 +177,7 @@ export default function PaymentHistory({
                       </div> */}
 
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
+                        <p className="eyebrow text-muted-foreground mb-0.5">
                           Date
                         </p>
 
@@ -180,7 +194,7 @@ export default function PaymentHistory({
                       </div>
 
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
+                        <p className="eyebrow text-muted-foreground mb-0.5">
                           Amount
                         </p>
 
@@ -190,19 +204,19 @@ export default function PaymentHistory({
                       </div>
 
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
+                        <p className="eyebrow text-muted-foreground mb-0.5">
                           Status
                         </p>
 
                         <span
-                          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${config.cls}`}
+                          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${config.cls}`}
                         >
                           {config.label}
                         </span>
                       </div>
 
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
+                        <p className="eyebrow text-muted-foreground mb-0.5">
                           Payment Mode
                         </p>
 
@@ -212,7 +226,7 @@ export default function PaymentHistory({
                       </div>
 
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
+                        <p className="eyebrow text-muted-foreground mb-0.5">
                           Currency
                         </p>
 

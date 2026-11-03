@@ -153,7 +153,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
       onClick={handleBackdrop}
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center scrim p-0 sm:p-4"
     >
-      <div className="w-full overflow-hidden rounded-t-3xl border border-border bg-card duration-200 animate-in slide-in-from-bottom-4 sm:max-w-md sm:rounded-3xl sm:slide-in-from-bottom-0">
+      <div className="w-full overflow-hidden rounded-t-3xl border border-border bg-card duration-200 sm:max-w-md sm:rounded-3xl ">
         {/* Modal header */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div className="flex items-center gap-3">
@@ -162,7 +162,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
             </span>
             <div>
               <p className="text-sm font-semibold text-foreground">Add Delivery Address</p>
-              <p className="text-[12px] text-muted-foreground">Used for shipping physical orders</p>
+              <p className="text-xs text-muted-foreground">Used for shipping physical orders</p>
             </div>
           </div>
           <button
@@ -386,7 +386,8 @@ export function AddressTab() {
     try {
       const payload = {
         address_line_1: editForm.address_line_1,
-        ...(editForm.address_line_2?.trim() && { address_line_2: editForm.address_line_2.trim() }),
+        // Always sent, so emptying the field clears it.
+        address_line_2: editForm.address_line_2?.trim() ?? '',
         ...(editForm.address_lat && {
           address_lat: parseFloat(editForm.address_lat),
         }),
@@ -415,11 +416,7 @@ export function AddressTab() {
       setEditing(null);
       setEditForm(null);
     } catch (error: any) {
-      setEditError(
-        error?.response?.data?.message ||
-        error?.message ||
-        "Please enter a valid address, city, state and ZIP code."
-      );
+      setEditError(addressError(error));
     } finally {
       setEditSaving(false);
     }
@@ -563,7 +560,7 @@ export function AddressTab() {
                         {addr.address_line_2 ? `, ${addr.address_line_2}` : ""}
                       </p>
                       {addr.is_default && (
-                        <span className="flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-secondary">
+                        <span className="flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-secondary">
                           <CheckCircle2 className="h-3 w-3" /> Default
                         </span>
                       )}
@@ -572,7 +569,7 @@ export function AddressTab() {
                       {addr?.user_city?.name || addr.city_name}, {addr?.user_state?.name || addr.state_name} · {addr.postal_code}
                     </p>
                     {(addr.address_lat || addr.address_long) && (
-                      <p className="mt-0.5 text-[11px] text-muted-foreground/60">
+                      <p className="mt-0.5 text-xs text-muted-foreground/60">
                         {addr.address_lat}, {addr.address_long}
                       </p>
                     )}

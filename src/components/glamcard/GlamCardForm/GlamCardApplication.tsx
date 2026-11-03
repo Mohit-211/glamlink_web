@@ -3,8 +3,10 @@ import { nanoid } from "nanoid";
 import GlamCardLivePreview from "../GlamCardLivePreview";
 import { initialGlamCardData } from "../initialGlamCardData";
 import GlamCardForm from "./GlamCardForm";
-import { GlamCardFormData } from "./types";
+import { GlamCardFormData, ProfessionalType } from "./types";
 import { getFormDataFromSession } from "./Formdatasessionstorage";
+import { getGooglePlaceForm } from "@/api/Api";
+import { useSession } from "@/lib/useSession";
 
 /**
  * The real, blank starting point for the form/submission. initialGlamCardData()
@@ -14,6 +16,7 @@ import { getFormDataFromSession } from "./Formdatasessionstorage";
  * user leaves a field untouched.
  */
 const emptyGlamCardData: GlamCardFormData = {
+  professional_type: "",
   name: "",
   business_name: "",
   professional_title: "",
@@ -46,8 +49,6 @@ const emptyGlamCardData: GlamCardFormData = {
   images: [],
   gallery_meta: [],
   elite_setup: false,
-  offer_promotion: undefined,
-  promotion_details: "",
   excites_about_glamlink: [],
   biggest_pain_points: [],
 };
@@ -69,12 +70,13 @@ const isEmptyValue = (value: any): boolean => {
  */
 const mergeForPreview = (
   data: GlamCardFormData,
-  demoData: GlamCardFormData | null
+  demoData: GlamCardFormData | null,
+  keepAsIs: (keyof GlamCardFormData)[] = []
 ): GlamCardFormData => {
   if (!demoData) return data;
   const merged: any = { ...data };
   (Object.keys(demoData) as (keyof GlamCardFormData)[]).forEach((key) => {
-    if (isEmptyValue(merged[key])) {
+    if (!keepAsIs.includes(key) && isEmptyValue(merged[key])) {
       merged[key] = demoData[key];
     }
   });
@@ -102,6 +104,8 @@ const hydrateFromSessionPayload = (
   };
 
   return {
+    professional_type: payload.professional_type === "brand" || payload.professional_type === "individual" ? payload.professional_type : "",
+    claimed_place_id: payload.claimed_place_id || undefined,
     name: payload.name ?? "",
     email: payload.email ?? "",
     phone: payload.phone ?? "",
@@ -109,12 +113,10 @@ const hydrateFromSessionPayload = (
     professional_title: payload.professional_title ?? "",
     bio: payload.bio ?? "",
     booking_link: payload.booking_link ?? "",
-    offer_promotion: payload.offer_promotion,
     elite_setup: payload.elite_setup === "true",
     primary_specialty: payload.primary_specialty ?? "",
     custom_handle: payload.custom_handle ?? "",
     website: payload.website ?? "",
-    promotion_details: payload.promotion_details ?? "",
     color_code: payload.color_code ?? "",
     is_phone_visible: payload.is_phone_visible !== "false",
     business_hour: parseJson(payload.business_hour) ?? [],
@@ -142,9 +144,77 @@ const hydrateFromSessionPayload = (
   };
 };
 
+const escapeHtml = (text: string) =>
+  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/**
+ * "Claim This Profile" on a Google listing in the directory opens /access?claim=<place id>. The listing's details
+ * fill the fields the person hasn't filled, and its place id goes with the card for an admin to verify.
+ */
+const fromGooglePlace = (prev: GlamCardFormData, place: any): GlamCardFormData => {
+  const form = place?.form ?? {};
+  const digits = String(form.phone ?? "").replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
+  const location = form.locations?.[0];
+  return {
+    ...prev,
+    claimed_place_id: place.place_id,
+    business_name: prev.business_name || place.name || "",
+    phone: prev.phone || (digits.length === 10 ? digits : ""),
+    website: prev.website || form.website || "",
+    // The bio editor holds HTML, and the card's bio is at most 80 characters of text
+    bio: prev.bio || (form.bio ? `<p>${escapeHtml(String(form.bio).slice(0, 80))}</p>` : ""),
+    business_hour: prev.business_hour?.length ? prev.business_hour : (form.business_hours ?? []).slice(0, 14),
+    locations: prev.locations?.length || !location?.address
+      ? prev.locations
+      : [{
+          id: nanoid(),
+          label: location.label || place.name || "Location 1",
+          location_type: "exact_address",
+          address: location.address,
+          area: "",
+          city: location.city || "",
+          state: location.state || "",
+          phone: "",
+          description: "",
+          isPrimary: true,
+          isOpen: true,
+          isSet: true,
+        }],
+  };
+};
+
 const GlamCardApplication: React.FC = () => {
   const [data, setData] = useState<GlamCardFormData>(emptyGlamCardData);
   const [demoData, setDemoData] = useState<GlamCardFormData | null>(null);
+  const session = useSession();
+  const [claim, setClaim] = useState<{ name: string; claimed: boolean } | null>(null);
+
+  // A signed-in person is a professional or a brand already: start from that
+  const accountType = session.user?.professional_type;
+  useEffect(() => {
+    if (accountType !== "individual" && accountType !== "brand") return;
+    setData((prev) => (prev.professional_type ? prev : { ...prev, professional_type: accountType as ProfessionalType }));
+  }, [accountType]);
+
+  // Claiming a Google listing (/access?claim=<place id>)
+  useEffect(() => {
+    const placeId = new URLSearchParams(window.location.search).get("claim");
+    if (!placeId) return;
+    let cancelled = false;
+    getGooglePlaceForm(placeId)
+      .then((res) => {
+        const place = res?.data;
+        if (cancelled || !place?.place_id) return;
+        setClaim({ name: place.name, claimed: !!place.claimed });
+        if (!place.claimed) setData((prev) => fromGooglePlace(prev, place));
+      })
+      .catch(() => {
+        // The listing can't be read (no Google key, or Google failed): the form still works without it.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const storedPayload = getFormDataFromSession();
@@ -163,16 +233,38 @@ const GlamCardApplication: React.FC = () => {
     });
   }, []);
 
+  // Locations are optional: the preview borrows the demo location (Las Vegas) only until the person
+  // adds or removes one. After that it shows exactly their list, so none means no location block.
+  const [locationsTouched, setLocationsTouched] = useState(false);
+  useEffect(() => {
+    if (data.locations !== emptyGlamCardData.locations) setLocationsTouched(true);
+  }, [data.locations]);
+
   const previewData = useMemo(
-    () => mergeForPreview(data, demoData),
-    [data, demoData]
+    () => mergeForPreview(data, demoData, locationsTouched ? ["locations"] : []),
+    [data, demoData, locationsTouched]
   );
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
       {/* FORM — stacked full-width on mobile; sticky side column from lg up */}
       <div className="w-full lg:w-1/2 lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">
-        <div className="rounded-xl border bg-card p-3 sm:p-6 shadow lg:h-full lg:overflow-y-auto">
+        <div className="rounded-xl border bg-card p-3 sm:p-6 shadow-soft lg:h-full lg:overflow-y-auto">
+          {claim && (
+            <div role="status" className="mb-6 rounded-xl border border-primary/20 bg-tint p-4 text-sm">
+              {claim.claimed ? (
+                <p>
+                  <strong>{claim.name}</strong> has already been claimed. You can still create your own profile below.
+                </p>
+              ) : (
+                <p>
+                  You&apos;re claiming <strong>{claim.name}</strong> from Google. We filled in what Google knows: check
+                  it, add the rest, and create your profile. We verify claims before the Google listing leaves the
+                  directory.
+                </p>
+              )}
+            </div>
+          )}
           <GlamCardForm data={data} setData={setData} />
         </div>
       </div>

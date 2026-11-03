@@ -34,7 +34,16 @@ interface SectionProps {
   >;
   errors?: FieldErrors;
   clearError?: (key: string) => void;
+  /** Editing a card: the type is shown but only admins change it. */
+  typeLocked?: boolean;
 }
+
+/* ================= WHO THE CARD IS FOR ================= */
+
+const TYPES = [
+  { value: "individual", label: "Beauty or wellness professional", hint: "You offer services to clients" },
+  { value: "brand", label: "Brand", hint: "You make or sell beauty or wellness products" },
+] as const;
 
 /* ================= STYLES ================= */
 
@@ -56,20 +65,62 @@ const BasicInformationSection: React.FC<SectionProps> = ({
   setData,
   errors,
   clearError,
+  typeLocked = false,
 }) => {
+  const brand = data.professional_type === "brand";
   return (
     <section className={sectionClass}>
       <h2 className="text-lg font-semibold">Basic Information</h2>
+
+      {/* PROFESSIONAL OR BRAND */}
+      <fieldset id="field-professional_type" className="space-y-2">
+        <legend className="label-glamlink">
+          I am a {!typeLocked && <span className="text-destructive">*</span>}
+        </legend>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {TYPES.map((type) => (
+            <label
+              key={type.value}
+              className={`flex items-start gap-3 rounded-xl border p-4 transition-colors has-checked:border-secondary has-checked:bg-accent ${
+                errors?.professional_type ? "border-destructive" : "border-border"
+              } ${typeLocked ? "cursor-default" : "cursor-pointer hover:border-secondary"}`}
+            >
+              <input
+                type="radio"
+                name="professional_type"
+                value={type.value}
+                checked={data.professional_type === type.value}
+                disabled={typeLocked}
+                onChange={() => {
+                  setData((p) => ({ ...p, professional_type: type.value }));
+                  clearError?.("professional_type");
+                }}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-secondary"
+              />
+              <span>
+                <span className="block text-sm font-semibold text-foreground">{type.label}</span>
+                <span className="mt-0.5 block text-xs text-muted-foreground">{type.hint}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+        {typeLocked && (
+          <p className="text-xs text-muted-foreground">To change this, contact support.</p>
+        )}
+        {errors?.professional_type && (
+          <p className="text-sm text-destructive">{errors.professional_type}</p>
+        )}
+      </fieldset>
 
       <div className="grid gap-5 md:grid-cols-2">
         {/* NAME */}
         <div id="field-name">
           <label className="label-glamlink">
-            Full Name <span className="text-destructive">*</span>
+            {brand ? "Contact Name" : "Full Name"} <span className="text-destructive">*</span>
           </label>
           <input
             className="input-glamlink" aria-invalid={!!errors?.name}
-            placeholder="e.g. Jane Smith"
+            placeholder={brand ? "The person we can reach" : "e.g. Jane Smith"}
             value={data.name || ""}
             onChange={(e) => {
               setData((p) => ({
@@ -87,11 +138,19 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         {/* TITLE */}
         <div id="field-professional_title">
           <label className="label-glamlink">
-            Professional Title <span className="text-destructive">*</span>
+            {brand ? (
+              <>
+                Tagline <span className="normal-case tracking-normal text-muted-foreground">(optional)</span>
+              </>
+            ) : (
+              <>
+                Professional Title <span className="text-destructive">*</span>
+              </>
+            )}
           </label>
           <input
             className="input-glamlink" aria-invalid={!!errors?.professional_title}
-            placeholder="e.g. Hair Stylist, Nail Technician"
+            placeholder={brand ? "e.g. Clean skincare, made in Las Vegas" : "e.g. Hair Stylist, Nail Technician"}
             value={data.professional_title || ""}
             onChange={(e) => {
               setData((p) => ({
@@ -189,7 +248,7 @@ const BasicInformationSection: React.FC<SectionProps> = ({
         {/* BIO */}
         <div id="field-bio" className="md:col-span-2">
           <label className="label-glamlink">
-            Professional Bio <span className="text-destructive">*</span>
+            {brand ? "About the Brand" : "Professional Bio"} <span className="text-destructive">*</span>
           </label>
 
           <div
@@ -229,11 +288,11 @@ const BasicInformationSection: React.FC<SectionProps> = ({
       {/* BUSINESS NAME */}
       <div id="field-business_name">
         <label className="label-glamlink">
-          Business Name <span className="text-destructive">*</span>
+          {brand ? "Brand Name" : "Business Name"} <span className="text-destructive">*</span>
         </label>
         <input
           className="input-glamlink w-full" aria-invalid={!!errors?.business_name}
-          placeholder="e.g. Glow Beauty Studio"
+          placeholder={brand ? "e.g. Glow Skincare" : "e.g. Glow Beauty Studio"}
           value={data.business_name || ""}
           onChange={(e) => {
             setData((p) => ({

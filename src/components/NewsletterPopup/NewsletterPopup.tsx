@@ -103,7 +103,7 @@ export default function NewsletterPopup({
 
       {/* Center Modal */}
       <div className="absolute inset-0 flex items-center justify-center p-4">
-        <div className="relative w-full max-w-lg rounded-3xl bg-card shadow-2xl overflow-hidden border border-border/30">
+        <div className="relative w-full max-w-lg rounded-3xl bg-card shadow-large overflow-hidden border border-border/30">
           {/* Background gradient decoration */}
 
           <div className="relative p-8 md:p-10">

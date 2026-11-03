@@ -2,7 +2,7 @@
 
 import { type ReactNode } from "react";
 import { Check, Sparkles, Nfc } from "lucide-react";
-import type { PlanDef } from "./plans";
+import { featureLists, type PlanDef, type PlanFeature, type PlanId } from "./plans";
 
 interface FeatureRowProps {
   children: ReactNode;
@@ -25,13 +25,13 @@ export function FeatureRow({ children, soon = false, keychain = false }: Feature
         )}
       </span>
       <span
-        className={`text-[13.5px] leading-5 ${
+        className={`text-sm leading-5 ${
           soon ? "text-muted-foreground" : keychain ? "font-medium text-secondary" : "text-foreground"
         }`}
       >
         {children}
         {soon && (
-          <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+          <span className="ml-2 rounded-full bg-muted px-2 py-0.5 eyebrow text-muted-foreground">
             Soon
           </span>
         )}
@@ -58,23 +58,42 @@ interface PlanCardProps {
   onSelect: () => void;
   compact?: boolean;
   disabled?: boolean;
+  /** The card before this one: "Everything in <name>, plus:" above `features`. */
+  includes?: string | null;
+  /** What this card lists (default: all of the plan's features). */
+  features?: PlanFeature[];
+  /** Why the card can't be chosen, e.g. "Your plan". */
+  note?: string | null;
 }
 
-export function PlanCard({ plan, selected, onSelect, compact = false, disabled = false }: PlanCardProps) {
+export function PlanCard({
+  plan,
+  selected,
+  onSelect,
+  compact = false,
+  disabled = false,
+  includes = null,
+  features = plan.features,
+  note = null,
+}: PlanCardProps) {
   const isSelected = selected && !disabled; // single source of truth
 
   return (
     <div
       role="button"
       aria-disabled={disabled}
+      aria-pressed={isSelected}
       tabIndex={disabled ? -1 : 0}
       onClick={disabled ? undefined : onSelect}
       onKeyDown={(e) => {
         if (disabled) return;
-        if (e.key === "Enter") onSelect();
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect();
+        }
       }}
       className={`card-glamlink relative flex flex-col overflow-hidden text-left ${
-        disabled ? "cursor-not-allowed" : "cursor-pointer"
+        disabled ? "cursor-not-allowed opacity-70" : "cursor-pointer"
       } ${compact ? "p-4" : ""} ${
         isSelected
           ? plan.isPro
@@ -90,15 +109,21 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
             <Sparkles className="h-3 w-3" /> {plan.badge}
           </span>
         ) : plan.hasKeychain ? (
-          <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          <span className="inline-flex items-center gap-1 eyebrow text-muted-foreground">
             <Nfc className="h-3 w-3" /> With keychain
           </span>
         ) : (
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          <span className="eyebrow text-muted-foreground">
             {plan.label}
           </span>
         )}
-        <PlanRadio selected={selected} />
+        {note ? (
+          <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+            {note}
+          </span>
+        ) : (
+          <PlanRadio selected={isSelected} />
+        )}
       </div>
 
       <h3 className="relative mt-4 text-base font-semibold text-foreground">{plan.name}</h3>
@@ -111,7 +136,7 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
         {plan.priceSuffix && <span className="text-xs text-muted-foreground">{plan.priceSuffix}</span>}
       </p>
       {(plan.afterNote || plan.personal) && (
-        <p className="relative mt-1 text-[11px] font-medium text-secondary">
+        <p className="relative mt-1 text-xs font-medium text-secondary">
           {plan.personal ? "Your personal price" : plan.afterNote}
         </p>
       )}
@@ -119,14 +144,57 @@ export function PlanCard({ plan, selected, onSelect, compact = false, disabled =
       <p className="relative mt-1.5 text-xs text-muted-foreground">{plan.tagline}</p>
 
       {!compact && (
-        <ul className="relative mt-4 flex-1 border-t border-border pt-4">
-          {plan.features.map((f) => (
-            <FeatureRow key={f.text} soon={f.soon} keychain={f.highlight === "keychain"}>
-              {f.text}
-            </FeatureRow>
-          ))}
-        </ul>
+        <div className="relative mt-4 flex-1 border-t border-border pt-4">
+          {includes && (
+            <p className="pb-1 text-sm font-semibold leading-5 text-foreground">
+              Everything in {includes}
+              {features.length ? ", plus:" : "."}
+            </p>
+          )}
+          <ul>
+            {features.map((f) => (
+              <FeatureRow key={f.text} soon={f.soon} keychain={f.highlight === "keychain"}>
+                {f.text}
+              </FeatureRow>
+            ))}
+          </ul>
+        </div>
       )}
+    </div>
+  );
+}
+
+interface PlanGridProps {
+  /** The plan cards in the order shown: each one builds on the card before it. */
+  plans: PlanDef[];
+  selected: PlanId | null;
+  onSelect: (id: PlanId) => void;
+  isDisabled?: (id: PlanId) => boolean;
+  noteFor?: (id: PlanId) => string | null;
+  className?: string;
+}
+
+/**
+ * Plan cards side by side. The first lists its features; each next one says
+ * "Everything in <the one before>, plus:" and lists only what it adds, so no
+ * feature is repeated (plans.featureLists).
+ */
+export function PlanGrid({ plans, selected, onSelect, isDisabled, noteFor, className }: PlanGridProps) {
+  const lists = featureLists(plans);
+  return (
+    <div className={className ?? "grid gap-5 md:grid-cols-3"}>
+      {plans.map((p, i) => (
+        <PlanCard
+          key={p.id}
+          plan={p}
+          includes={lists[i].includes}
+          features={lists[i].features}
+          selected={selected === p.id}
+          disabled={isDisabled?.(p.id) ?? false}
+          note={noteFor?.(p.id) ?? null}
+          onSelect={() => onSelect(p.id)}
+        />
+      ))}
     </div>
   );
 }

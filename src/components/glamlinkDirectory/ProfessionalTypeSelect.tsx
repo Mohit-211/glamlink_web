@@ -66,7 +66,7 @@ export default function ProfessionalTypeSelect({
     >
       <SelectPrimitive.Trigger
         aria-label="Professional type"
-        className="group flex w-full items-center gap-3 rounded-2xl md:rounded-full px-4 py-2.5 md:py-2 text-left outline-none transition-colors hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:ring-2 focus-visible:ring-primary/30 data-[state=open]:bg-muted/60"
+        className="group flex w-full items-center gap-3 rounded-2xl @xl:rounded-full px-4 py-2.5 @xl:py-2 text-left outline-none transition-colors hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:ring-2 focus-visible:ring-secondary/30 data-[state=open]:bg-muted/60"
       >
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
           {createElement(iconFor(value), { className: "h-[18px] w-[18px]", "aria-hidden": true })}
@@ -76,7 +76,7 @@ export default function ProfessionalTypeSelect({
             Professional Type
           </span>
           {/* Rendered manually so the trigger shows only the label, not the option's description. */}
-          <span aria-hidden="true" className="block truncate text-sm sm:text-[15px] font-medium text-foreground">
+          <span aria-hidden="true" className="block truncate text-sm sm:text-base font-medium text-foreground">
             {selected?.label ?? "All professionals"}
           </span>
           <span className="sr-only">
@@ -98,7 +98,7 @@ export default function ProfessionalTypeSelect({
           align="start"
           sideOffset={14}
           collisionPadding={16}
-          className="z-[60] w-[max(var(--radix-select-trigger-width),20rem)] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border bg-card shadow-large data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+          className="z-[60] w-[max(var(--radix-select-trigger-width),20rem)] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border bg-card shadow-large "
         >
           <SelectPrimitive.Viewport className="p-2">
             <Option

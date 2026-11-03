@@ -13,6 +13,7 @@ import HomeCarousel from "@/components/home/HomeCarousel";
 import {
   getArticles,
   getFeaturedTopics,
+  getTopics,
   getHomeSettings,
   getProducts,
   getProfiles,
@@ -143,7 +144,7 @@ function Hero({ image, popularSearches }: { image: string | StaticImageData; pop
       eyebrow="Discover. Learn. Shop. Connect."
       title={
         <>
-          Beauty Lives <span className="text-primary">Here</span>
+          Beauty Lives Here
         </>
       }
       subtitle="Real people. Real expertise. A more beautiful you."
@@ -238,7 +239,7 @@ function AccessBand() {
           <Image src={accessWordmark} alt="Access by Glamlink" className="h-auto w-48 md:w-60" />
         </h2>
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em]">A smarter way to connect</p>
+          <p className="text-sm font-semibold uppercase tracking-widest">A smarter way to connect</p>
           <p className="mt-2 text-muted-foreground">Digital profiles. Instant sharing. Lasting impressions.</p>
           <Link href="/access" className="btn-primary mt-6">
             Learn more
@@ -267,9 +268,10 @@ async function featuredOr<T>(featured: Promise<Paged<T>>, others: () => Promise<
 }
 
 export default async function HomeLanding() {
-  const [settings, topics, products, brands, articles, videos] = await Promise.all([
+  const [settings, featuredTopics, allTopics, products, brands, articles, videos] = await Promise.all([
     getHomeSettings(),
     getFeaturedTopics(),
+    getTopics(),
     featuredOr(getProducts({ featured: true, limit: 10 }), () => getProducts({ limit: 10 })),
     featuredOr(getProfiles({ type: "brand", featured: true, limit: 10 }), () => getProfiles({ type: "brand", limit: 10 })),
     getArticles({ limit: 3 }),
@@ -277,7 +279,10 @@ export default async function HomeLanding() {
   ]);
 
   const popularSearches = settings?.popular_searches?.length ? settings.popular_searches : DEFAULT_POPULAR_SEARCHES;
-  const tiles = topics.slice(0, 6);
+  // The featured topics in the admins' order, then the other active ones, so the row is full (the owner, Nov 3:
+  // with one topic featured, it showed one)
+  const featuredIds = new Set(featuredTopics.map((topic) => topic.id));
+  const tiles = [...featuredTopics, ...allTopics.filter((topic) => !featuredIds.has(topic.id))].slice(0, 6);
 
   return (
     <div>
@@ -331,7 +336,7 @@ export default async function HomeLanding() {
         eyebrow="Innovative brands. Advanced technology."
         title="Find a Brand"
         text="Discover the brands shaping beauty + wellness, from professional skincare to the devices experts trust."
-        action={{ label: "Browse Brands", href: "/directory" }}
+        action={{ label: "Browse Brands", href: "/brands" }}
       />
 
       {brands.rows.length > 0 && (
@@ -339,7 +344,7 @@ export default async function HomeLanding() {
           id="brands"
           title="Featured Brands"
           subtitle="Innovative brands. Advanced technology. Education. Opportunities."
-          action={{ label: "View all brands", href: "/directory" }}
+          action={{ label: "View all brands", href: "/brands" }}
         >
           <HomeCarousel label="Brands">
             {brands.rows.map((brand) => (

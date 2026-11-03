@@ -12,7 +12,7 @@ const ClientsCTA = () => {
     <section className="relative py-20 md:py-28 lg:py-32 overflow-hidden">
 
       <div className="container-glamlink px-5 md:px-8 relative z-10">
-        <div className="relative rounded-3xl bg-card/70 backdrop-blur-xl border border-border/80 shadow-2xl shadow-primary/10 p-8 md:p-12 lg:p-16 overflow-hidden">
+        <div className="relative rounded-3xl bg-card/70 backdrop-blur-xl border border-border/80 shadow-large shadow-primary/10 p-8 md:p-12 lg:p-16 overflow-hidden">
           {/* Ultra-subtle pattern */}
           <div className="absolute inset-0 opacity-[0.04]">
             <svg className="w-full h-full" viewBox="0 0 800 800">
@@ -50,7 +50,7 @@ const ClientsCTA = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 md:gap-6">
               <Button
                 size="lg"
-                className="group min-w-[240px] bg-primary hover:bg-secondary text-primary-foreground font-semibold text-base md:text-lg rounded-full shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-3 px-8 md:px-10 py-6 md:py-7"
+                className="group min-w-[240px] font-semibold text-base md:text-lg rounded-full shadow-large shadow-primary/25 hover:shadow-large hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-3 px-8 md:px-10 py-6 md:py-7"
                            onClick={() => setIsModalOpen(true)}
 
              >

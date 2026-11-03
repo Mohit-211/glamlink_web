@@ -201,9 +201,10 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
       autocompleteRef.current = null;
     }
 
+    // Suggestions from the countries the form's states and cities cover
     const autocomplete = new google.maps.places.Autocomplete(
       addressInputRef.current,
-      { types: ["geocode"] }
+      { types: ["geocode"], componentRestrictions: { country: ["us", "ca"] } }
     );
 
     autocomplete.setFields(["formatted_address", "geometry", "name"]);
@@ -234,33 +235,26 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
   const canConfirmExact =
     location.location_type === "exact_address" && !!location.address?.trim();
 
+  // A city can be set even when the browser can't geocode it: the API places it after saving.
   const canSetCity =
     location.location_type === "city_only" &&
     !!location.city &&
     !!location.state &&
-    !!cityCoords &&
     !cityCoordsLoading;
 
+  // An address picked from the suggestions brings its coordinates; a typed one is sent without
+  // any, and the API geocodes it after saving.
   const handleConfirmExact = () => {
     if (!canConfirmExact) return;
-
-    if (!location.latitude || !location.longitude) {
-      onUpdate({
-        isSet: true,
-        latitude: 36.1699,
-        longitude: -115.1398,
-      });
-    } else {
-      onUpdate({ isSet: true });
-    }
+    onUpdate({ isSet: true });
   };
 
   const handleSetCity = () => {
-    if (!canSetCity || !cityCoords) return;
+    if (!canSetCity) return;
     onUpdate({
       isSet: true,
-      latitude: cityCoords.latitude,
-      longitude: cityCoords.longitude,
+      latitude: cityCoords?.latitude,
+      longitude: cityCoords?.longitude,
     });
   };
 
@@ -330,6 +324,9 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                   onUpdate({
                     state: e.target.value,
                     city: "",
+                    latitude: undefined,
+                    longitude: undefined,
+                    isSet: false,
                   });
                 }}
                 disabled={statesLoading}
@@ -351,7 +348,9 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
               <select
                 className="input-glamlink"
                 value={location?.city ?? ""}
-                onChange={(e) => onUpdate({ city: e.target.value })}
+                onChange={(e) =>
+                  onUpdate({ city: e.target.value, latitude: undefined, longitude: undefined, isSet: false })
+                }
                 disabled={!location.state || citiesLoading}
               >
                 <option value="">
@@ -371,8 +370,8 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                 <p className="mt-1 text-xs text-muted-foreground/80">Resolving coordinates…</p>
               )}
               {location.city && !cityCoordsLoading && !cityCoords && (
-                <p className="mt-1 text-xs text-destructive">
-                  Couldn&apos;t resolve coordinates for this city.
+                <p className="mt-1 text-xs text-muted-foreground">
+                  We&apos;ll place this city on the map after you save.
                 </p>
               )}
             </div>
@@ -406,7 +405,11 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                 ref={addressInputRef}
                 className="input-glamlink"
                 value={location.address ?? ""}
-                onChange={(e) => onUpdate({ address: e.target.value })}
+                // Typing replaces a picked suggestion, so its coordinates no longer apply.
+                // (Picking a suggestion sets the input's value directly, which fires no onChange.)
+                onChange={(e) =>
+                  onUpdate({ address: e.target.value, latitude: undefined, longitude: undefined, isSet: false })
+                }
                 placeholder="Start typing an address..."
               />
             </div>

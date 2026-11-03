@@ -9,53 +9,60 @@ import {
   type FeaturedProfile,
 } from "@/lib/directory";
 
+export type DirectoryResultsState =
+  | {
+      /** Before a search: Google's listings around the default place, fetched with the page. */
+      mode: "popular";
+      status: "success";
+      businesses: DirectoryBusiness[];
+      profiles: FeaturedProfile[];
+      params: null;
+      location: null;
+    }
+  | {
+      /** The visitor's search: Google's listings and Glamlink's own professionals near the place. */
+      mode: "search";
+      status: DirectoryResultsStatus;
+      businesses: DirectoryBusiness[];
+      profiles: FeaturedProfile[];
+      params: DirectorySearchParams;
+      location: DirectoryLocation | null;
+    };
+
 export type DirectoryResultsStatus = "loading" | "success" | "error";
 
-export interface DirectoryResultsState {
-  status: DirectoryResultsStatus;
-  /** "popular" = nationwide picks before a search; "search" = user query. */
-  mode: "popular" | "search";
-  businesses: DirectoryBusiness[];
-  /** Glamlink's own professionals near the searched place. */
-  profiles: FeaturedProfile[];
-  params: DirectorySearchParams | null;
-  location: DirectoryLocation | null;
-}
-
-const INITIAL_STATE: DirectoryResultsState = {
-  status: "loading",
+const popularState = (businesses: DirectoryBusiness[]): DirectoryResultsState => ({
   mode: "popular",
-  businesses: [],
+  status: "success",
+  businesses,
   profiles: [],
   params: null,
   location: null,
-};
+});
 
 /**
- * Runs directory searches against the active provider and ignores
- * stale responses when a newer request has started.
+ * Runs directory searches against the active provider and ignores stale responses when a newer request has
+ * started. `popular` is what the page shows before (and after clearing) a search.
  */
-export function useDirectorySearch() {
-  const [state, setState] = useState<DirectoryResultsState>(INITIAL_STATE);
+export function useDirectorySearch(popular: DirectoryBusiness[]) {
+  const [state, setState] = useState<DirectoryResultsState>(() => popularState(popular));
   const requestId = useRef(0);
 
-  const loadPopular = useCallback(async () => {
-    const id = ++requestId.current;
-    setState({ ...INITIAL_STATE, status: "loading" });
-
-    try {
-      const businesses = await directoryProvider.getPopularBusinesses();
-      if (id !== requestId.current) return;
-      setState({ ...INITIAL_STATE, status: "success", businesses });
-    } catch {
-      if (id !== requestId.current) return;
-      setState({ ...INITIAL_STATE, status: "error" });
-    }
-  }, []);
+  const clear = useCallback(() => {
+    ++requestId.current;
+    setState(popularState(popular));
+  }, [popular]);
 
   const search = useCallback(async (params: DirectorySearchParams) => {
     const id = ++requestId.current;
-    setState((prev) => ({ ...prev, status: "loading", mode: "search", params }));
+    setState((prev) => ({
+      mode: "search",
+      status: "loading",
+      params,
+      businesses: prev.mode === "search" ? prev.businesses : [],
+      profiles: prev.profiles,
+      location: prev.mode === "search" ? prev.location : null,
+    }));
 
     try {
       const result = await directoryProvider.searchBusinesses(params);
@@ -70,9 +77,9 @@ export function useDirectorySearch() {
       });
     } catch {
       if (id !== requestId.current) return;
-      setState((prev) => ({ ...prev, status: "error", businesses: [], profiles: [] }));
+      setState({ mode: "search", status: "error", params, businesses: [], profiles: [], location: null });
     }
   }, []);
 
-  return { state, search, loadPopular };
+  return { state, search, clear };
 }

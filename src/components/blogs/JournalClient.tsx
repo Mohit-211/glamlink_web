@@ -61,7 +61,7 @@ function AdRow({ ads, slot, className }: { ads: Ads; slot: string; className?: s
 function SectionLabel({ id, children }: { id: string; children: ReactNode }) {
   return (
     <div className="flex items-center gap-4">
-      <h2 id={id} className="shrink-0 text-xs font-semibold uppercase tracking-[0.2em] text-foreground">
+      <h2 id={id} className="shrink-0 text-xs font-semibold uppercase tracking-widest text-foreground">
         {children}
       </h2>
       <span aria-hidden="true" className="h-px flex-1 bg-border" />
@@ -89,19 +89,19 @@ const PaginationControls = ({
         onClick={onPrev}
         disabled={page === 1}
         aria-label="Previous issues"
-        className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground transition-colors duration-150 hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
+        className="flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors duration-150 hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
       >
         <ChevronLeft className="h-3.5 w-3.5" />
         Prev
       </button>
-      <span className="text-[11px] text-muted-foreground">
+      <span className="text-xs text-muted-foreground">
         {page} / {totalPages}
       </span>
       <button
         onClick={onNext}
         disabled={page === totalPages}
         aria-label="Next issues"
-        className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground transition-colors duration-150 hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
+        className="flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors duration-150 hover:text-secondary disabled:cursor-not-allowed disabled:opacity-30"
       >
         Next
         <ChevronRight className="h-3.5 w-3.5" />
@@ -142,7 +142,7 @@ const FlipbookPanel = ({ issue, onClose }: { issue: MagazineIssue | null; onClos
         aria-label={issue ? issue.title : "Magazine issue"}
         aria-hidden={!isOpen}
         // Hidden once it has slid away, so its shadow doesn't show at the page's edge and its buttons leave the tab order
-        className={`fixed inset-y-0 right-0 z-40 flex w-full flex-col border-l border-border/40 bg-background shadow-2xl transition-[translate,visibility] duration-300 ease-out sm:w-120 lg:w-115 ${
+        className={`fixed inset-y-0 right-0 z-40 flex w-full flex-col border-l border-border/40 bg-background shadow-large transition-[translate,visibility] duration-300 ease-out sm:w-120 lg:w-115 ${
           isOpen ? "visible translate-x-0" : "invisible translate-x-full"
         }`}
       >
@@ -153,7 +153,7 @@ const FlipbookPanel = ({ issue, onClose }: { issue: MagazineIssue | null; onClos
             </button>
             {issue && (
               <div className="min-w-0">
-                <span className="block text-[11px] font-semibold text-secondary">Issue {issueNumber(issue)}</span>
+                <span className="block text-xs font-semibold text-secondary">Issue {issueNumber(issue)}</span>
                 <p className="truncate text-sm font-semibold text-foreground">{issue.title}</p>
               </div>
             )}
@@ -233,7 +233,7 @@ function TheEdit({
           />
         </span>
         <span className="block lg:mt-4">
-          <span className="block text-[11px] font-semibold uppercase tracking-widest text-secondary">Latest Issue</span>
+          <span className="block eyebrow text-secondary">Latest Issue</span>
           <span className="mt-1 block font-semibold leading-snug transition-colors group-hover:text-secondary">
             {issueTitle(latest)}
           </span>
@@ -247,7 +247,7 @@ function TheEdit({
 
       {past.length > 0 && (
         <div className="mt-6 border-t border-border pt-5">
-          <h3 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Past Issues</h3>
+          <h3 className="eyebrow text-muted-foreground">Past Issues</h3>
           <ul className="mt-3 space-y-1">
             {visible.map((issue) => (
               <li key={issue.slug}>
@@ -265,7 +265,7 @@ function TheEdit({
                       {issueTitle(issue)}
                     </span>
                     {issueMeta(issue) && (
-                      <span className="block text-[11px] text-muted-foreground">{issueMeta(issue)}</span>
+                      <span className="block text-xs text-muted-foreground">{issueMeta(issue)}</span>
                     )}
                   </span>
                 </button>
@@ -313,7 +313,7 @@ function SectionNav({ categories, current, search }: { categories: JournalCatego
             <Link
               href={listHref("/journal", { category: item.slug, search })}
               aria-current={current === item.slug ? "page" : undefined}
-              className="block border-b-2 border-transparent py-3.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground transition-colors hover:text-secondary aria-[current=page]:border-secondary aria-[current=page]:text-secondary"
+              className="block border-b-2 border-transparent py-3.5 eyebrow text-muted-foreground transition-colors hover:text-secondary aria-[current=page]:border-secondary aria-[current=page]:text-secondary"
             >
               {item.title}
             </Link>
@@ -347,7 +347,7 @@ function CoverStory({ article }: { article: ArticleCard }) {
 
       <div className="p-6 md:p-8">
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="text-[11px] font-semibold uppercase tracking-widest text-foreground">The Cover Story</span>
+          <span className="eyebrow text-foreground">The Cover Story</span>
           {article.journal_category?.title && (
             <>
               <span aria-hidden="true" className="h-px w-8 bg-border" />
@@ -514,7 +514,7 @@ const JournalClient = ({
         eyebrow="Beauty + Wellness, In Depth"
         title={
           <>
-            The Glamlink <span className="text-primary">Journal</span>
+            The Glamlink Journal
           </>
         }
         subtitle="Expert insights. Real stories. The latest in beauty + wellness."

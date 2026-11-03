@@ -36,7 +36,7 @@ function StatusPill({ isPaid, large }: { isPaid: boolean; large?: boolean }) {
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 leading-tight ${
-        large ? 'text-[11px]' : 'text-[10px]'
+        large ? 'text-xs' : 'text-xs'
       } ${
         isPaid
           ? 'border-success/30 bg-success/10 text-success'
@@ -140,7 +140,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-base font-semibold text-foreground sm:text-lg">QR code</h2>
-          <p className="mt-0.5 text-[11px] text-muted-foreground sm:text-xs">
+          <p className="mt-0.5 text-xs text-muted-foreground ">
             Share your QR code to let clients view your GlamCard instantly.
           </p>
         </div>
@@ -168,7 +168,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                   }`}
                 >
                   <span
-                    className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
+                    className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
                       active
                         ? 'bg-secondary text-primary-foreground'
                         : 'bg-muted text-muted-foreground'
@@ -199,7 +199,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
         {/* ── Card switcher — desktop: vertical list in a sidebar ── */}
         {multi && (
           <aside className="hidden lg:block">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            <p className="mb-2 eyebrow text-muted-foreground">
               Your cards ({cards.length})
             </p>
             <div className="space-y-1.5">
@@ -217,7 +217,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                     }`}
                   >
                     <span
-                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${
+                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
                         active
                           ? 'bg-secondary text-primary-foreground'
                           : 'bg-muted text-muted-foreground'
@@ -234,7 +234,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                         {card.name || 'Untitled card'}
                       </span>
                       <span
-                        className={`block truncate text-[10px] leading-tight ${
+                        className={`block truncate text-xs leading-tight ${
                           cardPaid ? 'text-success' : 'text-muted-foreground'
                         }`}
                       >
@@ -262,7 +262,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                     {selectedCard.name || 'Untitled card'}
                   </p>
                   <p
-                    className={`truncate text-[11px] leading-tight ${
+                    className={`truncate text-xs leading-tight ${
                       paid ? 'text-success' : 'text-muted-foreground'
                     }`}
                   >
@@ -284,7 +284,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                     />
                     {/* {!paid && (
                       <div className="absolute inset-0 flex items-center justify-center bg-overlay/30 p-4">
-                        <div className="max-w-[220px] rounded-xl bg-card p-4 text-center shadow-xl">
+                        <div className="max-w-[220px] rounded-xl bg-card p-4 text-center shadow-large">
                           <p className="text-lg">🔒</p>
                           <p className="text-sm font-semibold text-foreground">QR code locked</p>
                           <p className="mt-1 text-xs text-muted-foreground">
@@ -343,7 +343,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                 {/* Mobile: stacked rows. Tablet and up: two columns. */}
                 <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:gap-4">
                   <div className="min-w-0">
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    <p className="mb-1 eyebrow text-muted-foreground">
                       Name
                     </p>
                     <p className="break-words text-sm font-medium text-foreground">
@@ -351,7 +351,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                     </p>
                   </div>
                   <div className="min-w-0">
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    <p className="mb-1 eyebrow text-muted-foreground">
                       Title
                     </p>
                     <p className="break-words text-sm text-foreground">
@@ -359,11 +359,11 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                     </p>
                   </div>
                   <div className="min-w-0 sm:col-span-2">
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    <p className="mb-1 eyebrow text-muted-foreground">
                       Card link
                     </p>
                     <div className="flex min-w-0 items-center gap-2 rounded-xl border border-border bg-muted/60 px-3 py-2">
-                      <span className="min-w-0 flex-1 truncate tabular-nums text-[11px] text-muted-foreground">
+                      <span className="min-w-0 flex-1 truncate tabular-nums text-xs text-muted-foreground">
                         {/* {paid
                           ? selectedCard.business_card_link
                           : '••••••••••••••••••••••••••••••'} */}
@@ -390,7 +390,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
               {/* Sharing tips — collapsed on mobile, open on desktop */}
               <div className="rounded-xl border border-primary/20 bg-accent/40">
                 <details className="group p-3 sm:hidden">
-                  <summary className="flex cursor-pointer list-none items-center justify-between text-[11px] font-semibold uppercase tracking-widest text-secondary">
+                  <summary className="flex cursor-pointer list-none items-center justify-between eyebrow text-secondary">
                     How to share
                     <span className="text-base leading-none transition-transform group-open:rotate-45">
                       +
@@ -402,7 +402,7 @@ export default function ShowQRCode({ cardData, error, onPayNow }: Props) {
                 </details>
 
                 <div className="hidden p-4 sm:block">
-                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-secondary">
+                  <p className="mb-2 eyebrow text-secondary">
                     How to share
                   </p>
                   <TipList />

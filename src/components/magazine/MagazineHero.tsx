@@ -20,7 +20,7 @@ const MagazineHero = () => {
         id="magazine-hero"
         title={
           <>
-            The Glamlink <span className="text-primary">Edit</span>
+            The Glamlink Edit
           </>
         }
         subtitle="The Glamlink Edit is your inside look at beauty and wellness. Where top professionals, top treatments and evolving innovation are spotlighted. Stories go deeper and insight actually mean something. Watch, shop beauty products and connect with professionals behind the stories."

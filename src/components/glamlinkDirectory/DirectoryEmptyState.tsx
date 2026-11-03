@@ -6,7 +6,7 @@ export default function DirectoryEmptyState({ onModifySearch }: { onModifySearch
       <span className="flex h-16 w-16 items-center justify-center rounded-full bg-card text-primary shadow-medium">
         <SearchX className="w-7 h-7" aria-hidden="true" />
       </span>
-      <h3 className="mt-6 text-2xl sm:text-3xl font-semibold">No professionals found</h3>
+      <h4 className="mt-6 text-2xl sm:text-3xl font-semibold">No businesses found</h4>
       <p className="mt-3 max-w-md text-muted-foreground">
         Try changing your location or professional type to discover more beauty and wellness
         businesses.

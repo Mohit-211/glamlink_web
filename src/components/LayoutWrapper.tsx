@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
+import CookieBanner from "@/components/common/CookieBanner";
 
 export default function LayoutWrapper({
   children,
@@ -24,6 +25,9 @@ export default function LayoutWrapper({
       <main>{children}</main>
 
       {!hideLayout && <Footer />}
+
+      {/* On every page, the cards' too */}
+      <CookieBanner />
     </>
   );
 }

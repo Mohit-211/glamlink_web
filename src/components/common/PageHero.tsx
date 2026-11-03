@@ -54,6 +54,7 @@ export default function PageHero({
   imageAlt,
   imagePosition,
   media,
+  mediaColumns = "lg:grid-cols-2",
   children,
 }: {
   /** The heading's id is `${id}-heading`. */
@@ -66,6 +67,8 @@ export default function PageHero({
   imagePosition?: string;
   /** Instead of a photo, a visual beside the text. */
   media?: ReactNode;
+  /** The text's and the visual's columns from lg up: halves, unless the text needs more room (a search box). */
+  mediaColumns?: string;
   /** Under the standfirst: the actions, a search box or a form. */
   children?: ReactNode;
 }) {
@@ -94,7 +97,8 @@ export default function PageHero({
       ) : (
         <div
           className={cn(
-            "container-glamlink grid items-center gap-10 py-10 md:py-14 lg:grid-cols-2 lg:gap-16 lg:py-16",
+            "container-glamlink grid items-center gap-10 py-10 md:py-14 lg:gap-16 lg:py-16",
+            mediaColumns,
             media && "lg:min-h-144"
           )}
         >

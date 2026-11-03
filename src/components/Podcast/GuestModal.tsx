@@ -63,7 +63,7 @@ export default function GuestModal({ open, onClose }: Props) {
           <div className="mb-1 flex items-start justify-between">
             <div>
               <p className="eyebrow mb-1">Be on the show</p>
-              <h2 className="text-[22px] font-semibold leading-tight text-foreground">Guest application</h2>
+              <h2 className="text-2xl font-semibold leading-tight text-foreground">Guest application</h2>
             </div>
             <button
               type="button"
@@ -74,7 +74,7 @@ export default function GuestModal({ open, onClose }: Props) {
               <X className="h-4 w-4" />
             </button>
           </div>
-          <p className="mb-6 mt-2 text-[13px] leading-normal text-muted-foreground">
+          <p className="mb-6 mt-2 text-sm leading-normal text-muted-foreground">
             Tell us about yourself. We&apos;ll be in touch if it&apos;s a great fit.
           </p>
         </div>

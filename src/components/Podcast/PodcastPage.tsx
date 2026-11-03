@@ -135,7 +135,7 @@ function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
       <div className="relative mt-5 w-full max-w-[1030px]" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          className="absolute -top-12 right-0 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-overlay-foreground/60 transition-colors hover:text-overlay-foreground"
+          className="absolute -top-12 right-0 flex items-center gap-2 eyebrow text-overlay-foreground/60 transition-colors hover:text-overlay-foreground"
         >
           <span className="flex h-7 w-7 items-center justify-center rounded-full border border-overlay-foreground/20">
             <X className="h-3.5 w-3.5" />
@@ -151,7 +151,7 @@ function VideoModal({ video, onClose }: { video: Video; onClose: () => void }) {
             className="absolute inset-0 h-full w-full border-0"
           />
         </div>
-        <p className="mt-5 text-center text-[13px] font-medium leading-snug text-overlay-foreground/70">{video.title}</p>
+        <p className="mt-5 text-center text-sm font-medium leading-snug text-overlay-foreground/70">{video.title}</p>
       </div>
     </div>
   );
@@ -185,23 +185,23 @@ function EpisodeCard({
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center bg-accent text-secondary">
             <span className="mb-1 text-4xl font-light leading-none sm:text-5xl">{episodeNum}</span>
-            <span className="text-[9px] font-semibold uppercase tracking-[0.3em] opacity-70">Episode</span>
+            <span className="eyebrow text-inherit opacity-70">Episode</span>
           </div>
         )}
 
         {/* Episode badge */}
-        <span className="absolute left-3 top-3 rounded-full bg-card/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-accent-foreground backdrop-blur-sm">
+        <span className="absolute left-3 top-3 rounded-full bg-card/90 px-2.5 py-1 eyebrow text-accent-foreground backdrop-blur-sm">
           EP. {episodeNum}
         </span>
 
         {/* Play overlay */}
         {!isFallback && (
-          <div className="absolute inset-0 flex items-end bg-gradient-to-t from-overlay/55 to-transparent to-55% p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <div className="absolute inset-0 flex items-end bg-linear-to-t from-overlay/55 to-transparent to-55% p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             <div className="flex items-center gap-2.5">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary shadow-medium">
                 <Play className="ml-0.5 h-5 w-5 fill-primary-foreground text-primary-foreground" />
               </span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-overlay-foreground">Watch Now</span>
+              <span className="eyebrow text-overlay-foreground">Watch Now</span>
             </div>
           </div>
         )}
@@ -210,7 +210,7 @@ function EpisodeCard({
       {/* Meta */}
       <div className="flex flex-1 flex-col">
         <h3 className="mb-2 line-clamp-2 text-sm font-semibold leading-snug text-foreground">{video.title}</h3>
-        {!isFallback && <p className="mt-auto text-[11px] text-muted-foreground">{formattedDate}</p>}
+        {!isFallback && <p className="mt-auto text-xs text-muted-foreground">{formattedDate}</p>}
       </div>
     </div>
   );
@@ -254,7 +254,7 @@ function StatsBar({ episodeCount }: { episodeCount: number }) {
         {stats.map(({ value, label }) => (
           <div key={label} className="text-center">
             <p className="text-xl font-semibold leading-none text-primary-foreground">{value}</p>
-            <p className="mt-0.5 text-[9px] uppercase tracking-[0.2em] text-primary-foreground/70">{label}</p>
+            <p className="mt-0.5 eyebrow text-primary-foreground/70">{label}</p>
           </div>
         ))}
       </div>
@@ -337,7 +337,7 @@ export default function PodcastMain({
                     key={f}
                     onClick={() => setFilter(f)}
                     aria-pressed={filter === f}
-                    className="nav-link whitespace-nowrap rounded-full px-4 py-1.5 text-[11px] font-semibold tracking-wide"
+                    className="nav-link whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide"
                   >
                     {f === "all" ? "All Episodes" : "Recent"}
                   </button>
@@ -376,7 +376,7 @@ export default function PodcastMain({
                 View All Episodes
                 <ArrowRight className="h-4 w-4" />
               </a>
-              <span className="text-[11px] text-muted-foreground">{episodeCount} episodes total</span>
+              <span className="text-xs text-muted-foreground">{episodeCount} episodes total</span>
             </div>
           </div>
 
@@ -389,9 +389,9 @@ export default function PodcastMain({
               <div className="bg-primary px-5 py-4">
                 <div className="mb-0.5 flex items-center gap-2">
                   <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground/70" />
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-primary-foreground/70">Coming Up</p>
+                  <p className="eyebrow text-primary-foreground/70">Coming Up</p>
                 </div>
-                <h3 className="text-[17px] font-semibold tracking-tight text-primary-foreground">Upcoming Schedule</h3>
+                <h3 className="text-lg font-semibold tracking-tight text-primary-foreground">Upcoming Schedule</h3>
               </div>
               <UpcomingSchedule />
             </div>
@@ -407,8 +407,8 @@ export default function PodcastMain({
       {/* About Strip */}
       <section className="bg-primary px-4 py-12 sm:px-6 md:py-20">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-primary-foreground/70">About the Show</p>
-          <p className="mb-10 text-lg leading-relaxed text-primary-foreground md:text-[22px]">
+          <p className="mb-4 eyebrow text-primary-foreground/70">About the Show</p>
+          <p className="mb-10 text-lg leading-relaxed text-primary-foreground md:text-2xl">
             Unfiltered conversations with the professionals, founders, and innovators actively shaping the future of beauty and wellness.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12">
@@ -420,7 +420,7 @@ export default function PodcastMain({
               <div key={label} className="flex items-center gap-6 sm:gap-12">
                 <div className="text-center">
                   <p className="text-3xl font-semibold leading-none tracking-tight text-primary-foreground md:text-4xl">{value}</p>
-                  <p className="mt-2 text-[10px] uppercase tracking-[0.2em] text-primary-foreground/70">{label}</p>
+                  <p className="mt-2 eyebrow text-primary-foreground/70">{label}</p>
                 </div>
                 {i < arr.length - 1 && <div className="h-12 w-px bg-primary-foreground/20" />}
               </div>

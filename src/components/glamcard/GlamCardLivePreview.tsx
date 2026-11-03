@@ -180,7 +180,7 @@ const SectionBox: React.FC<{
           </p>
         </div>
       )}
-      <div className="rounded-xl bg-card p-3 sm:p-4 shadow-sm" style={{
+      <div className="rounded-xl bg-card p-3 sm:p-4 shadow-soft" style={{
         boxShadow: "var(--shadow-medium)",
       }}>{children}</div>
     </div>
@@ -466,9 +466,14 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
       />
     );
   };
+  /* ================= WHO ================= */
+  // A brand's card leads with the brand's name; a professional's with their own.
+  const isBrandCard = data.professional_type === "brand";
+  const cardHeading = isBrandCard ? data.business_name || data.name || "Brand Name" : data.name || "Your Name";
   /* ================= LOCATION ================= */
+  // The API's cards say `is_primary`; the form's draft says `isPrimary`.
   const primaryLocation = useMemo(
-    () => data.locations?.find((l: any) => l.is_primary) || data.locations?.[0],
+    () => data.locations?.find((l: any) => l.is_primary ?? l.isPrimary) || data.locations?.[0],
     [data.locations],
   );
   useEffect(() => {
@@ -482,20 +487,27 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
       primaryLocation
     );
   }, [data.locations, selectedLocationId, primaryLocation]);
-  /* ================= MAP SRC ================= */
+  /* ================= MAP SRC =================
+     A pin from the location's coordinates when it has them, otherwise its address or city as text.
+     Typed exact addresses used to be saved with Las Vegas's centre (36.1699, -115.1398) instead of
+     their own coordinates, so an exact address with exactly that pair still maps by its text. */
   const mapQuery = useMemo(() => {
     if (!selectedLocation) return "";
-    if (selectedLocation.location_type === "exact_address")
-      return selectedLocation.address?.trim() || "";
-    return (
-      [
-        selectedLocation.city?.trim(),
-        selectedLocation.state?.trim(),
-        selectedLocation.area?.trim(),
-      ]
-        .filter(Boolean)
-        .join(", ") || ""
-    );
+    // While the form's location is being edited, there is nothing to show yet.
+    if (selectedLocation.isSet === false) return "";
+    const exact = selectedLocation.location_type === "exact_address";
+    const lat = Number(selectedLocation.latitude);
+    const lng = Number(selectedLocation.longitude);
+    const placeholderPin = exact && lat === 36.1699 && lng === -115.1398;
+    if (
+      selectedLocation.latitude != null && selectedLocation.longitude != null &&
+      Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0) && !placeholderPin
+    )
+      return `${lat},${lng}`;
+    const parts = exact
+      ? [selectedLocation.address, selectedLocation.city, selectedLocation.state]
+      : [selectedLocation.city, selectedLocation.state, selectedLocation.area];
+    return parts.map((p: any) => (typeof p === "string" ? p.trim() : "")).filter(Boolean).join(", ");
   }, [selectedLocation]);
   const mapZoom = selectedLocation?.location_type === "exact_address" ? 15 : 12;
   const mapSrc = mapQuery
@@ -711,14 +723,14 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
     >
       {/* ===== MOBILE STICKY TOP BAR (view mode) ===== */}
       {mode === "view" && (
-        <div className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-card/90 backdrop-blur-md border-b border-border shadow-sm lg:hidden">
+        <div className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-card/90 backdrop-blur-md border-b border-border shadow-soft lg:hidden">
           <div className="flex items-center gap-2">
             <Image src={Logo} alt="access" width={90} height={28} />
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleSaveContact}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--card-accent)] text-primary-foreground text-xs font-semibold shadow transition active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--card-accent)] text-primary-foreground text-xs font-semibold shadow-soft transition active:scale-95"
             >
               <svg
                 className="w-3.5 h-3.5"
@@ -736,7 +748,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
             </button>
              <button
                   onClick={handleShare}
-                  className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-primary-foreground shadow-lg hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
+                  className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-primary-foreground shadow-large hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
                 >
                   <Share2 size={12} strokeWidth={2.5} />
                 </button>
@@ -757,7 +769,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
             boxShadow: "var(--shadow-medium)",
           }}
         >
-          <div className="rounded-2xl bg-card p-4 sm:p-6 shadow-sm">
+          <div className="rounded-2xl bg-card p-4 sm:p-6 shadow-soft">
             {/* ===== LOGO (desktop / non-view) ===== */}
             <div
               className={`mb-5 text-center ${mode === "view" ? "hidden lg:flex justify-center" : "flex justify-center"}`}
@@ -769,7 +781,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
               <div className="hidden lg:flex justify-end gap-2 mb-3">
                 <button
                   onClick={handleSaveContact}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] text-primary-foreground text-sm font-medium shadow-md transition-colors whitespace-nowrap" style={socialIconStyle}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] text-primary-foreground text-sm font-medium shadow-medium transition-colors whitespace-nowrap" style={socialIconStyle}
                 >
                   <svg
                     className="w-4 h-4 flex-shrink-0"
@@ -788,7 +800,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                 </button>
                 <button
                   onClick={handleShare}
-                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-primary-foreground shadow-lg hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
+                  className="h-10 w-10 flex items-center justify-center rounded-full bg-[var(--card-accent)] text-primary-foreground shadow-large hover:bg-[var(--card-accent-strong)] transition-all duration-200" style={socialIconStyle}
                 >
                   <Share2 size={18} strokeWidth={2.5} />
                 </button>
@@ -797,7 +809,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
             {/* ===== HERO: PROFILE CARD ===== */}
             <div className="mb-4">
               <div
-                className="relative rounded-2xl overflow-hidden shadow-md"
+                className="relative rounded-2xl overflow-hidden shadow-medium"
                 style={{
                   background: `${cardColor}`,
                 }}
@@ -809,7 +821,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                 </div>
                 <div className="flex items-center gap-4 p-4">
                   {/* avatar */}
-                  <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-card shadow-lg flex-shrink-0">
+                  <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-card shadow-large flex-shrink-0">
                     {data?.profile_image ? (
                       <img
                         src={
@@ -824,21 +836,31 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-primary-foreground text-2xl font-bold">
-                        {(data.name || "?")[0]}
+                        {(cardHeading || "?")[0]}
                       </div>
                     )}
                   </div>
-                  {/* info */}
+                  {/* info: a professional's name, title and business; a brand's name and tagline */}
                   <div className="flex-1 min-w-0 text-primary-foreground">
                     <p className="font-bold text-primary-foreground text-lg leading-tight truncate">
-                      {data.name || "Your Name"}
+                      {cardHeading}
                     </p>
-                    <p className="text-primary-foreground/90 text-sm font-medium mt-0.5 truncate">
-                      {data.professional_title || "Professional Title"}
-                    </p>
-                    <p className="text-primary-foreground/70 text-xs mt-0.5 truncate">
-                      {data.business_name || "Business Name"}
-                    </p>
+                    {isBrandCard ? (
+                      data.professional_title && (
+                        <p className="text-primary-foreground/90 text-sm font-medium mt-0.5 truncate">
+                          {data.professional_title}
+                        </p>
+                      )
+                    ) : (
+                      <>
+                        <p className="text-primary-foreground/90 text-sm font-medium mt-0.5 truncate">
+                          {data.professional_title || "Professional Title"}
+                        </p>
+                        <p className="text-primary-foreground/70 text-xs mt-0.5 truncate">
+                          {data.business_name || "Business Name"}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -849,7 +871,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
               {data.bio && (
                 <SectionBox
                   title="About"
-                  icon={<span className="text-[10px]">✦</span>}
+                  icon={<span className="text-xs">✦</span>}
                 >
                   <div
                     className="rich-text text-foreground/80 text-sm leading-relaxed"
@@ -859,7 +881,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
               )}
               {normalizedImages.length > 0 && thumbnailIndex !== null && (
                 <SectionBox title="Gallery" titleAlign="center">
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted shadow-sm">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted shadow-soft">
                     {normalizedImages[thumbnailIndex]?.file_type === "video" ? (
                       <video
                         key={galleryPreviews[thumbnailIndex]}
@@ -1000,7 +1022,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     </div>
                   )}
                   {mapSrc ? (
-                    <div className="relative rounded-xl overflow-hidden shadow-sm">
+                    <div className="relative rounded-xl overflow-hidden shadow-soft">
                       <iframe
                         title="Business Location Map"
                         className="w-full h-40"
@@ -1031,7 +1053,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                         }}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground font-medium px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-xs whitespace-nowrap active:scale-95 transition"
+                        className="btn-primary absolute bottom-3 left-1/2 -translate-x-1/2 gap-1.5 px-4 py-2 text-xs font-medium whitespace-nowrap"
                       >
                         <svg
                           className="w-3.5 h-3.5"
@@ -1126,7 +1148,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                   </p>
                   <span className="flex-1 h-px bg-input/60" />
                 </div>
-                <div className="rounded-xl bg-card p-3 sm:p-4 shadow-sm" style={{
+                <div className="rounded-xl bg-card p-3 sm:p-4 shadow-soft" style={{
                   boxShadow: "var(--shadow-medium)",
                 }}>
                   <DotList items={importantInfoArray}
@@ -1159,7 +1181,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                     </p>
                     <span className="flex-1 h-px bg-input/60" />
                   </div>
-                  <div className="rounded-xl bg-card p-3 sm:p-4 shadow-sm space-y-2" style={{
+                  <div className="rounded-xl bg-card p-3 sm:p-4 shadow-soft space-y-2" style={{
                     boxShadow: "var(--shadow-medium)",
                   }}>
                     {otherLinks
@@ -1262,7 +1284,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                               )}
                             </div>
                             {link?.is_featured && (
-                              <span className="absolute -top-1.5 -left-1.5 rounded-full bg-[var(--card-accent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-primary-foreground shadow-sm ring-2 ring-card whitespace-nowrap">
+                              <span className="absolute -top-1.5 -left-1.5 rounded-full bg-[var(--card-accent)] px-1.5 py-0.5 eyebrow text-primary-foreground shadow-soft ring-2 ring-card whitespace-nowrap">
                                 Featured
                               </span>
                             )}
@@ -1273,7 +1295,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                               {link.title}
                             </p>
                             {subtext && (
-                              <p className="text-xs sm:text-[13px] text-muted-foreground leading-snug mt-1 line-clamp-2">
+                              <p className="text-xs sm:text-sm text-muted-foreground leading-snug mt-1 line-clamp-2">
                                 {subtext}
                               </p>
                             )}
@@ -1294,20 +1316,20 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
             )}
             {/* ===== CONNECT BUTTON ===== */}
             <div className="flex items-center gap-3 mt-5">
-              <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent to-[var(--card-accent)]" />
+              <div className="flex-1 h-[2px] bg-linear-to-r from-transparent to-[var(--card-accent)]" />
               <button
                 onClick={() => {
                   track("CONNECT_CLICK");
                   setIsBookingModalOpen(true);
                 }}
-                className="flex items-center gap-2 bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] active:scale-95 text-primary-foreground px-7 py-2.5 rounded-full text-sm font-bold tracking-widest transition-all whitespace-nowrap uppercase shadow-md" style={{
+                className="flex items-center gap-2 bg-[var(--card-accent)] hover:bg-[var(--card-accent-strong)] active:scale-95 text-primary-foreground px-7 py-2.5 rounded-full text-sm font-bold tracking-widest transition-all whitespace-nowrap uppercase shadow-medium" style={{
                   boxShadow: "var(--shadow-medium)",
                 }}
               >
                 <Send className="w-4 h-4" strokeWidth={2.5} />
                 CONNECT
               </button>
-              <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent to-[var(--card-accent)]" />
+              <div className="flex-1 h-[2px] bg-linear-to-l from-transparent to-[var(--card-accent)]" />
             </div>
             {/* ===== SOCIAL ICONS ===== */}
             <div className="flex justify-center flex-wrap gap-4 sm:gap-5 mt-4">
@@ -1324,7 +1346,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                   >
                     <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-muted-foreground">Website</span>
+                  <span className="text-xs font-medium text-muted-foreground">Website</span>
                 </div>
               )}
               {allInstagramHandles.map(({ key, url }, idx) => (
@@ -1340,7 +1362,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                   >
                     <Instagram className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-muted-foreground">
+                  <span className="text-xs font-medium text-muted-foreground">
                     {idx > 0 ? `Instagram ${idx + 1}` : "Instagram"}
                   </span>
                 </div>
@@ -1358,7 +1380,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                   >
                     <Facebook className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-muted-foreground">Facebook</span>
+                  <span className="text-xs font-medium text-muted-foreground">Facebook</span>
                 </div>
               )}
               {socialMedia?.linkedin && (
@@ -1374,7 +1396,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                   >
                     <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-muted-foreground">LinkedIn</span>
+                  <span className="text-xs font-medium text-muted-foreground">LinkedIn</span>
                 </div>
               )}
               {socialMedia?.youtube && (
@@ -1390,7 +1412,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                   >
                     <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-muted-foreground">YouTube</span>
+                  <span className="text-xs font-medium text-muted-foreground">YouTube</span>
                 </div>
               )}
               {socialMedia?.tiktok && (
@@ -1406,7 +1428,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                   >
                     <Music2 className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--card-accent)] hover:text-[var(--card-accent-strong)] transition-colors duration-300" />
                   </a>
-                  <span className="text-[11px] font-medium text-muted-foreground">TikTok</span>
+                  <span className="text-xs font-medium text-muted-foreground">TikTok</span>
                 </div>
               )}
             </div>
@@ -1420,7 +1442,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
           onClick={() => setIsBookingModalOpen(false)}
         >
           <div
-            className="bg-card rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-sm sm:mx-4 max-h-[90vh] overflow-y-auto"
+            className="bg-card rounded-t-3xl sm:rounded-2xl shadow-large p-5 w-full sm:max-w-sm sm:mx-4 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sm:hidden w-10 h-1 rounded-full bg-input mx-auto mb-4" />
@@ -1554,7 +1576,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
           onClick={() => setIsQrModalOpen(false)}
         >
           <div
-            className="bg-card rounded-t-3xl sm:rounded-2xl shadow-xl p-5 w-full sm:max-w-md sm:mx-4"
+            className="bg-card rounded-t-3xl sm:rounded-2xl shadow-large p-5 w-full sm:max-w-md sm:mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sm:hidden w-10 h-1 rounded-full bg-input mx-auto mb-4" />

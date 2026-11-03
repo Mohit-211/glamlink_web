@@ -78,9 +78,14 @@ const LocationsSection: React.FC<SectionProps> = ({
       id="field-locations"
       className={`${sectionClass} ${errors?.locations ? "border-destructive" : ""}`}
     >
-      <h3 className="text-lg font-semibold">
-        Business Locations <span className="text-destructive">*</span>
-      </h3>
+      <div>
+        <h3 className="text-lg font-semibold">
+          Business Locations <span className="text-sm font-normal text-muted-foreground">(optional)</span>
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Add where clients can find you. With no location, your card shows no address or map.
+        </p>
+      </div>
       {errors?.locations && (
         <p className="text-sm text-destructive">{errors.locations}</p>
       )}
@@ -99,7 +104,7 @@ const LocationsSection: React.FC<SectionProps> = ({
         onClick={addLocation}
         className="mt-6 w-full rounded-xl border border-dashed border-border py-3 text-sm font-semibold text-primary hover:bg-accent hover:text-secondary transition-colors"
       >
-        + Add Another Location
+        {data.locations?.length ? "+ Add Another Location" : "+ Add a Location"}
       </button>
     </section>
   );

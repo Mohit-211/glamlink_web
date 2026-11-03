@@ -7,6 +7,11 @@
  * script cannot lift a long-lived credential. On every page load the session is
  * restored by calling the refresh endpoint, which reads the cookie.
  *
+ * While someone is signed in, the access token is refreshed a minute before it
+ * runs out, and again when the tab comes back to the foreground or the browser
+ * goes back online, so a page left open (a payment, a card edit) never sends a
+ * call without one.
+ *
  * Server code must never call setSession: module state on the server is shared
  * between visitors.
  */
@@ -44,6 +49,8 @@ let accessToken: string | null = null;
 let expiresAt = 0;
 let state: SessionState = { status: "loading", user: null };
 let refreshInFlight: Promise<string | null> | null = null;
+let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+let watching = false;
 const listeners = new Set<() => void>();
 
 function setState(next: SessionState) {
@@ -51,11 +58,57 @@ function setState(next: SessionState) {
   listeners.forEach((listener) => listener());
 }
 
+/**
+ * When the access token runs out on this browser's clock: from its lifetime
+ * (the JWT's exp - iat) when readable, so a device clock that is off can't make
+ * every token look expired. Else the API's time, if it is still ahead.
+ */
+function localExpiry(payload: TokenPayload): number {
+  try {
+    const claims = JSON.parse(atob(payload.access_token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    if (typeof claims?.exp === "number" && typeof claims?.iat === "number" && claims.exp > claims.iat) {
+      return Date.now() + (claims.exp - claims.iat) * 1000;
+    }
+  } catch {
+    // Not a readable JWT: use the API's time below.
+  }
+  const stated = Date.parse(payload.access_token_expires_at);
+  return stated > Date.now() ? stated : Date.now() + 14 * 60_000;
+}
+
+/** Refreshes a minute before the access token runs out (timers pause while a computer sleeps; see watchSession). */
+function scheduleRefresh() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = null;
+  if (!accessToken) return;
+  const delay = Math.max(expiresAt - REFRESH_MARGIN_MS - Date.now(), 30_000);
+  refreshTimer = setTimeout(() => {
+    refreshTimer = null;
+    if (state.status === "signed-in") void refreshSession();
+  }, delay);
+}
+
+/** Back in the foreground or online again with a stale token: refresh before the next call needs it. */
+function watchSession() {
+  if (watching) return;
+  watching = true;
+  const refreshIfStale = () => {
+    if (state.status === "signed-in" && !peekAccessToken() && document.visibilityState !== "hidden") {
+      void refreshSession();
+    }
+  };
+  document.addEventListener("visibilitychange", refreshIfStale);
+  window.addEventListener("focus", refreshIfStale);
+  window.addEventListener("online", refreshIfStale);
+}
+
 /** Stores the token pair from login, verify-email or refresh. */
 export function setSession(payload: TokenPayload) {
   if (!isBrowser) return;
   accessToken = payload.access_token;
-  expiresAt = Date.parse(payload.access_token_expires_at) || Date.now() + 14 * 60_000;
+  expiresAt = localExpiry(payload);
+  scheduleRefresh();
+  watchSession();
   setState({ status: "signed-in", user: payload.user ?? state.user });
 }
 
@@ -63,6 +116,7 @@ export function setSession(payload: TokenPayload) {
 export function clearSession() {
   accessToken = null;
   expiresAt = 0;
+  scheduleRefresh();
   setState({ status: "signed-out", user: null });
 }
 

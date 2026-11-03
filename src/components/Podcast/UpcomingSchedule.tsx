@@ -134,8 +134,8 @@ export default function UpcomingSchedule() {
 
               <div className="min-w-0 flex-1">
                 <div className="mb-0.5 flex items-center justify-between gap-2">
-                  <p className="truncate text-[13px] font-semibold leading-tight text-foreground">{item.name}</p>
-                  <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.15em] text-accent-foreground">
+                  <p className="truncate text-sm font-semibold leading-tight text-foreground">{item.name}</p>
+                  <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 eyebrow text-accent-foreground">
                     {formatDate(item.schedule_date)}
                   </span>
                 </div>
@@ -147,7 +147,7 @@ export default function UpcomingSchedule() {
       </div>
 
       <div className="flex items-center justify-between border-t border-border bg-muted/40 px-5 py-3">
-        <p className="text-[10px] text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           {shownItems.length} of {schedule.length} episodes
         </p>
 
@@ -155,7 +155,7 @@ export default function UpcomingSchedule() {
           <button
             type="button"
             onClick={() => setVisibleCount((c) => Math.min(c + PAGE_SIZE, schedule.length))}
-            className="link-glamlink text-secondary flex items-center gap-1.5 text-[11px] font-semibold tracking-wide"
+            className="link-glamlink text-secondary flex items-center gap-1.5 text-xs font-semibold tracking-wide"
           >
             Load {Math.min(PAGE_SIZE, schedule.length - visibleCount)} more
             <ChevronDown className="h-3 w-3" strokeWidth={2.5} />
@@ -164,7 +164,7 @@ export default function UpcomingSchedule() {
           <button
             type="button"
             onClick={() => setVisibleCount(PAGE_SIZE)}
-            className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-muted-foreground transition-colors hover:text-secondary"
+            className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-muted-foreground transition-colors hover:text-secondary"
           >
             Show less
             <ChevronUp className="h-3 w-3" strokeWidth={2.5} />

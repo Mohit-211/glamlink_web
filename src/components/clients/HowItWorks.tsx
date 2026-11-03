@@ -116,7 +116,7 @@ const HowItWorks = () => {
         <div className="text-center mt-12 md:mt-20">
           <Button
             size="lg"
-            className="group px-8 md:px-10 py-6 md:py-7 bg-primary hover:bg-secondary text-primary-foreground font-semibold text-base md:text-lg rounded-full shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-3 mx-auto"
+            className="group px-8 md:px-10 py-6 md:py-7 font-semibold text-base md:text-lg rounded-full shadow-large shadow-primary/25 hover:shadow-large hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-3 mx-auto"
                        onClick={() => setIsModalOpen(true)}
 
          >

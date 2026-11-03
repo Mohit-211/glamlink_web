@@ -41,8 +41,11 @@ export default function nextConfig(phase: string): NextConfig {
         // Education and Events are switched off for now; temporary, so they can return.
         { source: "/journal/education", destination: "/journal", permanent: false },
         { source: "/journal/events", destination: "/journal", permanent: false },
-        // Brands are browsed in the Directory, beside professionals, not on a page of their own.
-        { source: "/industry", destination: "/directory", permanent: false },
+        // Brands have their own list (Nov 2026); the Directory's nearby search lists professionals.
+        { source: "/industry", destination: "/brands", permanent: false },
+        // One way in (Nov 2026): the directory form is retired, and the Access form takes professionals and
+        // brands, and Google listing claims (?claim= passes through).
+        { source: "/directory-form-apply", destination: "/access", permanent: true },
       ];
     },
     // Test and staging builds (SITE_INDEXING=off, or any address other than

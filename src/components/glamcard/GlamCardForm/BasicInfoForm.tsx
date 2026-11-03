@@ -13,9 +13,11 @@ interface Props {
   setData: React.Dispatch<React.SetStateAction<GlamCardFormData>>;
   errors?: FieldErrors;
   clearError?: (key: string) => void;
+  /** Editing a card: professional or brand is shown, not changed. */
+  typeLocked?: boolean;
 }
 
-const BasicInfoForm: React.FC<Props> = ({ data, setData, errors, clearError }) => {
+const BasicInfoForm: React.FC<Props> = ({ data, setData, errors, clearError, typeLocked }) => {
   if (!data) return null;
 
   return (
@@ -25,6 +27,7 @@ const BasicInfoForm: React.FC<Props> = ({ data, setData, errors, clearError }) =
         setData={setData}
         errors={errors}
         clearError={clearError}
+        typeLocked={typeLocked}
       />
 
       <LocationsSection

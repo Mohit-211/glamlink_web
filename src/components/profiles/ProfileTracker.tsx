@@ -23,15 +23,25 @@ function send(slug: string, event: ProfileEvent, target?: string) {
 /**
  * Counts a view of a professional's or brand's page, and clicks on the links
  * inside it that carry `data-profile-event` (see `trackAs` in ./profileEvents).
+ * The page's own "View all" pages pass `countView={false}`: their clicks count
+ * for the page, but only the page itself counts as a view.
  */
-export default function ProfileTracker({ slug, children }: { slug: string; children: ReactNode }) {
+export default function ProfileTracker({
+  slug,
+  countView = true,
+  children,
+}: {
+  slug: string;
+  countView?: boolean;
+  children: ReactNode;
+}) {
   const counted = useRef<string | null>(null);
 
   useEffect(() => {
-    if (counted.current === slug) return;
+    if (!countView || counted.current === slug) return;
     counted.current = slug;
     send(slug, "PAGE_VIEW");
-  }, [slug]);
+  }, [slug, countView]);
 
   const onClick = (event: MouseEvent<HTMLDivElement>) => {
     const link = (event.target as HTMLElement).closest<HTMLElement>("[data-profile-event]");

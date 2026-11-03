@@ -36,7 +36,7 @@ const LocationCard: React.FC<CardProps> = ({
       "Not configured";
 
   return (
-    <div className="rounded-lg border border-border overflow-hidden bg-card shadow-sm">
+    <div className="rounded-lg border border-border overflow-hidden bg-card shadow-soft">
       {/* Header */}
       <div
         className={`flex items-center justify-between gap-3 px-3 sm:px-5 py-3.5 border-b ${isPrimary
@@ -68,9 +68,9 @@ const LocationCard: React.FC<CardProps> = ({
             {locationSummary}
           </p>
 
-          {/* ✅ Optional coordinate display */}
-          {location && (
-            <p className="text-[11px] text-muted-foreground/80 mt-1">
+          {/* Coordinates, once the location has them */}
+          {location?.latitude != null && location?.longitude != null && (
+            <p className="text-xs text-muted-foreground/80 mt-1">
               {Number(location?.latitude ?? 0).toFixed(6)},{' '}
               {Number(location?.longitude ?? 0).toFixed(6)}
             </p>

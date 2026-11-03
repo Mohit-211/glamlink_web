@@ -7,13 +7,15 @@ import { CheckCircle, Eye, EyeOff, LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import { resetPasswordApi } from "@/api/Api";
 import { readApiError } from "@/lib/apiError";
+import { pendingClaim } from "@/lib/cardToken";
 import { PASSWORD_HINT, passwordProblem } from "@/lib/password";
 import AuthShell from "./AuthShell";
 
 /**
  * Opened from an email link: forgot password (valid 1 hour), or the Access
  * welcome email for a new card owner (valid 7 days). Worded to fit both.
- * Setting the password signs out every device and verifies the email.
+ * Setting the password signs out every device and verifies the email. Signing
+ * in afterwards brings back a draft card being claimed (lib/auth afterSignInPath).
  */
 export default function ResetPassword() {
   const router = useRouter();
@@ -23,6 +25,8 @@ export default function ResetPassword() {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [state, setState] = useState<"form" | "done" | "invalid-link">(token ? "form" : "invalid-link");
+  // A draft card is waiting to be claimed in this browser: sign-in goes on to it.
+  const [claimWaiting, setClaimWaiting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +40,7 @@ export default function ResetPassword() {
     setLoading(true);
     try {
       await resetPasswordApi({ token, ...form });
+      setClaimWaiting(!!pendingClaim());
       setState("done");
     } catch (error) {
       const { code, message } = readApiError(error);
@@ -75,7 +80,11 @@ export default function ResetPassword() {
             <CheckCircle className="h-7 w-7 text-primary" />
           </div>
           <h1 className="mt-4 text-xl font-semibold tracking-tight">Your password is set</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Sign in with your new password.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {claimWaiting
+              ? "Sign in with your new password to finish your Access card."
+              : "Sign in with your new password."}
+          </p>
           <button type="button" onClick={() => router.push("/login")} className="btn-primary mt-6 w-full">
             Sign in
           </button>

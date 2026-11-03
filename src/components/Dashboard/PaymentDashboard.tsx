@@ -1,7 +1,8 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
+  AlertCircle,
   BarChart3,
   CreditCard,
   Edit3,
@@ -15,6 +16,8 @@ import {
   Lock,
   Sparkles,
   Globe,
+  GraduationCap,
+  Images,
   ShoppingBag,
   TrendingUp,
 } from 'lucide-react';
@@ -27,16 +30,20 @@ import { AddressTab } from './AddressTab';
 import PaymentHistory from './PaymentHistory';
 import EditAccessCard from './accessCardEdit';
 import ChangePasswordTab from './Changepasswordtab';
-import SubscriptionPlansTab, { type AccessSubscription } from '../Pricing/SubscriptionPlansTab';
+import SubscriptionPlansTab, { isPastDue, type AccessSubscription } from '../Pricing/SubscriptionPlansTab';
 import AccessCardAnalytics from './analytics/AccessCardAnalytics';
 import PageAnalytics from './analytics/PageAnalytics';
 import MyPageTab from './MyPageTab';
 import ProductsTab from './ProductsTab';
+import MediaTab from './profile/MediaTab';
+import EducationTab from './profile/EducationTab';
 type TabId =
   | 'my-card'
   | 'edit-card'
   | 'analytics'
   | 'my-page'
+  | 'media'
+  | 'education'
   | 'products'
   | 'page-analytics'
   | 'payment-history'
@@ -68,6 +75,18 @@ const NAV_ITEMS = [
     label: 'My Page',
     description: 'Your page on Glamlink',
     icon: <Globe className="h-5 w-5" />,
+  },
+  {
+    id: 'media',
+    label: 'Media & Images',
+    description: 'Photos and videos on your page',
+    icon: <Images className="h-5 w-5" />,
+  },
+  {
+    id: 'education',
+    label: 'Education',
+    description: 'Your videos and blog posts',
+    icon: <GraduationCap className="h-5 w-5" />,
   },
   {
     id: 'products',
@@ -113,9 +132,10 @@ const NAV_ITEMS = [
   },
 ] as const;
 // A card that is not live yet (draft, waiting for review, rejected) can always be
-// edited in full; a live card's photos, video and offer need Access Pro.
+// edited in full; a live card's photos and video need Access Pro.
 const isLiveCard = (card: any): boolean => (card?.status || '').toLowerCase() === 'accepted';
 const TAB_IDS = NAV_ITEMS.map((n) => n.id) as readonly string[];
+const isTabId = (tab: string | null): tab is TabId => !!tab && TAB_IDS.includes(tab);
 class TabErrorBoundary extends React.Component<
   { children: React.ReactNode; onReset: () => void },
   { hasError: boolean; message: string }
@@ -155,14 +175,35 @@ class TabErrorBoundary extends React.Component<
     return this.props.children;
   }
 }
+const FullPageSpinner = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  </div>
+);
+// The dashboard reads ?tab= from the URL, which needs a Suspense boundary.
 export default function DashboardPage() {
+  return (
+    <Suspense fallback={<FullPageSpinner />}>
+      <Dashboard />
+    </Suspense>
+  );
+}
+function Dashboard() {
   const router = useRouter();
   const session = useSession();
-  const [activeTab, setActiveTab] = useState<TabId>(() => {
-    // Links such as "See plans" open a tab with ?tab=.
-    const tab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null;
-    return tab && TAB_IDS.includes(tab) ? (tab as TabId) : 'my-card';
-  });
+  // Links such as "See plans" open a tab with ?tab=, also while the dashboard is
+  // open (a link to the same page keeps it mounted). The URL follows the tab.
+  const urlTab = useSearchParams().get('tab');
+  const [activeTab, setActiveTab] = useState<TabId>(() => (isTabId(urlTab) ? urlTab : 'my-card'));
+  const [seenUrlTab, setSeenUrlTab] = useState(urlTab);
+  if (urlTab !== seenUrlTab) {
+    setSeenUrlTab(urlTab);
+    if (isTabId(urlTab)) setActiveTab(urlTab);
+  }
+  const openTab = (id: TabId) => {
+    setActiveTab(id);
+    if (urlTab !== id) window.history.replaceState(null, '', `/dashboard?tab=${id}`);
+  };
   const [businessCard, setBusinessCard] = useState<any>(null);
   const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -172,31 +213,40 @@ export default function DashboardPage() {
   const [editCardId, setEditCardId] = useState<string | null>(null);
   // null: no Access Pro seat (Free). undefined: not known (not loaded, or the call failed).
   const [subscription, setSubscription] = useState<AccessSubscription | null | undefined>(undefined);
+  // The card, the payments and the seat load side by side: an owner without a
+  // card (deleted, or never made) still sees their payments and plan.
   const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      const cardRes = await getMyBusinessCardForDashboard();
-      setBusinessCard(cardRes?.data || cardRes);
-      const paymentRes = await getPaymenthistory();
-      setPaymentHistory(paymentRes?.data ?? []);
-      const subscriptionRes = await getAccessSubscription().catch(() => undefined);
-      setSubscription(subscriptionRes === undefined ? undefined : ((subscriptionRes?.data ?? null) as AccessSubscription | null));
-    } catch (error: any) {
+    setLoading(true);
+    const [cardRes, paymentRes, subscriptionRes] = await Promise.allSettled([
+      getMyBusinessCardForDashboard(),
+      getPaymenthistory(),
+      getAccessSubscription(),
+    ]);
+    if (cardRes.status === 'fulfilled') {
+      setBusinessCard(cardRes.value?.data || cardRes.value);
+      setError('');
+    } else {
+      const failure: any = cardRes.reason;
       setError(
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
+        failure?.response?.data?.message ||
+        failure?.response?.data?.error ||
         'Something went wrong'
       );
-    } finally {
-      setLoading(false);
     }
+    if (paymentRes.status === 'fulfilled') setPaymentHistory(paymentRes.value?.data ?? []);
+    setSubscription(
+      subscriptionRes.status === 'fulfilled'
+        ? ((subscriptionRes.value?.data ?? null) as AccessSubscription | null)
+        : undefined
+    );
+    setLoading(false);
   };
   // Wait for the session to be restored from the refresh cookie, then load
-  // the dashboard, or send a signed-out visitor to sign in and back.
+  // the dashboard, or send a signed-out visitor to sign in and back (to this tab).
   useEffect(() => {
     if (session.status === 'loading') return;
     if (session.status === 'signed-out') {
-      router.replace(loginHref('/dashboard'));
+      router.replace(loginHref());
       return;
     }
     fetchDashboardData();
@@ -220,13 +270,7 @@ export default function DashboardPage() {
       router.push('/login');
     }
   };
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  if (loading) return <FullPageSpinner />;
   const activeItem = NAV_ITEMS.find((n) => n.id === activeTab)!;
   const cardsArray: any[] = Array.isArray(businessCard)
     ? businessCard
@@ -243,7 +287,7 @@ export default function DashboardPage() {
     cardsArray.find((c) => String(c?.id) === effectiveEditCardId) ??
     cardsArray[0] ??
     null;
-  // Every owner can keep their details current; media and offers follow the plan.
+  // Every owner can keep their details current; photos and video follow the plan.
   const editCardEnabled = !!editingCard;
   const proAccess = !isLiveCard(editingCard) || Boolean(subscription?.pro);
   // Performance analytics are part of Access Pro: Free owners are offered the subscription.
@@ -264,7 +308,7 @@ export default function DashboardPage() {
       <div className="container-glamlink py-6 sm:py-8 md:py-12">
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-accent px-3 py-1 text-[11px] font-medium text-accent-foreground">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
               <LayoutDashboard className="h-3 w-3" />
               Dashboard
             </span>
@@ -310,7 +354,7 @@ export default function DashboardPage() {
                           setEditCardId(null);
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
-                        setActiveTab(item.id);
+                        openTab(item.id);
                       }}
                       aria-current={activeTab === item.id ? 'page' : undefined}
                       className="nav-link flex shrink-0 items-center gap-3 rounded-xl px-3 py-3 text-left lg:w-full disabled:opacity-50 disabled:text-muted-foreground"
@@ -318,7 +362,7 @@ export default function DashboardPage() {
                       {item.icon}
                       <div className="min-w-[110px] flex-1 lg:min-w-0">
                         <p className="whitespace-nowrap text-sm font-medium lg:whitespace-normal">{item.label}</p>
-                        <p className="hidden text-[11px] opacity-70 lg:block">{item.description}</p>
+                        <p className="hidden text-xs opacity-70 lg:block">{item.description}</p>
                       </div>
                       {isDisabled || isProOnly ? (
                         <Lock className="hidden h-4 w-4 lg:block" />
@@ -340,7 +384,7 @@ export default function DashboardPage() {
                     <p className="text-sm font-medium">
                       {signingOut ? 'Signing out...' : 'Sign Out'}
                     </p>
-                    <p className="text-[11px] opacity-70">End your session</p>
+                    <p className="text-xs opacity-70">End your session</p>
                   </div>
                 </button>
               </div>
@@ -352,6 +396,23 @@ export default function DashboardPage() {
               <ChevronRight className="h-3 w-3 flex-shrink-0" />
               <span className="truncate font-medium text-foreground">{activeItem.label}</span>
             </div>
+            {/* A renewal failed: Stripe retries it, and the owner can update their card. */}
+            {isPastDue(subscription) && activeTab !== 'subscription-plans' && (
+              <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center">
+                <AlertCircle className="h-5 w-5 flex-shrink-0 text-destructive" />
+                <p className="flex-1 text-sm text-foreground">
+                  <span className="font-semibold text-destructive">Payment failed: update your card.</span>{' '}
+                  Your last Access Pro payment didn&apos;t go through.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => openTab('subscription-plans')}
+                  className="btn-outline px-4 py-2 text-xs"
+                >
+                  Update card
+                </button>
+              </div>
+            )}
             {/* Content card: min-height scales with viewport instead of
                 pinning to 100dvh on every breakpoint from `md` up, which
                 added a full extra screen of empty space below short tabs
@@ -366,7 +427,7 @@ export default function DashboardPage() {
                     onPayNow={(card: any, plan?: string | null) => goToCheckout(card?.id ?? effectivePaymentCardId, plan)}
                     onEdit={(card: any) => {
                       setEditCardId(String(card?.id ?? ''));
-                      setActiveTab('edit-card');
+                      openTab('edit-card');
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                   />
@@ -375,13 +436,15 @@ export default function DashboardPage() {
                   <AccessCardAnalytics
                     cards={cardsArray}
                     locked={analyticsLocked}
-                    onUpgrade={() => setActiveTab('subscription-plans')}
+                    onUpgrade={() => openTab('subscription-plans')}
                   />
                 )}
                 {activeTab === 'my-page' && <MyPageTab />}
+                {activeTab === 'media' && <MediaTab />}
+                {activeTab === 'education' && <EducationTab />}
                 {activeTab === 'products' && <ProductsTab />}
                 {activeTab === 'page-analytics' && (
-                  <PageAnalytics locked={analyticsLocked} onUpgrade={() => setActiveTab('subscription-plans')} />
+                  <PageAnalytics locked={analyticsLocked} onUpgrade={() => openTab('subscription-plans')} />
                 )}
                 {activeTab === 'payment-history' && <PaymentHistory payments={paymentHistory} />}
                 {activeTab === 'qr-code' && <ShowQRCode cardData={businessCard} error={error} />}
@@ -397,7 +460,7 @@ export default function DashboardPage() {
                     proAccess={proAccess}
                     onCancel={() => {
                       setEditCardId(null);
-                      setActiveTab('my-card');
+                      openTab('my-card');
                     }}
                     onSave={(updated) => {
                       setBusinessCard((prev: any) =>
@@ -412,7 +475,7 @@ export default function DashboardPage() {
                             : updated
                       );
                       setEditCardId(null);
-                      setActiveTab('my-card');
+                      openTab('my-card');
                       fetchDashboardData();
                     }}
                   />

@@ -36,14 +36,14 @@ export default function VideoTile({
         />
         <div className="absolute inset-0 bg-linear-to-t from-overlay/80 via-overlay/20 to-transparent" />
         {duration && (
-          <span className="absolute right-3 top-3 rounded-md bg-overlay/70 px-1.5 py-0.5 text-[11px] font-medium text-overlay-foreground">
+          <span className="absolute right-3 top-3 rounded-md bg-overlay/70 px-1.5 py-0.5 text-xs font-medium text-overlay-foreground">
             {duration}
           </span>
         )}
         <div className="absolute inset-x-0 bottom-0 flex items-end gap-3 p-4">
           <div className="min-w-0 flex-1">
             {series && (
-              <p className="truncate text-[11px] font-semibold uppercase tracking-widest text-overlay-foreground/80">
+              <p className="truncate eyebrow text-overlay-foreground/80">
                 {series}
               </p>
             )}
@@ -51,7 +51,7 @@ export default function VideoTile({
               {video.title}
             </h3>
           </div>
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-card/95 text-primary shadow-soft transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-card/95 text-primary shadow-soft transition-colors group-hover:bg-secondary group-hover:text-primary-foreground">
             <Play className="ml-0.5 h-4 w-4 fill-current" aria-hidden="true" />
           </span>
         </div>
@@ -70,11 +70,11 @@ export default function VideoTile({
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
         <div className="absolute inset-0 bg-linear-to-t from-overlay/40 via-transparent to-transparent" />
-        <span className="absolute bottom-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-card/95 text-primary shadow-soft transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+        <span className="absolute bottom-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-card/95 text-primary shadow-soft transition-colors group-hover:bg-secondary group-hover:text-primary-foreground">
           <Play className="ml-0.5 h-4 w-4 fill-current" aria-hidden="true" />
         </span>
         {duration && (
-          <span className="absolute bottom-3 right-3 rounded-md bg-overlay/70 px-1.5 py-0.5 text-[11px] font-medium text-overlay-foreground">
+          <span className="absolute bottom-3 right-3 rounded-md bg-overlay/70 px-1.5 py-0.5 text-xs font-medium text-overlay-foreground">
             {duration}
           </span>
         )}

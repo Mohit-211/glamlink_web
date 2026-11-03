@@ -1,33 +1,23 @@
-"use client";
+import { Suspense } from "react";
+import type { Metadata } from "next";
+import PricingEntry from "@/components/Pricing/PricingEntry";
 
-import React, { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import PricingStep from "@/components/Pricing/Pricing1";
-
-function PricingContent() {
-  const searchParams = useSearchParams();
-  const businessCardId = searchParams.get("businessCardId");
-  const claim = searchParams.get("claim") === "1";
-  const plan = searchParams.get("plan");
-  // Set when Stripe sends the person back from a bank or wallet page.
-  const checkout = searchParams.get("checkout");
-  const redirectStatus = searchParams.get("redirect_status");
-
-  return (
-    <PricingStep
-      businessCardId={businessCardId}
-      claim={claim}
-      initialPlan={plan}
-      returnCheckout={checkout}
-      redirectStatus={redirectStatus}
-    />
-  );
-}
+// A step of one card's purchase, not a page to find in search.
+export const metadata: Metadata = {
+  title: "Choose your plan",
+  robots: { index: false, follow: false },
+};
 
 export default function PricingPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <PricingContent />
+    <Suspense
+      fallback={
+        <div className="page-soft flex min-h-screen items-center justify-center text-sm text-muted-foreground">
+          Loading...
+        </div>
+      }
+    >
+      <PricingEntry />
     </Suspense>
   );
 }

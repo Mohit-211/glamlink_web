@@ -21,9 +21,7 @@ const ClientsHero = () => {
           <h1 className="hero-title mt-6 animate-fade-up animation-delay-150">
             Redefining How The World{" "}
             <br className="hidden sm:block" />
-            <span className="text-primary">
-              Discovers Beauty
-            </span>
+            Discovers Beauty
           </h1>
 
           {/* Subheadline */}

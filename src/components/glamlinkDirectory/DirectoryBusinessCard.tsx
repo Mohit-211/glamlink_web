@@ -1,5 +1,5 @@
 import { BadgeCheck, ExternalLink, MapPin, Store } from "lucide-react";
-import { getProfessionalType, type DirectoryBusiness } from "@/lib/directory";
+import type { DirectoryBusiness } from "@/lib/directory";
 import StarRating from "./StarRating";
 import { GoogleWordmark } from "./GoogleAttribution";
 
@@ -9,7 +9,6 @@ interface DirectoryBusinessCardProps {
 }
 
 export default function DirectoryBusinessCard({ business, onClaim }: DirectoryBusinessCardProps) {
-  const category = getProfessionalType(business.professionalType)?.label ?? "Beauty + Wellness";
   const href = business.websiteUrl ?? business.mapsUrl;
 
   return (
@@ -28,8 +27,8 @@ export default function DirectoryBusinessCard({ business, onClaim }: DirectoryBu
             <Store className="h-14 w-14" />
           </div>
         )}
-        <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
-          {category}
+        <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-xs font-semibold text-foreground shadow-soft">
+          {business.category}
         </span>
       </div>
 

@@ -146,7 +146,7 @@ export default function ChangePasswordTab() {
                         </div>
                     </div>
                 ))}
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                     Password must be at least 8 characters and different from your current password.
                 </p>
                 <button

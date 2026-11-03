@@ -48,7 +48,7 @@ export default function DigitalCard() {
         <div className="space-y-6">
           
           {/* CARD SETTINGS */}
-          <div className="bg-card p-6 rounded-2xl shadow-sm border">
+          <div className="bg-card p-6 rounded-2xl shadow-soft border">
             <h2 className="text-lg font-semibold mb-4">Profile Info</h2>
 
             <div className="grid grid-cols-2 gap-4">
@@ -82,7 +82,7 @@ export default function DigitalCard() {
         <div className="flex justify-center">
           <div className="sticky top-24 w-full max-w-sm">
 
-            <div className="bg-card rounded-3xl shadow-xl overflow-hidden transition-all hover:shadow-2xl">
+            <div className="bg-card rounded-3xl shadow-large overflow-hidden transition-all hover:shadow-large">
               
               {/* Banner */}
               <div className="h-32 bg-primary" />
@@ -91,11 +91,11 @@ export default function DigitalCard() {
                 
                 {/* Avatar + QR */}
                 <div className="flex justify-between items-end">
-                  <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary text-primary-foreground text-2xl font-bold shadow-lg">
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center bg-primary text-primary-foreground text-2xl font-bold shadow-large">
                     {initials}
                   </div>
 
-                  <div className="bg-card p-2 rounded-xl shadow">
+                  <div className="bg-card p-2 rounded-xl shadow-soft">
                     <QRCode value={publicUrl} size={70} />
                   </div>
                 </div>

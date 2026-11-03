@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { MailCheck } from "lucide-react";
 import { toast } from "sonner";
 import { forgotPasswordApi } from "@/api/Api";
 import { readApiError } from "@/lib/apiError";
+import { safeNextPath, withNext } from "@/lib/auth";
 import AuthShell from "@/components/AuthPage/AuthShell";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14,8 +16,11 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * Forgot password: the API emails a reset link (valid 1 hour) that opens
  * /reset-password. It answers the same whether or not the account exists.
  * This is also how an account made with Google or Apple sets a password.
+ * `?next=` from sign-in is kept for "Sign in"; a draft card being claimed is
+ * also kept in this browser for after the reset (lib/cardToken).
  */
 export default function ForgotPasswordClient() {
+  const next = safeNextPath(useSearchParams().get("next"));
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -92,7 +97,7 @@ export default function ForgotPasswordClient() {
         </button>
         <p className="text-center text-sm text-muted-foreground">
           Remembered it?{" "}
-          <Link href="/login" className="link-glamlink">
+          <Link href={withNext("/login", next)} className="link-glamlink">
             Sign in
           </Link>
         </p>

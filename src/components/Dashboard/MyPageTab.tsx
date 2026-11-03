@@ -2,17 +2,20 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
-import { ExternalLink, EyeOff, Globe, ImagePlus, Loader2, Plus, Trash2 } from 'lucide-react';
+import { Clock, ExternalLink, EyeOff, Globe, ImagePlus, Loader2, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { getMyProfile, updateMyProfile } from '@/api/Api';
+import { getMyProfile, updateMyProfile, userSpecialtiesApi } from '@/api/Api';
 import BioEditor from '@/components/glamcard/GlamCardForm/LocationsSection/Bioeditor';
 import { readApiError } from '@/lib/apiError';
+import { BRAND_CATEGORIES, SHIPPING_OPTIONS } from '@/lib/api/profileContent';
 import { profileHref } from '@/lib/routes';
 import type { ProfileDetail, SocialLink } from '@/lib/api/types';
 
 /*
  * The owner's public page (/profiles/<slug>), from GET/PUT /my/profile (backend
  * handoff, 10.6). What is left empty here falls back to the Access card.
+ * Intro, category, shipping and the about image (contract of Nov 3) show once
+ * the API answers them in `page`; until then they say so and aren't sent.
  */
 
 interface PageFields {
@@ -22,7 +25,14 @@ interface PageFields {
   social: SocialLink[] | null;
   image: string | null;
   cover_image: string | null;
+  intro: string | null;
+  category: string | null;
+  shipping: string | null;
+  about_image: string | null;
 }
+
+/** The public view, with the Nov 3 fields while the shared type catches up. */
+type PublicPage = ProfileDetail & { intro?: string | null; about_image?: string | null };
 
 interface MyProfile {
   user_id: number;
@@ -30,11 +40,26 @@ interface MyProfile {
   page: Partial<PageFields> | null;
   visible: boolean;
   hidden_because: 'no_live_card' | 'unlisted' | null;
-  public: ProfileDetail | null;
+  public: PublicPage | null;
 }
 
 const MAX_SOCIAL = 10;
 const TAGLINE_MAX = 150;
+const INTRO_MAX = 300;
+
+/** The Nov 3 fields, each offered once the API answers it in `page`. */
+const NEW_FIELDS = [
+  { key: 'intro', label: 'intro' },
+  { key: 'category', label: 'category' },
+  { key: 'shipping', label: 'shipping' },
+  { key: 'about_image', label: 'about image' },
+] as const;
+type NewField = (typeof NEW_FIELDS)[number]['key'];
+
+const offers = (page: MyProfile['page'], key: NewField) => !!page && Object.prototype.hasOwnProperty.call(page, key);
+
+const listOf = (words: string[]) =>
+  words.length < 2 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`;
 
 interface ImagePick {
   file: File | null;
@@ -51,6 +76,7 @@ function ImageField({
   pick,
   fallback,
   wide,
+  landscape,
   onChange,
 }: {
   id: string;
@@ -59,6 +85,7 @@ function ImageField({
   pick: ImagePick;
   fallback?: string | null;
   wide?: boolean;
+  landscape?: boolean;
   onChange: (pick: ImagePick) => void;
 }) {
   const shown = pick.removed ? fallback : pick.preview || fallback;
@@ -67,7 +94,9 @@ function ImageField({
       <span className="label-glamlink">{label}</span>
       <div className="flex items-center gap-4">
         <div
-          className={`relative shrink-0 overflow-hidden rounded-2xl border border-border bg-muted ${wide ? 'aspect-3/1 w-56' : 'h-20 w-20'}`}
+          className={`relative shrink-0 overflow-hidden rounded-2xl border border-border bg-muted ${
+            wide ? 'aspect-3/1 w-56' : landscape ? 'aspect-4/3 w-28' : 'h-20 w-20'
+          }`}
         >
           {shown ? (
             // eslint-disable-next-line @next/next/no-img-element -- a local preview or the stored picture
@@ -121,6 +150,13 @@ export default function MyPageTab() {
   const [social, setSocial] = useState<SocialLink[]>([]);
   const [logo, setLogo] = useState<ImagePick>(noPick(null));
   const [cover, setCover] = useState<ImagePick>(noPick(null));
+  const [intro, setIntro] = useState('');
+  const [category, setCategory] = useState('');
+  const [shipping, setShipping] = useState('');
+  const [aboutImage, setAboutImage] = useState<ImagePick>(noPick(null));
+  // The specialties a professional's category is picked from; null until they load.
+  const [specialties, setSpecialties] = useState<string[] | null>(null);
+  const [specialtiesFailed, setSpecialtiesFailed] = useState(false);
 
   const fill = (data: MyProfile) => {
     setProfile(data);
@@ -131,6 +167,10 @@ export default function MyPageTab() {
     setSocial(page.social ?? []);
     setLogo(noPick(page.image));
     setCover(noPick(page.cover_image));
+    setIntro(page.intro ?? '');
+    setCategory(page.category ?? '');
+    setShipping(page.shipping ?? '');
+    setAboutImage(noPick(page.about_image));
   };
 
   useEffect(() => {
@@ -147,6 +187,35 @@ export default function MyPageTab() {
     };
   }, []);
 
+  const isBrand = profile?.public?.type === 'brand';
+  const wantsSpecialties = !!profile && !isBrand && offers(profile.page, 'category');
+  useEffect(() => {
+    if (!wantsSpecialties) return;
+    let active = true;
+    userSpecialtiesApi()
+      .then((res) => {
+        const rows: unknown[] = Array.isArray(res?.data?.rows) ? res.data.rows : [];
+        const names = rows
+          .map((row) => {
+            if (typeof row === 'string') return row;
+            const item = row as { name?: unknown; title?: unknown } | null;
+            return String(item?.name ?? item?.title ?? '');
+          })
+          .map((name) => name.trim())
+          // A category is at most 60 characters.
+          .filter((name) => name && name.length <= 60);
+        if (active) setSpecialties(Array.from(new Set(names)));
+      })
+      .catch(() => {
+        if (!active) return;
+        setSpecialties([]);
+        setSpecialtiesFailed(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [wantsSpecialties]);
+
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setSaving(true);
@@ -160,6 +229,15 @@ export default function MyPageTab() {
     else if (logo.removed) form.append('image', '');
     if (cover.file) form.append('images', cover.file);
     else if (cover.removed) form.append('cover_image', '');
+    // The Nov 3 fields go only to an API that has them (an older one refuses an unknown file field).
+    const page = profile?.page ?? null;
+    if (offers(page, 'intro')) form.append('intro', intro.trim());
+    if (offers(page, 'category')) form.append('category', category);
+    if (offers(page, 'shipping')) form.append('shipping', shipping);
+    if (offers(page, 'about_image')) {
+      if (aboutImage.file) form.append('about_image', aboutImage.file);
+      else if (aboutImage.removed) form.append('about_image', '');
+    }
 
     try {
       const res = await updateMyProfile(form);
@@ -187,6 +265,18 @@ export default function MyPageTab() {
   }
 
   const card = profile.public;
+  const can = (key: NewField) => offers(profile.page, key);
+  const missing = NEW_FIELDS.filter(({ key }) => !can(key)).map(({ label }) => label);
+  const missingNote = listOf(missing);
+
+  // A brand picks from the brand categories, a professional from the specialties; a saved value off the list stays.
+  const categoryOptions: { value: string; label: string }[] = isBrand
+    ? BRAND_CATEGORIES.map((c) => ({ value: c.key, label: `${c.label} Brand` }))
+    : (specialties ?? []).map((name) => ({ value: name, label: name }));
+  if (category && !categoryOptions.some((option) => option.value === category)) {
+    categoryOptions.unshift({ value: category, label: category });
+  }
+
   const errorFor = (field: string) =>
     fieldError?.field === field ? (
       <p role="alert" className="mt-1.5 text-xs text-destructive">
@@ -202,6 +292,12 @@ export default function MyPageTab() {
           <p className="mt-1 text-sm text-muted-foreground">
             Your page on Glamlink: what clients and brands see when they find you.
           </p>
+          {card?.type && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Listed as a {card.type === 'brand' ? 'brand' : 'beauty or wellness professional'}. To change this,
+              contact support.
+            </p>
+          )}
         </div>
         {profile.visible && (
           <Link href={profileHref(profile.slug)} target="_blank" className="btn-outline shrink-0 px-4 py-2 text-xs">
@@ -228,6 +324,19 @@ export default function MyPageTab() {
             ? 'Glamlink has hidden your page. Write to support@glamlink.net to bring it back.'
             : 'Your page goes live once your Access card is live.'}
       </p>
+
+      {missing.length > 0 && (
+        <p
+          role="status"
+          className="flex items-start gap-2 rounded-2xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground"
+        >
+          <Clock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>
+            {missingNote.charAt(0).toUpperCase() + missingNote.slice(1)} {missing.length === 1 ? "isn't" : "aren't"} available
+            yet. You&apos;ll be able to set {missing.length === 1 ? 'it' : 'them'} here soon.
+          </span>
+        </p>
+      )}
 
       <div className="grid gap-6 sm:grid-cols-2">
         <ImageField
@@ -270,12 +379,111 @@ export default function MyPageTab() {
         {errorFor('tagline')}
       </div>
 
+      {can('intro') && (
+        <div>
+          <label htmlFor="page-intro" className="label-glamlink">
+            Intro
+          </label>
+          <textarea
+            id="page-intro"
+            rows={3}
+            value={intro}
+            maxLength={INTRO_MAX}
+            onChange={(e) => setIntro(e.target.value)}
+            placeholder={card?.intro || 'A sentence or two about what you do'}
+            aria-invalid={fieldError?.field === 'intro' || undefined}
+            className="input-glamlink resize-y"
+          />
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            {intro.length}/{INTRO_MAX}. Shown over your cover image, under your name. Empty: your Access card bio.
+          </p>
+          {errorFor('intro')}
+        </div>
+      )}
+
       <div>
         <span className="label-glamlink">About</span>
         <BioEditor value={about} onChange={setAbout} placeholder="Tell clients about your work, your story and what to expect." />
         <p className="mt-1.5 text-xs text-muted-foreground">Up to 2,000 characters of text.</p>
         {errorFor('about')}
       </div>
+
+      {can('about_image') && (
+        <div>
+          <ImageField
+            id="page-about-image"
+            label="About image"
+            hint="Shown beside your About text. Empty: your first photo in Media & Images, else your Access card's cover photo."
+            pick={aboutImage}
+            fallback={card?.about_image && card.about_image !== profile.page?.about_image ? card.about_image : null}
+            landscape
+            onChange={setAboutImage}
+          />
+          {errorFor('about_image')}
+        </div>
+      )}
+
+      {(can('category') || can('shipping')) && (
+        <fieldset>
+          <legend className="text-sm font-semibold">Quick Info</legend>
+          <p className="mb-4 mt-1 text-xs text-muted-foreground">Lines in the Quick Info box on your page.</p>
+          <div className="grid gap-6 sm:grid-cols-2">
+            {can('category') && (
+              <div>
+                <label htmlFor="page-category" className="label-glamlink">
+                  Category
+                </label>
+                <select
+                  id="page-category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  disabled={!isBrand && specialties === null}
+                  aria-invalid={fieldError?.field === 'category' || undefined}
+                  className="input-glamlink"
+                >
+                  <option value="">{!isBrand && specialties === null ? 'Loading specialties…' : 'Not set'}</option>
+                  {categoryOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1.5 text-xs text-muted-foreground">
+                  {isBrand
+                    ? 'What kind of brand you are, as in “Skincare Brand”. Also shown under your name.'
+                    : specialtiesFailed
+                      ? "We couldn't load the specialties. Try again later."
+                      : 'Your main specialty. Also shown under your name.'}
+                </p>
+                {errorFor('category')}
+              </div>
+            )}
+            {can('shipping') && (
+              <div>
+                <label htmlFor="page-shipping" className="label-glamlink">
+                  Shipping
+                </label>
+                <select
+                  id="page-shipping"
+                  value={shipping}
+                  onChange={(e) => setShipping(e.target.value)}
+                  aria-invalid={fieldError?.field === 'shipping' || undefined}
+                  className="input-glamlink"
+                >
+                  <option value="">Not set</option>
+                  {SHIPPING_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1.5 text-xs text-muted-foreground">Whether and how far you ship.</p>
+                {errorFor('shipping')}
+              </div>
+            )}
+          </div>
+        </fieldset>
+      )}
 
       <div>
         <label htmlFor="page-website" className="label-glamlink">

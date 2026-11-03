@@ -1,12 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Eye, EyeOff, MailCheck } from "lucide-react";
-import { loginUser } from "@/api/Api";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
+import { loginUser, updateCard } from "@/api/Api";
 import { toast } from "sonner";
 import { readApiError } from "@/lib/apiError";
-import { safeNextPath } from "@/lib/auth";
+import { afterSignInPath, claimedCardOf, keepClaimThroughSignIn, safeNextPath, withNext } from "@/lib/auth";
+import { clearPendingClaim, getCardToken } from "@/lib/cardToken";
 import { useSession } from "@/lib/useSession";
 import AuthShell from "./AuthShell";
 import {
@@ -25,15 +26,18 @@ type FieldErrors = {
   password?: string;
 };
 
-/** Where to go after signing in: `?next=` when it is a path on this site. */
-const nextPath = () =>
-  typeof window === "undefined"
-    ? null
-    : safeNextPath(new URLSearchParams(window.location.search).get("next"));
+type Notice =
+  | { kind: "verify" | "set-password"; email: string }
+  /** The email is an app account, which can't sign in here: the draft card can take another email. */
+  | { kind: "app-account"; email: string; cardId: string };
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login({ onSuccess }: LoginProps = {}) {
   const router = useRouter();
   const session = useSession();
+  // Where to go after signing in: `?next=` when it is a path on this site.
+  const next = safeNextPath(useSearchParams().get("next"));
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -42,7 +46,10 @@ export default function Login({ onSuccess }: LoginProps = {}) {
   });
   const [errors, setErrors] = useState<FieldErrors>({});
   // Shown instead of a toast when the account needs the person to act by email.
-  const [notice, setNotice] = useState<{ kind: "verify" | "set-password"; email: string } | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
+  const [cardEmail, setCardEmail] = useState("");
+  const [cardEmailError, setCardEmailError] = useState<string | null>(null);
+  const [switching, setSwitching] = useState(false);
 
   useEffect(() => {
     const storedPayload = getFormDataFromSession();
@@ -50,17 +57,20 @@ export default function Login({ onSuccess }: LoginProps = {}) {
       storedPayload && typeof storedPayload.email === "string"
         ? storedPayload.email
         : null;
+    // A guest sent here to claim their draft card: keep the claim through the
+    // email links (verify, set or reset the password) that open new tabs.
+    keepClaimThroughSignIn(next, savedEmail);
     if (savedEmail) {
       setForm((prev) => ({ ...prev, email: savedEmail }));
     }
-  }, []);
+  }, [next]);
 
   // Already signed in (restored from the refresh cookie): skip the form.
   useEffect(() => {
     if (session.status === "signed-in" && !onSuccess) {
-      router.replace(nextPath() ?? "/dashboard");
+      router.replace(afterSignInPath(next, session.user?.email));
     }
-  }, [session.status, router, onSuccess]);
+  }, [session.status, session.user?.email, router, onSuccess, next]);
 
   const validate = (): FieldErrors => {
     const next: FieldErrors = {};
@@ -106,7 +116,7 @@ export default function Login({ onSuccess }: LoginProps = {}) {
         onSuccess();
         return;
       }
-      router.push(nextPath() ?? "/dashboard");
+      router.push(afterSignInPath(next, response?.data?.user?.email ?? form.email.trim()));
     } catch (error: any) {
       const { code, message } = readApiError(error);
       switch (code) {
@@ -121,16 +131,58 @@ export default function Login({ onSuccess }: LoginProps = {}) {
           setErrors({ password: "Invalid email or password." });
           toast.error("Invalid email or password.");
           break;
-        case "PROFESSIONAL_REQUIRED":
-          toast.error(
-            "This is a Glamlink app account. The website is for professionals; sign in through the app."
-          );
+        case "PROFESSIONAL_REQUIRED": {
+          // Sent here to claim a draft card made with this email: the card can take another email instead.
+          const cardId = claimedCardOf(next);
+          if (cardId && getCardToken(cardId)) {
+            setNotice({ kind: "app-account", email: form.email.trim(), cardId });
+          } else {
+            toast.error(
+              "This is a Glamlink app account. The website is for professionals; sign in through the app."
+            );
+          }
           break;
+        }
         default:
           toast.error(message);
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  /** Gives the guest's draft card another email, so it can be bought without the app account. */
+  const switchCardEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (notice?.kind !== "app-account") return;
+    const email = cardEmail.trim();
+    if (!EMAIL_REGEX.test(email)) {
+      setCardEmailError("Please enter a valid email address");
+      return;
+    }
+    if (email.toLowerCase() === notice.email.toLowerCase()) {
+      setCardEmailError("Use an email other than your app account's.");
+      return;
+    }
+    setSwitching(true);
+    setCardEmailError(null);
+    try {
+      const formData = new FormData();
+      formData.append("email", email);
+      await updateCard(notice.cardId, formData);
+      clearPendingClaim(notice.cardId);
+      // The form's saved copy holds the old email (the payment form would prefill it).
+      clearFormDataFromSession();
+      toast.success(`Your card now uses ${email}.`);
+      router.push(`/pricing?businessCardId=${encodeURIComponent(notice.cardId)}`);
+    } catch (error) {
+      const { code, message } = readApiError(error);
+      if (code === "INVALID_CARD") setCardEmailError(message);
+      else if (code === "CARD_TOKEN_REQUIRED" || code === "SIGN_IN_REQUIRED")
+        setCardEmailError("This card can no longer be changed. Please create your card again.");
+      else toast.error(message);
+    } finally {
+      setSwitching(false);
     }
   };
 
@@ -147,7 +199,39 @@ export default function Login({ onSuccess }: LoginProps = {}) {
       <p className="mt-2 text-sm text-muted-foreground">
         Welcome back — sign in to your account
       </p>
-      {notice && (
+      {notice?.kind === "app-account" ? (
+        <div className="mt-6 rounded-xl border border-primary/25 bg-accent/60 p-4 text-sm text-foreground">
+          <p>
+            <span className="font-medium">{notice.email}</span> is a Glamlink app account, which signs in through the
+            app. To finish your Access card here, give the card another email.
+          </p>
+          <form onSubmit={switchCardEmail} noValidate className="mt-3 space-y-2">
+            <label htmlFor="card-email" className="label-glamlink">
+              Email for your card
+            </label>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <input
+                id="card-email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@yourbusiness.com"
+                value={cardEmail}
+                onChange={(e) => {
+                  setCardEmail(e.target.value);
+                  setCardEmailError(null);
+                }}
+                aria-invalid={!!cardEmailError}
+                className="input-glamlink"
+              />
+              <button type="submit" disabled={switching} className="btn-primary shrink-0 disabled:opacity-50">
+                {switching && <Loader2 className="h-4 w-4 animate-spin" />}
+                Use this email
+              </button>
+            </div>
+            {cardEmailError && <p className="text-xs text-destructive">{cardEmailError}</p>}
+          </form>
+        </div>
+      ) : notice ? (
         <div className="mt-6 flex gap-3 rounded-xl border border-primary/25 bg-accent/60 p-4 text-sm text-foreground">
           <MailCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           {notice.kind === "verify" ? (
@@ -158,14 +242,14 @@ export default function Login({ onSuccess }: LoginProps = {}) {
           ) : (
             <p>
               This account doesn&apos;t have a password yet.{" "}
-              <Link href="/forgot-password" className="link-glamlink text-secondary">
+              <Link href={withNext("/forgot-password", next)} className="link-glamlink text-secondary">
                 Set one with &ldquo;Forgot password&rdquo;
               </Link>
               .
             </p>
           )}
         </div>
-      )}
+      ) : null}
       <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-5">
         {/* Email */}
         <div>
@@ -192,7 +276,7 @@ export default function Login({ onSuccess }: LoginProps = {}) {
             <label htmlFor="password" className="label-glamlink">
               Password
             </label>
-            <Link href="/forgot-password" className="link-glamlink text-xs">
+            <Link href={withNext("/forgot-password", next)} className="link-glamlink text-xs">
               Forgot password?
             </Link>
           </div>
@@ -235,7 +319,7 @@ export default function Login({ onSuccess }: LoginProps = {}) {
         {/* Register Link */}
         <p className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="link-glamlink">
+          <Link href={withNext("/register", next)} className="link-glamlink">
             Create Access Account
           </Link>
         </p>

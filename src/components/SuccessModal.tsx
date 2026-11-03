@@ -24,7 +24,7 @@ const SuccessModal: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center scrim">
-      <div className="w-full max-w-md rounded-xl bg-card p-6 shadow-xl text-center">
+      <div className="w-full max-w-md rounded-xl bg-card p-6 shadow-large text-center">
         <h2 className="text-xl font-semibold text-foreground">
           ✅ {title}
         </h2>

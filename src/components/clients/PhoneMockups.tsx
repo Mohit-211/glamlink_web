@@ -68,7 +68,7 @@ const PhoneMockups = () => {
                   <div
                     className={`
                       relative w-[160px] xs:w-[180px] sm:w-[200px] md:w-[240px] lg:w-[280px]
-                      aspect-[9/19] rounded-[1.8rem] md:rounded-[2.2rem] overflow-hidden
+                      aspect-[9/19] rounded-3xl md:rounded-4xl overflow-hidden
                       border-[8px] md:border-[12px] border-overlay/90 shadow-lg shadow-overlay/20
                       transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-primary
                     `}
@@ -83,7 +83,7 @@ const PhoneMockups = () => {
                     />
 
                     {/* Light screen overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-overlay/10 via-transparent to-card/5 pointer-events-none" />
+                    <div className="absolute inset-0 bg-linear-to-t from-overlay/10 via-transparent to-card/5 pointer-events-none" />
                   </div>
                 </div>
               );
@@ -95,7 +95,7 @@ const PhoneMockups = () => {
         <div className="text-center">
           <Button
             size="lg"
-            className="group px-7 md:px-9 py-5 md:py-6 bg-primary hover:bg-secondary text-primary-foreground font-semibold text-base md:text-lg rounded-full shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2.5 mx-auto"
+            className="group px-7 md:px-9 py-5 md:py-6 font-semibold text-base md:text-lg rounded-full shadow-large shadow-primary/25 hover:shadow-large hover:shadow-primary/35 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2.5 mx-auto"
               onClick={() => setIsModalOpen(true)}
           
           >

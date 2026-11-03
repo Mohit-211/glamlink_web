@@ -1,9 +1,11 @@
 import axios, { type AxiosRequestConfig, type InternalAxiosRequestConfig } from "axios";
 import { API_URL } from "@/lib/config";
+import type { OwnerEducation, OwnerMedia } from "@/lib/api/profileContent";
 import { handleSignedOut } from "@/lib/auth";
 import {
   clearSession,
   getAccessToken,
+  getSessionState,
   peekAccessToken,
   refreshSession,
   sessionReady,
@@ -17,6 +19,9 @@ declare module "axios" {
     /** The call needs a signed-in account: wait for the session, and send the
      *  person to sign in if there is none. */
     requireAuth?: boolean;
+    /** Guests make this call too (with a card token), but a signed-in owner must
+     *  send their access token: wait for the session to be restored first. */
+    withSession?: boolean;
     /** Internal: this request was already retried after a refresh. */
     _retried?: boolean;
   }
@@ -24,26 +29,33 @@ declare module "axios" {
 
 const isBrowser = typeof window !== "undefined";
 
-const api = axios.create({
+/** The browser API client. Exported for the feature modules in src/api/ (directory.ts). */
+export const api = axios.create({
   baseURL: API_URL,
 });
 
-/* The access token lives in memory (lib/session). Calls that need sign-in wait
-   for the session to be restored on page load; every other call sends the token
-   when there is a fresh one, so optional-auth routes show the person's view. */
+/* The access token lives in memory (lib/session). Calls that need sign-in, and
+   the purchase calls (`withSession`), wait for the session to be restored on
+   page load. A signed-in person's calls always carry a fresh token: a stale one
+   is refreshed first. Other calls from someone signed out go without one. */
 api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   if (!isBrowser) return config;
   let token = peekAccessToken();
-  if (!token && config.requireAuth) {
-    await sessionReady();
-    token = await getAccessToken();
+  if (!token) {
+    let { status } = getSessionState();
+    if (status === "loading" && (config.requireAuth || config.withSession)) ({ status } = await sessionReady());
+    if (config.requireAuth || status === "signed-in") token = await getAccessToken();
   }
   if (token) config.headers.set("Authorization", `Bearer ${token}`);
   return config;
 });
 
-/* 401 SESSION_EXPIRED: the access token ran out or the session ended. Refresh
-   once and retry; if the refresh fails too, the person is signed out. */
+/** 401s that a fresh access token can fix: it ran out, or it went unsent while stale. */
+const RETRY_AFTER_REFRESH = new Set(["SESSION_EXPIRED", "SIGN_IN_REQUIRED", "CARD_TOKEN_REQUIRED"]);
+
+/* A 401 the access token can fix: refresh once and retry. SIGN_IN_REQUIRED and
+   CARD_TOKEN_REQUIRED are retried only for someone signed in (a guest's card
+   token is what is missing then). If the refresh fails, the person is signed out. */
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -52,12 +64,16 @@ api.interceptors.response.use(
     const code = error?.response?.data?.code;
     if (!isBrowser || !config || status !== 401) return Promise.reject(error);
 
-    if (code === "SESSION_EXPIRED" && !config._retried) {
-      const token = await refreshSession();
-      if (token) {
-        config._retried = true;
-        config.headers = { ...(config.headers as any), Authorization: `Bearer ${token}` };
-        return api.request(config);
+    if (RETRY_AFTER_REFRESH.has(code) && !config._retried) {
+      let session = getSessionState();
+      if (session.status === "loading") session = await sessionReady();
+      if (code === "SESSION_EXPIRED" || session.status === "signed-in") {
+        const token = await refreshSession();
+        if (token) {
+          config._retried = true;
+          config.headers = { ...(config.headers as any), Authorization: `Bearer ${token}` };
+          return api.request(config);
+        }
       }
     }
     if ((code === "SESSION_EXPIRED" || code === "SIGN_IN_REQUIRED") && config.requireAuth) {
@@ -273,6 +289,7 @@ export const createCard = async (formData: FormData) => {
 /** Owner edit (signed in), or a guest's draft (card token). */
 export const updateCard = async (cardId: string | number, formData: FormData) => {
   const { data } = await api.put(`businessCard/updateBusinessCard/${cardId}`, formData, {
+    withSession: true,
     headers: cardTokenHeader(cardId),
   });
   return data;
@@ -281,7 +298,7 @@ export const reorderFeaturedLinks = async (cardId: string | number, featured_lin
   const { data } = await api.put(
     `businessCard/${cardId}/featured-links/reorder`,
     { featured_links },
-    { headers: cardTokenHeader(cardId) }
+    { withSession: true, headers: cardTokenHeader(cardId) }
   );
   return data;
 };
@@ -302,10 +319,14 @@ export const getMyBusinessCardForDashboard = async () => {
 /* ============================= */
 /* 📌 Access plans, checkout, subscription */
 /* ============================= */
+// The purchase calls carry the card token (a guest) and, for a signed-in owner,
+// the access token (`withSession`): an owner holds no card token.
+
 /** Plans with prices for whoever asks: a guest passes their draft card for personal prices. */
 export const getAccessPlans = async (businessCardId?: string | number | null) => {
   const { data } = await api.get("access/plans", {
     params: businessCardId ? { business_card_id: businessCardId } : undefined,
+    withSession: true,
     headers: cardTokenHeader(businessCardId),
   });
   return data;
@@ -316,32 +337,42 @@ interface SelectPlanPayload {
 }
 export const SelectPlanAPI = async (payload: SelectPlanPayload) => {
   const { data } = await api.post("businessCard/select-plan", payload, {
+    withSession: true,
     headers: cardTokenHeader(payload.business_card_id),
   });
   return data;
 };
+/** A quote for a plan, kept as a checkout. Answers the card's pending checkout for the same plan, or 409
+ *  CHECKOUT_IN_PROGRESS `{checkout_id}` while a payment for the card is processing or has gone through. */
 export const quoteCheckout = async (payload: {
   business_card_id: number | string;
   plan_type: string;
   rate_id?: string;
 }) => {
   const { data } = await api.post("access/checkout/quote", payload, {
+    withSession: true,
     headers: cardTokenHeader(payload.business_card_id),
   });
   return data;
 };
+/** Starts paying a checkout: `{client_secret, publishable_key}`, or `{paid: true}` when nothing is due. */
 export const payCheckout = async (checkoutId: number | string, businessCardId: number | string) => {
   const { data } = await api.post(`access/checkout/${checkoutId}/pay`, {}, {
+    withSession: true,
     headers: cardTokenHeader(businessCardId),
   });
   return data;
 };
+/** The checkout as it stands (the API asks Stripe while it waits): its status, the client secret while it can
+ *  still be paid, and the card once paid. */
 export const getCheckout = async (checkoutId: number | string, businessCardId: number | string) => {
   const { data } = await api.get(`access/checkout/${checkoutId}`, {
+    withSession: true,
     headers: cardTokenHeader(businessCardId),
   });
   return data;
 };
+/** The person's Access Pro seat, or null. `past_due`: the last renewal failed. */
 export const getAccessSubscription = async () => {
   const { data } = await api.get("access/subscription", { requireAuth: true });
   return data;
@@ -353,6 +384,11 @@ export const cancelAccessSubscription = async () => {
 };
 export const resumeAccessSubscription = async () => {
   const { data } = await api.post("access/subscription/resume", {}, { requireAuth: true });
+  return data;
+};
+/** Stripe's billing page (update the card, see invoices): `{url}`, or 404 NO_CUSTOMER before a first payment. */
+export const openBillingPortal = async (returnUrl: string) => {
+  const { data } = await api.post("access/billing-portal", { return_url: returnUrl }, { requireAuth: true });
   return data;
 };
 
@@ -367,12 +403,14 @@ export const addNewAddress = async (payload: any) => {
 };
 export const addNewAddressWithoutToken = async (payload: any) => {
   const { data } = await api.post("order/addNewAddress-public", payload, {
+    withSession: true,
     headers: cardTokenHeader(payload?.business_card_id),
   });
   return data;
 };
 export const EditAddressWithoutTokenAPI = async (addressId: number | string, payload: any) => {
   const { data } = await api.put(`order/editAddress-public/${addressId}`, payload, {
+    withSession: true,
     headers: cardTokenHeader(payload?.business_card_id),
   });
   return data;
@@ -474,16 +512,6 @@ export const trackAdEvent = async (payload: { ad_id: number; type: "impression" 
 /* ============================= */
 /* 📌 Professional and brand pages */
 /* ============================= */
-export const getProfilesApi = async (params: {
-  type?: "individual" | "brand";
-  featured?: boolean;
-  search?: string;
-  page?: number;
-  limit?: number;
-}) => {
-  const { data } = await api.get("profiles", { params });
-  return data;
-};
 export const trackProfileEventApi = async (
   slug: string,
   payload: {
@@ -504,7 +532,8 @@ export const getMyProfile = async () => {
   const { data } = await api.get("my/profile", { requireAuth: true });
   return data;
 };
-// A form: tagline, about, website, social (JSON), profile_image and images (the cover) as files
+// A form: tagline, about, intro, category, shipping, website, social (JSON); profile_image (the logo), images (the
+// cover) and about_image as files, or image / cover_image / about_image "" to remove one
 export const updateMyProfile = async (formData: FormData) => {
   const { data } = await api.put("my/profile", formData, { requireAuth: true });
   return data;
@@ -529,6 +558,112 @@ export const updateMyProduct = async (id: number | string, formData: FormData) =
 export const deleteMyProduct = async (id: number | string) => {
   const { data } = await api.delete(`my/products/${id}`, { requireAuth: true });
   return data;
+};
+/* ============================= */
+/* 📌 The owner's Media & Images and Education (dashboard) */
+/* ============================= */
+// Every answer comes in the API's envelope; `data` holds what each comment names.
+export interface ApiAnswer<T> {
+  success?: boolean;
+  message?: string;
+  data: T;
+}
+export interface OwnerRows<T> {
+  count: number;
+  rows: T[];
+}
+/** Reports how much of a request's upload has gone, from 0 to 1. */
+export type UploadProgress = (fraction: number) => void;
+const uploadProgress = (onProgress?: UploadProgress): AxiosRequestConfig =>
+  onProgress
+    ? { onUploadProgress: (e) => onProgress(Math.min(1, e.progress ?? (e.total ? e.loaded / e.total : 0))) }
+    : {};
+
+// { count, rows: OwnerMedia[] }: the owner's items in order, hidden ones too
+export const getMyMedia = async (params?: { page?: number; limit?: number }) => {
+  const { data } = await api.get<ApiAnswer<OwnerRows<OwnerMedia>>>("my/profile/media", { params, requireAuth: true });
+  return data;
+};
+// A form: `images` (at most 20 a request) and/or `videos` with `video_thumbnails` (the same order, at most 10), plus
+// `captions` (JSON, images then videos). { rows }: the items added
+export const addMyMedia = async (formData: FormData, onProgress?: UploadProgress) => {
+  const { data } = await api.post<ApiAnswer<{ rows: OwnerMedia[] }>>("my/profile/media", formData, {
+    requireAuth: true,
+    ...uploadProgress(onProgress),
+  });
+  return data;
+};
+// A YouTube or Vimeo link. { rows }
+export const addMyMediaLink = async (payload: { url: string; caption?: string }) => {
+  const { data } = await api.post<ApiAnswer<{ rows: OwnerMedia[] }>>("my/profile/media", payload, { requireAuth: true });
+  return data;
+};
+// Copies the Access card's gallery items not imported yet. { rows }
+export const importMyCardMedia = async () => {
+  const { data } = await api.post<ApiAnswer<{ rows: OwnerMedia[] }>>("my/profile/media/import-card", {}, { requireAuth: true });
+  return data;
+};
+// The item
+export const updateMyMedia = async (id: number, payload: { caption?: string; alt?: string }) => {
+  const { data } = await api.put<ApiAnswer<OwnerMedia>>(`my/profile/media/${id}`, payload, { requireAuth: true });
+  return data;
+};
+// The full order: every id. { ok: true }
+export const reorderMyMedia = async (ids: number[]) => {
+  const { data } = await api.put<ApiAnswer<{ ok: boolean }>>("my/profile/media/order", { ids }, { requireAuth: true });
+  return data;
+};
+export const deleteMyMedia = async (id: number) => {
+  const { data } = await api.delete<ApiAnswer<{ deleted: boolean }>>(`my/profile/media/${id}`, { requireAuth: true });
+  return data;
+};
+// { count, rows: OwnerEducation[] }: the owner's posts in order, drafts too
+export const getMyEducation = async (params?: { page?: number; limit?: number }) => {
+  const { data } = await api.get<ApiAnswer<OwnerRows<OwnerEducation>>>("my/profile/education", { params, requireAuth: true });
+  return data;
+};
+// One post, with its `body`
+export const getMyEducationItem = async (id: number) => {
+  const { data } = await api.get<ApiAnswer<OwnerEducation>>(`my/profile/education/${id}`, { requireAuth: true });
+  return data;
+};
+// A form: kind ("video" | "article"), title, summary, status ("published" | "draft"), body (articles' HTML),
+// video_url (YouTube or Vimeo) or `videos` + `video_thumbnails` files (videos), the cover as an `images` file or a
+// `cover_image` link ("" removes it). The post
+export const createMyEducation = async (formData: FormData, onProgress?: UploadProgress) => {
+  const { data } = await api.post<ApiAnswer<OwnerEducation>>("my/profile/education", formData, {
+    requireAuth: true,
+    ...uploadProgress(onProgress),
+  });
+  return data;
+};
+// The same fields as creating one, each optional. The post
+export const updateMyEducation = async (id: number, formData: FormData, onProgress?: UploadProgress) => {
+  const { data } = await api.put<ApiAnswer<OwnerEducation>>(`my/profile/education/${id}`, formData, {
+    requireAuth: true,
+    ...uploadProgress(onProgress),
+  });
+  return data;
+};
+// The full order: every id. { ok: true }
+export const reorderMyEducation = async (ids: number[]) => {
+  const { data } = await api.put<ApiAnswer<{ ok: boolean }>>("my/profile/education/order", { ids }, { requireAuth: true });
+  return data;
+};
+export const deleteMyEducation = async (id: number) => {
+  const { data } = await api.delete<ApiAnswer<{ deleted: boolean }>>(`my/profile/education/${id}`, { requireAuth: true });
+  return data;
+};
+/** One picture for a blog post's body (`images`). Answers its link. */
+export const uploadMyProfileImage = async (file: File): Promise<string> => {
+  const form = new FormData();
+  form.append("images", file);
+  const { data } = await api.post<ApiAnswer<{ location?: string }> & { location?: string }>("my/profile/uploads", form, {
+    requireAuth: true,
+  });
+  const location = data?.data?.location ?? data?.location;
+  if (!location) throw new Error("The picture didn't upload. Please try again.");
+  return location;
 };
 /* ============================= */
 /* 📌 Directory */
@@ -557,17 +692,9 @@ export const getGoogleListings = async (params: {
   const { data } = await api.get("directory/google", { params });
   return data;
 };
-export const findGoogleBusiness = async (q: string) => {
-  const { data } = await api.get("directory/google/search", { params: { q } });
-  return data;
-};
+// A Google listing as form fields: "Claim This Profile" prefills the Access form from it.
 export const getGooglePlaceForm = async (placeId: string) => {
   const { data } = await api.get(`directory/google/places/${encodeURIComponent(placeId)}`);
-  return data;
-};
-// The directory form: kept as sent for admins to review (photos as profile_image and images).
-export const submitDirectoryApplication = async (formData: FormData) => {
-  const { data } = await api.post("directory/applications", formData);
   return data;
 };
 /* ============================= */

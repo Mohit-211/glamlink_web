@@ -57,7 +57,7 @@ export default async function DigitalIssuePage({ params }: { params: Params }) {
           scrolling="no"
           allow="clipboard-write; autoplay; fullscreen"
           allowFullScreen
-          className="h-[75vh] min-h-120 w-full rounded-lg border-0 shadow-lg"
+          className="h-[75vh] min-h-120 w-full rounded-lg border-0 shadow-large"
         />
       ) : (
         <p className="text-muted-foreground">The digital edition of this issue is not available yet.</p>

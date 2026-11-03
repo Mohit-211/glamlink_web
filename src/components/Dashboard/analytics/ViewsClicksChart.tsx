@@ -149,7 +149,7 @@ export default function ViewsClicksChart({
                     y={geometry.y(t)}
                     dy="0.32em"
                     textAnchor="end"
-                    className="fill-muted-foreground text-[11px] tabular-nums"
+                    className="fill-muted-foreground text-xs tabular-nums"
                   >
                     {formatNumber(t)}
                   </text>
@@ -166,7 +166,7 @@ export default function ViewsClicksChart({
                     textAnchor={
                       data.length === 1 ? 'middle' : i === 0 ? 'start' : i === data.length - 1 ? 'end' : 'middle'
                     }
-                    className="fill-muted-foreground text-[11px]"
+                    className="fill-muted-foreground text-xs"
                   >
                     {formatShortDate(d.date)}
                   </text>

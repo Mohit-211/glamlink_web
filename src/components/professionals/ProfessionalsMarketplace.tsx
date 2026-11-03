@@ -68,7 +68,7 @@ const ProfessionalCard = ({
   return (
     <div
       onClick={() => pro.is_details && onCardClick(pro)}
-      className={`group rounded-[22px] overflow-hidden bg-card border-2 border-primary/30 shadow-md hover:shadow-xl hover:border-secondary transition-all duration-300 flex flex-col select-none ${
+      className={`group rounded-3xl overflow-hidden bg-card border-2 border-primary/30 shadow-medium hover:shadow-large hover:border-secondary transition-all duration-300 flex flex-col select-none ${
         pro.is_details ? "cursor-pointer" : "cursor-default"
       }`}
     >
@@ -80,7 +80,7 @@ const ProfessionalCard = ({
           className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
         />
         {founderBadge && (
-          <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md tracking-wide">
+          <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-medium tracking-wide">
             {founderBadge}
           </span>
         )}
@@ -88,7 +88,7 @@ const ProfessionalCard = ({
 
       {/* Info */}
       <div className="p-5 flex flex-col gap-2 flex-1">
-        <h3 className="text-[17px] font-semibold text-foreground leading-tight">{pro.name}</h3>
+        <h3 className="text-lg font-semibold text-foreground leading-tight">{pro.name}</h3>
 
         <p className="text-muted-foreground text-sm -mt-1">
           {pro.professional_title || "Beauty Expert"}
@@ -117,7 +117,7 @@ const ProfessionalCard = ({
 
         <Button
           onClick={(e) => e.stopPropagation()}
-          className="mt-auto w-full bg-primary hover:bg-secondary text-primary-foreground rounded-full py-5 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 gap-2"
+          className="mt-auto w-full py-5 font-semibold shadow-soft hover:shadow-medium"
         >
           <CalendarDays className="w-4 h-4" />
          CONNECT
@@ -183,8 +183,6 @@ const mapProToGlamCardData = (pro: Professional): any => ({
   locations: pro.locations || [],
 
   // GlamCardFormData required fields with safe defaults
-  offer_promotion: false,
-  promotion_details: "",
   booking_link: "",
   bio: "",
   services: [],
@@ -295,7 +293,7 @@ console.log(allSpecialties,"")
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
           <h1 className="hero-title">
-            <span className="text-primary">Meet the Professionals</span>
+            Meet the Professionals
           </h1>
           <p className="hero-subtitle mt-6 max-w-3xl mx-auto">
             Browse our verified beauty experts ready to transform your look.
@@ -314,7 +312,7 @@ console.log(allSpecialties,"")
                 placeholder="Search professionals..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-5 py-3 bg-card border border-border rounded-full text-sm focus:outline-none focus:border-primary transition shadow-sm"
+                className="w-full pl-11 pr-5 py-3 bg-card border border-border rounded-full text-sm focus:outline-none focus:border-primary transition shadow-soft"
               />
             </div>
 
@@ -322,7 +320,7 @@ console.log(allSpecialties,"")
             <div className="relative" ref={sortRef}>
               <button
                 onClick={() => setSortOpen((o) => !o)}
-                className="inline-flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-full text-sm font-medium text-foreground/80 shadow-sm hover:border-secondary transition whitespace-nowrap"
+                className="inline-flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-full text-sm font-medium text-foreground/80 shadow-soft hover:border-secondary transition whitespace-nowrap"
               >
                 <ChevronsUpDown className="w-4 h-4 text-muted-foreground/80" />
                 {/* FIX 1: Clean label — no "undefined" when nothing selected */}
@@ -340,7 +338,7 @@ console.log(allSpecialties,"")
 
               {/* Dropdown Menu */}
               {sortOpen && (
-                <div className="absolute top-full mt-2 left-0 bg-card border border-border rounded-2xl shadow-lg z-20 min-w-[160px] overflow-hidden">
+                <div className="absolute top-full mt-2 left-0 bg-card border border-border rounded-2xl shadow-large z-20 min-w-[160px] overflow-hidden">
                   {sortOptions.map((option) => (
                     <button
                       key={option.value}
@@ -390,7 +388,7 @@ console.log(allSpecialties,"")
               {/* Filter Panel */}
               {filterOpen && (
                 <div
-                  className="absolute top-full mt-2 right-0 bg-card border border-border rounded-2xl shadow-xl z-30 w-72"
+                  className="absolute top-full mt-2 right-0 bg-card border border-border rounded-2xl shadow-large z-30 w-72"
                 >
                   {/* Tabs */}
                   <div className="flex border-b border-border">
@@ -566,7 +564,7 @@ console.log(allSpecialties,"")
             onClick={() => setSelectedPro(null)}
           >
             <div
-              className="relative bg-card rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="relative bg-card rounded-3xl shadow-large w-full max-w-2xl max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <button

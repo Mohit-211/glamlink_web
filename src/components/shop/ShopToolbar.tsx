@@ -4,48 +4,30 @@ import { useRouter } from "next/navigation";
 import { useTransition, type FormEvent } from "react";
 import { Loader2, Search } from "lucide-react";
 import { listHref } from "@/lib/searchParams";
-import type { ShopFilterValue } from "@/lib/api/types";
 
 interface ShopToolbarProps {
   search: string;
-  brand: string;
-  category: string;
-  brands: ShopFilterValue[];
+  /** The list's other choices (category, brand, price, sort, saved), kept by a new search. */
+  keep: Record<string, string>;
 }
 
 /**
- * Search box and brand picker for /shop. Without JavaScript it is a plain GET
- * form; with it, the URL keeps only the filters in use and the page stays put.
+ * The Shop's search box. Without JavaScript it is a plain GET form; with it, the URL keeps only the choices in use
+ * and the page stays put. The filters and sort are ListFilters, under it.
  */
-export default function ShopToolbar({ search, brand, category, brands }: ShopToolbarProps) {
+export default function ShopToolbar({ search, keep }: ShopToolbarProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
-  const go = (form: HTMLFormElement) => {
-    const data = new FormData(form);
-    const href = listHref("/shop", {
-      search: String(data.get("search") ?? "").trim(),
-      brand: String(data.get("brand") ?? ""),
-      category,
-    });
-    startTransition(() => router.push(href, { scroll: false }));
-  };
-
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    go(event.currentTarget);
+    const typed = String(new FormData(event.currentTarget).get("search") ?? "").trim();
+    startTransition(() => router.push(listHref("/shop", { ...keep, search: typed }), { scroll: false }));
   };
 
   return (
-    <form
-      action="/shop"
-      method="get"
-      role="search"
-      onSubmit={onSubmit}
-      className="flex flex-col gap-3 sm:flex-row"
-      aria-busy={pending}
-    >
-      {category && <input type="hidden" name="category" value={category} />}
+    <form action="/shop" method="get" role="search" onSubmit={onSubmit} className="flex flex-col gap-3 sm:flex-row" aria-busy={pending}>
+      {Object.entries(keep).map(([name, value]) => (value ? <input key={name} type="hidden" name={name} value={value} /> : null))}
       <div className="relative flex-1">
         <label htmlFor="shop-search" className="sr-only">
           Search products
@@ -64,28 +46,6 @@ export default function ShopToolbar({ search, brand, category, brands }: ShopToo
           className="input-glamlink rounded-full pl-11"
         />
       </div>
-
-      {brands.length > 0 && (
-        <div className="sm:w-60">
-          <label htmlFor="shop-brand" className="sr-only">
-            Brand
-          </label>
-          <select
-            id="shop-brand"
-            name="brand"
-            defaultValue={brand}
-            onChange={(event) => event.currentTarget.form && go(event.currentTarget.form)}
-            className="input-glamlink rounded-full"
-          >
-            <option value="">All brands</option>
-            {brands.map((option) => (
-              <option key={option.slug} value={option.slug}>
-                {option.name} ({option.count})
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
 
       <button type="submit" className="btn-primary shrink-0" disabled={pending}>
         {pending ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}

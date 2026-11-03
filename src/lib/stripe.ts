@@ -1,27 +1,59 @@
 /**
- * Stripe.js, loaded with the publishable key the API reports
- * (`GET /payment/stripe/stripe-key`), so the website always uses the same
- * Stripe account and mode (test or live) as the API's secret key.
- * NEXT_PUBLIC_STRIPE_PUBLIC_KEY is only a fallback if that call fails.
+ * Stripe.js, loaded with the publishable key that matches the payment:
+ *
+ * 1. the key `POST /access/checkout/:id/pay` answered with the client secret,
+ *    which is always the key of the account and mode that made the payment;
+ * 2. otherwise the key the API reports (`GET /payment/stripe/stripe-key`), so
+ *    the site follows the API's Stripe mode (test or live);
+ * 3. NEXT_PUBLIC_STRIPE_PUBLIC_KEY only if that call fails.
+ *
+ * A failed load is never kept: the next call tries again. getStripe resolves to
+ * null when Stripe can't load, and the page shows that payments are unavailable.
  */
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
-import { API_URL } from "@/lib/config";
+import { apiUrl } from "@/lib/config";
 
-let stripePromise: Promise<Stripe | null> | null = null;
+const isKey = (key: unknown): key is string => typeof key === "string" && key.startsWith("pk_");
 
-async function publishableKey(): Promise<string> {
-  try {
-    const res = await fetch(`${API_URL}/payment/stripe/stripe-key`);
-    const body = await res.json();
-    const key = body?.data?.publishable_key;
-    if (typeof key === "string" && key.startsWith("pk_")) return key;
-  } catch {
-    // Fall back below.
+let reportedKey: Promise<string | null> | null = null;
+const loaded = new Map<string, Promise<Stripe | null>>();
+
+/** The API's publishable key, kept once it answers; null when it can't be had. */
+function apiPublishableKey(): Promise<string | null> {
+  if (!reportedKey) {
+    reportedKey = fetch(apiUrl("payment/stripe/stripe-key"))
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body) => {
+        const key = body?.data?.publishable_key;
+        if (isKey(key)) return key;
+        throw new Error("The API did not report a Stripe publishable key.");
+      })
+      .catch((error) => {
+        reportedKey = null;
+        const fallback = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY;
+        if (isKey(fallback)) return fallback;
+        console.error("Stripe publishable key unavailable:", error);
+        return null;
+      });
   }
-  return process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY ?? "";
+  return reportedKey;
 }
 
-export function getStripe(): Promise<Stripe | null> {
-  if (!stripePromise) stripePromise = publishableKey().then((key) => (key ? loadStripe(key) : null));
-  return stripePromise;
+/** Stripe.js for `publishableKey` (the one /pay answered), else for the API's key. Null when it can't load. */
+export async function getStripe(publishableKey?: string | null): Promise<Stripe | null> {
+  const key = isKey(publishableKey) ? publishableKey : await apiPublishableKey();
+  if (!key) return null;
+  let stripe = loaded.get(key);
+  if (!stripe) {
+    stripe = loadStripe(key).catch((error) => {
+      console.error("Stripe.js failed to load:", error);
+      return null;
+    });
+    loaded.set(key, stripe);
+    // Never keep a failure: the next call loads again.
+    void stripe.then((result) => {
+      if (!result) loaded.delete(key);
+    });
+  }
+  return stripe;
 }

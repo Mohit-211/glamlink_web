@@ -2,10 +2,12 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Script from "next/script";
+import { useSearchParams } from "next/navigation";
 import { Eye, EyeOff, MailCheck } from "lucide-react";
 import { registerUser, resendVerification } from "@/api/Api";
 import { toast } from "sonner";
 import { readApiError } from "@/lib/apiError";
+import { keepClaimThroughSignIn, safeNextPath, withNext } from "@/lib/auth";
 import { passwordProblem } from "@/lib/password";
 import { getFormDataFromSession } from "../glamcard/GlamCardForm/Formdatasessionstorage";
 import AuthShell from "./AuthShell";
@@ -46,6 +48,9 @@ type FieldErrors = {
 };
 
 export default function Register() {
+  // From sign-in: where to go once signed in (e.g. claiming a draft Access card).
+  // The verification email opens a new tab, so a claim is also kept in this browser.
+  const next = safeNextPath(useSearchParams().get("next"));
   // Set once the API has emailed the verification link.
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [resending, setResending] = useState(false);
@@ -70,6 +75,7 @@ export default function Register() {
   // session — e.g. when GlamCardForm stored its submit payload).
   useEffect(() => {
     const storedPayload = getFormDataFromSession();
+    keepClaimThroughSignIn(next, typeof storedPayload?.email === "string" ? storedPayload.email : null);
     if (!storedPayload) return;
 
     setForm((prev) => ({
@@ -87,7 +93,7 @@ export default function Register() {
           ? storedPayload.phone
           : prev.mobile,
     }));
-  }, []);
+  }, [next]);
 
 
   const passwordStrength = (() => {
@@ -320,7 +326,7 @@ export default function Register() {
           </button>
           <p className="mt-4 text-sm text-muted-foreground">
             Already verified?{" "}
-            <Link href="/login" className="link-glamlink">
+            <Link href={withNext("/login", next)} className="link-glamlink">
               Sign in
             </Link>
           </p>
@@ -455,7 +461,7 @@ export default function Register() {
           {loading ? "Creating Access Account..." : "Create Access Account"}
         </button>
         {TURNSTILE_SITE_KEY && (
-          <p className="text-[11px] text-muted-foreground text-center">
+          <p className="text-xs text-muted-foreground text-center">
             This site is protected by Cloudflare Turnstile and its{" "}
             <a
               href="https://www.cloudflare.com/privacypolicy/"
@@ -479,7 +485,7 @@ export default function Register() {
         )}
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="link-glamlink">
+          <Link href={withNext("/login", next)} className="link-glamlink">
             Sign in
           </Link>
         </p>

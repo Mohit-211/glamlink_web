@@ -357,7 +357,7 @@ export default function ProductsTab() {
                     {[product.brand, product.category, price].filter(Boolean).join(' · ') || '—'}
                   </p>
                   <span
-                    className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                    className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
                       isDraft ? 'bg-muted text-muted-foreground' : 'bg-success/10 text-success'
                     }`}
                   >

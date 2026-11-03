@@ -8,6 +8,7 @@ import JsonLd from "@/components/content/JsonLd";
 import ProductTile from "@/components/content/ProductTile";
 import SectionHeading from "@/components/content/SectionHeading";
 import ShareProductButton from "@/components/blogs/ShareProductButton";
+import SaveProductButton from "@/components/shop/SaveProductButton";
 import { getProductById, getProductBySlug, getProducts } from "@/lib/api/public";
 import type { ProductCard, ProductDetail } from "@/lib/api/types";
 import { SITE_URL } from "@/lib/config";
@@ -175,6 +176,7 @@ export default async function ProductPage({ params }: { params: Params }) {
                 <span className="sr-only">(opens the seller&apos;s site)</span>
               </a>
             )}
+            <SaveProductButton productId={product.id} title={product.title} variant="button" className="px-5 py-2.5 font-medium" />
             <ShareProductButton url={url} title={product.title} />
           </div>
 

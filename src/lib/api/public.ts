@@ -2,17 +2,26 @@ import { apiUrl } from "@/lib/config";
 import type {
   ArticleCard,
   ArticleMention,
+  BrandFilters,
+  EducationCard,
+  EducationDetail,
+  GoogleListing,
   HomeSettings,
   JournalCategory,
   MagazineIssue,
   MagazineIssueDetail,
+  MapPin,
   Paged,
   ProductCard,
   ProductDetail,
+  ProfessionalFilters,
   ProfileCard,
   ProfileDetail,
   ProfileIssue,
+  ProfileMedia,
+  ProfileSort,
   ProfileType,
+  ShopSort,
   SearchGroup,
   SearchResults,
   ShopFilters,
@@ -147,6 +156,9 @@ export const getHomeSettings = () => getData<HomeSettings>("settings/home", { ta
 export const getFeaturedTopics = () =>
   getList<Topic>("journal/topic", { tags: ["topics"], query: { featured: true } });
 
+/** Every active topic. */
+export const getTopics = () => getList<Topic>("journal/topic", { tags: ["topics"] });
+
 /* ── Journal ─────────────────────────────────────────────── */
 
 export interface ArticleQuery extends PageQuery {
@@ -181,6 +193,14 @@ export interface ProductQuery extends PageQuery {
   owner?: string;
   search?: string;
   featured?: boolean;
+  /** Since Nov 3 (the Shop's filters and Saved list); an older API ignores them. */
+  sort?: ShopSort;
+  /** Inclusive. */
+  min_price?: number;
+  /** Exclusive, so price bands don't overlap. */
+  max_price?: number;
+  /** Comma-separated product ids (at most 100): the visitor's saved products. */
+  ids?: string;
 }
 
 export const getProducts = (query: ProductQuery) =>
@@ -200,10 +220,48 @@ export interface ProfileQuery extends PageQuery {
   type?: ProfileType;
   featured?: boolean;
   search?: string;
+  /** Since Nov 3 (the Professionals and Brands pages); an older API ignores them. */
+  sort?: ProfileSort;
+  specialty?: string;
+  category?: string;
+  shipping?: string;
+  state?: string;
+  city?: string;
+  lat?: number;
+  lng?: number;
 }
 
 export const getProfiles = (query: ProfileQuery) =>
   getPage<ProfileCard>("profiles", { tags: ["profiles", "cards"], query: { limit: 12, ...query } });
+
+/* ── The directory ───────────────────────────────────────── */
+
+const DIRECTORY_TAGS: CacheTag[] = ["profiles", "cards", "directory"];
+
+/** What the Professionals or the Brands page can be narrowed by, with counts. */
+export function getDirectoryFilters(type: "individual"): Promise<ProfessionalFilters | null>;
+export function getDirectoryFilters(type: "brand"): Promise<BrandFilters | null>;
+export function getDirectoryFilters(type: ProfileType) {
+  return getData<ProfessionalFilters | BrandFilters>("directory/filters", { tags: DIRECTORY_TAGS, query: { type } });
+}
+
+export interface MapBounds {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+}
+
+/** The professionals with a location inside the box, for the directory's map. */
+export const getMapPins = (bounds: MapBounds, limit = 100) =>
+  getPage<MapPin>("directory/map", { tags: DIRECTORY_TAGS, query: { ...bounds, limit } });
+
+/**
+ * Google's listings near a point, the way the directory shows them before a search. The API keeps Google's answer
+ * six hours and this cache an hour, so a busy page costs a few Google calls a day.
+ */
+export const getGoogleListings = (query: { lat: number; lng: number; limit?: number }) =>
+  getList<GoogleListing>("directory/google", { tags: ["directory"], query: { ...query } });
 
 export const getProfile = (slug: string) =>
   getData<ProfileDetail>(`profiles/${encodeURIComponent(slug)}`, { tags: PROFILE_TAGS });
@@ -214,11 +272,44 @@ export const getProfileProducts = (slug: string, query: PageQuery) =>
 export const getProfileArticles = (slug: string, query: PageQuery) =>
   getPage<ArticleCard>(`profiles/${encodeURIComponent(slug)}/articles`, { tags: PROFILE_TAGS, query: { ...query } });
 
-export const getProfileVideos = (slug: string, query: PageQuery) =>
+export interface ProfileVideoQuery extends PageQuery {
+  /** One series only, by slug (the podcast is "beauty-vault-podcast"). An API from before Nov 3 ignores it. */
+  series?: string;
+}
+
+export const getProfileVideos = (slug: string, query: ProfileVideoQuery) =>
   getPage<VideoCard>(`profiles/${encodeURIComponent(slug)}/videos`, { tags: PROFILE_TAGS, query: { ...query } });
 
 export const getProfileIssues = (slug: string, query: PageQuery) =>
   getPage<ProfileIssue>(`profiles/${encodeURIComponent(slug)}/magazine`, { tags: PROFILE_TAGS, query: { ...query } });
+
+/*
+ * A page's own gallery and education posts (Nov 3). An API from before then
+ * answers these paths with 404, which reads as an empty list or null.
+ */
+
+export interface ProfileMediaQuery extends PageQuery {
+  kind?: ProfileMedia["kind"];
+}
+
+/** The gallery in the owner's order (the Access card's gallery until the owner adds their own). */
+export const getProfileMedia = (slug: string, query: ProfileMediaQuery) =>
+  getPage<ProfileMedia>(`profiles/${encodeURIComponent(slug)}/media`, { tags: PROFILE_TAGS, query: { ...query } });
+
+export interface ProfileEducationQuery extends PageQuery {
+  kind?: EducationCard["kind"];
+}
+
+/** Published education posts, in the owner's order. */
+export const getProfileEducation = (slug: string, query: ProfileEducationQuery) =>
+  getPage<EducationCard>(`profiles/${encodeURIComponent(slug)}/education`, { tags: PROFILE_TAGS, query: { ...query } });
+
+/** One published post; null when it is missing or a draft. */
+export const getEducationItem = (slug: string, itemSlug: string) =>
+  getData<EducationDetail>(
+    `profiles/${encodeURIComponent(slug)}/education/${encodeURIComponent(itemSlug)}`,
+    { tags: PROFILE_TAGS }
+  );
 
 /* ── Watch ───────────────────────────────────────────────── */
 

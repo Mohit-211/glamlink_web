@@ -1,77 +1,76 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { Appearance } from "@stripe/stripe-js";
-import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import type { PaymentIntent } from "@stripe/stripe-js";
 import {
   ArrowRight,
   Loader2,
   MapPin,
-  ArrowLeft,
   AlertCircle,
-  CreditCard,
-  Lock,
   Truck,
   CheckCircle,
   MailCheck,
+  Clock,
+  ExternalLink,
+  RefreshCw,
 } from "lucide-react";
 import {
   addNewAddressWithoutToken,
   claimCard,
   EditAddressWithoutTokenAPI,
   getAllStates,
-  getCheckout,
   getCitiesByState,
   payCheckout,
   quoteCheckout,
   SelectPlanAPI,
 } from "@/api/Api";
-import { TOKENS } from "@/lib/designTokens";
 import { readApiError } from "@/lib/apiError";
 import { loginHref } from "@/lib/auth";
-import { clearCardToken } from "@/lib/cardToken";
+import { claimPath, clearCardToken, clearPendingClaim } from "@/lib/cardToken";
 import { useSession } from "@/lib/useSession";
-import { getStripe } from "@/lib/stripe";
-import KeychainOffer from "./KeychainOffer";
-import { PlanCard } from "./PlanCard";
-import { ADD_ON_PLAN_IDS, money, usePlans, WITH_KEYCHAIN, type PlanDef, type PlanId } from "./plans";
-
-// Stripe's Payment Element renders inside its own iframe, which cannot see the
-// site's CSS: Manrope is loaded into it and the design tokens are passed here.
-const ELEMENTS_FONTS = [{ cssSrc: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap" }];
-
-const APPEARANCE: Appearance = {
-  theme: "stripe",
-  variables: {
-    colorPrimary: TOKENS.primary,
-    colorBackground: TOKENS.card,
-    colorText: TOKENS.foreground,
-    colorTextSecondary: TOKENS.mutedForeground,
-    colorDanger: TOKENS.destructive,
-    fontFamily: "Manrope, system-ui, -apple-system, sans-serif",
-    borderRadius: "12px",
-  },
-  rules: {
-    ".Input": { borderColor: TOKENS.input, boxShadow: "none" },
-    ".Input:focus": { borderColor: TOKENS.primary, boxShadow: `0 0 0 3px ${TOKENS.primary}26` },
-    ".Label": { fontWeight: "500" },
-  },
-};
+import { getFormDataFromSession } from "../glamcard/GlamCardForm/Formdatasessionstorage";
+import KeychainOffer, { KeychainAddOn } from "./KeychainOffer";
+import { PlanGrid } from "./PlanCard";
+import PaymentStep from "./PaymentStep";
+import {
+  ADD_ON_PLAN_IDS,
+  isOwnedPlan,
+  money,
+  ownedNote,
+  usePlans,
+  WITH_KEYCHAIN,
+  type PlanDef,
+  type PlanId,
+} from "./plans";
+import {
+  clearSavedCheckout,
+  fetchCheckout,
+  paymentIntentStatus,
+  readSavedCheckout,
+  saveCheckout,
+  waitForCheckout,
+  type CheckoutView,
+  type SavedCheckout,
+} from "./checkout";
+import { friendlyError } from "./messages";
+import { BackButton, Centered, ErrorNote, StepHeading } from "./ui";
 
 interface PricingStepProps {
-  businessCardId?: string | number | null;
+  /** The card being bought for (a positive integer; the page checks it). */
+  businessCardId: string;
   /** Set when a guest signed in to continue: claim the draft for their account first. */
   claim?: boolean;
-  /** Preselects a plan (e.g. "nfc_only" from the dashboard's "Add keychain"). */
+  /** Preselects a plan (e.g. "nfc_only" from the dashboard's "Include NFC"). */
   initialPlan?: string | null;
   /**
-   * Back from a payment method that leaves the site (a bank or wallet page):
-   * the checkout id from the return URL, and Stripe's `redirect_status`.
+   * A checkout to show: back from a bank's page (with Stripe's `redirect_status`
+   * and `payment_intent_client_secret`), or a reload after paying.
    */
   returnCheckout?: string | null;
   redirectStatus?: string | null;
+  returnSecret?: string | null;
 }
 
 interface AddressFormState {
@@ -80,21 +79,6 @@ interface AddressFormState {
   state_id: string;
   city_id: string;
   postal_code: string;
-}
-
-/** `POST /access/checkout/quote`: what the plan costs this person now. */
-interface Quote {
-  checkout_id: number;
-  plan_type: string;
-  lines: { product: string; name?: string; amount: number; list: number; recurring: number | null; personal: boolean }[];
-  shipping: {
-    options: { rate_id: string; amount_cents: number; provider: string; service: string; estimated_days: number | null }[];
-    selected: { rate_id: string } | null;
-  } | null;
-  subtotal_cents: number;
-  shipping_cents: number;
-  total_cents: number;
-  monthly_cents: number | null;
 }
 
 const EMPTY_ADDRESS: AddressFormState = {
@@ -109,7 +93,24 @@ const LINE_NAMES: Record<string, string> = { pro: "Access Pro, first month", key
 
 type Step = "plan" | "address" | "review" | "payment";
 
+/** The end of a purchase. "paid" only once the API says so. */
+type Done =
+  | { result: "free" }
+  | { result: "paid"; checkoutId: number; cardLink: string | null; live: boolean }
+  | { result: "processing"; checkoutId: number };
+
+/** Why the purchase can't go on here. `retry`: a claim that failed for a passing reason. */
+type Fatal = { kind: "expired" | "unavailable" | "unclaimable"; retry?: boolean };
+
 const PLAN_IDS: PlanId[] = ["free", "nfc_only", "subscription_only", "nfc_with_subscription"];
+const DEFAULT_PLAN: PlanId = "nfc_with_subscription";
+const CONFIRMING = "Confirming your payment...";
+
+/** The email typed into the card form in this tab (a guest's), if it is still kept. */
+function savedFormEmail(): string | null {
+  const payload = getFormDataFromSession();
+  return typeof payload?.email === "string" && payload.email.trim() ? payload.email.trim() : null;
+}
 
 export default function PricingStep({
   businessCardId,
@@ -117,19 +118,20 @@ export default function PricingStep({
   initialPlan,
   returnCheckout,
   redirectStatus,
+  returnSecret,
 }: PricingStepProps) {
   const router = useRouter();
   const session = useSession();
   const signedIn = session.status === "signed-in";
-  const { plans, sale, owned, loading: plansLoading, error: plansError, reload } = usePlans(businessCardId);
+  const { plans, sale, owned, loading: plansLoading, error: plansError, reload: reloadPlans } = usePlans(businessCardId);
 
   const requestedPlan = PLAN_IDS.includes(initialPlan as PlanId) ? (initialPlan as PlanId) : null;
   // The plan card picked. The keychain alone is not a card: it is offered after Free or Pro.
-  const [selected, setSelected] = useState<PlanId>(
-    requestedPlan && !ADD_ON_PLAN_IDS.includes(requestedPlan) ? requestedPlan : "nfc_with_subscription"
+  const [selected, setSelected] = useState<PlanId | null>(
+    requestedPlan && !ADD_ON_PLAN_IDS.includes(requestedPlan) ? requestedPlan : null
   );
   // What is being bought: the card picked, or that card with the keychain added.
-  const [checkoutId, setCheckoutId] = useState<PlanId | null>(null);
+  const [checkoutPlanId, setCheckoutPlanId] = useState<PlanId | null>(null);
   // The card whose keychain offer is open, and the card the keychain was added to.
   const [offerFor, setOfferFor] = useState<PlanId | null>(null);
   const [keychainFrom, setKeychainFrom] = useState<PlanId | null>(null);
@@ -137,10 +139,15 @@ export default function PricingStep({
   const [submitting, setSubmitting] = useState(false);
   const [claiming, setClaiming] = useState(claim);
   const [claimConflict, setClaimConflict] = useState(false);
-  // "expired": the 24-hour card token is gone; the guest must start again or sign in.
-  const [fatal, setFatal] = useState<"expired" | null>(null);
-  // "processing": a bank payment that confirms later; Stripe's webhook tells the API.
-  const [done, setDone] = useState<"free" | "paid" | "processing" | null>(null);
+  const [fatal, setFatal] = useState<Fatal | null>(null);
+  // Looking for a payment already under way (a reload, a return from the bank) before showing the plans.
+  const [starting, setStarting] = useState(true);
+  // The message while the page waits for the API to see a payment.
+  const [settling, setSettling] = useState<string | null>(null);
+  // The checkout whose payment didn't go through.
+  const [failedPayment, setFailedPayment] = useState<number | null>(null);
+  const [done, setDone] = useState<Done | null>(null);
+  const [checking, setChecking] = useState(false);
 
   const [address, setAddress] = useState<AddressFormState>(EMPTY_ADDRESS);
   const [states, setStates] = useState<{ id: number; name: string }[]>([]);
@@ -148,83 +155,290 @@ export default function PricingStep({
   const [addressError, setAddressError] = useState<string | null>(null);
   const [addressId, setAddressId] = useState<number | null>(null);
   const [correctedTo, setCorrectedTo] = useState<string | null>(null);
-  const [quote, setQuote] = useState<Quote | null>(null);
+  const [quote, setQuote] = useState<CheckoutView | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [publishableKey, setPublishableKey] = useState<string | null>(null);
+  const [paymentNotice, setPaymentNotice] = useState<string | null>(null);
 
+  // Blocked plans: what the person already has is not sold again (Free is part of Pro).
+  const canBuy = (id: PlanId) => !isOwnedPlan(id, owned);
   const cardPlans = plans.filter((p) => !ADD_ON_PLAN_IDS.includes(p.id));
-  const plan = cardPlans.find((p) => p.id === selected) ?? cardPlans[0];
-  const checkoutPlan = plans.find((p) => p.id === checkoutId) ?? plan;
-  // A claim must run once, even when an effect runs twice (development).
+  const keychainPlan = plans.find((p) => p.id === "nfc_only") ?? null;
+  // The picked card, else the first that can be bought (the bundle first).
+  const plan =
+    cardPlans.find((p) => p.id === selected && canBuy(p.id)) ??
+    cardPlans.find((p) => p.id === DEFAULT_PLAN && canBuy(p.id)) ??
+    cardPlans.find((p) => canBuy(p.id)) ??
+    null;
+  const checkoutPlan = plans.find((p) => p.id === checkoutPlanId) ?? plan;
+  // Someone with Pro and no keychain has no card left that offers it.
+  const showKeychainAddOn = owned.subscription && !owned.keychain && !!keychainPlan;
+
+  // The return or reload this page opened with; later URL changes (this page's own) don't restart it.
+  const initialReturn = useRef({ checkout: returnCheckout, redirectStatus, secret: returnSecret });
   const claimStarted = useRef(false);
+  const started = useRef(false);
   const keychainStarted = useRef(false);
-  const stripePromise = useMemo(() => getStripe(), []);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   // The guest signed in because their email already had an account: move the
   // draft card to that account (with its card token), then continue signed in.
   useEffect(() => {
-    if (!claiming || !businessCardId || session.status === "loading") return;
+    if (!claiming || session.status === "loading" || claimStarted.current) return;
     if (session.status === "signed-out") {
-      router.replace(loginHref(`/pricing?businessCardId=${businessCardId}&claim=1`));
+      router.replace(loginHref(claimPath(businessCardId)));
       return;
     }
-    if (claimStarted.current) return;
     claimStarted.current = true;
-    runClaim(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    void Promise.resolve().then(() => runClaim(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once, when the session is known
   }, [claiming, businessCardId, session.status]);
 
-  // Back from a redirect: wait for the API to see the payment (its webhook), then confirm.
-  const returnState = returnCheckout && redirectStatus ? (redirectStatus === "failed" ? "failed" : "confirming") : null;
+  // Once the session is known (and any claim is done): pick up a payment already under way.
   useEffect(() => {
-    if (returnState !== "confirming" || !returnCheckout || !businessCardId) return;
-    let active = true;
-    waitUntilPaid(returnCheckout, businessCardId).then((paid) => {
-      if (!active) return;
-      if (paid) clearCardToken(businessCardId);
-      setDone(paid ? "paid" : "processing");
-    });
-    return () => {
-      active = false;
-    };
-  }, [returnState, returnCheckout, businessCardId]);
+    if (started.current || claiming || session.status === "loading" || fatal || claimConflict) return;
+    started.current = true;
+    void Promise.resolve().then(start);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once
+  }, [claiming, session.status, fatal, claimConflict]);
 
+  // The dashboard's "Include NFC" asks for the keychain alone: start on its delivery address.
+  useEffect(() => {
+    if (requestedPlan !== "nfc_only" || keychainStarted.current || starting || claiming || plansLoading) return;
+    if (!plans.length || done || settling || failedPayment !== null || step !== "plan") return;
+    keychainStarted.current = true;
+    if (!owned.keychain) void Promise.resolve().then(() => startPlan("nfc_only"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- startPlan reads the current render
+  }, [requestedPlan, starting, claiming, plansLoading, plans.length, owned.keychain, done, settling, failedPayment, step]);
+
+  /** Moves the draft to the signed-in account. The caller shows `claiming`. */
   async function runClaim(replace: boolean) {
-    if (!businessCardId) return;
     try {
       await claimCard(businessCardId, replace);
+      // The card is the account's now: the access token covers it (this also forgets the kept claim).
       clearCardToken(businessCardId);
-      setClaimConflict(false);
       toast.success("Your card is now on your account.");
+      // The page starts afresh for the claimed card (PricingEntry keys it by the claim), its plans
+      // priced for the account. The spinner stays until then.
       router.replace(`/pricing?businessCardId=${businessCardId}`);
     } catch (error) {
-      const { code, message } = readApiError(error);
+      const { status, code } = readApiError(error);
       if (code === "CARD_EXISTS") setClaimConflict(true);
-      else if (code === "CARD_TOKEN_REQUIRED") setFatal("expired");
-      else toast.error(message);
-    } finally {
+      else if (code === "CARD_TOKEN_REQUIRED") setFatal({ kind: "expired" });
+      else if (status === 0 || status >= 500) setFatal({ kind: "unclaimable", retry: true });
+      else {
+        // CARD_NOT_CLAIMABLE, or the card is gone: there is nothing to buy for it here.
+        clearPendingClaim(businessCardId);
+        setFatal({ kind: "unclaimable" });
+      }
       setClaiming(false);
     }
   }
 
-  // Blocked plans: what the signed-in person already owns cannot be bought again.
-  const isOwned = (id: PlanId) =>
-    (owned.subscription && (id === "subscription_only" || id === "nfc_with_subscription")) ||
-    (owned.keychain && (id === "nfc_only" || id === "nfc_with_subscription"));
+  /* ── Payments under way ─────────────────────────────────────────────────── */
+
+  /** Back from a bank's page, a reload, or a payment left in this tab: carry on with it. */
+  async function start() {
+    const { checkout, redirectStatus: returnStatus, secret } = initialReturn.current;
+    const saved = readSavedCheckout(businessCardId);
+    try {
+      const returned = Number(checkout);
+      if (checkout && Number.isInteger(returned) && returned > 0) {
+        keychainStarted.current = true;
+        if (returnStatus === "failed") setFailedPayment(returned);
+        else if (secret) await settleReturn(returned, secret, saved);
+        else await settle(returned, { tries: 3 });
+        return;
+      }
+      // A plan asked for by name (the dashboard) wins over a payment left for another plan.
+      if (saved && (!requestedPlan || requestedPlan === saved.planId)) {
+        keychainStarted.current = true;
+        await resume(saved.checkoutId, saved);
+      } else if (saved) {
+        clearSavedCheckout(businessCardId);
+      }
+    } finally {
+      if (mounted.current) setStarting(false);
+    }
+  }
+
+  /** Back from a bank's page: Stripe says whether it went through, then the API confirms it. */
+  async function settleReturn(checkoutId: number, secret: string, saved: SavedCheckout | null) {
+    setSettling(CONFIRMING);
+    const status = await paymentIntentStatus(secret, saved?.checkoutId === checkoutId ? saved.publishableKey : null);
+    if (!mounted.current) return;
+    if (status === "requires_payment_method" || status === "requires_action" || status === "canceled") {
+      setSettling(null);
+      setFailedPayment(checkoutId);
+      return;
+    }
+    await settle(checkoutId, { tries: status === "processing" ? 2 : 10 });
+  }
+
+  /** Waits for the API to see the payment, then shows how it ended. */
+  async function settle(checkoutId: number, { tries = 10 }: { tries?: number } = {}) {
+    setSettling(CONFIRMING);
+    let view: CheckoutView | null = null;
+    try {
+      view = await waitForCheckout(checkoutId, businessCardId, { tries, isActive: () => mounted.current });
+    } catch (error) {
+      if (!mounted.current) return;
+      setSettling(null);
+      checkoutRefused(error);
+      return;
+    }
+    if (!mounted.current) return;
+    setSettling(null);
+    showOutcome(checkoutId, view);
+  }
+
+  /** The API refused to show the checkout: no access (the timed-out screen), or it is gone. */
+  function checkoutRefused(error: unknown) {
+    if (readApiError(error).status === 404) {
+      clearSavedCheckout(businessCardId);
+      toast.error("We couldn't find that payment. Please choose your plan again.");
+      resetToPlans();
+    } else if (!handlePurchaseError(error)) {
+      resetToPlans();
+    }
+  }
+
+  /** The end of a payment, as the API reports it. Paid and live only when it says so. */
+  function showOutcome(checkoutId: number, view: CheckoutView | null) {
+    const status = view?.status;
+    if (status === "paid") {
+      clearSavedCheckout(businessCardId);
+      clearPendingClaim(businessCardId);
+      const card = view?.card;
+      const link = card?.business_card_link;
+      setDone({
+        result: "paid",
+        checkoutId,
+        cardLink: link && /^https?:\/\//i.test(link) ? link : null,
+        // A paid checkout made the card live (the API answers its status; older answers have no card).
+        live: !card || card.status === "accepted",
+      });
+      keepCheckoutInUrl(checkoutId);
+      return;
+    }
+    if (status === "failed") {
+      setFailedPayment(checkoutId);
+      return;
+    }
+    if (status === "expired" || status === "cancelled") {
+      clearSavedCheckout(businessCardId);
+      toast.info(status === "cancelled" ? "This order was cancelled." : "This checkout expired. Please choose your plan again.");
+      resetToPlans();
+      return;
+    }
+    // Still being confirmed (a slow bank or a busy Stripe), or no answer yet: never "paid".
+    setDone({ result: "processing", checkoutId });
+    keepCheckoutInUrl(checkoutId);
+  }
+
+  /** A reload of the result asks the API again instead of starting over. */
+  function keepCheckoutInUrl(checkoutId: number) {
+    const url = `/pricing?businessCardId=${encodeURIComponent(businessCardId)}&checkout=${checkoutId}`;
+    if (window.location.pathname + window.location.search !== url) window.history.replaceState(null, "", url);
+  }
+
+  function resetToPlans() {
+    setDone(null);
+    setFailedPayment(null);
+    setQuote(null);
+    setClientSecret(null);
+    setPaymentNotice(null);
+    setCheckoutPlanId(null);
+    setStep("plan");
+  }
+
+  /** Back to a checkout already started for this card: its payment, never a second one. */
+  async function resume(checkoutId: number, saved: SavedCheckout | null) {
+    let view: CheckoutView | null = null;
+    try {
+      view = await fetchCheckout(checkoutId, businessCardId);
+    } catch {
+      // Gone or not ours: start from the plans.
+    }
+    if (!mounted.current) return;
+    if (!view || view.status === "expired") {
+      clearSavedCheckout(businessCardId);
+      return;
+    }
+    if (view.status === "paid" || view.status === "processing" || view.status === "cancelled") {
+      showOutcome(checkoutId, view);
+      return;
+    }
+    const planId = (saved?.checkoutId === checkoutId ? saved.planId : view.plan_type) as PlanId;
+    const key = view.publishable_key ?? (saved?.checkoutId === checkoutId ? saved.publishableKey : null);
+    // Stripe may already have it while the API catches up: wait for that instead of a new attempt.
+    if (view.client_secret && view.status !== "open") {
+      const stripeStatus = await paymentIntentStatus(view.client_secret, key);
+      if (stripeStatus === "succeeded" || stripeStatus === "processing") {
+        await settle(checkoutId);
+        return;
+      }
+    }
+    if (!mounted.current) return;
+    setCheckoutPlanId(planId);
+    if (!ADD_ON_PLAN_IDS.includes(planId)) setSelected(planId);
+    setQuote(view);
+    if (view.client_secret) {
+      setClientSecret(view.client_secret);
+      setPublishableKey(key);
+      setPaymentNotice(view.status === "failed" ? "Your last payment didn't go through. Try again, or use another card." : null);
+      setStep("payment");
+    } else {
+      setStep("review");
+    }
+  }
+
+  /** "Check again" while a payment is being confirmed. */
+  async function checkAgain(checkoutId: number) {
+    setChecking(true);
+    let view: CheckoutView | null = null;
+    try {
+      view = await waitForCheckout(checkoutId, businessCardId, { tries: 3, every: 1500, isActive: () => mounted.current });
+    } catch (error) {
+      if (!mounted.current) return;
+      setChecking(false);
+      setDone(null);
+      checkoutRefused(error);
+      return;
+    }
+    if (!mounted.current) return;
+    setChecking(false);
+    if (view && view.status !== "pending" && view.status !== "processing" && view.status !== "open") {
+      setDone(null);
+      showOutcome(checkoutId, view);
+    } else {
+      toast.info("Your payment is still being confirmed. We'll email you as soon as it's through.");
+    }
+  }
+
+  /** "Try again" after a payment that didn't go through: the same checkout, paid again. */
+  async function retryPayment(checkoutId: number) {
+    setFailedPayment(null);
+    window.history.replaceState(null, "", `/pricing?businessCardId=${encodeURIComponent(businessCardId)}`);
+    setSettling("Getting your payment ready...");
+    await resume(checkoutId, readSavedCheckout(businessCardId));
+    if (mounted.current) setSettling(null);
+  }
+
+  /* ── The steps ──────────────────────────────────────────────────────────── */
 
   /** The plan that adds the keychain to card `id`, while it can still be offered. */
   const keychainUpgrade = (id: PlanId | null): PlanDef | null => {
     const target = id ? WITH_KEYCHAIN[id] : undefined;
-    if (!target || owned.keychain || isOwned(target)) return null;
+    if (!target || owned.keychain || !canBuy(target)) return null;
     return plans.find((p) => p.id === target) ?? null;
   };
-
-  // The dashboard's "Include NFC" asks for the keychain alone: start on its delivery address.
-  useEffect(() => {
-    if (requestedPlan !== "nfc_only" || keychainStarted.current || claiming || plansLoading || !plans.length) return;
-    keychainStarted.current = true;
-    if (!owned.keychain) void Promise.resolve().then(() => startPlan("nfc_only"));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requestedPlan, claiming, plansLoading, plans.length, owned.keychain]);
 
   async function loadStates() {
     if (states.length) return;
@@ -246,24 +460,33 @@ export default function PricingStep({
     setCities(res?.data?.all_city || res?.all_city || []);
   }
 
-  /** Common refusals of the purchase calls. Returns true when handled. */
-  function handlePurchaseError(error: unknown): boolean {
-    const { code, message } = readApiError(error);
+  /**
+   * Common refusals of the purchase calls. Returns true when handled.
+   * `card`: the call names the card, so a 404 means the card is gone.
+   */
+  function handlePurchaseError(error: unknown, { card = false }: { card?: boolean } = {}): boolean {
+    const { status, code } = readApiError(error);
     if (code === "ACCOUNT_EXISTS") {
       toast.info("This email already has a Glamlink account. Sign in to continue.");
-      router.push(loginHref(`/pricing?businessCardId=${businessCardId}&claim=1`));
+      router.push(loginHref(claimPath(businessCardId)));
       return true;
     }
     if (code === "CARD_TOKEN_REQUIRED") {
-      setFatal("expired");
+      setFatal({ kind: "expired" });
+      return true;
+    }
+    if (status === 403 || (card && status === 404)) {
+      setFatal({ kind: "unavailable" });
       return true;
     }
     if (code === "ALREADY_OWNED") {
       toast.error("You already have Access Pro.");
+      reloadPlans();
       return true;
     }
     if (code === "NFC_ALREADY_PURCHASED") {
       toast.error("You already have your NFC keychain.");
+      reloadPlans();
       return true;
     }
     if (code === "ADDRESS_NOT_VERIFIED" || code === "ADDRESS_NOT_FOUND") {
@@ -271,26 +494,40 @@ export default function PricingStep({
       setAddressError("Please enter your delivery address first.");
       return true;
     }
-    toast.error(message);
+    toast.error(friendlyError(error));
     return false;
   }
 
+  /** 409 CHECKOUT_IN_PROGRESS: a payment for this card is going through already. Follow it, don't pay twice. */
+  async function followPaymentInProgress(details: Record<string, unknown> | null, planId: PlanId) {
+    const checkoutId = Number(details?.checkout_id);
+    if (!checkoutId) {
+      toast.info("A payment for this card is already being confirmed.");
+      return;
+    }
+    saveCheckout(businessCardId, { checkoutId, planId, publishableKey: null });
+    await settle(checkoutId);
+  }
+
   async function requestQuote(target: PlanDef, rateId?: string) {
-    if (!businessCardId) return;
     setSubmitting(true);
     try {
       const res = await quoteCheckout({ business_card_id: businessCardId, plan_type: target.planType, rate_id: rateId });
-      setQuote((res?.data ?? res) as Quote);
+      const view = (res?.data ?? res) as CheckoutView;
+      // Another plan than the payment kept for this card: that one is left behind.
+      const saved = readSavedCheckout(businessCardId);
+      if (saved && saved.checkoutId !== view.checkout_id) clearSavedCheckout(businessCardId);
+      setQuote(view);
       setStep("review");
     } catch (error) {
-      const { code, message } = readApiError(error);
+      const { code, details } = readApiError(error);
       if (code === "SHIPPING_COUNTRY_UNSUPPORTED") {
         setStep("address");
         setAddressError("The keychain ships within the United States only.");
-      } else if (code === "CHECKOUT_EXPIRED") {
-        toast.error("Prices were refreshed. Please review your order again.");
-      } else if (!handlePurchaseError(error)) {
-        console.error(message);
+      } else if (code === "CHECKOUT_IN_PROGRESS") {
+        await followPaymentInProgress(details, target.id);
+      } else {
+        handlePurchaseError(error, { card: true });
       }
     } finally {
       setSubmitting(false);
@@ -308,11 +545,8 @@ export default function PricingStep({
   // the card the keychain offer added the keychain to, so it can be dropped again.
   async function startPlan(id: PlanId, addedTo: PlanId | null = null) {
     const target = plans.find((p) => p.id === id);
-    if (!businessCardId || !target) {
-      toast.error("Missing business card reference. Please create your card again.");
-      return;
-    }
-    setCheckoutId(id);
+    if (!target) return;
+    setCheckoutPlanId(id);
     setKeychainFrom(addedTo);
     setSubmitting(true);
     try {
@@ -320,8 +554,9 @@ export default function PricingStep({
       const data = res?.data ?? res;
       const planType = String(data?.plan_type ?? target.planType).trim();
       if (!data?.payment_required || planType === "free") {
-        clearCardToken(businessCardId);
-        setDone("free");
+        // The card is live on Free. Its card token stays for the rest of this tab's visit.
+        clearPendingClaim(businessCardId);
+        setDone({ result: "free" });
         return;
       }
       if (target.hasKeychain) {
@@ -332,7 +567,7 @@ export default function PricingStep({
       setSubmitting(false);
       await requestQuote(target);
     } catch (error) {
-      handlePurchaseError(error);
+      handlePurchaseError(error, { card: true });
     } finally {
       setSubmitting(false);
       setOfferFor(null);
@@ -340,7 +575,6 @@ export default function PricingStep({
   }
 
   async function handleSaveAddress() {
-    if (!businessCardId) return;
     if (!address.address_line_1.trim() || !address.state_id || !address.city_id || !address.postal_code.trim()) {
       setAddressError("Please fill in all required fields.");
       return;
@@ -350,7 +584,8 @@ export default function PricingStep({
     try {
       const payload = {
         address_line_1: address.address_line_1.trim(),
-        ...(address.address_line_2.trim() && { address_line_2: address.address_line_2.trim() }),
+        // Always sent, so clearing it on a second save clears it.
+        address_line_2: address.address_line_2.trim(),
         state_id: parseInt(address.state_id),
         city_id: parseInt(address.city_id),
         postal_code: address.postal_code.trim(),
@@ -373,37 +608,59 @@ export default function PricingStep({
       if (code === "ADDRESS_INVALID") setAddressError(message.replace(/^Address validation failed:\s*/i, ""));
       else if (code === "ADDRESS_CHECK_UNAVAILABLE")
         setAddressError("We couldn't check the address just now. Please try again.");
-      else if (!handlePurchaseError(error)) setAddressError(message);
+      else if (!handlePurchaseError(error, { card: true })) setAddressError(friendlyError(error));
       setSubmitting(false);
       return;
     }
     setSubmitting(false);
-    await requestQuote(checkoutPlan);
+    if (checkoutPlan) await requestQuote(checkoutPlan);
   }
 
   // Step 3: the API starts the subscription or the keychain payment and returns
   // its client secret, which the Payment Element is created with.
   async function handleStartPayment() {
-    if (!quote || !businessCardId) return;
+    if (!quote) return;
+    const planId = (checkoutPlan?.id ?? quote.plan_type) as PlanId;
     setSubmitting(true);
     try {
       const res = await payCheckout(quote.checkout_id, businessCardId);
-      const secret = res?.data?.client_secret;
+      const data = res?.data ?? res;
+      if (data?.paid) {
+        // Nothing to pay today: the API settles it without Stripe.js.
+        saveCheckout(businessCardId, { checkoutId: quote.checkout_id, planId, publishableKey: null });
+        await settle(quote.checkout_id);
+        return;
+      }
+      const secret: string | undefined = data?.client_secret;
       if (!secret) {
         toast.error("Payment could not be started. Please try again.");
         return;
       }
+      const key: string | null = data?.publishable_key ?? null;
+      // Kept for this tab: a reload or a return comes back to this payment.
+      saveCheckout(businessCardId, { checkoutId: quote.checkout_id, planId, publishableKey: key });
+      // A payment started before (another tab, a reload) may have gone through already.
+      if (quote.status === "pending") {
+        const stripeStatus = await paymentIntentStatus(secret, key);
+        if (stripeStatus === "succeeded" || stripeStatus === "processing") {
+          await settle(quote.checkout_id);
+          return;
+        }
+      }
       setClientSecret(secret);
+      setPublishableKey(key);
+      setPaymentNotice(null);
       setStep("payment");
     } catch (error) {
-      const { code } = readApiError(error);
+      const { code, details } = readApiError(error);
       if (code === "ALREADY_PAID") {
-        clearCardToken(businessCardId);
-        setDone("paid");
+        await settle(quote.checkout_id);
+      } else if (code === "CHECKOUT_IN_PROGRESS") {
+        await followPaymentInProgress(details, planId);
       } else if (code === "CHECKOUT_EXPIRED") {
         toast.error("Prices were refreshed. Please review your order again.");
         setSubmitting(false);
-        await requestQuote(checkoutPlan, quote.shipping?.selected?.rate_id);
+        if (checkoutPlan) await requestQuote(checkoutPlan, quote.shipping?.selected?.rate_id);
       } else {
         handlePurchaseError(error);
       }
@@ -412,57 +669,21 @@ export default function PricingStep({
     }
   }
 
-  const ownerEmailNote = signedIn
-    ? null
-    : "We've emailed you a link to set your password. Use it to sign in and manage your card.";
+  /** Stripe took the payment: wait for the API (a bank still confirming is only checked briefly). */
+  function handleConfirmed(status: PaymentIntent.Status | null) {
+    if (!quote) return;
+    void settle(quote.checkout_id, { tries: status === "processing" || status === "requires_action" ? 2 : 10 });
+  }
 
   /* ── Page states before the steps ─────────────────────────────────────── */
 
-  if (fatal === "expired") {
-    return (
-      <Centered>
-        <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
-        <h1 className="mt-4 text-xl">This purchase has timed out</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          A card you build while signed out can be finished within 24 hours. Start again, or sign in if you already
-          paid.
-        </p>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <button type="button" onClick={() => router.push("/access")} className="btn-primary flex-1">
-            Start again
-          </button>
-          <button type="button" onClick={() => router.push("/login")} className="btn-outline flex-1">
-            Sign in
-          </button>
-        </div>
-      </Centered>
-    );
-  }
-
-  if (returnState === "failed" && !done) {
-    return (
-      <Centered>
-        <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
-        <h1 className="mt-4 text-xl">Your payment didn&apos;t go through</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Nothing was charged. Try again, or choose another way to pay.</p>
-        <button
-          type="button"
-          onClick={() => router.replace(`/pricing?businessCardId=${businessCardId}`)}
-          className="btn-primary mt-6 w-full"
-        >
-          Try again
-        </button>
-      </Centered>
-    );
-  }
-
-  if (returnState === "confirming" && !done) {
-    return (
-      <Centered>
-        <Loader2 className="mx-auto h-7 w-7 animate-spin text-primary" />
-        <p className="mt-4 text-sm text-muted-foreground">Confirming your payment...</p>
-      </Centered>
-    );
+  if (fatal) {
+    const retryClaim = () => {
+      setFatal(null);
+      setClaiming(true);
+      void runClaim(false);
+    };
+    return <FatalScreen fatal={fatal} signedIn={signedIn} onRetryClaim={retryClaim} />;
   }
 
   if (claimConflict) {
@@ -474,10 +695,27 @@ export default function PricingStep({
           code, keychain and plan.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <button type="button" onClick={() => router.push("/dashboard")} className="btn-outline flex-1">
+          <button
+            type="button"
+            onClick={() => {
+              clearPendingClaim(businessCardId);
+              router.push("/dashboard");
+            }}
+            disabled={claiming}
+            className="btn-outline flex-1 disabled:opacity-50"
+          >
             Keep my card
           </button>
-          <button type="button" onClick={() => runClaim(true)} className="btn-primary flex-1">
+          <button
+            type="button"
+            onClick={() => {
+              setClaiming(true);
+              void runClaim(true);
+            }}
+            disabled={claiming}
+            className="btn-primary flex-1 disabled:opacity-50"
+          >
+            {claiming && <Loader2 className="h-4 w-4 animate-spin" />}
             Replace it
           </button>
         </div>
@@ -486,24 +724,58 @@ export default function PricingStep({
   }
 
   if (done) {
+    // A guest's account is made when the card goes live (Free, or once paid), with a link to set a password.
+    const guestNote =
+      !signedIn && done.result !== "processing"
+        ? "We've emailed you a link to set your password. Use it to sign in and manage your card."
+        : null;
     return (
       <Centered>
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent">
-          {ownerEmailNote ? <MailCheck className="h-7 w-7 text-primary" /> : <CheckCircle className="h-7 w-7 text-primary" />}
+          {done.result === "processing" ? (
+            <Clock className="h-7 w-7 text-primary" />
+          ) : guestNote ? (
+            <MailCheck className="h-7 w-7 text-primary" />
+          ) : (
+            <CheckCircle className="h-7 w-7 text-primary" />
+          )}
         </div>
         <h2 className="mt-4 text-xl text-foreground">
-          {done === "paid" ? "Payment successful!" : done === "processing" ? "Payment processing" : "Welcome to Glamlink!"}
+          {done.result === "paid" ? "Payment successful!" : done.result === "processing" ? "Payment processing" : "Welcome to Glamlink!"}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          {done === "paid"
-            ? "Your order is confirmed and your card is live."
-            : done === "processing"
-              ? "Your bank is confirming the payment. We'll email you as soon as it's through."
+          {done.result === "paid"
+            ? done.live
+              ? "Your order is confirmed and your card is live."
+              : "Your order is confirmed."
+            : done.result === "processing"
+              ? "Your payment is being confirmed. This usually takes a moment, and we'll email you as soon as it's through. There's no need to pay again."
               : "Your card is live on the Free plan."}
-          {ownerEmailNote && <> {ownerEmailNote}</>}
+          {guestNote && <> {guestNote}</>}
         </p>
+        {done.result === "processing" && (
+          <button
+            type="button"
+            onClick={() => checkAgain(done.checkoutId)}
+            disabled={checking}
+            className="btn-primary mt-6 w-full disabled:opacity-50"
+          >
+            {checking ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            Check again
+          </button>
+        )}
+        {done.result === "paid" && done.live && done.cardLink && (
+          <a href={done.cardLink} target="_blank" rel="noopener noreferrer" className="btn-primary mt-6 w-full">
+            <ExternalLink className="h-4 w-4" />
+            View your card
+          </a>
+        )}
         {signedIn && (
-          <button type="button" onClick={() => router.push("/dashboard")} className="btn-primary mt-6 w-full">
+          <button
+            type="button"
+            onClick={() => router.push("/dashboard")}
+            className={`${done.result === "free" || (done.result === "paid" && !(done.live && done.cardLink)) ? "btn-primary mt-6" : "btn-outline mt-3"} w-full`}
+          >
             Go to dashboard
             <ArrowRight className="h-4 w-4" />
           </button>
@@ -512,7 +784,29 @@ export default function PricingStep({
     );
   }
 
-  if (claiming || plansLoading) {
+  if (settling) {
+    return (
+      <Centered>
+        <Loader2 className="mx-auto h-7 w-7 animate-spin text-primary" />
+        <p className="mt-4 text-sm text-muted-foreground">{settling}</p>
+      </Centered>
+    );
+  }
+
+  if (failedPayment !== null) {
+    return (
+      <Centered>
+        <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
+        <h1 className="mt-4 text-xl">Your payment didn&apos;t go through</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Nothing was charged. Try again, or use another card.</p>
+        <button type="button" onClick={() => retryPayment(failedPayment)} className="btn-primary mt-6 w-full">
+          Try again
+        </button>
+      </Centered>
+    );
+  }
+
+  if (claiming || starting || plansLoading) {
     return (
       <Centered>
         <Loader2 className="mx-auto h-7 w-7 animate-spin text-primary" />
@@ -520,11 +814,11 @@ export default function PricingStep({
     );
   }
 
-  if (plansError || !plan) {
+  if (plansError || !cardPlans.length) {
     return (
       <Centered>
         <p className="text-sm text-muted-foreground">{plansError ?? "No plans are available right now."}</p>
-        <button type="button" onClick={reload} className="btn-outline mt-4">
+        <button type="button" onClick={reloadPlans} className="btn-outline mt-4">
           Try again
         </button>
       </Centered>
@@ -533,6 +827,9 @@ export default function PricingStep({
 
   /* ── Steps ────────────────────────────────────────────────────────────── */
 
+  const paymentEmail = step === "payment" ? quote?.email || session.user?.email || savedFormEmail() : null;
+  const keychainInQuote = !!quote?.lines.some((line) => line.product === "keychain");
+
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="page-soft w-[90%] px-4 py-14">
@@ -540,8 +837,8 @@ export default function PricingStep({
           {step === "plan" && (
             <>
               <div className="mx-auto mb-10 max-w-5xl">
-                <h1 className="mt-1 text-[26px] leading-tight text-foreground sm:text-[30px]">Choose your plan</h1>
-                <p className="section-subtitle mt-2 max-w-md text-[15px] leading-6">
+                <h1 className="mt-1 text-2xl leading-tight text-foreground sm:text-3xl">Choose your plan</h1>
+                <p className="section-subtitle mt-2 max-w-md text-base leading-6">
                   Choose the plan that best fits your business. You can upgrade anytime.
                 </p>
                 {sale && (
@@ -552,45 +849,59 @@ export default function PricingStep({
                 )}
               </div>
 
-              <div className="mx-auto grid max-w-5xl gap-5 md:grid-cols-3">
-                {cardPlans.map((p) => (
-                  <PlanCard
-                    key={p.id}
-                    plan={p}
-                    selected={selected === p.id}
-                    disabled={isOwned(p.id)}
-                    onSelect={() => setSelected(p.id)}
-                  />
-                ))}
-              </div>
+              <PlanGrid
+                plans={cardPlans}
+                selected={plan?.id ?? null}
+                onSelect={setSelected}
+                isDisabled={(id) => !canBuy(id)}
+                noteFor={(id) => ownedNote(id, owned)}
+                className="mx-auto grid max-w-5xl gap-5 md:grid-cols-3"
+              />
+
+              {showKeychainAddOn && keychainPlan && (
+                <div className="mx-auto mt-6 max-w-5xl">
+                  <KeychainAddOn plan={keychainPlan} busy={submitting} onAdd={() => startPlan("nfc_only")} />
+                </div>
+              )}
 
               <div className="mt-9 flex flex-col items-center gap-3">
-                <button
-                  type="button"
-                  onClick={handlePrimaryContinue}
-                  disabled={submitting || isOwned(plan.id)}
-                  className="btn-primary w-full max-w-xs flex-col gap-0.5 py-3 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
-                >
-                  <span className="flex items-center gap-2">
-                    {submitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Setting up your plan...
-                      </>
-                    ) : (
-                      <>
-                        Continue with {plan.name}
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </span>
-                  {!submitting && (
-                    <span className="text-xs font-normal text-primary-foreground/80">
-                      {plan.priceLabel}
-                      {plan.priceSuffix ? ` ${plan.priceSuffix}` : ""}
+                {plan ? (
+                  <button
+                    type="button"
+                    onClick={handlePrimaryContinue}
+                    disabled={submitting}
+                    className="btn-primary w-full max-w-xs flex-col gap-0.5 py-3 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                  >
+                    <span className="flex items-center gap-2">
+                      {submitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Setting up your plan...
+                        </>
+                      ) : (
+                        <>
+                          Continue with {plan.name}
+                          <ArrowRight className="h-4 w-4" />
+                        </>
+                      )}
                     </span>
-                  )}
-                </button>
+                    {!submitting && (
+                      <span className="text-xs font-normal text-primary-foreground/80">
+                        {plan.priceLabel}
+                        {plan.priceSuffix ? ` ${plan.priceSuffix}` : ""}
+                      </span>
+                    )}
+                  </button>
+                ) : (
+                  !showKeychainAddOn && (
+                    <>
+                      <p className="text-sm text-muted-foreground">You already have Access Pro and the keychain.</p>
+                      <button type="button" onClick={() => router.push("/dashboard")} className="btn-outline">
+                        Go to dashboard
+                      </button>
+                    </>
+                  )
+                )}
               </div>
 
               <KeychainOffer
@@ -726,7 +1037,7 @@ export default function PricingStep({
 
           {step === "review" && quote && (
             <div className="mx-auto max-w-md">
-              <BackButton onClick={() => setStep(checkoutPlan.hasKeychain ? "address" : "plan")} disabled={submitting}>
+              <BackButton onClick={() => setStep(checkoutPlan?.hasKeychain ? "address" : "plan")} disabled={submitting}>
                 Back
               </BackButton>
               <StepHeading icon={<Truck className="h-4.5 w-4.5 text-primary" />} title="Your order">
@@ -748,7 +1059,7 @@ export default function PricingStep({
                         type="radio"
                         name="rate"
                         checked={quote.shipping?.selected?.rate_id === o.rate_id}
-                        onChange={() => requestQuote(checkoutPlan, o.rate_id)}
+                        onChange={() => checkoutPlan && requestQuote(checkoutPlan, o.rate_id)}
                         disabled={submitting}
                         className="accent-secondary"
                       />
@@ -766,7 +1077,7 @@ export default function PricingStep({
 
               <div className="card-glamlink space-y-2">
                 {quote.lines.map((line) => (
-                  <div key={line.product} className="flex justify-between text-[13px] text-muted-foreground">
+                  <div key={line.product} className="flex justify-between text-sm text-muted-foreground">
                     <span>{line.name ?? LINE_NAMES[line.product] ?? line.product}</span>
                     <span>
                       {line.list > line.amount && <span className="mr-1.5 line-through">{money(line.list)}</span>}
@@ -774,19 +1085,22 @@ export default function PricingStep({
                     </span>
                   </div>
                 ))}
-                {quote.shipping_cents > 0 && (
-                  <div className="flex justify-between text-[13px] text-muted-foreground">
+                {/* The keychain's shipping follows the quote: a line when charged, else included. */}
+                {quote.shipping_cents > 0 ? (
+                  <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Shipping</span>
                     <span>{money(quote.shipping_cents)}</span>
                   </div>
-                )}
+                ) : keychainInQuote ? (
+                  <p className="text-xs text-muted-foreground">Shipping and tax included.</p>
+                ) : null}
                 <div className="h-px bg-border" />
                 <div className="flex justify-between text-sm font-semibold text-foreground">
                   <span>Total due today</span>
                   <span className="text-primary">{money(quote.total_cents)}</span>
                 </div>
                 {quote.monthly_cents ? (
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     Then {money(quote.monthly_cents)} / month. Cancel anytime; Pro runs to the end of the paid month.
                   </p>
                 ) : null}
@@ -813,24 +1127,19 @@ export default function PricingStep({
             </div>
           )}
 
-          {step === "payment" && quote && businessCardId && clientSecret && (
-            // A new client secret needs a new Elements: Stripe fixes it at creation.
-            <Elements
+          {step === "payment" && quote && clientSecret && (
+            <PaymentStep
               key={clientSecret}
-              stripe={stripePromise}
-              options={{ clientSecret, appearance: APPEARANCE, fonts: ELEMENTS_FONTS }}
-            >
-              <PaymentStep
-                businessCardId={businessCardId}
-                quote={quote}
-                planLabel={checkoutPlan.name}
-                onBack={() => setStep("review")}
-                onDone={(result) => {
-                  if (result === "paid") clearCardToken(businessCardId);
-                  setDone(result);
-                }}
-              />
-            </Elements>
+              businessCardId={businessCardId}
+              quote={quote}
+              clientSecret={clientSecret}
+              publishableKey={publishableKey}
+              planLabel={checkoutPlan?.name ?? "Access"}
+              email={paymentEmail || null}
+              notice={paymentNotice}
+              onBack={() => setStep("review")}
+              onConfirmed={handleConfirmed}
+            />
           )}
         </div>
       </div>
@@ -838,168 +1147,84 @@ export default function PricingStep({
   );
 }
 
-/* ── Payment ──────────────────────────────────────────────────────────────── */
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-/** Stripe tells the API through its webhook: waits up to 18 seconds for the checkout to be paid. */
-async function waitUntilPaid(checkoutId: number | string, businessCardId: string | number): Promise<boolean> {
-  for (let i = 0; i < 12; i++) {
-    const check = await getCheckout(checkoutId, businessCardId).catch(() => null);
-    if ((check?.data ?? check)?.status === "paid") return true;
-    await wait(1500);
-  }
-  return false;
-}
-
-/** Where a payment method that leaves the site (a bank or wallet page) sends the person back. */
-const paymentReturnUrl = (businessCardId: string | number, checkoutId: number) =>
-  `${window.location.origin}/pricing?businessCardId=${encodeURIComponent(String(businessCardId))}&checkout=${checkoutId}`;
-
-function PaymentStep({
-  businessCardId,
-  quote,
-  planLabel,
-  onBack,
-  onDone,
-}: {
-  businessCardId: string | number;
-  quote: Quote;
-  planLabel: string;
-  onBack: () => void;
-  onDone: (result: "paid" | "processing") => void;
-}) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [status, setStatus] = useState<"idle" | "paying" | "confirming">("idle");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [ready, setReady] = useState(false);
-
-  async function handlePay(event: React.FormEvent) {
-    event.preventDefault();
-    if (!stripe || !elements) return;
-    setStatus("paying");
-    setErrorMsg("");
-    // Cards and wallets confirm here; bank and wallet pages that need a
-    // redirect come back to the return URL.
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      confirmParams: { return_url: paymentReturnUrl(businessCardId, quote.checkout_id) },
-      redirect: "if_required",
-    });
-    if (error) {
-      // Card and validation messages are written for the customer; others are not.
-      setErrorMsg(
-        (error.type === "card_error" || error.type === "validation_error") && error.message
-          ? error.message
-          : "Your payment could not be completed. Please try again."
-      );
-      setStatus("idle");
-      return;
-    }
-    if (paymentIntent?.status === "processing") {
-      onDone("processing");
-      return;
-    }
-    setStatus("confirming");
-    await waitUntilPaid(quote.checkout_id, businessCardId);
-    onDone("paid");
-  }
-
-  const busy = status !== "idle";
-
-  return (
-    <div className="mx-auto max-w-md">
-      <BackButton onClick={onBack} disabled={busy}>
-        Back
-      </BackButton>
-      <StepHeading icon={<CreditCard className="h-4.5 w-4.5 text-primary" />} title="Payment">
-        Complete your {planLabel} purchase.
-      </StepHeading>
-
-      <form onSubmit={handlePay}>
-        <div className="card-glamlink space-y-4">
-          <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-accent/40 px-4 py-3">
-            <span className="text-sm font-semibold text-foreground">Total due today</span>
-            <span className="text-sm font-semibold text-secondary">{money(quote.total_cents)}</span>
-          </div>
-
-          {errorMsg && <ErrorNote>{errorMsg}</ErrorNote>}
-
-          <PaymentElement
-            options={{ layout: "tabs" }}
-            onReady={() => setReady(true)}
-            onLoadError={() => setErrorMsg("The payment form could not load. Go back and try again.")}
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={busy || !stripe || !ready}
-          className="btn-primary mt-6 w-full py-3 disabled:opacity-50"
-        >
-          {busy ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {status === "confirming" ? "Confirming payment..." : "Processing..."}
-            </>
-          ) : (
-            <>
-              <Lock className="h-3.5 w-3.5" />
-              Pay {money(quote.total_cents)}
-            </>
-          )}
-        </button>
-        {quote.monthly_cents ? (
-          <p className="mt-3 text-center text-[11px] text-muted-foreground">
-            Then {money(quote.monthly_cents)} / month until you cancel.
-          </p>
-        ) : null}
-      </form>
-    </div>
-  );
-}
-
-/* ── Small pieces ─────────────────────────────────────────────────────────── */
-
-function Centered({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="card-glamlink w-full max-w-md text-center hover:translate-y-0">{children}</div>
-    </div>
-  );
-}
-
-function BackButton({ onClick, disabled, children }: { onClick: () => void; disabled?: boolean; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className="mb-6 flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground disabled:opacity-50"
-    >
-      <ArrowLeft className="h-4 w-4" /> {children}
+/** Why the purchase can't go on here, worded for whether the person is signed in. */
+function FatalScreen({ fatal, signedIn, onRetryClaim }: { fatal: Fatal; signedIn: boolean; onRetryClaim: () => void }) {
+  const router = useRouter();
+  const startAgain = (
+    <button type="button" onClick={() => router.push("/access")} className="btn-outline flex-1">
+      Start again
     </button>
   );
-}
-
-function StepHeading({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
-  return (
-    <div className="mb-6 flex items-center gap-3">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-accent">{icon}</span>
-      <div>
-        <h2 className="text-xl text-foreground">{title}</h2>
-        <p className="text-sm text-muted-foreground">{children}</p>
-      </div>
-    </div>
+  const dashboard = (
+    <button type="button" onClick={() => router.push("/dashboard")} className="btn-primary flex-1">
+      Go to dashboard
+    </button>
   );
-}
 
-function ErrorNote({ children }: { children: React.ReactNode }) {
+  let title: string;
+  let body: string;
+  let actions: React.ReactNode;
+  if (fatal.kind === "expired" && !signedIn) {
+    title = "This purchase has timed out";
+    body =
+      "A card you build while signed out can be finished within 24 hours, in the tab you made it in. Start again, or sign in if you already paid.";
+    actions = (
+      <>
+        {startAgain}
+        <button type="button" onClick={() => router.push(loginHref())} className="btn-primary flex-1">
+          Sign in
+        </button>
+      </>
+    );
+  } else if (fatal.kind === "expired") {
+    title = "We can't continue this purchase";
+    body =
+      "This card isn't on your account, or the time to finish it ran out. Your dashboard shows your card and plan.";
+    actions = (
+      <>
+        {startAgain}
+        {dashboard}
+      </>
+    );
+  } else if (fatal.kind === "unavailable") {
+    title = "This card isn't available";
+    body = "It may have been replaced or deleted, or it belongs to another account.";
+    actions = signedIn ? (
+      <>
+        {startAgain}
+        {dashboard}
+      </>
+    ) : (
+      <button type="button" onClick={() => router.push("/access")} className="btn-primary flex-1">
+        Create your card
+      </button>
+    );
+  } else {
+    title = "We couldn't move this card to your account";
+    body = fatal.retry
+      ? "Something went wrong on our side. Try again in a moment."
+      : "It was already finished or moved to an account. Open your dashboard, or start a new card.";
+    actions = fatal.retry ? (
+      <>
+        {dashboard}
+        <button type="button" onClick={onRetryClaim} className="btn-outline flex-1">
+          Try again
+        </button>
+      </>
+    ) : (
+      <>
+        {startAgain}
+        {dashboard}
+      </>
+    );
+  }
+
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-xs text-destructive">
-      <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-      {children}
-    </div>
+    <Centered>
+      <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
+      <h1 className="mt-4 text-xl">{title}</h1>
+      <p className="mt-2 text-sm text-muted-foreground">{body}</p>
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row">{actions}</div>
+    </Centered>
   );
 }

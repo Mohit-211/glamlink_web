@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/config";
 import React from "react";
 import dynamic from "next/dynamic";
 import Script from "next/script";
-import AccessPricingSection from "@/components/AccessPricingSection/AccessPricingSection";
+import AccessBenefits from "@/components/glamcard/AccessBenefits";
 import GlamCardHero from "@/components/glamcard/GlamCardHero";
 
 const GlamCardApplication = dynamic(
@@ -29,7 +29,7 @@ export default function DigitalApplyPage() {
     },
     areaServed: {
       "@type": "Country",
-      name: "United Kingdom",
+      name: "United States",
     },
   };
 
@@ -43,11 +43,10 @@ export default function DigitalApplyPage() {
         }}
       />
 
-      <main>
+      {/* The layout's <main> holds the page */}
+      <div>
         <GlamCardHero formId={FORM_ID} />
-        {/* <section className="pb-20">
-          <AccessPricingSection />
-        </section> */}
+        <AccessBenefits />
         <section
           id={FORM_ID}
           tabIndex={-1}
@@ -58,7 +57,7 @@ export default function DigitalApplyPage() {
             <GlamCardApplication />
           </div>
         </section>
-      </main>
+      </div>
     </div>
   );
 }

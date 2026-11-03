@@ -115,7 +115,7 @@ export default function PageAnalytics({ locked = false, onUpgrade }: { locked?: 
           </p>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-shrink-0 sm:items-end">
-          {!locked && (
+          {!locked && failed !== 'upgrade' && (
             <AnalyticsDateFilter
               value={range}
               onChange={(next) => {
@@ -125,7 +125,7 @@ export default function PageAnalytics({ locked = false, onUpgrade }: { locked?: 
               disabled={loading}
             />
           )}
-          {data && !loading && <p className="text-[11px] text-muted-foreground">Showing {rangeLabel}</p>}
+          {data && !loading && <p className="text-xs text-muted-foreground">Showing {rangeLabel}</p>}
         </div>
       </div>
 

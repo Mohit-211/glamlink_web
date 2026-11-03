@@ -10,7 +10,7 @@ export default function FeaturedProfileCard({ profile }: { profile: FeaturedProf
       className="group relative shrink-0 snap-start w-[78%] min-[480px]:w-[calc((100%_-_1rem)/2)] md:w-[calc((100%_-_3rem)/3)] lg:w-[calc((100%_-_4.5rem)/4)]"
       aria-label={[profile.name, profile.title].filter(Boolean).join(", ")}
     >
-      <div className="relative aspect-3/4 overflow-hidden rounded-[1.75rem] bg-muted shadow-medium ring-1 ring-overlay/5">
+      <div className="relative aspect-3/4 overflow-hidden rounded-3xl bg-muted shadow-medium ring-1 ring-overlay/5">
         {profile.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- photos come from any host the API stores
           <img
@@ -31,14 +31,16 @@ export default function FeaturedProfileCard({ profile }: { profile: FeaturedProf
           className="absolute inset-0 bg-linear-to-t from-overlay/80 via-overlay/15 to-transparent"
         />
 
-        <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-card/95 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary shadow-sm">
-          <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-          {profile.distanceLabel ?? "Featured"}
-        </span>
+        {(profile.distanceLabel || profile.featured) && (
+          <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-card/95 px-3 py-1.5 eyebrow text-primary shadow-soft">
+            <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+            {profile.distanceLabel ?? "Featured"}
+          </span>
+        )}
 
         <div className="absolute inset-x-0 bottom-0 p-5">
           {profile.featuredIn && (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-overlay-foreground/75">
+            <p className="eyebrow text-overlay-foreground/75">
               {profile.featuredIn}
             </p>
           )}

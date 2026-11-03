@@ -252,14 +252,14 @@ console.log(realExperts,"realExperts")
           {/* ── HERO ── */}
           <section className="grid md:grid-cols-2 gap-10 md:gap-14 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 text-[10px] tracking-[.2em] uppercase text-secondary font-medium mb-5 bg-primary/8 px-3.5 py-1.5 rounded-full">
+              <div className="inline-flex items-center gap-2 eyebrow text-secondary mb-5 bg-primary/8 px-3.5 py-1.5 rounded-full">
                 <Sparkles className="h-3 w-3" />
                 Glamlink Topic
               </div>
-              <h1 className="text-[clamp(32px,5vw,48px)] leading-[1.08] tracking-tight text-foreground">
+              <h1 className="text-[clamp(32px,5vw,48px)] leading-tight tracking-tight text-foreground">
                 {topic.name}
               </h1>
-              <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground font-normal max-w-md">
+              <p className="mt-5 text-base leading-relaxed text-muted-foreground font-normal max-w-md">
                 {getTopicSummary(topic)}
               </p>
 
@@ -278,7 +278,7 @@ console.log(realExperts,"realExperts")
               )}
             </div>
 
-            <div className="relative rounded-[1.75rem] overflow-hidden aspect-[16/9] w-full shadow-primary">
+            <div className="relative rounded-3xl overflow-hidden aspect-[16/9] w-full shadow-primary">
               <Image
                 unoptimized={process.env.NODE_ENV === "development"}
                 src={getTopicImage(topic)}
@@ -287,7 +287,7 @@ console.log(realExperts,"realExperts")
                 className="object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-overlay/35 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-overlay/35 via-transparent to-transparent" />
             </div>
           </section>
         </div>
@@ -302,7 +302,7 @@ console.log(realExperts,"realExperts")
                 <ArticleContent content={topic.description} />
               </div>
             ) : (
-              <p className="text-[15px] leading-[1.8] text-muted-foreground font-normal">
+              <p className="text-base leading-relaxed text-muted-foreground font-normal">
                 {topic.name} is one of the beauty and wellness topics Glamlink
                 tracks across our journal and professional network. Explore
                 the articles and specialists below to learn more, or search
@@ -311,20 +311,20 @@ console.log(realExperts,"realExperts")
             )}
 
             <div className="mt-7 flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[13px] text-muted-foreground">
+              <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground">
                 <span className="text-base text-foreground">
                   {journals.length}
                 </span>
                 related {journals.length === 1 ? "article" : "articles"}
               </div>
-              <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[13px] text-muted-foreground">
+              <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground">
                 <span className="text-base text-foreground">
                   {experts.length}
                 </span>
                 {experts.length === 1 ? "professional" : "professionals"} found
               </div>
               {addedDate && (
-                <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[13px] text-muted-foreground">
+                <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground">
                   Tracked since{" "}
                   <span className="font-medium text-foreground">{addedDate}</span>
                 </div>
@@ -389,6 +389,7 @@ console.log(realExperts,"realExperts")
                     title={article.title}
                     excerpt={article.short_description}
                     author={article.journal_author?.name}
+                    authorImage={article.journal_author?.profile_image}
                     date={formattedDate}
                   />
                 </Link>
@@ -421,7 +422,7 @@ console.log(realExperts,"realExperts")
                     className="object-cover"
                   />
                 </div>
-                <span className="text-[12px] font-medium text-foreground/80 leading-snug">
+                <span className="text-xs font-medium text-foreground/80 leading-snug">
                   {option.label}
                 </span>
               </div>
@@ -475,7 +476,7 @@ console.log(realExperts,"realExperts")
                   <>
                     <Quote className="h-4 w-4 text-primary/40 mb-3" />
                     <p
-                      className="rich-text text-[15px] leading-[1.8] text-muted-foreground font-normal"
+                      className="rich-text text-base leading-relaxed text-muted-foreground font-normal"
                       dangerouslySetInnerHTML={{ __html: text }}
                     />
                   </>
@@ -483,12 +484,12 @@ console.log(realExperts,"realExperts")
                 return (
                   <div
                     key={paragraph.id}
-                    className="group rounded-2xl border border-border bg-card p-6 shadow-sm hover:border-secondary/40 hover:shadow-md transition-all duration-300"
+                    className="group rounded-2xl border border-border bg-card p-6 shadow-soft hover:border-secondary/40 hover:shadow-medium transition-all duration-300"
                   >
                     {href ? (
                       <Link href={href} className="block hover:text-secondary transition-colors">
                         {textEl}
-                        <span className="flex items-center gap-1 text-[11px] font-medium text-primary mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <span className="flex items-center gap-1 text-xs font-medium text-primary mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                           Read the full article
                           <ArrowRight className="h-3 w-3" />
                         </span>
@@ -506,7 +507,7 @@ console.log(realExperts,"realExperts")
         {/* ── CTA ── */}
         <div className="max-w-[1100px] mx-auto px-5 sm:px-6 pb-20">
           <section
-            className="relative overflow-hidden rounded-[1.75rem] bg-accent px-6 py-12 md:px-14 md:py-16 text-center"
+            className="relative overflow-hidden rounded-3xl bg-accent px-6 py-12 md:px-14 md:py-16 text-center"
           >
             <p className="eyebrow text-secondary mb-3">
               Glamlink

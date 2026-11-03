@@ -101,7 +101,7 @@ const fetchData = async () => {
  if (error) {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-card rounded-2xl shadow-lg border p-8 text-center">
+      <div className="max-w-md w-full bg-card rounded-2xl shadow-large border p-8 text-center">
         <div className="text-6xl mb-4">
           {isSubscriptionError ? "💳" : "⚠️"}
         </div>

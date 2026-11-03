@@ -13,7 +13,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/20",
         outline:
-          "border bg-background shadow-xs hover:border-secondary hover:bg-accent hover:text-secondary",
+          "border bg-background shadow-soft hover:border-secondary hover:bg-accent hover:text-secondary",
         // A quiet grey button (shadcn's "secondary" variant), not the secondary teal
         secondary:
           "bg-muted text-foreground hover:bg-accent hover:text-secondary",

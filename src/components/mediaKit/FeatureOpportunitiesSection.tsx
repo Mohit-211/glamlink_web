@@ -126,7 +126,7 @@ export default function FeaturedComponent() {
 
               {/* HIGHLIGHT BADGE */}
               {item.highlight && (
-                <span className="absolute top-4 right-4 text-[10px] uppercase tracking-wide text-primary">
+                <span className="absolute top-4 right-4 eyebrow text-primary">
                   Premium
                 </span>
               )}

@@ -83,16 +83,20 @@ export async function initialGlamCardData(): Promise<GlamCardFormData> {
       { note: "Sat: 10:00 AM – 4:00 PM" },
       { note: "Sun: Closed" },
     ],
-    /* ================= LOCATION ================= */
+    /* ================= LOCATION =================
+       A city with its coordinates, so the preview's map starts on Las Vegas, Nevada.
+       (A street address without a city made Google pick a match near the viewer.) */
     locations: [
       {
         id: nanoid(),
-        label: "Location 1",
-        location_type: "exact_address",
-        address: "123 Main Street",
-        area: "Downtown",
-        city: "Los Angeles",
-        state: "CA",
+        label: "Las Vegas Studio",
+        location_type: "city_only",
+        address: "",
+        area: "",
+        city: "Las Vegas",
+        state: "Nevada",
+        latitude: 36.1699,
+        longitude: -115.1398,
         phone: "1234567890",
         description: "Our main studio location.",
         isPrimary: true,

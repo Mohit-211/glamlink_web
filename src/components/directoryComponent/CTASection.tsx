@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function CTASection() {
   return (
     <section className="section-glamlink">
@@ -15,7 +17,9 @@ export default function CTASection() {
             clients looking for trusted services near them.
           </p>
 
-          <button className="btn-primary">Join For Free</button>
+          <Link href="/access#create-profile" className="btn-primary">
+            Join For Free
+          </Link>
         </div>
 
         {/* FEATURE IN EDIT */}

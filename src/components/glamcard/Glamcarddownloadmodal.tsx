@@ -540,7 +540,7 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative flex flex-col bg-card rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl max-h-[92vh] sm:max-h-[90vh] overflow-hidden">
+      <div className="relative flex flex-col bg-card rounded-t-2xl sm:rounded-2xl shadow-large w-full sm:max-w-2xl max-h-[92vh] sm:max-h-[90vh] overflow-hidden">
         {/* drag handle (mobile) */}
         <div className="sm:hidden w-10 h-1 rounded-full bg-input mx-auto mt-3 mb-1 flex-shrink-0" />
 

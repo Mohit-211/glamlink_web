@@ -27,22 +27,22 @@ interface ProductCardProps {
 const COMPACT_CLASSES = {
   card: "rounded-lg sm:rounded-xl",
   badge:
-    "top-1.5 left-1.5 max-w-[calc(100%-0.75rem)] truncate text-[8px] px-1.5 py-0.5 sm:top-3 sm:left-3 sm:max-w-none sm:text-[10px] sm:px-2 sm:py-1",
+    "top-1.5 left-1.5 max-w-[calc(100%-0.75rem)] truncate text-xs px-1.5 py-0.5 sm:top-3 sm:left-3 sm:max-w-none sm:px-2 sm:py-1",
   body: "p-2 space-y-1 sm:p-4 sm:space-y-2",
-  brand: "text-[8px] truncate sm:text-[10px]",
+  brand: "text-xs truncate ",
   title: "text-xs sm:text-sm md:text-base line-clamp-2",
   footer:
     "flex flex-col items-stretch gap-1.5 pt-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0 sm:pt-2",
   price: "text-xs sm:text-base",
-  button: "w-full px-2 text-[10px] sm:w-auto sm:px-3 sm:text-xs",
+  button: "w-full px-2 text-xs sm:w-auto sm:px-3 ",
   icon: "mr-1 sm:mr-1.5",
 };
 
 const DEFAULT_CLASSES = {
   card: "rounded-xl",
-  badge: "top-3 left-3 text-[10px] px-2 py-1",
+  badge: "top-3 left-3 text-xs px-2 py-1",
   body: "p-4 space-y-2",
-  brand: "text-[10px]",
+  brand: "text-xs",
   title: "text-sm md:text-base",
   footer: "flex items-center justify-between pt-2",
   price: "text-base",
@@ -57,7 +57,7 @@ const ProductCard = ({ product, onSelect, compact = false }: ProductCardProps) =
   return (
     <div
       onClick={() => onSelect(product)}
-      className={`group flex flex-col h-full border border-border/50 ${c.card} overflow-hidden bg-background shadow-sm hover:border-secondary/50 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer`}
+      className={`group flex flex-col h-full border border-border/50 ${c.card} overflow-hidden bg-background shadow-soft hover:border-secondary/50 hover:shadow-large hover:-translate-y-0.5 transition-all duration-200 cursor-pointer`}
     >
       <div className="relative aspect-[5/5.5] bg-muted/30 overflow-hidden">
         <img

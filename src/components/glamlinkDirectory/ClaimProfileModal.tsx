@@ -7,7 +7,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getProfessionalType, type DirectoryBusiness } from "@/lib/directory";
+import type { DirectoryBusiness } from "@/lib/directory";
 
 interface ClaimProfileModalProps {
   business: DirectoryBusiness | null;
@@ -25,12 +25,12 @@ export default function ClaimProfileModal({ business, onOpenChange, onConfirm }:
           <>
             <div className="relative h-32 bg-muted">
               <img src={business.imageUrl} alt="" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-overlay/60 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-overlay/60 to-transparent" />
               <div className="absolute bottom-3 left-5 right-12 text-overlay-foreground">
                 <p className="font-semibold leading-tight truncate">{business.name}</p>
                 <p className="mt-0.5 flex items-center gap-1 text-xs text-overlay-foreground/85">
                   <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
-                  {getProfessionalType(business.professionalType)?.label} · {business.city},{" "}
+                  {business.category} · {business.city},{" "}
                   {business.state}
                 </p>
               </div>
@@ -44,7 +44,8 @@ export default function ClaimProfileModal({ business, onOpenChange, onConfirm }:
                 Is this your business?
               </DialogTitle>
               <DialogDescription className="mt-3 text-muted-foreground">
-                Claim your profile and start building your Glamlink presence.
+                Create your free Access profile, starting from this listing&apos;s details. We check each claim
+                before your profile takes the listing&apos;s place.
               </DialogDescription>
 
               <button

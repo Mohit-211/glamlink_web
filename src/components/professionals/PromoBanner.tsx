@@ -45,7 +45,7 @@ const PromoBanner = () => {
               </p>
 
               {/* CTA */}
-              <Button className="bg-card text-primary hover:bg-card hover:text-secondary px-10 py-6 text-lg font-semibold rounded-full shadow-xl gap-2">
+              <Button className="bg-card text-primary hover:bg-card hover:text-secondary px-10 py-6 text-lg font-semibold rounded-full shadow-large gap-2">
                 Start Selling
                 <ArrowRight className="w-5 h-5" />
               </Button>

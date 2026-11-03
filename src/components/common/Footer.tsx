@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import logo from "../../../public/logo.png";
+import { openCookieSettings } from "@/lib/consent";
 import {
   Instagram,
   Twitter,
@@ -187,6 +188,15 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <button
+                  type="button"
+                  onClick={() => openCookieSettings()}
+                  className="text-muted-foreground hover:text-secondary transition-colors"
+                >
+                  Cookie settings
+                </button>
+              </li>
             </ul>
           </div>
 

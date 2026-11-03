@@ -127,7 +127,7 @@ export default function FeatureFormModal({ onClose }: Props) {
                 {/* STEP 1 — Form */}
                 {step === 1 && (
                     <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
-                        <p className="text-[13px] leading-relaxed text-muted-foreground">
+                        <p className="text-sm leading-relaxed text-muted-foreground">
                             Apply to be featured in The Glamlink Edit, our editorial platform highlighting
                             standout beauty and wellness professionals. Select the type of feature you&apos;d
                             like to be considered for — from Cover Feature and expert interviews to

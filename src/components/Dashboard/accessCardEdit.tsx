@@ -18,7 +18,7 @@ interface Props {
   cardData: AccessCardData | null | undefined;
   onSave: (updated: AccessCardData) => void;
   onCancel: () => void;
-  /** Whether photos, video and offers can change (see GlamCardForm). */
+  /** Whether photos and video can change (see GlamCardForm). */
   proAccess?: boolean;
 }
 
@@ -268,7 +268,6 @@ const normalize = (raw: AccessCardData | null | undefined): GlamCardFormData => 
     excites_about_glamlink: toStringList(base.excites_about_glamlink),
     biggest_pain_points: toStringList(base.biggest_pain_points),
     is_phone_visible: toBool(base.is_phone_visible, true),
-    offer_promotion: toBool(base.offer_promotion),
     elite_setup: toBool(base.elite_setup),
   } as GlamCardFormData;
 };
