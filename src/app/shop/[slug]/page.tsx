@@ -10,7 +10,7 @@ import SectionHeading from "@/components/content/SectionHeading";
 import ShareProductButton from "@/components/blogs/ShareProductButton";
 import SaveProductButton from "@/components/shop/SaveProductButton";
 import { getProductById, getProductBySlug, getProducts } from "@/lib/api/public";
-import type { ProductCard, ProductDetail } from "@/lib/api/types";
+import { productButtonLabel, type ProductCard, type ProductDetail } from "@/lib/api/types";
 import { SITE_URL } from "@/lib/config";
 import { formatPrice } from "@/lib/format";
 import { decodeId } from "@/lib/idCodec";
@@ -146,6 +146,11 @@ export default async function ProductPage({ params }: { params: Params }) {
         </div>
 
         <div className="flex flex-col">
+          {product.tag && (
+            <span className="mb-4 self-start rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
+              {product.tag.name}
+            </span>
+          )}
           {brand &&
             (brandProfile ? (
               <Link href={profileHref(brandProfile.slug)} className="eyebrow self-start hover:text-secondary">
@@ -155,6 +160,7 @@ export default async function ProductPage({ params }: { params: Params }) {
               <p className="eyebrow">{brand}</p>
             ))}
           <h1 className="mt-3 text-3xl leading-tight md:text-4xl">{product.title}</h1>
+          {product.category && <p className="mt-2 text-sm text-muted-foreground">{product.category}</p>}
           {price && <p className="mt-4 text-2xl font-semibold">{price}</p>}
 
           {paragraphs.length > 0 && (
@@ -171,7 +177,7 @@ export default async function ProductPage({ params }: { params: Params }) {
             {product.link && (
               <a href={product.link} target="_blank" rel="noopener noreferrer" className="btn-primary">
                 <ShoppingBag className="h-4 w-4" aria-hidden="true" />
-                Shop Now
+                {productButtonLabel(product)}
                 <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                 <span className="sr-only">(opens the seller&apos;s site)</span>
               </a>

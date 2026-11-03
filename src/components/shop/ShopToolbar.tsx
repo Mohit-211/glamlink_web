@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useTransition, type FormEvent } from "react";
+import type { FormEvent } from "react";
 import { Loader2, Search } from "lucide-react";
+import { useListNavigation } from "@/components/content/ListNavigation";
 import { listHref } from "@/lib/searchParams";
 
 interface ShopToolbarProps {
@@ -16,13 +16,12 @@ interface ShopToolbarProps {
  * and the page stays put. The filters and sort are ListFilters, under it.
  */
 export default function ShopToolbar({ search, keep }: ShopToolbarProps) {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const { pending, navigate } = useListNavigation();
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const typed = String(new FormData(event.currentTarget).get("search") ?? "").trim();
-    startTransition(() => router.push(listHref("/shop", { ...keep, search: typed }), { scroll: false }));
+    navigate(listHref("/shop", { ...keep, search: typed }));
   };
 
   return (

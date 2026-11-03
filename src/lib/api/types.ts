@@ -102,7 +102,22 @@ export interface ProductCard {
   owner?: PageRef | null;
   /** The page of the brand that makes it. */
   brand_profile?: PageRef | null;
+  /** Since Nov 4: the product's tag, from the list admins keep (top-left on the card). */
+  tag?: ProductTag | null;
+  /** Since Nov 4: the button's words; none means "Shop now". */
+  button_label?: string | null;
 }
+
+/** A product tag (`GET /discover/shop/tags`). Editorial ones are set by admins only. */
+export interface ProductTag {
+  id: number;
+  name: string;
+  is_editorial: boolean;
+  sort_order?: number;
+}
+
+/** The button's words on a product: its own, else "Shop now". */
+export const productButtonLabel = (product: Pick<ProductCard, "button_label">) => product.button_label?.trim() || "Shop now";
 
 export interface ProductDetail extends ProductCard {
   description: string | null;

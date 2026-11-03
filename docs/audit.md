@@ -19,6 +19,20 @@ The visual review overlaps the code audit on SEO and dead routes.
 - **Severity:** P0 breaks a page or a feature, or leaks data; P1 fix before the switch; P2 medium; P3 low. **Effort:** S under half a day, M up to two days, L more.
 - **Waiting on a decision:** approval of the preview (heroes, Journal), the brand directory layout (W-06), the Access card form look (https://claude.ai/artifact/6F1B7FrtpJ5w8GPSYkhbG8), and whether `/for-clients` and `/for-professionals` stay (W-29).
 
+## The Shop's tags, categories and button, and a faster Access form (Nov 4, not deployed)
+
+The owner's requests of Nov 4, on `master`. The Shop and the dashboard read the backend's Nov 4 additions (product tags, a category list and a button label: its `docs/handoff/website-frontend.md`); against an older API the new fields are simply absent.
+
+| Part | What |
+| --- | --- |
+| Shop cards | The product's button under each card on the Shop ("Shop now" unless renamed), straight to the seller; its tag top-left; the category beside the brand |
+| Shop filters | A Category filter (the 8 categories) beside Brand, Price and Sort; All products or Saved. The hero stays on every view and a change loads in place, the results dimmed until the new ones arrive (`content/ListNavigation.tsx`): the hero used to vanish with a filter and come back without one, so the page jumped |
+| Product page | Its tag above the brand, its category under the title, its button's own words |
+| Dashboard | My Products: Category from the list, a Tag (the open ones; an editorial tag set by Glamlink shows, locked) and the Button's words |
+| Access form | The hero clip is 3.7 MB (540×960, no sound) instead of 38 MB, behind a poster, loaded after the page and not for reduced motion or saving data. Card photos are cropped to JPEG at most 1600 px (a 12 MP photo: about 200–350 KB) instead of full-size PNG (often 15 MB or more), so creating a card sends a fraction of the data |
+
+Measured from outside on Nov 4, even the API's health check (which does no work) took 0.9–4 s, so much of each call's time is the way to the server rather than the API's own work.
+
 ## The Shop's filters, saved products, cookies and the Google map (Nov 3, not deployed)
 
 The owner's second request of Nov 3, on `master` (Nov 4). It reads the backend's shop additions (backend `docs/handoff/website-frontend.md`: GET /discover/shop `sort`, `min_price`, `max_price`, `ids`, and `price` on its filters), so the API deploys first: before it, the sort and price filter are ignored and the Saved list shows only the saved products on the shop's first page.

@@ -1,10 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import { Loader2 } from "lucide-react";
 import { listHref } from "@/lib/searchParams";
 import { cn } from "@/lib/utils";
+import { useListNavigation } from "./ListNavigation";
 
 export interface FilterOption {
   value: string;
@@ -43,8 +43,7 @@ const roundCoordinate = (n: number) => String(Math.round(n * 100) / 100);
  * JavaScript it is a plain GET form with an Apply button. "Nearest to me" asks the browser for the visitor's place.
  */
 export default function ListFilters({ action, fields, sort, keep = {}, point = null }: ListFiltersProps) {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const { pending, navigate } = useListNavigation();
   const [values, setValues] = useState(() => Object.fromEntries(fields.map((f) => [f.name, f.value])));
   const [sortValue, setSortValue] = useState(sort.value);
   const [locating, setLocating] = useState(false);
@@ -59,7 +58,7 @@ export default function ListFilters({ action, fields, sort, keep = {}, point = n
       sort: nextSort === sort.options[0]?.value ? "" : nextSort,
       ...(nextSort === "nearest" && at ? at : {}),
     });
-    startTransition(() => router.push(href, { scroll: false }));
+    navigate(href);
   };
 
   const onField = (field: FilterField) => (event: ChangeEvent<HTMLSelectElement>) => {

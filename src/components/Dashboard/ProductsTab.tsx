@@ -4,11 +4,12 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { ExternalLink, ImagePlus, Loader2, Package, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { createMyProduct, deleteMyProduct, getMyProducts, updateMyProduct } from '@/api/Api';
+import { createMyProduct, deleteMyProduct, getMyProducts, getProductTags, updateMyProduct } from '@/api/Api';
+import { PRODUCT_CATEGORIES } from '@/components/shop/shopOptions';
 import { readApiError } from '@/lib/apiError';
 import { formatPrice } from '@/lib/format';
 import { productHref } from '@/lib/routes';
-import type { ProductCard } from '@/lib/api/types';
+import type { ProductCard, ProductTag } from '@/lib/api/types';
 
 /*
  * The owner's products (backend handoff, 10.14): /my/products. Published
@@ -28,6 +29,10 @@ interface Draft {
   brand: string;
   price: string;
   link: string;
+  /** The button's words; empty shows "Shop now". */
+  button_label: string;
+  /** A tag's id, or '' for none. */
+  tag_id: string;
   status: 'published' | 'draft';
   cover: File | null;
   coverPreview: string;
@@ -42,6 +47,8 @@ const emptyDraft = (): Draft => ({
   brand: '',
   price: '',
   link: '',
+  button_label: '',
+  tag_id: '',
   status: 'published',
   cover: null,
   coverPreview: '',
@@ -56,6 +63,8 @@ const draftFrom = (p: MyProduct): Draft => ({
   brand: p.brand ?? '',
   price: p.price === null || p.price === undefined ? '' : String(p.price),
   link: p.link ?? '',
+  button_label: p.button_label ?? '',
+  tag_id: p.tag ? String(p.tag.id) : '',
   status: p.status === 'draft' ? 'draft' : 'published',
   cover: null,
   coverPreview: p.cover_image ?? '',
@@ -75,15 +84,36 @@ function ProductForm({
   const [saving, setSaving] = useState(false);
   const [fieldError, setFieldError] = useState<{ field: string; message: string } | null>(null);
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) => setDraft((d) => ({ ...d, [key]: value }));
+  // The tags owners may set; an editorial one (set by Glamlink) stays as it is
+  const [tags, setTags] = useState<ProductTag[] | null>(null);
+  const lockedTag = editing?.tag?.is_editorial ? editing.tag : null;
+
+  useEffect(() => {
+    let active = true;
+    getProductTags()
+      .then((res) => {
+        const list: ProductTag[] = Array.isArray(res?.data) ? res.data : [];
+        if (active) setTags(list.filter((tag) => !tag.is_editorial));
+      })
+      .catch(() => active && setTags([]));
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setSaving(true);
     setFieldError(null);
     const form = new FormData();
-    (['title', 'short_description', 'description', 'category', 'brand', 'price', 'link', 'status'] as const).forEach((key) =>
-      form.append(key, String(draft[key]).trim())
-    );
+    // A category from before the list (Nov 4) is refused when sent: unchanged, it isn't sent, and the API keeps it
+    const oldCategory =
+      editing && draft.category === (editing.category ?? '') && !(PRODUCT_CATEGORIES as readonly string[]).includes(draft.category);
+    (['title', 'short_description', 'description', 'category', 'brand', 'price', 'link', 'button_label', 'status'] as const).forEach((key) => {
+      if (key === 'category' && oldCategory) return;
+      form.append(key, String(draft[key]).trim());
+    });
+    if (!lockedTag && tags) form.append('tag_id', draft.tag_id);
     if (draft.cover) form.append('images', draft.cover);
     else if (editing && draft.removeCover) form.append('cover_image', '');
 
@@ -211,10 +241,79 @@ function ProductForm({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {text('category', 'Category', { placeholder: 'Serums' })}
+        <div>
+          <label htmlFor="product-category" className="label-glamlink">
+            Category
+          </label>
+          <select
+            id="product-category"
+            value={draft.category}
+            onChange={(e) => set('category', e.target.value)}
+            aria-invalid={fieldError?.field === 'category' || undefined}
+            className="input-glamlink"
+          >
+            <option value="">No category</option>
+            {/* A category saved before the list (Nov 4) stays until changed */}
+            {draft.category && !(PRODUCT_CATEGORIES as readonly string[]).includes(draft.category) && (
+              <option value={draft.category}>{draft.category}</option>
+            )}
+            {PRODUCT_CATEGORIES.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+          {errorFor('category')}
+        </div>
         {text('brand', 'Brand', { placeholder: 'Leave empty for your own brand' })}
         {text('price', 'Price (USD)', { inputMode: 'decimal', placeholder: '49.00', pattern: '^\\d+(\\.\\d{1,2})?$' })}
         {text('link', 'Where to buy (link)', { type: 'url', placeholder: 'https://' })}
+        <div>
+          <label htmlFor="product-button_label" className="label-glamlink">
+            Button
+          </label>
+          <input
+            id="product-button_label"
+            value={draft.button_label}
+            onChange={(e) => set('button_label', e.target.value)}
+            maxLength={30}
+            placeholder="Shop now"
+            aria-invalid={fieldError?.field === 'button_label' || undefined}
+            aria-describedby="product-button_label-help"
+            className="input-glamlink"
+          />
+          <p id="product-button_label-help" className="mt-1.5 text-xs text-muted-foreground">
+            The words on the button to your link. Empty shows &ldquo;Shop now&rdquo;.
+          </p>
+          {errorFor('button_label')}
+        </div>
+        <div>
+          <label htmlFor="product-tag" className="label-glamlink">
+            Tag
+          </label>
+          {lockedTag ? (
+            <p id="product-tag" className="input-glamlink bg-muted text-muted-foreground">
+              {lockedTag.name} (set by Glamlink)
+            </p>
+          ) : (
+            <select
+              id="product-tag"
+              value={draft.tag_id}
+              onChange={(e) => set('tag_id', e.target.value)}
+              disabled={!tags}
+              aria-invalid={fieldError?.field === 'tag_id' || undefined}
+              className="input-glamlink"
+            >
+              <option value="">No tag</option>
+              {(tags ?? []).map((tag) => (
+                <option key={tag.id} value={String(tag.id)}>
+                  {tag.name}
+                </option>
+              ))}
+            </select>
+          )}
+          {errorFor('tag_id')}
+        </div>
       </div>
 
       <fieldset>

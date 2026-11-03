@@ -1,7 +1,32 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import PageHero from "@/components/common/PageHero";
+
+/* The phone-shaped clip (Nov 4): 540×960 at about 1 Mbps, no sound, 3.7 MB, where the original was 38 MB and held
+   back the form's first load. Its poster shows at once; the clip loads after the page has, and not at all for
+   visitors who ask for less motion or less data. */
+const CLIP = "/access/access-hero.mp4";
+const POSTER = "/access/access-hero-poster.jpg";
+
+/** Starts the clip once the page has loaded, unless the visitor asked for reduced motion or to save data. */
+function useDeferredClip() {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+    if (saveData || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const start = () => {
+      video.src = CLIP;
+      video.play().catch(() => {});
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+    return () => window.removeEventListener("load", start);
+  }, []);
+  return ref;
+}
 
 interface GlamCardHeroProps {
   /** The id of the profile form's section: the hero's button scrolls to it. */
@@ -9,6 +34,7 @@ interface GlamCardHeroProps {
 }
 
 const GlamCardHero: React.FC<GlamCardHeroProps> = ({ formId }) => {
+  const clipRef = useDeferredClip();
   const scrollToForm = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const form = document.getElementById(formId);
     if (!form) return;
@@ -32,10 +58,7 @@ const GlamCardHero: React.FC<GlamCardHeroProps> = ({ formId }) => {
       media={
         // The phone-shaped clip, sized to the hero's height
         <div className="aspect-9/16 w-60 overflow-hidden rounded-3xl border border-border bg-card shadow-large sm:w-64 xl:w-72">
-          <video className="h-full w-full object-cover" autoPlay muted loop playsInline preload="metadata">
-            <source src="/magazine/6641.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+          <video ref={clipRef} className="h-full w-full object-cover" poster={POSTER} muted loop playsInline preload="none" aria-hidden="true" />
         </div>
       }
     >

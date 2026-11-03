@@ -1,7 +1,19 @@
 import type { FilterOption } from "@/components/content/ListFilters";
 import type { ShopFilters } from "@/lib/api/types";
 
-/* The Shop's sorting and price filter (the owner, Nov 3). */
+/* The Shop's sorting and price filter (the owner, Nov 3), and the product categories (Nov 4). */
+
+/** The categories a product is filed under (the API keeps the label): picked in the dashboard and the admin panel. */
+export const PRODUCT_CATEGORIES = [
+  "Skincare",
+  "Haircare",
+  "Makeup",
+  "Nails",
+  "Body & Bath",
+  "Fragrance",
+  "Wellness & Supplements",
+  "Devices & Tools",
+] as const;
 
 export const SHOP_SORTS: FilterOption[] = [
   { value: "featured", label: "Featured" },

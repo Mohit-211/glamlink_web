@@ -542,11 +542,17 @@ export const getMyProfileAnalytics = async (params?: { from?: string; to?: strin
   const { data } = await api.get("my/profile/analytics", { params, requireAuth: true });
   return data;
 };
+// The product tags admins keep (Nov 4): [{ id, name, is_editorial, sort_order }]; owners may set the others.
+export const getProductTags = async () => {
+  const { data } = await api.get("discover/shop/tags");
+  return data;
+};
 export const getMyProducts = async (params?: { page?: number; limit?: number }) => {
   const { data } = await api.get("my/products", { params, requireAuth: true });
   return data;
 };
-// A form: title, short_description, description, category, brand, price, link, status; the cover as `images`
+// A form: title, short_description, description, category, brand, price, link, status, button_label, tag_id; the
+// cover as `images`
 export const createMyProduct = async (formData: FormData) => {
   const { data } = await api.post("my/products", formData, { requireAuth: true });
   return data;
