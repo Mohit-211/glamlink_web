@@ -54,28 +54,53 @@ Don't set `NODE_ENV` in an env file; Next sets it. Keep server secrets (database
 
 ## Branches and environments
 
-| Where | Branch | API | State on Oct 30 |
+| Where | Branch | API | State on Nov 5 |
 | --- | --- | --- | --- |
-| glamlink.net and www | `main` (`origin/main` `4154565`) | Old API, node.glamlink.net | The old build. The switch to the new site has not happened. `main` is GitHub's default branch. |
-| test.glamlink.net | `master` (`191e275`) | api.glamlink.net | The current site. Search engines kept out. |
-| Local preview | `preview/journal-and-heroes` (`5a10841`) | api.glamlink.net | Two commits on `master`: shared heroes and the editorial Journal. Not pushed; waiting on client approval. |
+| glamlink.net and www | `main` | api.glamlink.net (from the switch) | The same code as `master` since Nov 5: `main` merged `master` and kept its files. `main`'s own Oct 15 commit "fix env" deleted `.env.example` and `public/favicon.png`, which this site uses. Until the server deploys it, glamlink.net is the old build on node.glamlink.net. `main` is GitHub's default branch. |
+| test.glamlink.net | `master` | api.glamlink.net | The preview of what goes to `main` next. Search engines kept out. Until it has an API of its own, it reads and writes live data: no test purchases there. |
 
-- Work for the test site goes to `master`. Changes the client must see first go on a `preview/*` branch and are merged into `master` once approved.
-- The switch of glamlink.net (env, backup, merge, deploy, `www` redirect) is a checklist in the Cutover status tab of the Code Audit doc (see Trackers below).
+- Work goes to `master` first (the test site), then to `main` (`git push origin master:main`, a fast-forward). Changes the client must see first go on a `preview/*` branch and are merged into `master` once approved.
+- The switch of glamlink.net: "Deploy the live site" below, and the backend's `docs/deploy.md` section 8.
 - Most other remote branches are old. `origin/test_dev` holds 21 commits that are not in `master`; check them before pruning.
-- Nov 1–4: the Access fixes, the one form, `/brands`, the Stripe work, profile pages, the directory, the Shop's filters and cookies, and the design pass are on `master` (merged from `preview/journal-and-heroes` on Nov 4), not deployed (`docs/audit.md`).
+- Nov 1–4: the Access fixes, the one form, `/brands`, the Stripe work, profile pages, the directory, the Shop's filters and cookies, and the design pass went to test.glamlink.net on Nov 4, and go to glamlink.net with the switch (`docs/audit.md`).
+
+## Deploy the live site
+
+On the server, after the API has its live settings (the backend's `docs/deploy.md`, section 8):
+
+```bash
+cd /var/www/frontend/live
+git status                  # Nov 5: package.json changed on the server, and an untracked file `env`
+git diff package.json       # what the server changed (its port?): it is kept below
+git stash
+git pull                    # main
+git stash pop               # stop here if it reports a conflict
+npm ci
+rm -rf .next/cache/fetch-cache
+npm run build
+pm2 reload glamlink-frontend
+```
+
+The live build reads `.env.local`: `NEXT_PUBLIC_SITE_URL=https://glamlink.net`, `NEXT_PUBLIC_API_URL=https://api.glamlink.net/api/v1`, `SITE_INDEXING=on`, `REVALIDATE_SECRET` (the API's `WEBSITE_REFRESH_SECRET`, with its `WEBSITE_REFRESH_URL` at `https://glamlink.net/api/revalidate`), the Turnstile site key, the Google Maps keys, and the GTM and AdSense IDs (`.env.example` explains each). Next reads `.env.production.local` over `.env.local`, and both over `.env.production` and `.env`: keep the values in `.env.local` only.
+
+Going back: `git checkout 4154565` (the old site), the env file it had, `npm ci`, `npm run build`, and `pm2 reload glamlink-frontend`.
 
 ## Deploy the test site
 
 On the server:
 
 ```bash
-cd /var/www/test.glamlink.net
+cd /var/www/frontend/test/glamlink_web
 git pull
 npm ci
+rm -rf .next/cache/fetch-cache
 npm run build
 pm2 reload glamlink-test
 ```
+
+`rm -rf .next/cache/fetch-cache` drops the API answers the site saved before the deploy. Next keeps them across builds, so without it a page can show the API's old answers for up to an hour (on Nov 4 the Shop lacked a new product tag and its Category filter until they expired).
+
+Edits made through the API show within seconds only with the cache-refresh hook: `REVALIDATE_SECRET` in the site's `.env.local`, and the same value as the API's `WEBSITE_REFRESH_SECRET`, with its `WEBSITE_REFRESH_URL` set to `https://test.glamlink.net/api/revalidate`. Without the secret the site answers that route with 503 and shows a change only when its saved answer expires, within the hour.
 
 The test build needs the test values listed at the end of `.env.example`: `NEXT_PUBLIC_SITE_URL=https://test.glamlink.net`, `NEXT_PUBLIC_API_URL=https://api.glamlink.net/api/v1`, `SITE_INDEXING=off`, the Turnstile site key, and empty GTM and AdSense IDs.
 

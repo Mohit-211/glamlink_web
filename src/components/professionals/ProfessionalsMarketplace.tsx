@@ -10,7 +10,6 @@ import {
   X,
   ArrowUp,
   ArrowDown,
-  ChevronsUpDown,
   ChevronDown,
 } from "lucide-react";
 import { Instagram } from "@/components/icons/BrandIcons";
@@ -322,7 +321,6 @@ console.log(allSpecialties,"")
                 onClick={() => setSortOpen((o) => !o)}
                 className="inline-flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-full text-sm font-medium text-foreground/80 shadow-soft hover:border-secondary transition whitespace-nowrap"
               >
-                <ChevronsUpDown className="w-4 h-4 text-muted-foreground/80" />
                 {/* FIX 1: Clean label — no "undefined" when nothing selected */}
                 {activeSort
                   ? `Sort by ${sortOptions.find((o) => o.value === activeSort)?.label}`

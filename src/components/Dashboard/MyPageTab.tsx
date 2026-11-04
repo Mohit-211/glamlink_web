@@ -10,6 +10,7 @@ import { readApiError } from '@/lib/apiError';
 import { BRAND_CATEGORIES, SHIPPING_OPTIONS } from '@/lib/api/profileContent';
 import { profileHref } from '@/lib/routes';
 import type { ProfileDetail, SocialLink } from '@/lib/api/types';
+import { NativeSelect } from '@/components/ui/native-select';
 
 /*
  * The owner's public page (/profiles/<slug>), from GET/PUT /my/profile (backend
@@ -433,7 +434,7 @@ export default function MyPageTab() {
                 <label htmlFor="page-category" className="label-glamlink">
                   Category
                 </label>
-                <select
+                <NativeSelect
                   id="page-category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
@@ -447,7 +448,7 @@ export default function MyPageTab() {
                       {option.label}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
                 <p className="mt-1.5 text-xs text-muted-foreground">
                   {isBrand
                     ? 'What kind of brand you are, as in “Skincare Brand”. Also shown under your name.'
@@ -463,7 +464,7 @@ export default function MyPageTab() {
                 <label htmlFor="page-shipping" className="label-glamlink">
                   Shipping
                 </label>
-                <select
+                <NativeSelect
                   id="page-shipping"
                   value={shipping}
                   onChange={(e) => setShipping(e.target.value)}
@@ -476,7 +477,7 @@ export default function MyPageTab() {
                       {option.label}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
                 <p className="mt-1.5 text-xs text-muted-foreground">Whether and how far you ship.</p>
                 {errorFor('shipping')}
               </div>

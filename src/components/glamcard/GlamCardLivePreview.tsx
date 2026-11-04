@@ -23,6 +23,7 @@ import {
 import GlamCardDownloadModal from "./Glamcarddownloadmodal";
 import { trackEvent, AnalyticsEventType } from "@/utils/analytics";
 import { TOKENS } from "@/lib/designTokens";
+import { NativeSelect } from "@/components/ui/native-select";
 /* ================= VIDEO THUMBNAIL GENERATOR ================= */
 /**
  * Generates a JPEG data URL from a video's first safely-seekable frame.
@@ -981,8 +982,9 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                   icon={<MapPin size={12} />}
                 >
                   {data.locations.length > 1 && (
-                    <select
-                      className="mb-3 w-full rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--card-accent-border)] bg-card"
+                    <NativeSelect
+                      wrapperClassName="mb-3"
+                      className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--card-accent-border)] bg-card"
                       value={selectedLocationId || ""}
                       onChange={(e) => setSelectedLocationId(e.target.value)}
                     >
@@ -991,7 +993,7 @@ const GlamCardLivePreviewContent: React.FC<Props> = ({
                           {loc.label || `Location ${loc.id}`}
                         </option>
                       ))}
-                    </select>
+                    </NativeSelect>
                   )}
                   {selectedLocation && (
                     <div className="mb-3 space-y-1">

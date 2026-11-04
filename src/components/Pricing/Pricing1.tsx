@@ -56,6 +56,7 @@ import {
 } from "./checkout";
 import { friendlyError } from "./messages";
 import { BackButton, Centered, ErrorNote, StepHeading } from "./ui";
+import { NativeSelect } from "@/components/ui/native-select";
 
 interface PricingStepProps {
   /** The card being bought for (a positive integer; the page checks it). */
@@ -955,7 +956,7 @@ export default function PricingStep({
                     <span className="label-glamlink">
                       State <span className="text-destructive">*</span>
                     </span>
-                    <select
+                    <NativeSelect
                       value={address.state_id}
                       onChange={(e) => handleStateChange(e.target.value)}
                       disabled={submitting}
@@ -967,13 +968,13 @@ export default function PricingStep({
                           {s.name}
                         </option>
                       ))}
-                    </select>
+                    </NativeSelect>
                   </label>
                   <label className="block">
                     <span className="label-glamlink">
                       City <span className="text-destructive">*</span>
                     </span>
-                    <select
+                    <NativeSelect
                       value={address.city_id}
                       onChange={(e) => setAddress((f) => ({ ...f, city_id: e.target.value }))}
                       disabled={!address.state_id || submitting}
@@ -985,7 +986,7 @@ export default function PricingStep({
                           {c.name}
                         </option>
                       ))}
-                    </select>
+                    </NativeSelect>
                   </label>
                 </div>
                 <label className="block">

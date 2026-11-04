@@ -7,6 +7,7 @@ import { TOKENS } from "@/lib/designTokens";
 import GlamCardLivePreview from "./GlamCardLivePreview";
 import { GlamCardFormData } from "./GlamCardForm/types";
 import BusinessCardPage from "../BusinessCardPage";
+import { NativeSelect } from "@/components/ui/native-select";
 
 interface GlamCardDownloadModalProps {
   isOpen: boolean;
@@ -577,15 +578,16 @@ const GlamCardDownloadModal: React.FC<GlamCardDownloadModalProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-border flex-shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="flex items-center gap-2">
             <label htmlFor="download-format" className="label-glamlink mb-0">Format</label>
-            <select
+            <NativeSelect
               id="download-format"
               value={format}
               onChange={(e) => setFormat(e.target.value as "png" | "jpg")}
-              className="input-glamlink flex-1 sm:w-auto sm:flex-initial px-3 py-2"
+              wrapperClassName="flex-1 sm:w-auto sm:flex-initial"
+              className="input-glamlink px-3 py-2"
             >
               <option value="png">PNG (High Quality)</option>
               <option value="jpg">JPG (Smaller Size)</option>
-            </select>
+            </NativeSelect>
           </div>
 
           <div className="flex items-center gap-3">

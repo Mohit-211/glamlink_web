@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, type ChangeEvent } from "react";
-import { Loader2 } from "lucide-react";
 import { listHref } from "@/lib/searchParams";
 import { cn } from "@/lib/utils";
 import { useListNavigation } from "./ListNavigation";
+import { NativeSelect } from "@/components/ui/native-select";
 
 export interface FilterOption {
   value: string;
@@ -127,7 +127,7 @@ export default function ListFilters({ action, fields, sort, keep = {}, point = n
               <label htmlFor={`filter-${field.name}`} className="label-glamlink">
                 {field.label}
               </label>
-              <select
+              <NativeSelect
                 id={`filter-${field.name}`}
                 name={field.name}
                 value={values[field.name] ?? ""}
@@ -145,7 +145,7 @@ export default function ListFilters({ action, fields, sort, keep = {}, point = n
                     {optionText(option)}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </div>
           );
         })}
@@ -154,27 +154,20 @@ export default function ListFilters({ action, fields, sort, keep = {}, point = n
           <label htmlFor="filter-sort" className="label-glamlink">
             Sort by
           </label>
-          <div className="relative">
-            <select
-              id="filter-sort"
-              name="sort"
-              value={sortValue}
-              onChange={onSort}
-              className={cn("input-glamlink rounded-full py-2.5", (pending || locating) && "pr-10")}
-            >
-              {sort.options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            {(pending || locating) && (
-              <Loader2
-                className="pointer-events-none absolute right-8 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground"
-                aria-hidden="true"
-              />
-            )}
-          </div>
+          <NativeSelect
+            id="filter-sort"
+            name="sort"
+            value={sortValue}
+            onChange={onSort}
+            loading={pending || locating}
+            className="input-glamlink rounded-full py-2.5"
+          >
+            {sort.options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </NativeSelect>
         </div>
 
         <noscript>

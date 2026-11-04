@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Loader2, X } from "lucide-react";
 import { submitFeatureRequest } from "@/api/Api";
 import { readApiError } from "@/lib/apiError";
+import { NativeSelect } from "@/components/ui/native-select";
 
 interface Props {
     onClose: () => void;
@@ -159,7 +160,7 @@ export default function FeatureFormModal({ onClose }: Props) {
                                 <span className="label-glamlink">
                                     What are you interested in? <span className="text-destructive">*</span>
                                 </span>
-                                <select
+                                <NativeSelect
                                     value={form.interest}
                                     onChange={(e) => {
                                         handleChange("interest", e.target.value);
@@ -173,7 +174,7 @@ export default function FeatureFormModal({ onClose }: Props) {
                                     {INTEREST_OPTIONS.map((opt) => (
                                         <option key={opt} value={opt}>{opt}</option>
                                     ))}
-                                </select>
+                                </NativeSelect>
                                 {showError("interest") && (
                                     <span className="mt-1.5 block text-xs text-destructive">Please select a feature type.</span>
                                 )}

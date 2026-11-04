@@ -4,6 +4,7 @@ import { getAllStates, getCitiesByState } from "@/api/Api";
 import React, { useEffect, useRef, useState } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
 import { GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_ID } from "@/lib/googleMapsLoader";
+import { NativeSelect } from "@/components/ui/native-select";
 
 interface Location {
   location_type: "exact_address" | "city_only";
@@ -317,7 +318,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
             {/* STATE */}
             <div>
               <label className="label-glamlink">State</label>
-              <select
+              <NativeSelect
                 className="input-glamlink"
                 value={String(location.state ?? "")}
                 onChange={(e) => {
@@ -339,13 +340,13 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                     {state.name}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </div>
 
             {/* CITY */}
             <div>
               <label className="label-glamlink">City</label>
-              <select
+              <NativeSelect
                 className="input-glamlink"
                 value={location?.city ?? ""}
                 onChange={(e) =>
@@ -365,7 +366,7 @@ const LocationFormFields: React.FC<FieldsProps> = ({ location, onUpdate }) => {
                     {city?.name}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
               {location.city && cityCoordsLoading && (
                 <p className="mt-1 text-xs text-muted-foreground/80">Resolving coordinates…</p>
               )}

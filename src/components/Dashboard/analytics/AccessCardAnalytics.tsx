@@ -25,6 +25,7 @@ import {
   AnalyticsSkeleton,
   AnalyticsUpgradeState,
 } from './AnalyticsStates';
+import { NativeSelect } from '@/components/ui/native-select';
 
 type CardOption = Pick<AccessCardData, 'id' | 'name' | 'business_name' | 'business_card_link'>;
 
@@ -162,18 +163,19 @@ export default function AccessCardAnalytics({ cards, locked = false, onUpgrade }
 
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-shrink-0 sm:items-end">
           {cards.length > 1 && (
-            <select
+            <NativeSelect
               value={selectedId}
               onChange={(e) => setSelectedId(e.target.value)}
               aria-label="Select Access Card"
-              className="w-full rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground outline-none focus:border-primary sm:w-56"
+              wrapperClassName="w-full sm:w-56"
+              className="w-full rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground outline-none focus:border-primary"
             >
               {cards.map((c) => (
                 <option key={c.id} value={String(c.id)}>
                   {[c.name, c.business_name].filter(Boolean).join(' • ') || `Card #${c.id}`}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
           )}
           {!locked && failed !== 'upgrade' && (
             <AnalyticsDateFilter value={range} onChange={setRange} disabled={loading} />

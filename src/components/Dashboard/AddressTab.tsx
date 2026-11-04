@@ -11,6 +11,7 @@ import {
   getAllStates,
   getCitiesByState,
 } from '../../api/Api';
+import { NativeSelect } from '@/components/ui/native-select';
 /* ─── Types ─── */
 interface Address {
   user_state?: { id: number; name: string };
@@ -209,7 +210,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
               <label className="label-glamlink">
                 State <span className="text-destructive">*</span>
               </label>
-              <select
+              <NativeSelect
                 value={form.state_id}
                 onChange={(e) =>
                   setForm((prev) => ({
@@ -227,13 +228,13 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
                     {state.name}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </div>
             <div>
               <label className="label-glamlink">
                 City <span className="text-destructive">*</span>
               </label>
-              <select
+              <NativeSelect
                 value={form.city_id}
                 onChange={(e) =>
                   setForm((prev) => ({
@@ -250,7 +251,7 @@ export function AddAddressModal({ onClose, onSaved }: AddAddressModalProps) {
                     {city.name}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </div>
           </div>
           {/* Zip code */}
@@ -635,7 +636,7 @@ export function AddressTab() {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="label-glamlink">State</label>
-                        <select
+                        <NativeSelect
                           value={editForm.state_id ?? ""}
                           onChange={(e) => handleEditStateChange(e.target.value)}
                           disabled={editSaving}
@@ -647,11 +648,11 @@ export function AddressTab() {
                               {state.name}
                             </option>
                           ))}
-                        </select>
+                        </NativeSelect>
                       </div>
                       <div>
                         <label className="label-glamlink">City</label>
-                        <select
+                        <NativeSelect
                           value={editForm.city_id ?? ""}
                           onChange={(e) =>
                             setEditForm((prev) =>
@@ -672,7 +673,7 @@ export function AddressTab() {
                               {city.name}
                             </option>
                           ))}
-                        </select>
+                        </NativeSelect>
                       </div>
                     </div>
                     <div>

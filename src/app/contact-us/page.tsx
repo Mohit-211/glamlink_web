@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CheckCircle2, Send } from "lucide-react";
 import { contactUs } from "@/api/Api";
+import { NativeSelect } from "@/components/ui/native-select";
 
 /* -------------------------
    Types & options
@@ -172,7 +173,7 @@ export default function ContactPage() {
                   <label htmlFor="subject" className="label-glamlink">
                     What&apos;s this about?
                   </label>
-                  <select
+                  <NativeSelect
                     id="subject"
                     aria-invalid={!!errors.subject}
                     defaultValue=""
@@ -186,7 +187,7 @@ export default function ContactPage() {
                         {opt.label}
                       </option>
                     ))}
-                  </select>
+                  </NativeSelect>
                   {errors.subject && (
                     <p className="mt-1.5 text-xs text-destructive">
                       {errors.subject.message}

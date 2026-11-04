@@ -19,7 +19,17 @@ The visual review overlaps the code audit on SEO and dead routes.
 - **Severity:** P0 breaks a page or a feature, or leaks data; P1 fix before the switch; P2 medium; P3 low. **Effort:** S under half a day, M up to two days, L more.
 - **Waiting on a decision:** approval of the preview (heroes, Journal), the brand directory layout (W-06), the Access card form look (https://claude.ai/artifact/6F1B7FrtpJ5w8GPSYkhbG8), and whether `/for-clients` and `/for-professionals` stay (W-29).
 
-## The Shop's tags, categories and button, and a faster Access form (Nov 4, not deployed)
+## Dropdown arrows, and the Shop's stale cache (Nov 4; live with the switch of Nov 5)
+
+The owner's report of Nov 4, from the test site: the Shop's dropdown arrows looked odd, and a product's new tag showed on its page but not on its Shop card.
+
+| Part | What |
+| --- | --- |
+| Dropdowns | The browser drew its own arrow, heavy and black and against the edge, most visibly on the rounded filters. All 19 native selects now use `ui/native-select.tsx`: a thin muted chevron set 16 px in, as on the directory's own dropdown; a spinner in its place while a list loads, and dimmed when the select is disabled |
+| Other arrows | The /for-professionals sort button had three arrows (⇕, the direction, ⌄): the ⇕ is gone. The card form's location cards toggled with ▲/▼ text: now a chevron that turns |
+| The missing tag | Not the code: the API answered with the tag, but the site kept its saved Shop answers from before the deploy (Next keeps them across builds) and the cache-refresh hook is off on the test server (`/api/revalidate` answered 503: no `REVALIDATE_SECRET`). It showed once they expired. The README's deploy steps now clear `.next/cache/fetch-cache`, and say how to turn the hook on |
+
+## The Shop's tags, categories and button, and a faster Access form (Nov 4; live with the switch of Nov 5)
 
 The owner's requests of Nov 4, on `master`. The Shop and the dashboard read the backend's Nov 4 additions (product tags, a category list and a button label: its `docs/handoff/website-frontend.md`); against an older API the new fields are simply absent.
 
@@ -33,7 +43,7 @@ The owner's requests of Nov 4, on `master`. The Shop and the dashboard read the 
 
 Measured from outside on Nov 4, even the API's health check (which does no work) took 0.9–4 s, so much of each call's time is the way to the server rather than the API's own work.
 
-## The Shop's filters, saved products, cookies and the Google map (Nov 3, not deployed)
+## The Shop's filters, saved products, cookies and the Google map (Nov 3; live with the switch of Nov 5)
 
 The owner's second request of Nov 3, on `master` (Nov 4). It reads the backend's shop additions (backend `docs/handoff/website-frontend.md`: GET /discover/shop `sort`, `min_price`, `max_price`, `ids`, and `price` on its filters), so the API deploys first: before it, the sort and price filter are ignored and the Saved list shows only the saved products on the shop's first page.
 
@@ -50,7 +60,7 @@ The flow was clicked through in headless Chrome over http: the banner on a first
 
 The whole site now keeps to `globals.css` (Nov 4, at the owner's request; 300 files checked by script): no palette or raw colours, only its shadows (soft, medium, large), the type scale or its classes (`eyebrow`) instead of pixel sizes (11 px labels became `eyebrow`; 10 px became 12, 13 became 14, 15 became 16), scale values for letter-spacing, line height and corners, `btn-primary` for teal buttons, and the secondary teal for hover states and focus rings. The only colours outside the tokens are on purpose: Google's own colours in "Powered by Google", the colour each owner picks for their Access card, and `lib/designTokens.ts`, the tokens as hex for Stripe's form, charts and canvas (checked: all eleven match). Every hero title is now one colour, the foreground, with no teal last word.
 
-## The directory, Professionals and Brands (Nov 3, not deployed)
+## The directory, Professionals and Brands (Nov 3; live with the switch of Nov 5)
 
 The owner's layout of Nov 3, on `master` (Nov 4). It reads the backend's Nov 3 additions (backend `docs/handoff/website-frontend.md`: GET /profiles filters and sort, GET /directory/filters, GET /directory/map). Against today's live API it still renders: the map shows without pins, the lists keep their old order and the filters hide. Checks: `tsc` 0 errors outside stale `.next` files; ESLint 0 errors; the three routes server-rendered with mock data (new and old API) at 390, 1024, 1280 and 1440 px, no sideways scroll.
 
@@ -64,7 +74,7 @@ The owner's layout of Nov 3, on `master` (Nov 4). It reads the backend's Nov 3 a
 
 Also fixed: a Google listing's card named every result "Esthetician" when no type was searched; it now shows the searched type, else Google's own ("Hair salon"). The page's hero and sections are now in its HTML: the whole page used to wait for the browser because it read the URL; now only a search in the URL does.
 
-## Profile pages in the owner's design (Nov 3, not deployed)
+## Profile pages in the owner's design (Nov 3; live with the switch of Nov 5)
 
 The owner's Epicutis mockup, for brands and professionals alike, without tabs, reviews, the verified badge or Follow. On `master` (Nov 4); it reads the backend's Nov 3 fields and endpoints (backend `docs/handoff/website-frontend.md`, section 10.6.1), so the API's migrations run first. Against today's live API the page still renders: new fields are optional, and new endpoints answering 404 read as empty. Checks: `tsc` 0 errors outside stale `.next` files; ESLint 0 errors, no warnings in the new files; the routes server-rendered with mock data at 1440 and 390 px, no sideways scroll.
 
@@ -80,7 +90,7 @@ Also on Nov 3: Journal authors show their photo (`blogs/AuthorAvatar.tsx`, on th
 
 UI-38 stays open: whether `/profiles/imageskincare` reads as a brand, and shows the shop's IMAGE products, depends on its account type and on linking those products to it, both data fixes.
 
-## Fixed since the audit (Nov 1–2, not deployed)
+## Fixed since the audit (Nov 1–2; live with the switch of Nov 5)
 
 The owner's decisions of Nov 1 (Access fixes, one form, brands, Stripe), on `master` (Nov 4). They rely on the backend's Nov 1 changes, which deploy first (backend `docs/progress.md`). Checks: `tsc` 0 errors outside stale `.next` files, ESLint 0 errors and 256 warnings. WS-n are the website items of the Nov 1 Stripe review.
 

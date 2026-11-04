@@ -10,6 +10,7 @@ import { readApiError } from '@/lib/apiError';
 import { formatPrice } from '@/lib/format';
 import { productHref } from '@/lib/routes';
 import type { ProductCard, ProductTag } from '@/lib/api/types';
+import { NativeSelect } from '@/components/ui/native-select';
 
 /*
  * The owner's products (backend handoff, 10.14): /my/products. Published
@@ -245,7 +246,7 @@ function ProductForm({
           <label htmlFor="product-category" className="label-glamlink">
             Category
           </label>
-          <select
+          <NativeSelect
             id="product-category"
             value={draft.category}
             onChange={(e) => set('category', e.target.value)}
@@ -262,7 +263,7 @@ function ProductForm({
                 {name}
               </option>
             ))}
-          </select>
+          </NativeSelect>
           {errorFor('category')}
         </div>
         {text('brand', 'Brand', { placeholder: 'Leave empty for your own brand' })}
@@ -296,7 +297,7 @@ function ProductForm({
               {lockedTag.name} (set by Glamlink)
             </p>
           ) : (
-            <select
+            <NativeSelect
               id="product-tag"
               value={draft.tag_id}
               onChange={(e) => set('tag_id', e.target.value)}
@@ -310,7 +311,7 @@ function ProductForm({
                   {tag.name}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
           )}
           {errorFor('tag_id')}
         </div>

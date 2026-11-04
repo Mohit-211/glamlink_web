@@ -1,4 +1,6 @@
 import React from "react";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import LocationFormFields from "./LocationFormFields";
 import { Location } from "../types";
 
@@ -123,12 +125,16 @@ const LocationCard: React.FC<CardProps> = ({
           <button
             type="button"
             onClick={handleToggle}
-            className="text-xl leading-none text-muted-foreground hover:text-foreground"
+            className="rounded-full p-1 text-muted-foreground transition-colors hover:text-secondary"
             aria-label={
               location.isOpen ? "Collapse" : "Expand"
             }
+            aria-expanded={location.isOpen}
           >
-            {location.isOpen ? "▲" : "▼"}
+            <ChevronDown
+              className={cn("h-5 w-5 transition-transform duration-200", location.isOpen && "rotate-180")}
+              aria-hidden="true"
+            />
           </button>
         </div>
       </div>
