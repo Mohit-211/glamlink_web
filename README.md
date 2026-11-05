@@ -33,7 +33,7 @@ There are no tests and no CI yet.
 
 ## Environment variables
 
-Copy `.env.example` to `.env.local` and fill it in; the file explains each variable. Variables starting with `NEXT_PUBLIC_` are built into the browser bundle: anyone can read them, and changing one needs a rebuild. Never put a secret in one.
+Copy `.env.example` to `.env.local` and fill it in: it holds what glamlink.net needs, and the table below has every variable. Variables starting with `NEXT_PUBLIC_` are built into the browser bundle: anyone can read them, and changing one needs a rebuild. Never put a secret in one.
 
 | Variable | Needed | Used for |
 | --- | --- | --- |
