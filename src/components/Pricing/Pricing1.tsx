@@ -50,6 +50,7 @@ import {
   paymentIntentStatus,
   readSavedCheckout,
   saveCheckout,
+  shippingOptionName,
   waitForCheckout,
   type CheckoutView,
   type SavedCheckout,
@@ -1065,9 +1066,12 @@ export default function PricingStep({
                         className="accent-secondary"
                       />
                       <span className="flex-1">
-                        {o.provider} {o.service}
+                        {shippingOptionName(o)}
                         {o.estimated_days ? (
-                          <span className="text-muted-foreground"> · {o.estimated_days} days</span>
+                          <span className="text-muted-foreground">
+                            {" "}
+                            · about {o.estimated_days} {o.estimated_days === 1 ? "day" : "days"}
+                          </span>
                         ) : null}
                       </span>
                       <span className="font-medium">{money(o.amount_cents)}</span>

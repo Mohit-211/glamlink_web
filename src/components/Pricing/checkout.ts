@@ -27,13 +27,23 @@ export interface QuoteLine {
   personal: boolean;
 }
 
+/**
+ * A way to ship the keychain: "Standard Shipping" or "Expedited Shipping", Shippo's rate behind each staying on the
+ * server. Its `rate_id` ("standard", "expedited", or "flat"/"free" for the settings' price) chooses it in the next quote.
+ */
 export interface ShippingOption {
   rate_id: string;
+  label?: string;
   amount_cents: number;
-  provider: string;
-  service: string;
   estimated_days: number | null;
+  /** The carrier's service itself, in quotes from before the options (Nov 16) had labels. */
+  provider?: string | null;
+  service?: string | null;
 }
+
+/** An option as the buyer reads it. */
+export const shippingOptionName = (option: ShippingOption) =>
+  option.label ?? ([option.provider, option.service].filter(Boolean).join(" ") || "Shipping");
 
 /** The quote (`POST /access/checkout/quote`) and the poll (`GET /access/checkout/:id`) answer this. */
 export interface CheckoutView {
