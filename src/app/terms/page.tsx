@@ -30,6 +30,7 @@ export default function TermsOfUsePage() {
     { id: "13", title: "Assignment / Modification", anchor: "assignment-modification" },
     { id: "14", title: "Ability to Accept Terms of Use", anchor: "ability-to-accept" },
     { id: "15", title: "Consent", anchor: "consent" },
+    { id: "16", title: "Access Subscription Terms & Cancellation Policy", anchor: "access-subscription" },
   ];
 
   useEffect(() => {
@@ -94,7 +95,7 @@ export default function TermsOfUsePage() {
         <div className="container-glamlink">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="section-title mb-4">Terms of Use</h1>
-            <p className="text-lg text-muted-foreground mb-6">Last revised on January 25, 2025</p>
+            <p className="text-lg text-muted-foreground mb-6">Last revised on November 16, 2026</p>
             <Breadcrumb>
               <BreadcrumbList className="justify-center">
                 <BreadcrumbItem>
@@ -139,8 +140,15 @@ export default function TermsOfUsePage() {
                   Glamlink Inc, a Nevada limited liability company (&quot;Glamlink&quot;) provides the Glamlink and Glamlink Pro app, the glamlink.net site, and related goods and services, including any and all mobile applications, online software, and other services (collectively, the &quot;Glamlink
                   Service&quot;) subject to your compliance with the terms and conditions set forth below. Your use of the Glamlink Service signifies your acknowledgement of and agreement to these Terms of Use.
                 </p>
-                <p className="text-foreground/80 leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed mb-6">
                   These Terms of Use apply to all users of the Glamlink Service. The term &quot;users&quot; includes both registered members of the Glamlink Service and any other person that accesses or uses the Glamlink Service at any point for any amount of time.
+                </p>
+                <p className="text-foreground/80 leading-relaxed">
+                  If you purchase an Access by GLAMLINK product or subscribe to Access services, the{" "}
+                  <a href="#access-subscription" className="link-glamlink underline">
+                    Subscription Terms &amp; Cancellation Policy
+                  </a>{" "}
+                  in Section 16 also applies to you.
                 </p>
               </div>
               {/* Section 1: Service Providers */}
@@ -233,14 +241,15 @@ export default function TermsOfUsePage() {
                     </p>
                     <h4 className="text-lg font-semibold text-foreground mb-3">1.7. Payments / Fees</h4>
                     <p className="text-foreground/80 leading-relaxed mb-6">
-                      The Glamlink Service may have recurring subscription fees disclosed at the time of the initial enrolment for certain services. You are responsible for such recurring fees according to the terms and conditions of the Glamlink Service. Subscription and membership fees are subject
-                      to change at any time at the sole and absolute discretion of Glamlink.
+                      The Glamlink Service may have recurring subscription fees disclosed at the time of the initial enrolment for certain services. You are responsible for such recurring fees according to the terms and conditions of the Glamlink Service. Subscription and membership fees may change
+                      as described in Section 1.11. The prices of Access by GLAMLINK products and of the monthly Access subscription are set out in Section 16.1; shipping and taxes are calculated at checkout, where applicable.
                     </p>
                     <h4 className="text-lg font-semibold text-foreground mb-3">1.8. Automatic Recurring Billing</h4>
                     <p className="text-foreground/80 leading-relaxed mb-6">
                       In accordance with the terms and conditions of the Glamlink Service, subscription fees may be automatically renewed at or after the end of the original term selected, for a similar period of time and for a similar or lower amount, unless notice of cancellation is received from
                       you. Unless and until your subscription is cancelled in accordance with the Terms of Use, you hereby authorize Glamlink to charge your chosen payment method to pay for the ongoing cost of membership. You hereby further authorize Glamlink to charge your chosen payment method for
-                      any and all additional purchases of materials you purchase on the Glamlink Service.
+                      any and all additional purchases of materials you purchase on the Glamlink Service. The monthly Access subscription renews automatically each month until you cancel it; the first billing date, subsequent renewal dates, and any applicable promotional periods are disclosed during
+                      checkout (Section 16.2).
                     </p>
                     <h4 className="text-lg font-semibold text-foreground mb-3">1.9. Rejection of Orders</h4>
                     <p className="text-foreground/80 leading-relaxed mb-4">Glamlink may reject orders for services for any reason. Reasons for rejecting an order include:</p>
@@ -254,18 +263,25 @@ export default function TermsOfUsePage() {
                     <h4 className="text-lg font-semibold text-foreground mb-3">1.10. Sales Tax</h4>
                     <p className="text-foreground/80 leading-relaxed mb-6">Glamlink charges sales tax where required by law. If sales tax is charged, the appropriate charges will be added to your purchase and displayed in your shopping cart and on your invoice.</p>
                     <h4 className="text-lg font-semibold text-foreground mb-3">1.11. Price Changes</h4>
-                    <p className="text-foreground/80 leading-relaxed mb-6">Glamlink may change the price of any membership tier, item, or service at any time.</p>
+                    <p className="text-foreground/80 leading-relaxed mb-6">
+                      Glamlink may change the price of any membership tier, item, or service, or the features a subscription includes. If you have an active subscription, you will receive advance notice of an applicable price change, and any required opportunity to consent or cancel, before the
+                      change takes effect (Section 16.7).
+                    </p>
                     <h4 className="text-lg font-semibold text-foreground mb-3">1.12. Cancellation</h4>
                     <p className="text-foreground/80 leading-relaxed mb-6">
                       At any time, and without cause, any service may be terminated by you, Glamlink, or the Glamlink Service. When you cancel, you are liable for all charges incurred up to and including through your current subscription or service period. Once you cancel a subscription or service,
-                      it will result loss of access to at the end of your current subscription period. Cancellation requests may take up to 3 business days.
+                      it will not renew for another billing cycle, and you keep access to its paid features until the end of your current subscription period. You may cancel an Access subscription at any time from your Access subscription settings, and GLAMLINK will confirm your cancellation; your
+                      Access profile and NFC product keep working after you cancel (Sections 16.3 and 16.4).
                     </p>
                     <h4 className="text-lg font-semibold text-foreground mb-3">1.13. Cardholder Disputes/Chargebacks</h4>
                     <p className="text-foreground/80 leading-relaxed mb-6">All chargebacks are thoroughly investigated and may prevent you from making future purchases for other Glamlink subscriptions or services.</p>
                     <h4 className="text-lg font-semibold text-foreground mb-3">1.14. Fraudulent Activities</h4>
                     <p className="text-foreground/80 leading-relaxed mb-6">Glamlink will prosecute to the fullest extent of the law any fraudulent activities related to any chargebacks or reversals of a valid charge for an order.</p>
                     <h4 className="text-lg font-semibold text-foreground mb-3">1.15. Returns / No Warranties</h4>
-                    <p className="text-foreground/80 leading-relaxed mb-6">There are no product or service warranties of any kind. Subscriptions, services, and digital content are not eligible to be returned or exchanged.</p>
+                    <p className="text-foreground/80 leading-relaxed mb-6">
+                      There are no product or service warranties of any kind. Subscriptions, services, and digital content are not eligible to be returned or exchanged. Purchases of Access by GLAMLINK NFC products are final, and Access subscription payments are nonrefundable, except where required by
+                      applicable law; an NFC product that arrives damaged, defective, or not functioning as intended is reviewed as described in Section 16.5.
+                    </p>
                     <h4 className="text-lg font-semibold text-foreground mb-3">1.16. No Transfer of Access Rights</h4>
                     <p className="text-foreground/80 leading-relaxed mb-6">
                       You may not under any circumstances transfer your account, subscriptions, or services to any other person or entity. You are required to keep your access rights strictly confidential. If any breach of security, theft or loss of access rights, or unauthorized disclosure of
@@ -782,7 +798,8 @@ export default function TermsOfUsePage() {
                   <h4 className="text-lg font-semibold text-foreground mb-3 mt-6">13.2</h4>
                   <p className="text-foreground/80 leading-relaxed">
                     We reserve the right to amend these Terms of Use at any time. If we do this, we will post the amended Terms of Use on this page and indicate at the top of the page the date the Terms of Use were last revised. The most current version of these Terms of Use will supersede all
-                    previous versions. Your continued use of the Glamlink Service after any such changes constitutes your acceptance of the new Terms of Use. If you do not agree to any of these terms or any future Terms of Use, do not use or access (or continue to access) the Glamlink Service.
+                    previous versions. Your continued use of the Glamlink Service after any such changes constitutes your acceptance of the new Terms of Use, where permitted by law. Material changes to the Access Subscription Terms &amp; Cancellation Policy will be communicated as required by
+                    applicable law (Section 16.10). If you do not agree to any of these terms or any future Terms of Use, do not use or access (or continue to access) the Glamlink Service.
                   </p>
                 </div>
               </div>
@@ -809,6 +826,163 @@ export default function TermsOfUsePage() {
                   </p>
                 </div>
               </div>
+
+              {/* Section 16: Access Subscription Terms & Cancellation Policy (the client's text of Nov 7, 2026; the checkout's subscription checkbox links here) */}
+              <div id="access-subscription" className="mb-16 scroll-mt-24">
+                <h3 className="text-2xl font-semibold text-foreground mb-2">16. ACCESS BY GLAMLINK: SUBSCRIPTION TERMS &amp; CANCELLATION POLICY</h3>
+                <p className="text-sm text-muted-foreground mb-6">Effective Date: November 7, 2026</p>
+                <p className="text-foreground/80 leading-relaxed mb-4">
+                  Welcome to Access by GLAMLINK, a digital networking solution designed to help professionals and businesses connect, share information, and manage their digital presence.
+                </p>
+                <p className="text-foreground/80 leading-relaxed mb-8">By purchasing an Access product or subscribing to Access services, you agree to the following terms and conditions.</p>
+
+                <div className="border-l-4 border-primary pl-6 space-y-8">
+                  <div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">16.1. Access Product Purchase</h4>
+                    <p className="text-foreground/80 leading-relaxed mb-4">Access by GLAMLINK offers NFC-enabled products that connect to your personalized digital profile.</p>
+                    <ul className="list-disc pl-6 space-y-1 text-foreground/80 mb-4">
+                      <li>One-Time Product Purchase: $39.99</li>
+                      <li>Monthly Access Subscription: $9.99</li>
+                      <li>Shipping and Taxes: Calculated at checkout, where applicable.</li>
+                    </ul>
+                    <p className="text-foreground/80 leading-relaxed mb-4">The physical NFC product is yours to keep after purchase.</p>
+                    <p className="text-foreground/80 leading-relaxed">
+                      Your NFC product and existing digital profile will continue functioning even if you cancel your monthly subscription, subject to GLAMLINK’s general platform terms.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">16.2. Monthly Access Subscription</h4>
+                    <p className="text-foreground/80 leading-relaxed mb-4">
+                      The Access subscription costs $9.99 per month and provides ongoing access to profile editing, updates, and management features.
+                    </p>
+                    <p className="text-foreground/80 leading-relaxed mb-4">Your subscription automatically renews each month unless canceled.</p>
+                    <p className="text-foreground/80 leading-relaxed mb-4">
+                      By enrolling, you authorize GLAMLINK to charge your selected payment method $9.99 each billing cycle until you cancel.
+                    </p>
+                    <p className="text-foreground/80 leading-relaxed">
+                      The first billing date, subsequent renewal dates, and any applicable promotional periods will be disclosed during checkout.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">16.3. Access Profile Without a Subscription</h4>
+                    <p className="text-foreground/80 leading-relaxed mb-4">An active subscription is not required to maintain your existing Access profile.</p>
+                    <p className="text-foreground/80 leading-relaxed mb-2">If you cancel your subscription:</p>
+                    <ul className="list-disc pl-6 space-y-1 text-foreground/80 mb-4">
+                      <li>Your existing digital profile remains active and accessible.</li>
+                      <li>Your NFC product continues directing people to your profile.</li>
+                      <li>Your previously published profile information remains visible.</li>
+                      <li>Access to paid editing and profile management features ends when your current paid billing period expires.</li>
+                      <li>You may reactivate your subscription to regain access to paid features.</li>
+                    </ul>
+                    <p className="text-foreground/80 leading-relaxed">Cancellation alone does not delete your profile or deactivate your NFC product.</p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">16.4. Subscription Cancellation</h4>
+                    <p className="text-foreground/80 leading-relaxed mb-4">You may cancel your Access subscription at any time.</p>
+                    <p className="text-foreground/80 leading-relaxed mb-2">To cancel:</p>
+                    <ol className="list-decimal pl-6 space-y-1 text-foreground/80 mb-4">
+                      <li>Log in to your GLAMLINK account.</li>
+                      <li>Navigate to your Access subscription settings.</li>
+                      <li>Select the cancellation option and follow the instructions.</li>
+                    </ol>
+                    <p className="text-foreground/80 leading-relaxed mb-2">Once your cancellation is confirmed:</p>
+                    <ul className="list-disc pl-6 space-y-1 text-foreground/80 mb-4">
+                      <li>Your subscription will not renew for another billing cycle.</li>
+                      <li>No additional subscription charges will occur unless you reactivate your subscription or authorize another purchase.</li>
+                      <li>Your paid features remain available through the end of your current billing period.</li>
+                      <li>Your existing Access profile and NFC product remain functional.</li>
+                    </ul>
+                    <p className="text-foreground/80 leading-relaxed">GLAMLINK will provide confirmation of your cancellation.</p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">16.5. Refunds &amp; Returns Policy</h4>
+                    <p className="text-foreground/80 leading-relaxed mb-4">
+                      All purchases of Access by GLAMLINK NFC products are final. We do not accept returns, exchanges, or provide refunds for purchased products, except where required by applicable law.
+                    </p>
+                    <p className="text-foreground/80 leading-relaxed mb-4">
+                      Monthly Access subscription payments are nonrefundable. Customers may cancel their subscription at any time to prevent future recurring charges. Cancellation does not entitle customers to refunds for previous billing periods.
+                    </p>
+                    <p className="text-foreground/80 leading-relaxed mb-4">
+                      If you believe a billing error has occurred, please contact GLAMLINK Support at{" "}
+                      <a href="mailto:support@glamlink.net" className="link-glamlink underline">
+                        support@glamlink.net
+                      </a>{" "}
+                      for assistance.
+                    </p>
+                    <p className="text-foreground/80 leading-relaxed">
+                      If an NFC product arrives damaged, defective, or does not function as intended, please contact GLAMLINK Support so we can review the issue and determine an appropriate resolution in accordance with applicable law.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">16.6. Failed Payments</h4>
+                    <p className="text-foreground/80 leading-relaxed mb-4">
+                      If a subscription payment cannot be processed, GLAMLINK may notify you and request an updated payment method.
+                    </p>
+                    <p className="text-foreground/80 leading-relaxed mb-4">Continued payment failures may result in suspension of paid subscription features.</p>
+                    <p className="text-foreground/80 leading-relaxed">
+                      Your existing Access profile and NFC product will remain functional, subject to GLAMLINK’s general platform terms.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">16.7. Subscription Pricing Changes</h4>
+                    <p className="text-foreground/80 leading-relaxed mb-4">GLAMLINK reserves the right to modify subscription pricing or included features.</p>
+                    <p className="text-foreground/80 leading-relaxed">
+                      Customers will receive advance notice of applicable pricing changes and any required opportunity to consent or cancel before the changes take effect.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">16.8. Account Responsibilities</h4>
+                    <p className="text-foreground/80 leading-relaxed mb-4">
+                      You are responsible for maintaining accurate profile information and safeguarding your account credentials.
+                    </p>
+                    <p className="text-foreground/80 leading-relaxed">
+                      GLAMLINK reserves the right to suspend or terminate accounts that violate these Terms of Use, applicable laws, or platform policies.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">16.9. Service Availability</h4>
+                    <p className="text-foreground/80 leading-relaxed mb-4">GLAMLINK strives to maintain reliable access to its digital services.</p>
+                    <p className="text-foreground/80 leading-relaxed mb-4">
+                      However, temporary interruptions may occur due to maintenance, technical issues, third-party service disruptions, or circumstances beyond GLAMLINK’s control.
+                    </p>
+                    <p className="text-foreground/80 leading-relaxed">GLAMLINK does not guarantee uninterrupted service availability.</p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">16.10. Changes to These Terms</h4>
+                    <p className="text-foreground/80 leading-relaxed mb-4">
+                      GLAMLINK may update these Subscription Terms &amp; Conditions and Cancellation Policy periodically.
+                    </p>
+                    <p className="text-foreground/80 leading-relaxed mb-4">Material changes will be communicated as required by applicable law.</p>
+                    <p className="text-foreground/80 leading-relaxed">
+                      Continued use of the service after an applicable update takes effect constitutes acceptance of the revised terms where permitted by law.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-semibold text-foreground mb-3">16.11. Contact &amp; Support</h4>
+                    <p className="text-foreground/80 leading-relaxed mb-2">
+                      For questions regarding Access subscriptions, billing, cancellations, or account management, please contact:
+                    </p>
+                    <p className="text-foreground/80 leading-relaxed">
+                      GLAMLINK Support:{" "}
+                      <a href="mailto:support@glamlink.net" className="link-glamlink underline">
+                        support@glamlink.net
+                      </a>
+                      <br />
+                      8090 S. Durango Dr Ste 102 #1033, Las Vegas, NV 89113
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -819,7 +993,9 @@ export default function TermsOfUsePage() {
         <div className="container-glamlink">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl font-semibold text-foreground mb-4">Questions About Our Terms?</h2>
-            <p className="text-lg text-muted-foreground mb-8">If you have any questions about these Terms of Use, please don&apos;t hesitate to contact us.</p>
+            <p className="text-lg text-muted-foreground mb-8">
+              If you have any questions about these Terms of Use, or about Access subscriptions, billing, cancellations, or account management, please don&apos;t hesitate to contact us.
+            </p>
             <div className="bg-card rounded-lg p-8 shadow-soft border">
               <div className="space-y-4">
                 <div className="flex items-center justify-center space-x-2">

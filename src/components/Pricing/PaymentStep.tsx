@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import type { Appearance, PaymentIntent, StripePaymentElementOptions } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { CreditCard, Loader2, Lock, RefreshCw } from "lucide-react";
@@ -36,6 +37,21 @@ const APPEARANCE: Appearance = {
 /** Where a payment method that leaves the site (a bank's 3-D Secure page) sends the person back. */
 const paymentReturnUrl = (businessCardId: string | number, checkoutId: number) =>
   `${window.location.origin}/pricing?businessCardId=${encodeURIComponent(String(businessCardId))}&checkout=${checkoutId}`;
+
+/** The subscription's first renewal, as Stripe bills it: the same day next month, or that month's last day. */
+const firstRenewal = (from = new Date()) => {
+  const month = from.getMonth() + 1;
+  const lastDay = new Date(from.getFullYear(), month + 1, 0).getDate();
+  return new Date(from.getFullYear(), month, Math.min(from.getDate(), lastDay)).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
+/** The section of the Terms of Use the subscription checkbox agrees to. */
+const SUBSCRIPTION_TERMS = "/terms#access-subscription";
+const AGREE_FIRST = "Please tick the box to agree to the subscription terms.";
 
 interface PaymentStepProps {
   businessCardId: string | number;
@@ -134,6 +150,9 @@ function PaymentForm({
   const [errorMsg, setErrorMsg] = useState(notice ?? "");
   const [ready, setReady] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
+  // A purchase with Access Pro renews monthly: the buyer agrees to that, unticked until they do (the client, Nov 16).
+  const renews = Boolean(quote.monthly_cents);
+  const [agreed, setAgreed] = useState(false);
 
   const options = useMemo<StripePaymentElementOptions>(
     () => ({
@@ -154,6 +173,10 @@ function PaymentForm({
   async function handlePay(event: React.FormEvent) {
     event.preventDefault();
     if (!stripe || !elements || paying) return;
+    if (renews && !agreed) {
+      setErrorMsg(AGREE_FIRST);
+      return;
+    }
     setBusy(true);
     setErrorMsg("");
     // Cards and wallets confirm here, 3-D Secure in Stripe's own window; a
@@ -209,10 +232,34 @@ function PaymentForm({
         )}
       </div>
 
+      {renews && (
+        <label className="mt-6 flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-foreground/80">
+          <input
+            type="checkbox"
+            required
+            checked={agreed}
+            onChange={(e) => {
+              setAgreed(e.target.checked);
+              if (e.target.checked && errorMsg === AGREE_FIRST) setErrorMsg("");
+            }}
+            disabled={paying}
+            className="mt-1 h-4 w-4 shrink-0 accent-secondary"
+          />
+          <span>
+            I understand that my Access subscription costs {money(quote.monthly_cents ?? 0)} per month and
+            automatically renews until canceled. I agree to the{" "}
+            <Link href={SUBSCRIPTION_TERMS} target="_blank" rel="noopener noreferrer" className="link-glamlink underline">
+              Subscription Terms &amp; Cancellation Policy
+            </Link>
+            .
+          </span>
+        </label>
+      )}
+
       <button
         type="submit"
         disabled={paying || !stripe || !elements || !ready}
-        className="btn-primary mt-6 w-full py-3 disabled:opacity-50"
+        className={`btn-primary ${renews ? "mt-4" : "mt-6"} w-full py-3 disabled:opacity-50`}
       >
         {paying ? (
           <>
@@ -226,9 +273,9 @@ function PaymentForm({
           </>
         )}
       </button>
-      {quote.monthly_cents ? (
+      {renews ? (
         <p className="mt-3 text-center text-xs text-muted-foreground">
-          Then {money(quote.monthly_cents)} / month until you cancel.
+          Then {money(quote.monthly_cents ?? 0)} every month, starting {firstRenewal()}, until you cancel.
         </p>
       ) : null}
     </form>

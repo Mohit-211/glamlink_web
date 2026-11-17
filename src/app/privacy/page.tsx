@@ -79,7 +79,7 @@ export default function PrivacyPolicyPage() {
         <div className="container-glamlink">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="section-title mb-4">Privacy Policy</h1>
-            <p className="text-lg text-muted-foreground mb-6">Last revised on January 25, 2025</p>
+            <p className="text-lg text-muted-foreground mb-6">Last revised on November 16, 2026</p>
             <Breadcrumb>
               <BreadcrumbList className="justify-center">
                 <BreadcrumbItem>
@@ -242,6 +242,10 @@ export default function PrivacyPolicyPage() {
                   We may use your personally identifiable information in many ways, such as to send information you provide through the Booking Service to Beauty Professionals. In addition, sometimes we hire companies to help deliver products or services, such as a third-party content provider or a
                   company that provides payment processing. In those instances, there is a need to share your information with these companies. We may also use information collected through the Glamlink Service for research regarding the effectiveness of the Glamlink Service and our business
                   planning, marketing, advertising, and sales efforts.
+                </p>
+                <p className="text-foreground/80 leading-relaxed mb-6">
+                  When you purchase an Access by GLAMLINK product or subscription, your payment is processed by our payment processor, Stripe, which receives your card or wallet details directly; Glamlink does not store your full card number. To ship an NFC product, we share the recipient&apos;s
+                  name, shipping address, phone number, and email address with our shipping provider and the carrier that delivers it, so they can check the address, deliver the product, and send tracking updates.
                 </p>
                 <p className="text-foreground/80 leading-relaxed mb-6">
                   We may also take your personally identifiable information and make it non-personally identifiable, either by combining it with information about other individuals, or by removing characteristics (such as your name) that make the information personally identifiable to you. There are
@@ -425,9 +429,16 @@ export default function PrivacyPolicyPage() {
               {/* Section 9: Data Retention */}
               <div id="data-retention" className="mb-16 scroll-mt-24">
                 <h3 className="text-2xl font-semibold text-foreground mb-6">9. Data Retention</h3>
-                <p className="text-foreground/80 leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed mb-6">
                   Unless required under applicable law, we will retain your personally identifiable information for our business records even after your account is deleted. This is necessary for maintaining our business and accounting records as to the services you have purchased and the payments
                   you have made.
+                </p>
+                <p className="text-foreground/80 leading-relaxed">
+                  Cancelling an Access subscription does not delete your Access profile: the profile and the information you published on it remain active and visible, and your NFC product keeps directing people to it, until you edit or remove that information or delete your account (see the{" "}
+                  <Link href="/terms#access-subscription" className="link-glamlink underline">
+                    Subscription Terms &amp; Cancellation Policy
+                  </Link>
+                  ).
                 </p>
               </div>
 
