@@ -1,7 +1,9 @@
 import { SITE_URL } from "@/lib/config";
 import { cache } from "react";
 import slugify from "slugify";
-import { getAllTopics, getTopicById, getTopicParagraphs, getBlogsById } from "@/api/Api";
+import { getBlogsById } from "@/api/Api";
+import { getTopic, getTopicParagraphRows, getTopics } from "@/lib/api/public";
+import type { ProfileCard, VideoCard } from "@/lib/api/types";
 
 /* --------------------------------
    Types
@@ -32,31 +34,35 @@ export interface TopicExpertLocation {
 export interface TopicExpert {
   id: number;
   name: string;
+  /** Their page, /profiles/<slug> (since Nov 24). */
+  slug?: string | null;
   business_name?: string;
   professional_title?: string | null;
   profile_image?: string | null;
   primary_specialty?: string | null;
-  specialties?: string;
+  /** A JSON list as text, or the list itself. */
+  specialties?: string | string[];
   locations?: TopicExpertLocation[];
   business_card_link?: string;
   business_card_qr?: string | null;
 }
 
 /**
- * `journal/topic/:id`'s `professionals` relation: the API now returns only the
- * id and profile name publicly (it used to return full account rows). This
- * allowlists what the UI shows, so nothing else can reach a component prop.
+ * `journal/topic/:id`'s `professionals` relation: since Nov 24 only those whose
+ * page shows, `{ id, name, slug, business_card }`, the card as anyone may see it.
+ * This allowlists what the UI shows, so nothing else can reach a component prop.
  */
 interface RawTopicProfessional {
   id: number;
   name?: string;
   user_name?: string;
+  slug?: string | null;
   business_card?: {
     name?: string;
     business_name?: string;
     professional_title?: string;
     profile_image?: string;
-    specialties?: string;
+    specialties?: string | string[];
     locations?: TopicExpertLocation[];
     business_card_link?: string;
     business_card_qr?: string;
@@ -67,6 +73,7 @@ function toSafeTopicExpert(raw: RawTopicProfessional): TopicExpert {
   const card = raw.business_card;
   return {
     id: raw.id,
+    slug: raw.slug ?? null,
     name: card?.name || raw.name || raw.user_name || "Glamlink Professional",
     business_name: card?.business_name,
     professional_title: card?.professional_title,
@@ -104,6 +111,14 @@ export interface TopicParagraph {
   } | null;
 }
 
+/** An entry of the podcast's schedule tied to a topic. */
+export interface TopicPodcastGuest {
+  id: number;
+  name: string;
+  short_description: string;
+  schedule_date?: string;
+}
+
 export interface Topic {
   id: number;
   name: string;
@@ -113,13 +128,19 @@ export interface Topic {
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;
-  // Only populated when fetched via getTopicById (topic detail), not the list endpoint.
+  // Only populated when fetched via getTopic (topic detail), not the list endpoint.
+  // Since Nov 24 the API answers published, visible content only (its handoff note, section 10.19).
   journals?: TopicJournal[];
   // Raw rows from the API — see toSafeTopicExpert for why these must never
   // be used directly; always go through getTopicExperts() instead.
   professionals?: RawTopicProfessional[];
+  /** Products, in the topic's order: JournalShopCard's rows. */
   shops?: unknown[];
-  podcasts?: unknown[];
+  podcasts?: TopicPodcastGuest[];
+  /** Since Nov 24: brands whose page shows, as GET /profiles lists them. */
+  brands?: ProfileCard[];
+  /** Since Nov 24: published videos, newest first (podcast episodes are the `beauty-vault-podcast` series). */
+  videos?: VideoCard[];
 }
 
 /* --------------------------------
@@ -169,45 +190,27 @@ export function getTopicSummary(topic: Pick<Topic, "name" | "description">): str
 -------------------------------- */
 
 export const getTopicsList = cache(async (): Promise<Topic[]> => {
-  try {
-    const res = await getAllTopics();
-    const rows: Topic[] = Array.isArray(res?.data) ? res.data : [];
-    return rows.filter((topic) => topic?.is_active !== false);
-  } catch (error) {
-    console.error("Failed to load topics:", error);
-    return [];
-  }
+  const rows = (await getTopics()) as Topic[];
+  return rows.filter((topic) => topic?.is_active !== false);
 });
 
 /**
  * Resolves a route param (numeric id or slug) to the full topic detail,
- * including its real `journals` / `professionals` / `shops` / `podcasts`
- * relations — those are only present on the single-topic endpoint, not
- * the list endpoint, so this always fetches the detail once an id is known.
+ * including what it gathers (articles, videos, professionals, brands,
+ * products, podcast guests): only the single-topic endpoint has those. The API
+ * takes a slug since Nov 24; an older one only an id, so a slug it misses is
+ * looked up in the list.
  */
 export const resolveTopic = cache(
   async (idParam: string): Promise<Topic | null> => {
-    let topicId: number | null = /^\d+$/.test(idParam) ? Number(idParam) : null;
+    const direct = await getTopic<Topic>(idParam);
+    if (direct?.id) return direct;
+    if (/^\d+$/.test(idParam)) return null;
 
-    if (topicId == null) {
-      const topics = await getTopicsList();
-      const found = topics.find(
-        (topic) => topic.slug === idParam || String(topic.id) === idParam
-      );
-      if (!found) return null;
-      topicId = found.id;
-    }
-
-    try {
-      const res = await getTopicById(topicId);
-      if (res?.data?.id) return res.data as Topic;
-    } catch (error) {
-      console.error("Failed to load topic detail:", error);
-    }
-
+    const found = (await getTopicsList()).find((topic) => topic.slug === idParam);
+    if (!found) return null;
     // Detail call failed for some reason — fall back to the lightweight list entry.
-    const topics = await getTopicsList();
-    return topics.find((topic) => topic.id === topicId) ?? null;
+    return (await getTopic<Topic>(found.id)) ?? found;
   }
 );
 
@@ -241,28 +244,31 @@ export async function getEnrichedJournals(topic: Topic): Promise<TopicJournal[]>
   });
 }
 
-/** The topic's own `professionals` relation is the source of truth for Expert Insights — mapped through toSafeTopicExpert so raw account fields (password hash, Stripe ids, tokens, ...) never leave this function. */
+/** The topic's own `professionals` relation, in the topic's order — mapped through toSafeTopicExpert so no other card field reaches a component. */
 export function getTopicExperts(topic: Topic): TopicExpert[] {
   if (!Array.isArray(topic.professionals)) return [];
-  return topic.professionals.slice(0, 6).map(toSafeTopicExpert);
+  return topic.professionals.map(toSafeTopicExpert);
 }
+
+/** The topic's brands (an older API sends none). */
+export const getTopicBrands = (topic: Topic): ProfileCard[] => (Array.isArray(topic.brands) ? topic.brands : []);
+
+/** The topic's videos, the podcast's episodes among them (an older API sends none). */
+export const getTopicVideos = (topic: Topic): VideoCard[] => (Array.isArray(topic.videos) ? topic.videos : []);
+
+/** The topic's products, in its order. */
+export const getTopicProducts = (topic: Topic): unknown[] => (Array.isArray(topic.shops) ? topic.shops : []);
+
+/** The podcast schedule's entries tied to the topic. */
+export const getTopicPodcastGuests = (topic: Topic): TopicPodcastGuest[] =>
+  Array.isArray(topic.podcasts) ? topic.podcasts : [];
 
 /** Author-written paragraphs for a topic, from `GET journal/topic/:id/paragraphs`. */
 export const getTopicParagraphsList = cache(
   async (topicId: number): Promise<TopicParagraph[]> => {
-    try {
-      const res = await getTopicParagraphs(topicId);
-      const rows: TopicParagraph[] = Array.isArray(res?.data)
-        ? res.data
-        : Array.isArray(res?.data?.rows)
-          ? res.data.rows
-          : [];
-
-      return rows.filter((p) => !!getParagraphText(p));
-    } catch (error) {
-      console.error("Failed to load topic paragraphs:", error);
-      return [];
-    }
+    const data = await getTopicParagraphRows<TopicParagraph[] | { rows?: TopicParagraph[] }>(topicId);
+    const rows: TopicParagraph[] = Array.isArray(data) ? data : Array.isArray(data?.rows) ? data.rows : [];
+    return rows.filter((p) => !!getParagraphText(p));
   }
 );
 

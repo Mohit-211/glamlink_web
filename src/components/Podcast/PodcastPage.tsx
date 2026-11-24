@@ -246,11 +246,10 @@ function StatsBar({ episodeCount }: { episodeCount: number }) {
     { value: `${episodeCount}+`, label: "Episodes" },
     { value: "Weekly", label: "New Drops" },
     { value: "3", label: "Platforms" },
-    { value: "Top 10%", label: "Beauty Pods" },
   ];
   return (
     <div className="rounded-2xl bg-primary p-5 shadow-primary">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         {stats.map(({ value, label }) => (
           <div key={label} className="text-center">
             <p className="text-xl font-semibold leading-none text-primary-foreground">{value}</p>

@@ -1,5 +1,6 @@
 import { SITE_URL } from "@/lib/config";
 import { Metadata } from "next";
+import { Fragment } from "react";
 import Script from "next/script";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,7 +13,8 @@ import {
   ShoppingBag,
   Quote,
   Sparkles,
-  Layers,
+  PlayCircle,
+  Store,
   type LucideIcon,
 } from "lucide-react";
 
@@ -20,6 +22,10 @@ import {
   resolveTopic,
   getEnrichedJournals,
   getTopicExperts,
+  getTopicBrands,
+  getTopicVideos,
+  getTopicProducts,
+  getTopicPodcastGuests,
   getTopicParagraphsList,
   getParagraphText,
   getParagraphJournalHref,
@@ -27,20 +33,13 @@ import {
   getTopicImageUrl,
   getTopicSummary,
 } from "@/lib/topics";
-import {
-  FALLBACK_JOURNAL_ARTICLES,
-  FALLBACK_PRODUCTS,
-  FALLBACK_PODCAST_GUESTS,
-  FALLBACK_PROFESSIONALS,
-  FALLBACK_TREATMENT_OPTIONS,
-  FallbackProduct,
-  FallbackPodcastGuest,
-} from "@/app/access/[slug]/topicFallbackContent";
 import BlogCard from "@/components/blogs/BlogCard";
 import ArticleContent from "@/components/blogs/ArticleContent";
 import JournalShopCard from "@/components/blogs/JournalShopCard";
 import ExpertCard from "@/components/topics/ExpertCard";
 import PodcastGuestCard from "@/components/topics/PodcastGuestCard";
+import ProfileTile from "@/components/content/ProfileTile";
+import VideoTile from "@/components/content/VideoTile";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -50,7 +49,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-// Revalidate periodically rather than refetching on every request.
+// Revalidate periodically rather than refetching on every request (the API's
+// `topics` refresh comes sooner when an admin changes what a topic gathers).
 export const revalidate = 3600;
 
 /* --------------------------------
@@ -165,30 +165,17 @@ export default async function TopicDetailPage({
     notFound();
   }
 
-  const [realJournals, paragraphs] = await Promise.all([
+  // Only what the topic itself gathers: admins fill topics by hand or with the
+  // AI (Nov 24), and a section with nothing in it isn't shown.
+  const [journals, paragraphs] = await Promise.all([
     getEnrichedJournals(topic),
     getTopicParagraphsList(topic.id),
   ]);
-  console.log(topic,"topic")
-  const realExperts = getTopicExperts(topic);
-console.log(realExperts,"realExperts")
-  // Each section prefers the topic's own real relation and only falls back
-  // to a fixed set of genuine Glamlink content when that relation is empty
-  // (the Topics feature is new, so most topics aren't curated yet).
-  const journals = realJournals.length > 0 ? realJournals : FALLBACK_JOURNAL_ARTICLES;
-  const usingFallbackJournals = realJournals.length === 0;
-
-  const experts = realExperts.length > 0 ? realExperts : FALLBACK_PROFESSIONALS;
-
-  const shopProducts: FallbackProduct[] =
-    Array.isArray(topic.shops) && topic.shops.length > 0
-      ? (topic.shops as FallbackProduct[])
-      : FALLBACK_PRODUCTS;
-
-  const podcastGuests: FallbackPodcastGuest[] =
-    Array.isArray(topic.podcasts) && topic.podcasts.length > 0
-      ? (topic.podcasts as FallbackPodcastGuest[])
-      : FALLBACK_PODCAST_GUESTS;
+  const videos = getTopicVideos(topic);
+  const experts = getTopicExperts(topic);
+  const brands = getTopicBrands(topic);
+  const products = getTopicProducts(topic);
+  const podcastGuests = getTopicPodcastGuests(topic);
 
   const topicUrl = `${SITE_URL}/topics/${topic.slug || topic.id}`;
 
@@ -207,6 +194,207 @@ console.log(realExperts,"realExperts")
         month: "long",
       })
     : null;
+
+  // What the page gathers, for the overview's counts (each only when there is some).
+  const counts = [
+    { count: journals.length, one: "article", many: "articles" },
+    { count: videos.length, one: "video", many: "videos" },
+    { count: experts.length, one: "professional", many: "professionals" },
+    { count: brands.length, one: "brand", many: "brands" },
+    { count: products.length, one: "product", many: "products" },
+  ].filter(({ count }) => count > 0);
+
+  // The sections after the overview, in order; their backgrounds alternate.
+  const sections = [
+    journals.length > 0 && {
+      key: "journal",
+      body: (
+        <>
+          <SectionHeader
+            icon={BookOpen}
+            eyebrow="Journal"
+            title={`Explore ${topic.name} Content`}
+            action={{ label: "Browse the Journal", href: "/journal" }}
+          />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {journals.slice(0, 6).map((article) => {
+              const slug =
+                article.slug ||
+                slugify(article.title || "", { lower: true, strict: true });
+              const formattedDate = article.publish_date
+                ? new Date(article.publish_date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "";
+              return (
+                <Link
+                  key={article.id}
+                  href={`/journal/${article.id}/${slug}`}
+                  className="block h-full"
+                >
+                  <BlogCard
+                    image={article.cover_image}
+                    category={article.journal_category?.title}
+                    title={article.title}
+                    excerpt={article.short_description}
+                    author={article.journal_author?.name}
+                    authorImage={article.journal_author?.profile_image}
+                    date={formattedDate}
+                  />
+                </Link>
+              );
+            })}
+          </div>
+        </>
+      ),
+    },
+    videos.length > 0 && {
+      key: "videos",
+      body: (
+        <>
+          <SectionHeader
+            icon={PlayCircle}
+            eyebrow="Watch"
+            title={`${topic.name} Videos & Episodes`}
+            action={{ label: "See all videos", href: "/watch" }}
+          />
+          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {videos.slice(0, 6).map((video) => (
+              <li key={video.id}>
+                <VideoTile video={video} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
+              </li>
+            ))}
+          </ul>
+        </>
+      ),
+    },
+    podcastGuests.length > 0 && {
+      key: "guests",
+      body: (
+        <>
+          <SectionHeader
+            icon={Sparkles}
+            eyebrow="Hear From Experts"
+            title="Expert Insights"
+            action={{ label: "See all episodes", href: "/podcast" }}
+          />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {podcastGuests.slice(0, 4).map((guest, index) => (
+              <PodcastGuestCard
+                key={guest.id}
+                name={guest.name}
+                role={guest.short_description}
+                date={guest.schedule_date}
+                index={index}
+              />
+            ))}
+          </div>
+        </>
+      ),
+    },
+    experts.length > 0 && {
+      key: "professionals",
+      body: (
+        <>
+          <SectionHeader
+            icon={Users}
+            eyebrow="Professionals"
+            title="Find an Expert"
+            action={{ label: "View all professionals", href: "/professionals" }}
+          />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {experts.slice(0, 9).map((expert) => (
+              <ExpertCard key={expert.id} expert={expert} />
+            ))}
+          </div>
+        </>
+      ),
+    },
+    brands.length > 0 && {
+      key: "brands",
+      body: (
+        <>
+          <SectionHeader
+            icon={Store}
+            eyebrow="Brands"
+            title={`${topic.name} Brands`}
+            action={{ label: "See all brands", href: "/brands" }}
+          />
+          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {brands.slice(0, 8).map((brand) => (
+              <li key={brand.id}>
+                <ProfileTile profile={brand} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />
+              </li>
+            ))}
+          </ul>
+        </>
+      ),
+    },
+    products.length > 0 && {
+      key: "shop",
+      body: (
+        <>
+          <SectionHeader
+            icon={ShoppingBag}
+            eyebrow="Shop"
+            title={`Shop ${topic.name}-Recommended Products`}
+            action={{ label: "Shop the Journal", href: "/shop" }}
+          />
+          <JournalShopCard shop={products} heading="no" />
+        </>
+      ),
+    },
+    paragraphs.length > 0 && {
+      key: "paragraphs",
+      body: (
+        <>
+          <SectionHeader
+            icon={Quote}
+            eyebrow="From Our Authors"
+            title="Author Insights"
+          />
+          <div className="max-w-[720px] space-y-5">
+            {paragraphs.map((paragraph) => {
+              const text = getParagraphText(paragraph);
+              const href = getParagraphJournalHref(paragraph);
+              const textEl = (
+                <>
+                  <Quote className="h-4 w-4 text-primary/40 mb-3" />
+                  <p
+                    className="rich-text text-base leading-relaxed text-muted-foreground font-normal"
+                    dangerouslySetInnerHTML={{ __html: text }}
+                  />
+                </>
+              );
+              return (
+                <div
+                  key={paragraph.id}
+                  className="group rounded-2xl border border-border bg-card p-6 shadow-soft hover:border-secondary/40 hover:shadow-medium transition-all duration-300"
+                >
+                  {href ? (
+                    <Link href={href} className="block hover:text-secondary transition-colors">
+                      {textEl}
+                      <span className="flex items-center gap-1 text-xs font-medium text-primary mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        Read the full article
+                        <ArrowRight className="h-3 w-3" />
+                      </span>
+                    </Link>
+                  ) : (
+                    textEl
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      ),
+    },
+  ].filter((section): section is { key: string; body: React.ReactElement } => Boolean(section));
+  // The overview is tinted and the sections alternate after it: the closing call
+  // to action needs room above it when the band before it is tinted.
+  const endsTinted = sections.length % 2 === 0;
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -249,7 +437,7 @@ console.log(realExperts,"realExperts")
             </BreadcrumbList>
           </Breadcrumb>
 
-          {/* ── HERO ── */}
+          {/* ── HERO: the name and image; the description is the overview's alone ── */}
           <section className="grid md:grid-cols-2 gap-10 md:gap-14 items-center">
             <div>
               <div className="inline-flex items-center gap-2 eyebrow text-secondary mb-5 bg-primary/8 px-3.5 py-1.5 rounded-full">
@@ -259,9 +447,6 @@ console.log(realExperts,"realExperts")
               <h1 className="text-[clamp(32px,5vw,48px)] leading-tight tracking-tight text-foreground">
                 {topic.name}
               </h1>
-              <p className="mt-5 text-base leading-relaxed text-muted-foreground font-normal max-w-md">
-                {getTopicSummary(topic)}
-              </p>
 
               {relatedCategories.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 mt-6">
@@ -304,208 +489,40 @@ console.log(realExperts,"realExperts")
             ) : (
               <p className="text-base leading-relaxed text-muted-foreground font-normal">
                 {topic.name} is one of the beauty and wellness topics Glamlink
-                tracks across our journal and professional network. Explore
-                the articles and specialists below to learn more, or search
-                our directory to find someone who can help in person.
+                follows across its journal, videos and professional network.
               </p>
             )}
 
-            <div className="mt-7 flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground">
-                <span className="text-base text-foreground">
-                  {journals.length}
-                </span>
-                related {journals.length === 1 ? "article" : "articles"}
-              </div>
-              <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground">
-                <span className="text-base text-foreground">
-                  {experts.length}
-                </span>
-                {experts.length === 1 ? "professional" : "professionals"} found
-              </div>
-              {addedDate && (
-                <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground">
-                  Tracked since{" "}
-                  <span className="font-medium text-foreground">{addedDate}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </Band>
-
-        {/* ── EXPERT INSIGHTS (podcast guests, white band) ── */}
-        {podcastGuests.length > 0 && (
-          <Band>
-            <SectionHeader
-              icon={Sparkles}
-              eyebrow="Hear From Experts"
-              title="Expert Insights"
-              action={{ label: "See all episodes", href: "/podcast" }}
-            />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {podcastGuests.slice(0, 4).map((guest, index) => (
-                <PodcastGuestCard
-                  key={guest.id}
-                  name={guest.name}
-                  role={guest.short_description}
-                  date={guest.schedule_date}
-                  index={index}
-                />
-              ))}
-            </div>
-          </Band>
-        )}
-
-        {/* ── RELATED CONTENT (tinted band) ── */}
-        <Band tint>
-          <SectionHeader
-            icon={BookOpen}
-            eyebrow="Journal"
-            title={`Explore ${topic.name} Content`}
-            action={{ label: "Browse the Journal", href: "/journal" }}
-          />
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {journals.slice(0, 6).map((article) => {
-              const slug =
-                article.slug ||
-                slugify(article.title || "", { lower: true, strict: true });
-              const formattedDate = article.publish_date
-                ? new Date(article.publish_date).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })
-                : "";
-              return (
-                <Link
-                  key={article.id}
-                  href={`/journal/${article.id}/${slug}`}
-                  className="block h-full"
-                >
-                  <BlogCard
-                    image={article.cover_image}
-                    category={article.journal_category?.title}
-                    title={article.title}
-                    excerpt={article.short_description}
-                    author={article.journal_author?.name}
-                    authorImage={article.journal_author?.profile_image}
-                    date={formattedDate}
-                  />
-                </Link>
-              );
-            })}
-          </div>
-          {usingFallbackJournals && (
-            <p className="text-xs text-muted-foreground/80 mt-6">
-              We&apos;re still curating articles tagged specifically to{" "}
-              {topic.name} — here are some related reads in the meantime.
-            </p>
-          )}
-        </Band>
-
-        {/* ── EXPLORE TREATMENT OPTIONS (white band) ── */}
-        <Band>
-          <SectionHeader
-            icon={Layers}
-            eyebrow="Treatment Options"
-            title={`Explore ${topic.name} Treatment Options`}
-          />
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 sm:gap-5">
-            {FALLBACK_TREATMENT_OPTIONS.map((option) => (
-              <div key={option.id} className="flex flex-col items-center gap-2.5 text-center">
-                <div className="relative w-full aspect-square rounded-2xl overflow-hidden">
-                  <Image
-                    src={option.image}
-                    alt={option.label}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <span className="text-xs font-medium text-foreground/80 leading-snug">
-                  {option.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Band>
-
-        {/* ── FIND AN EXPERT (professionals, tinted band) ── */}
-        {experts.length > 0 && (
-          <Band tint>
-            <SectionHeader
-              icon={Users}
-              eyebrow="Professionals"
-              title="Find an Expert"
-              action={{ label: "View all professionals", href: "/journal/directory" }}
-            />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {experts.map((expert) => (
-                <ExpertCard key={expert.id} expert={expert} />
-              ))}
-            </div>
-          </Band>
-        )}
-
-        {/* ── SHOP RECOMMENDED PRODUCTS (white band) ── */}
-        {shopProducts.length > 0 && (
-          <Band>
-            <SectionHeader
-              icon={ShoppingBag}
-              eyebrow="Shop"
-              title={`Shop ${topic.name}-Recommended Products`}
-              action={{ label: "Shop the Journal", href: "/shop" }}
-            />
-            <JournalShopCard shop={shopProducts} heading="no" />
-          </Band>
-        )}
-
-        {/* ── AUTHOR INSIGHTS (paragraphs, tinted band) ── */}
-        {paragraphs.length > 0 && (
-          <Band tint>
-            <SectionHeader
-              icon={Quote}
-              eyebrow="From Our Authors"
-              title="Author Insights"
-            />
-            <div className="max-w-[720px] space-y-5">
-              {paragraphs.map((paragraph) => {
-                const text = getParagraphText(paragraph);
-                const href = getParagraphJournalHref(paragraph);
-                const textEl = (
-                  <>
-                    <Quote className="h-4 w-4 text-primary/40 mb-3" />
-                    <p
-                      className="rich-text text-base leading-relaxed text-muted-foreground font-normal"
-                      dangerouslySetInnerHTML={{ __html: text }}
-                    />
-                  </>
-                );
-                return (
+            {(counts.length > 0 || addedDate) && (
+              <div className="mt-7 flex flex-wrap gap-3">
+                {counts.map(({ count, one, many }) => (
                   <div
-                    key={paragraph.id}
-                    className="group rounded-2xl border border-border bg-card p-6 shadow-soft hover:border-secondary/40 hover:shadow-medium transition-all duration-300"
+                    key={many}
+                    className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground"
                   >
-                    {href ? (
-                      <Link href={href} className="block hover:text-secondary transition-colors">
-                        {textEl}
-                        <span className="flex items-center gap-1 text-xs font-medium text-primary mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          Read the full article
-                          <ArrowRight className="h-3 w-3" />
-                        </span>
-                      </Link>
-                    ) : (
-                      textEl
-                    )}
+                    <span className="text-base text-foreground">{count}</span>
+                    {count === 1 ? one : many}
                   </div>
-                );
-              })}
-            </div>
-          </Band>
-        )}
+                ))}
+                {addedDate && (
+                  <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground">
+                    Tracked since{" "}
+                    <span className="font-medium text-foreground">{addedDate}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </Band>
+
+        {sections.map((section, index) => (
+          <Fragment key={section.key}>
+            <Band tint={index % 2 === 1}>{section.body}</Band>
+          </Fragment>
+        ))}
 
         {/* ── CTA ── */}
-        <div className="max-w-[1100px] mx-auto px-5 sm:px-6 pb-20">
+        <div className={`max-w-[1100px] mx-auto px-5 sm:px-6 pb-20 ${endsTinted ? "pt-14 md:pt-16" : ""}`}>
           <section
             className="relative overflow-hidden rounded-3xl bg-accent px-6 py-12 md:px-14 md:py-16 text-center"
           >
@@ -526,7 +543,7 @@ console.log(realExperts,"realExperts")
                 Explore Topics
               </Link>
               <Link
-                href="/journal/directory"
+                href="/professionals"
                 className="btn-outline"
               >
                 Discover Professionals

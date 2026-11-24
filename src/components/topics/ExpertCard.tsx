@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { MapPin, ArrowUpRight } from "lucide-react";
 import { TopicExpert } from "@/lib/topics";
+import { profileHref } from "@/lib/routes";
 
 interface ExpertCardProps {
   expert: TopicExpert;
 }
 
-const parseSpecialties = (raw?: string): string[] => {
+const parseSpecialties = (raw?: string | string[]): string[] => {
   if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
   try {
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -17,6 +19,8 @@ const parseSpecialties = (raw?: string): string[] => {
 };
 
 const ExpertCard = ({ expert }: ExpertCardProps) => {
+  // Their page on Glamlink (since Nov 24); before, their Access card.
+  const href = expert.slug ? profileHref(expert.slug) : expert.business_card_link;
   const specialties = parseSpecialties(expert.specialties).slice(0, 3);
   const location = expert.locations?.[0];
   const locationLine =
@@ -90,7 +94,7 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
         ) : (
           <span />
         )}
-        {expert.business_card_link && (
+        {href && (
           <span className="flex items-center gap-1 text-xs font-medium text-primary group-hover:text-secondary group-hover:gap-1.5 transition-all duration-200">
             View profile
             <ArrowUpRight className="h-3 w-3" />
@@ -100,15 +104,15 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
     </div>
   );
 
-  if (!expert.business_card_link) {
+  if (!href) {
     return content;
   }
 
-  const isExternal = expert.business_card_link.startsWith("http");
+  const isExternal = href.startsWith("http");
 
   return isExternal ? (
     <a
-      href={expert.business_card_link}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       className="block h-full"
@@ -116,7 +120,7 @@ const ExpertCard = ({ expert }: ExpertCardProps) => {
       {content}
     </a>
   ) : (
-    <Link href={expert.business_card_link} className="block h-full">
+    <Link href={href} className="block h-full">
       {content}
     </Link>
   );

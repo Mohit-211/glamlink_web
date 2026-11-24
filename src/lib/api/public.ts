@@ -159,6 +159,17 @@ export const getFeaturedTopics = () =>
 /** Every active topic. */
 export const getTopics = () => getList<Topic>("journal/topic", { tags: ["topics"] });
 
+/** What a topic page shows: the topic and the articles, videos, professionals, brands and products it gathers. */
+const TOPIC_TAGS: CacheTag[] = ["topics", "journal", "videos", "profiles", "cards", "shop", "podcasts"];
+
+/** A topic with what it gathers, by id or (since Nov 24) slug: the backend's handoff note, section 10.19. */
+export const getTopic = <T>(idOrSlug: string | number) =>
+  getData<T>(`journal/topic/${encodeURIComponent(String(idOrSlug))}`, { tags: TOPIC_TAGS });
+
+/** The paragraphs authors tagged to a topic, from published articles. */
+export const getTopicParagraphRows = <T>(topicId: number) =>
+  getData<T>(`journal/topic/${topicId}/paragraphs`, { tags: ["topics", "journal"] });
+
 /* ── Journal ─────────────────────────────────────────────── */
 
 export interface ArticleQuery extends PageQuery {
